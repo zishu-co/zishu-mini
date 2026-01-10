@@ -1,0 +1,51 @@
+/* pages/test.wxss */
+page {
+    background-color: rgb(242, 242, 242);
+    font-size:  35rpx;
+}
+.ptitle{
+    margin-top:30rpx;
+    font-size: 50rpx;
+    font-weight:700;
+    text-align: center;
+}
+
+.quizblock {
+    margin:20rpx;
+    border-radius: 10rpx;
+    background-color: white;
+}
+.itemblock {
+    padding-bottom:20rpx;
+    padding-top:20rpx;
+    border-bottom: 5rpx solid rgb(242, 242, 242);
+}
+.title{
+    font-size: 40rpx;
+    font-weight:500;
+    color:blueviolet;
+    padding-left:10rpx;
+}
+.checkitem{
+    margin:10rpx;
+}
+.checkresult{
+    color:green;
+    text-align: center;
+}
+.slotinput{
+    border:5rpx solid rgb(242, 242, 242);
+    margin: 10rpx 0;
+    border-radius: 10rpx;
+    padding:10rpx;
+}
+.submit{
+    margin-bottom:100rpx;
+}
+.result{
+    text-align: center;
+}
+.bottomblock{
+    height:100rpx;
+}
+    

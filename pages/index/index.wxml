@@ -1,0 +1,13 @@
+<!--index.wxml-->
+<image class="logoimg" src="../../img/logo.png"></image>
+<view class="container">
+  <view class="papercard" wx:for="{{paperdata}}" wx:key="paperid">
+    <navigator open-type="navigate" url="/pages/test/test?pid={{item.paperid}}">
+    <view class="papertitle">{{item.papertitle}}</view>
+    <view>
+      <text>题数：{{item.num}}</text>
+      <text style="margin-left:100rpx;">作者：{{item.author}}</text>
+    </view>
+    </navigator>
+  </view>
+</view>

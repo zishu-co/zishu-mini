@@ -1,0 +1,48 @@
+<!--pages/test.wxml-->
+<view class="ptitle">{{papertitle}}</view>
+<view class="quizblock" wx:for="{{checkData}}" wx:key="quesid">
+  <checkbox-group wx:if="{{item.ques_type=='选择题'}}" id="{{index}}-cb" class="itemblock" bindchange="checkClick">
+      <view class="title">{{index+1}}. {{item.ques_title}}</view>
+      <view class="checkitem"><checkbox value='A'>{{item.item_a}}</checkbox></view>
+      <view class="checkitem"><checkbox value='B'>{{item.item_b}}</checkbox></view>
+      <view wx:if="{{item.item_c.length>1}}" class="checkitem"><checkbox value='C'>{{item.item_c}}</checkbox></view>
+      <view wx:if="{{item.item_d.length>1}}" class="checkitem"><checkbox value='D'>{{item.item_d}}</checkbox></view>
+      <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
+      <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
+      <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
+  </checkbox-group>
+
+  <radio-group wx:if="{{item.ques_type=='判断题'}}" class="itemblock" id="{{index}}-r" bindchange="checkRadio">
+    <view class="title">{{index+1}}. {{item.ques_title}}</view>
+    <view class="checkitem">
+    <label><radio value="正确" />正确</label>
+    <label style="margin-left:50rpx;"><radio value="错误" />错误</label>
+    </view>
+    <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
+    <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
+    <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
+  </radio-group>
+
+  <view wx:if="{{item.ques_type=='填空题'}}" class="itemblock">
+    <view class="title">{{index+1}}. {{item.ques_title}}</view>
+    <view class="checkitem" wx:if="{{item.item_a}}">
+        A:<input id="{{index}}-A" bindinput="checkSlot" class="slotinput" />
+    </view>
+    <view class="checkitem" wx:if="{{item.item_b}}">
+        B:<input id="{{index}}-B" bindinput="checkSlot" class="slotinput" />
+    </view>
+    <view class="checkitem" wx:if="{{item.item_c}}">
+        C:<input id="{{index}}-C" bindinput="checkSlot" class="slotinput" />
+    </view>
+    <view class="checkitem" wx:if="{{item.item_d}}">
+        D:<input id="{{index}}-D" bindinput="checkSlot" class="slotinput" />
+    </view>
+    <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
+    <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
+    <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
+  </view>
+</view>
+<button type="primary" hidden="{{showrst}}" class="submit" bindtap="onSubmit">提交</button>
+<view hidden="{{!showrst}}" class="result">{{papertitle}}</view>
+<view hidden="{{!showrst}}" class="result">您的总分是{{perform}}分</view>
+<view class="bottomblock"></view>
