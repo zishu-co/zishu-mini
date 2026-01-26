@@ -10,7 +10,6 @@
     "navigationBarTitleText": "学本领 上自塾",
     "navigationBarTextStyle":"black"
   },
-  "style": "v2",
   "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"
 }
