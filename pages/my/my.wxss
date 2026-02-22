@@ -1,0 +1,74 @@
+
+/* pages/my/my.wxss */
+.container {
+  padding: 0;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: #1296db;
+  padding: 40rpx 30rpx;
+  color: #fff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.5);
+}
+
+.user-detail {
+  margin-left: 30rpx;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.phone {
+  font-size: 28rpx;
+  opacity: 0.8;
+}
+
+.menu-list {
+  background-color: #fff;
+  margin-top: 20rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  width: 50rpx;
+  text-align: center;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.menu-arrow {
+  color: #ccc;
+  font-size: 32rpx;
+}

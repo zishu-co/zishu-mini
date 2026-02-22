@@ -1,9 +1,43 @@
 {
   "pages":[
     "pages/index/index",
+    "pages/inno/index",
     "pages/test/test",
+    "pages/event/index",
+    "pages/usercenter/index",
+    "pages/my/my",
+    "pages/login/login",
     "pages/logs/logs"
   ],
+  "tabBar": {
+    "custom": true,
+    "color": "#666666",
+    "selectedColor": "#aa00ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "学习"
+      },
+      {
+        "pagePath": "pages/inno/index",
+        "text": "创新"
+      },
+      {
+        "pagePath": "pages/usercenter/index",
+        "text": "目标"
+      },
+      {
+        "pagePath": "pages/event/index",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "text": "我的"
+      }
+    ]
+  },
   "window":{
     "backgroundTextStyle":"light",
     "navigationBarBackgroundColor": "#c6f",
