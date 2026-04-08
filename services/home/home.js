@@ -1,6 +1,6 @@
 import { config, cdnBase } from '../../config/index';
 
-/** 获取首页数据 */
+/** 获取创新数据 */
 function mockFetchHome() {
   const { delay } = require('../_utils/delay');
   const { genSwiperImageList } = require('../../model/swiper');
@@ -9,31 +9,31 @@ function mockFetchHome() {
       swiper: genSwiperImageList(),
       tabList: [
         {
-          text: '精选推荐',
+          text: '前端',
           key: 0,
         },
         {
-          text: '夏日防晒',
+          text: '后端',
           key: 1,
         },
         {
-          text: '二胎大作战',
+          text: '文档',
           key: 2,
         },
         {
-          text: '人气榜',
+          text: '教程',
           key: 3,
         },
         {
-          text: '好评榜',
+          text: '指南',
           key: 4,
         },
         {
-          text: 'RTX 30',
+          text: '课程',
           key: 5,
         },
         {
-          text: '手机也疯狂',
+          text: '文件',
           key: 6,
         },
       ],

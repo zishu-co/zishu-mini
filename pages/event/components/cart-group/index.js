@@ -2,6 +2,13 @@ import Toast from 'tdesign-miniprogram/toast/index';
 
 const shortageImg = 'https://tdesign.gtimg.com/miniprogram/template/retail/cart/shortage.png';
 
+// 格式化价格（分转元）
+function formatPrice(price) {
+  if (!price) return '0.00';
+  const num = parseFloat(price);
+  return (num / 100).toFixed(2);
+}
+
 Component({
   isSpecsTap: false, // 标记本次点击事件是否因为点击specs触发（由于底层goods-card组件没有catch specs点击事件，只能在此处加状态来避免点击specs时触发跳转商品详情）
   externalClasses: ['wr-class'],
@@ -13,10 +20,12 @@ Component({
           for (const activity of store.promotionGoodsList) {
             for (const goods of activity.goodsPromotionList) {
               goods.specs = goods.specInfo.map((item) => item.specValue); // 目前仅展示商品已选规格的值
+              goods.price = formatPrice(goods.price); // 格式化价格（分转元）
             }
           }
           for (const goods of store.shortageGoodsList) {
             goods.specs = goods.specInfo.map((item) => item.specValue); // 目前仅展示商品已选规格的值
+            goods.price = formatPrice(goods.price); // 格式化价格（分转元）
           }
         }
 

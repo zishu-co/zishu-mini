@@ -1,6 +1,6 @@
 <t-user-center-card
   userInfo="{{userInfo}}"
-  isPhoneHide="{{true}}"
+  isPhoneHide="{{false}}"
   name-class="custom-name-class"
   phone-class="custom-phone-class"
   avatar-class="customer-avatar-class"
