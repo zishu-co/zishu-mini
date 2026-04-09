@@ -1,12 +1,13 @@
 <view class="cart-group">
-  <view class="goods-wrap" wx:for="{{_storeGoods}}" wx:for-item="store" wx:for-index="si" wx:key="storeId">
-    <block wx:for="{{store.promotionGoodsList}}" wx:for-item="promotion" wx:for-index="promoindex" wx:key="promoindex">
+  <view class="goods-wrap" wx:for="{{_storeGoods}}" wx:for-item="store" wx:key="storeId">
+    <block wx:for="{{store.promotionGoodsList}}" wx:for-item="promotion" wx:key="promoindex">
       <view
         class="goods-item"
         wx:for="{{promotion.goodsPromotionList}}"
         wx:for-item="goods"
-        wx:for-index="gi"
-        wx:key="extKey"
+        wx:key="index"
+        data-goods="{{goods}}"
+        bindtap="deleteGoods"
       >
         <view class="goods-simple-card">
           <image
@@ -29,8 +30,9 @@
         class="goods-item"
         wx:for="{{store.shortageGoodsList}}"
         wx:for-item="goods"
-        wx:for-index="gi"
-        wx:key="extKey"
+        wx:key="shortage"
+        data-goods="{{goods}}"
+        bindtap="deleteGoods"
       >
         <view class="goods-simple-card">
           <image

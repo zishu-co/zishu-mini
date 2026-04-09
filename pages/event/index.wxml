@@ -3,16 +3,8 @@
   <cart-group
     store-goods="{{ cartGroupData.storeGoods }}"
     invalid-good-items="{{ cartGroupData.invalidGoodItems }}"
-    bindselectgoods="onGoodsSelect"
-    bindselectstore="onStoreSelect"
-    bindchangequantity="onQuantityChange"
-    bindgocollect="goCollect"
-    bindgoodsclick="goGoodsDetail"
-    bindclearinvalidgoods="clearInvalidGoods"
     binddelete="onGoodsDelete"
   />
 
   <view class="gap" />
-
 </block>
-
