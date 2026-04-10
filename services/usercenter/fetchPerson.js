@@ -1,28 +1,23 @@
-import { config } from '../../config/index';
+import { delay } from '../_utils/delay';
 
-/** 获取个人中心信息 */
-function mockFetchPerson() {
-  const { delay } = require('../_utils/delay');
-  const { genSimpleUserInfo } = require('../../model/usercenter');
-  const { genAddress } = require('../../model/address');
-  const address = genAddress();
-  return delay().then(() => ({
-    ...genSimpleUserInfo(),
+/** 生成个人中心信息 */
+function genPersonData() {
+  return {
+    avatarUrl:
+      'https://we-retail-static-1300977798.cos.ap-guangzhou.myqcloud.com/retail-ui/components-exp/avatar/avatar-1.jpg',
+    nickName: 'TDesign 🌟',
+    phoneNumber: '13438358888',
+    gender: 2,
     address: {
-      provinceName: address.provinceName,
-      provinceCode: address.provinceCode,
-      cityName: address.cityName,
-      cityCode: address.cityCode,
+      provinceName: '广东省',
+      provinceCode: '440000',
+      cityName: '深圳市',
+      cityCode: '440300',
     },
-  }));
+  };
 }
 
 /** 获取个人中心信息 */
 export function fetchPerson() {
-  if (config.useMock) {
-    return mockFetchPerson();
-  }
-  return new Promise((resolve) => {
-    resolve('real api');
-  });
+  return delay().then(() => genPersonData());
 }

@@ -122,7 +122,6 @@ Page({
   },
 
   navToSearchPage() {
-    wx.navigateTo({ url: '/pages/goods/search/index' });
   },
 
   navToActivityDetail({ detail }) {

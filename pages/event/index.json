@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "购物车",
+  "navigationBarTitleText": "活动",
   "usingComponents": {
     "cart-group": "./components/cart-group/index",
     "t-toast": "tdesign-miniprogram/toast/toast",
