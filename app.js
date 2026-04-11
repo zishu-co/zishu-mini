@@ -108,7 +108,8 @@ App({
     hasUserInfo: false,
     phoneNumber: null,
     hasPhoneNumber: false,
-    token: null,
+    accessToken: null,
+    refreshToken: null,
     openid: null,
     sessionkey: null,
     code: null

@@ -1,10 +1,15 @@
-
 <!--pages/login/login.wxml-->
 <view class="container">
+  <!-- 装饰背景圆 -->
+  <view class="decor-circle decor-circle-1"></view>
+  <view class="decor-circle decor-circle-2"></view>
+  <view class="decor-circle decor-circle-3"></view>
+
   <view class="header">
-    <image class="logo" src="/img/v2.jpg" mode="aspectFill"></image>
-    <!-- <view class="title">欢迎回来</view>
-    <view class="subtitle">授权登录后体验更多精彩功能</view> -->
+    <view class="welcome-text">
+      <view class="welcome-title">欢迎登录</view>
+      <view class="welcome-subtitle">授权登录后体验更多精彩功能</view>
+    </view>
   </view>
 
   <view class="auth-section">
@@ -13,12 +18,13 @@
       <view class="auth-title">头像授权</view>
       <view class="auth-content" wx:if="{{avatarUrl}}">
         <view class="user-info">
-            <image class="avatar" src="{{avatarUrl}}"></image>
+          <image class="avatar" src="{{avatarUrl}}"></image>
+          <view class="nickname">已获取头像</view>
         </view>
-        <view class="auth-status success">已完成授权</view>
+        <view class="auth-status success">已完成</view>
       </view>
       <view class="auth-content" wx:else>
-        <view class="auth-desc">用于身份识别</view>
+        <view class="auth-desc">用于展示您的个人形象</view>
         <button class="pop_avatar" wx:if="{{!avatarUrl}}" open-type="chooseAvatar" bindchooseavatar="getAvatar">获取头像</button>
         <view class="auth-status">待授权</view>
       </view>
@@ -31,10 +37,10 @@
         <view class="user-info">
           <view class="nickname">{{nickName}}</view>
         </view>
-        <view class="auth-status success">已完成授权</view>
+        <view class="auth-status success">已完成</view>
       </view>
       <view class="auth-content" wx:else>
-        <view class="auth-desc">用于身份识别</view>
+        <view class="auth-desc">用于识别您的身份</view>
         <input wx:if="{{!nickName}}" type="nickname" class="ipu" placeholder="点击获取昵称" bindblur="getName" />
         <view class="auth-status">待授权</view>
       </view>
@@ -44,12 +50,14 @@
     <view class="auth-item">
       <view class="auth-title">手机号授权</view>
       <view class="auth-content" wx:if="{{hasPhoneNumber}}">
-        <view class="phone-info">{{phoneNumber}}</view>
-        <view class="auth-status success">已完成授权</view>
+        <view class="user-info">
+          <view class="phone-info">{{phoneNumber}}</view>
+        </view>
+        <view class="auth-status success">已完成</view>
       </view>
       <view class="auth-content" wx:else>
-        <view class="auth-desc">用于身份识别</view>
-        <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">立即授权</button>
+        <view class="auth-desc">用于接收订单通知</view>
+        <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">一键授权</button>
         <view class="auth-status">待授权</view>
       </view>
     </view>
@@ -57,6 +65,9 @@
 
   <view class="footer">
     <button class="complete-btn" bindtap="completeLogin">完成授权并进入</button>
-    <view class="privacy-policy">点击上方按钮，即表示您已阅读并同意<text class="link">《用户协议》</text>和<text class="link">《隐私政策》</text></view>
+    <view class="privacy-policy">
+      点击上方按钮，即表示您已阅读并同意
+      <text class="link">《用户协议》</text>和<text class="link">《隐私政策》</text>
+    </view>
   </view>
 </view>

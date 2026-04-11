@@ -1,58 +1,180 @@
+import Toast from 'tdesign-miniprogram/toast/index';
 
-// pages/my/my.js
-const app = getApp()
+const app = getApp();
+
 Page({
   data: {
-    // 页面的初始数据
-    userInfo: null,
-    hasUserInfo: false,
-    phoneNumber: '',
-    hasPhoneNumber: false
+    userInfo: {
+      avatarUrl: '',
+      nickName: '未登录',
+      phoneNumber: '',
+    },
+    currAuthStep: 1,
+    showMakePhone: false,
+    customerServiceInfo: {
+      servicePhone: '4006336868',
+      serviceTimeDuration: '每周三至周五 9:00-12:00  13:00-15:00',
+    },
+    showKefu: true,
+    versionNo: '',
   },
-  onLoad: function (options) {
-    // 页面加载时执行，一个页面只会调用一次
-    
-    // 检查登录状态
-    this.checkLoginStatus()
+
+  onLoad() {
+    this.getVersionInfo();
   },
-  
-  // 检查登录状态
-  checkLoginStatus() {
-    const app = getApp()
-    // 如果没有用户信息或手机号，跳转到登录页
-    if (!app.globalData.hasUserInfo || !app.globalData.hasPhoneNumber) {
-      wx.navigateTo({
-        url: '/pages/login/login',
-      })
-    } else {
-      // 已登录，更新页面显示的用户信息
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true,
-        phoneNumber: app.globalData.phoneNumber,
-        hasPhoneNumber: true
-      })
-    }
-  },
+
   onShow() {
     this.getTabBar().init();
+    this.init();
   },
-  
-  logOut(){
-    wx.setStorageSync('phoneNumber', null)
-    wx.setStorageSync('userInfo', null)
-    wx.setStorageSync('logs', null)
-    app.globalData.userInfo = null
-    app.globalData.hasUserInfo = false
-    app.globalData.phoneNumber = null
-    app.globalData.hasPhoneNumber = false
+
+  init() {
+    // 从本地存储读取真实的用户信息
+    const localUserInfo = wx.getStorageSync('userInfo') || {};
+    const localPhoneNumber = wx.getStorageSync('phoneNumber') || '';
+
+    const userInfo = {
+      avatarUrl: localUserInfo.avatarUrl || '',
+      nickName: localUserInfo.nickName || '未登录',
+      phoneNumber: localPhoneNumber,
+    };
+
+    // 判断登录状态
+    const isLoggedIn = localUserInfo && localUserInfo.nickName && localPhoneNumber;
+
     this.setData({
-        userInfo: null,
-        hasUserInfo: false,
-        phoneNumber: null,
-        hasPhoneNumber: false
-      })
-    let phoneNumber = wx.getStorageSync('phoneNumber')
-    console.log(phoneNumber)
-},
-})
+      userInfo,
+      currAuthStep: isLoggedIn ? 2 : 1,
+    });
+  },
+
+  onClickCell({ currentTarget }) {
+    const { type } = currentTarget.dataset;
+
+    switch (type) {
+      case 'address': {
+        wx.navigateTo({ url: '/pages/user/address/list/index' });
+        break;
+      }
+      case 'service': {
+        this.openMakePhone();
+        break;
+      }
+      case 'help-center': {
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: '你点击了帮助中心',
+          icon: '',
+          duration: 1000,
+        });
+        break;
+      }
+      case 'point': {
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: '你点击了积分菜单',
+          icon: '',
+          duration: 1000,
+        });
+        break;
+      }
+      case 'coupon': {
+        wx.navigateTo({ url: '/pages/coupon/coupon-list/index' });
+        break;
+      }
+      default: {
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: '未知跳转',
+          icon: '',
+          duration: 1000,
+        });
+        break;
+      }
+    }
+  },
+
+  jumpNav(e) {
+    let status;
+    if (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.status !== undefined) {
+      // 来自自定义菜单的点击
+      status = parseInt(e.currentTarget.dataset.status);
+    } else if (e.detail && e.detail.tabType !== undefined) {
+      // 来自组件的事件
+      status = e.detail.tabType;
+    } else {
+      return;
+    }
+
+    if (status === 0) {
+      wx.navigateTo({ url: '/pages/order/after-service-list/index' });
+    } else {
+      wx.navigateTo({ url: `/pages/order/order-list/index?status=${status}` });
+    }
+  },
+
+  jumpAllOrder() {
+    wx.navigateTo({ url: '/pages/order/order-list/index' });
+  },
+
+  openMakePhone() {
+    this.setData({ showMakePhone: true });
+  },
+
+  closeMakePhone() {
+    this.setData({ showMakePhone: false });
+  },
+
+  call() {
+    wx.makePhoneCall({
+      phoneNumber: this.data.customerServiceInfo.servicePhone,
+    });
+  },
+
+  gotoUserEditPage() {
+    // 已登录，跳转到编辑页面
+    if (this.data.currAuthStep === 2) {
+      wx.navigateTo({ url: '/pages/user/person-info/index' });
+    } else {
+      // 未登录，跳转到登录页
+      wx.navigateTo({ url: '/pages/login/login' });
+    }
+  },
+
+  getVersionInfo() {
+    const versionInfo = wx.getAccountInfoSync();
+    const { version, envVersion = __wxConfig } = versionInfo.miniProgram;
+    this.setData({
+      versionNo: envVersion === 'release' ? version : envVersion,
+    });
+  },
+
+  logOut() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 清除登录信息
+          wx.clearStorageSync();
+          this.setData({
+            userInfo: {
+              avatarUrl: '',
+              nickName: '未登录',
+              phoneNumber: '',
+            },
+            currAuthStep: 1,
+          });
+          Toast({
+            context: this,
+            selector: '#t-toast',
+            message: '已退出登录',
+          });
+        }
+      },
+    });
+  },
+});

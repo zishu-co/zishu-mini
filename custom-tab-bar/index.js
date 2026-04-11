@@ -16,6 +16,9 @@ Component({
     },
 
     init() {
+      // 默认显示"目标"模块（索引2）
+      const defaultActive = 2;
+      
       const page = getCurrentPages().pop();
       const route = page ? page.route.split('?')[0] : '';
       const active = this.data.list.findIndex(
@@ -23,7 +26,8 @@ Component({
           (item.url.startsWith('/') ? item.url.substr(1) : item.url) ===
           `${route}`,
       );
-      this.setData({ active });
+      // 只有当页面匹配到 tabBar 中的项目时才切换，否则默认显示"目标"
+      this.setData({ active: active !== -1 ? active : defaultActive });
     },
   },
 });

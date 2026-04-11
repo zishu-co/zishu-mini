@@ -1,5 +1,6 @@
-
 {
   "usingComponents": {},
-  "navigationBarTitleText": "登录授权"
+  "navigationBarTitleText": "登录授权",
+  "navigationBarBackgroundColor": "#f5f3ff",
+  "navigationBarTextStyle": "black"
 }

@@ -109,13 +109,14 @@ Page({
         },
         success: function (res) {
           console.log(res.data)
-          app.globalData.phoneNumber = res.data.rtoken
-          app.globalData.token = res.data.atoken
+          app.globalData.phoneNumber = res.data.phone
+          app.globalData.accessToken = res.data.atoken
+          app.globalData.refreshToken = res.data.rtoken
           app.globalData.hasPhoneNumber = true
-          app.savePhoneNumber(res.data.rtoken)
+          app.savePhoneNumber(res.data.phone)
           // 更新页面数据
             that.setData({
-                phoneNumber: res.data.rtoken,
+                phoneNumber: res.data.phone,
                 hasPhoneNumber: true
             })
 
@@ -125,15 +126,6 @@ Page({
         }
       })
       
-      // 模拟获取手机号成功
-      //const simulatedPhoneNumber = '138****1234' // 实际应用中应该是从后端解密获取
-      
-      // 更新全局数据
-      //app.globalData.phoneNumber = simulatedPhoneNumber
-      //app.globalData.hasPhoneNumber = true
-      
-      // 保存到本地存储
-      //app.savePhoneNumber(simulatedPhoneNumber)
       
       
       
@@ -160,7 +152,8 @@ Page({
       app.globalData.hasPhoneNumber = true
       app.globalData.userInfo = {avatarUrl:this.data.avatarUrl, nickName: this.data.nickName}
       wx.setStorageSync('userInfo', app.globalData.userInfo)
-      wx.setStorageSync('zishu_token', app.globalData.token)
+      wx.setStorageSync('accessToken', app.globalData.accessToken)
+      wx.setStorageSync('refreshToken', app.globalData.refreshToken)
       
       // 跳转到首页
       wx.switchTab({

@@ -1,54 +1,151 @@
-
 /* pages/my/my.wxss */
 .container {
-  padding: 0;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  background-color: #f2f5f6;
 }
 
-.header {
-  background-color: #1296db;
-  padding: 40rpx 30rpx;
-  color: #fff;
+/* 用户卡片 */
+.user-card {
+  position: relative;
+  height: 300rpx;
+  overflow: hidden;
 }
 
-.user-info {
+.user-card__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://tdesign.gtimg.com/miniprogram/template/retail/template/user-center-bg-v1.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.user-card__content {
+  position: relative;
+  z-index: 1;
+  padding: 50rpx 32rpx 0;
   display: flex;
   align-items: center;
 }
 
-.avatar {
-  width: 120rpx;
-  height: 120rpx;
+.user-card__avatar {
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  border: 6rpx solid rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
 }
 
-.user-detail {
-  margin-left: 30rpx;
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.user-card__info {
+  flex: 1;
+  margin-left: 24rpx;
+  color: #fff;
 }
 
 .nickname {
   font-size: 36rpx;
   font-weight: bold;
-  margin-bottom: 10rpx;
+  line-height: 1.3;
+  color: #fff;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
 }
 
 .phone {
-  font-size: 28rpx;
-  opacity: 0.8;
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 8rpx;
 }
 
-.menu-list {
+.user-card__arrow {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-icon {
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 内容区域 */
+.content-wrapper {
+  padding: 24rpx;
+  margin-top: -80rpx;
+  position: relative;
+  z-index: 2;
+}
+
+/* 订单区域 */
+.order-section {
   background-color: #fff;
-  margin-top: 20rpx;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.section-more {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.order-icons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.order-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.order-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.order-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 菜单区域 */
+.menu-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 30rpx;
-  border-bottom: 1rpx solid #eee;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .menu-item:last-child {
@@ -58,17 +155,79 @@
 .menu-icon {
   font-size: 40rpx;
   margin-right: 20rpx;
-  width: 50rpx;
-  text-align: center;
 }
 
 .menu-text {
   flex: 1;
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #333;
 }
 
 .menu-arrow {
+  font-size: 28rpx;
   color: #ccc;
+}
+
+/* 退出登录 */
+.logout-wrapper {
+  margin-top: 48rpx;
+  padding: 0 32rpx;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
   font-size: 32rpx;
+  color: #fa4126;
+  text-align: center;
+  border: none;
+}
+
+.logout-btn::after {
+  border: none;
+}
+
+/* 底部版本号 */
+.footer__version {
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+  padding: 24rpx 0 120rpx;
+}
+
+/* 客服弹窗 */
+.popup-content {
+  background-color: #fff;
+  border-radius: 16rpx 16rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.popup-title {
+  padding: 32rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.popup-phone {
+  padding: 32rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: #333;
+  border-bottom: 1rpx solid #eee;
+}
+
+.popup-close {
+  padding: 32rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: #666;
+  background-color: #fff;
+}
+
+.border-bottom-1px {
+  border-bottom: 1rpx solid #eee;
 }

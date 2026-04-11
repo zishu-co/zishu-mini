@@ -1,4 +1,10 @@
 /**app.wxss**/
+/* TDesign 主题色覆盖 */
+page {
+  --td-tab-bar-active-color: #a0f;
+  --td-tab-bar-color: #666666;
+}
+
 .container {
   height: 100%;
   display: flex;
@@ -7,4 +13,4 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}

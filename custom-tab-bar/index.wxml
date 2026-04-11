@@ -10,9 +10,10 @@
 	 wx:key="index"
 	>
 		<view class="custom-tab-bar-wrapper">
-			<t-icon name="{{item.icon}}" size="48rpx" />
-			<view class="text">{{ item.text }}</view>
+			<t-icon name="{{item.icon}}" size="48rpx" color="{{active === index ? '#a0f' : '#666'}}" />
+			<view class="text" style="{{active === index ? 'color: #a0f;' : 'color: #666;'}}">{{ item.text }}</view>
 		</view>
 	</t-tab-bar-item>
 </t-tab-bar>
+
 

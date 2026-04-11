@@ -1,10 +1,10 @@
 {
   "pages":[
+    "pages/usercenter/index",
     "pages/index/index",
     "pages/inno/index",
     "pages/test/test",
     "pages/event/index",
-    "pages/usercenter/index",
     "pages/my/my",
     "pages/login/login",
     "pages/logs/logs"
