@@ -1,15 +1,15 @@
 // pages/event/index.ts
 import Toast from 'tdesign-miniprogram/toast/index';
 import Dialog from 'tdesign-miniprogram/dialog/index';
-import { fetchCartGroupData, CartResponse } from '../../services/cart/cart';
+import { fetchEventGroupData, EventResponse } from '../../services/event/event';
 
 interface IEventData {
-  cartGroupData: CartResponse['data'] | null;
+  eventGroupData: EventResponse['data'] | null;
 }
 
 Page<IData, IEventData>({
   data: {
-    cartGroupData: null,
+    eventGroupData: null,
   },
 
   onShow() {
@@ -21,17 +21,17 @@ Page<IData, IEventData>({
   },
 
   refreshData() {
-    this.getCartGroupData().then((res) => {
-      this.setData({ cartGroupData: res.data });
+    this.getEventGroupData().then((res) => {
+      this.setData({ eventGroupData: res.data });
     });
   },
 
-  getCartGroupData() {
-    const { cartGroupData } = this.data;
-    if (!cartGroupData) {
-      return fetchCartGroupData();
+  getEventGroupData() {
+    const { eventGroupData } = this.data;
+    if (!eventGroupData) {
+      return fetchEventGroupData();
     }
-    return Promise.resolve({ data: cartGroupData });
+    return Promise.resolve({ data: eventGroupData });
   },
 
   onGoodsSelect(e: any) {
@@ -85,5 +85,5 @@ Page<IData, IEventData>({
 });
 
 interface IData {
-  cartGroupData: CartResponse['data'] | null;
+  eventGroupData: EventResponse['data'] | null;
 }

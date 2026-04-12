@@ -1,8 +1,8 @@
-<!-- 分层购物车 -->
-<block wx:if="{{cartGroupData.isNotEmpty}}">
-  <cart-group
-    store-goods="{{ cartGroupData.storeGoods }}"
-    invalid-good-items="{{ cartGroupData.invalidGoodItems }}"
+<!-- 分层活动 -->
+<block wx:if="{{eventGroupData.isNotEmpty}}">
+  <event-group
+    store-goods="{{ eventGroupData.storeGoods }}"
+    invalid-good-items="{{ eventGroupData.invalidGoodItems }}"
     binddelete="onGoodsDelete"
   />
 

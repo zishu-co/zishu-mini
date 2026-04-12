@@ -17,18 +17,18 @@ interface StoreGoods {
   shortageGoodsList: any[];
 }
 
-interface CartData {
+interface EventData {
   isNotEmpty: boolean;
   storeGoods: StoreGoods[];
   invalidGoodItems: any[];
 }
 
-interface CartResponse {
-  data: CartData;
+interface EventResponse {
+  data: EventData;
 }
 
-/** 生成购物车数据 */
-function genCartGroupData(): CartResponse {
+/** 生成活动数据 */
+function genEventGroupData(): EventResponse {
   return {
     data: {
       isNotEmpty: true,
@@ -84,7 +84,7 @@ function genCartGroupData(): CartResponse {
   };
 }
 
-/** 获取购物车数据 */
-export function fetchCartGroupData(): Promise<CartResponse> {
-  return delay().then(() => genCartGroupData());
+/** 获取活动数据 */
+export function fetchEventGroupData(): Promise<EventResponse> {
+  return delay().then(() => genEventGroupData());
 }

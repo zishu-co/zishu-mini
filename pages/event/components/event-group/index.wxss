@@ -1,41 +1,41 @@
-.cart-group {
+.event-group {
   border-radius: 8rpx;
 }
 
-.cart-group .goods-wrap {
+.event-group .goods-wrap {
   margin-top: 20rpx;
   background-color: #fff;
   border-radius: 8rpx;
   overflow: hidden;
 }
 
-.cart-group .goods-wrap:first-of-type {
+.event-group .goods-wrap:first-of-type {
   margin-top: 0;
 }
 
-.cart-group .goods-item {
+.event-group .goods-item {
   padding: 24rpx;
   border-bottom: 1rpx solid #f5f5f5;
 }
 
-.cart-group .goods-item:last-child {
+.event-group .goods-item:last-child {
   border-bottom: none;
 }
 
-.cart-group .goods-simple-card {
+.event-group .goods-simple-card {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
 }
 
-.cart-group .goods-thumb {
+.event-group .goods-thumb {
   width: 180rpx;
   height: 180rpx;
   border-radius: 8rpx;
   flex-shrink: 0;
 }
 
-.cart-group .goods-info {
+.event-group .goods-info {
   flex: 1;
   margin-left: 24rpx;
   display: flex;
@@ -43,7 +43,7 @@
   justify-content: flex-start;
 }
 
-.cart-group .goods-title {
+.event-group .goods-title {
   font-size: 28rpx;
   color: #333333;
   line-height: 1.5;
@@ -55,12 +55,12 @@
   margin-bottom: 16rpx;
 }
 
-.cart-group .goods-price {
+.event-group .goods-price {
   font-size: 32rpx;
   color: #fa4126;
   font-weight: 600;
 }
 
-.cart-group .goods-price .price-symbol {
+.event-group .goods-price .price-symbol {
   font-size: 24rpx;
 }

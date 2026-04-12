@@ -1,5 +1,5 @@
 // pages/inno/index.ts
-import { fetchHome, HomeData } from '../../services/home/home';
+import { fetchInno, InnoData } from '../../services/inno/inno';
 import { fetchGoodsList, Goods } from '../../services/good/fetchGoods';
 
 // Toast 使用 require 方式导入
@@ -57,17 +57,17 @@ Page<IData, IData>({
 
   init() {
     console.log('初始化页面')
-    this.loadHomePage();
+    this.loadInnoPage();
   },
 
-  loadHomePage() {
+  loadInnoPage() {
     wx.stopPullDownRefresh();
 
     this.setData({
       pageLoading: true,
     });
 
-    fetchHome().then((res: HomeData) => {
+    fetchInno().then((res: InnoData) => {
       this.setData({
         tabList: res.tabList,
         imgSrcs: res.swiper,

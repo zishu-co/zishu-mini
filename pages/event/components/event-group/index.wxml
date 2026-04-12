@@ -1,4 +1,4 @@
-<view class="cart-group">
+<view class="event-group">
   <view class="goods-wrap" wx:for="{{_storeGoods}}" wx:for-item="store" wx:key="storeId">
     <block wx:for="{{store.promotionGoodsList}}" wx:for-item="promotion" wx:key="promoindex">
       <view

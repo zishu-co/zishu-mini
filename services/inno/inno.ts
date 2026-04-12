@@ -14,14 +14,14 @@ interface TabItem {
   key: number;
 }
 
-export interface HomeData {
+export interface InnoData {
   swiper: string[];
   tabList: TabItem[];
   activityImg: string;
 }
 
 /** 获取创新数据 */
-function mockFetchHome(): Promise<HomeData> {
+function mockFetchInno(): Promise<InnoData> {
   return delay().then(() => {
     return {
       swiper: images,
@@ -39,7 +39,7 @@ function mockFetchHome(): Promise<HomeData> {
   });
 }
 
-/** 获取首页数据 */
-export function fetchHome(): Promise<HomeData> {
-  return mockFetchHome();
+/** 获取创新数据 */
+export function fetchInno(): Promise<InnoData> {
+  return mockFetchInno();
 }

@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "活动",
   "usingComponents": {
-    "cart-group": "./components/cart-group/index",
+    "event-group": "./components/event-group/index",
     "t-toast": "tdesign-miniprogram/toast/toast",
     "t-dialog": "tdesign-miniprogram/dialog/dialog"
   }
