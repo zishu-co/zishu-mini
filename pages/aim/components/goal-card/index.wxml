@@ -1,0 +1,78 @@
+<view class="goal-card">
+  <!-- 卡片头部 -->
+  <view class="card-header">
+    <view class="card-title">
+      <t-icon name="flag" size="40rpx" />
+      <text>当前目标</text>
+    </view>
+    <view class="card-actions">
+      <t-icon 
+        name="edit-1" 
+        size="36rpx" 
+        class="edit-icon"
+        bind:tap="onEdit"
+      />
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <t-loading indicator theme="circular" size="40rpx" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!goal}}" class="empty-container">
+    <t-icon name="flag" size="80rpx" class="empty-icon" />
+    <text class="empty-text">暂无目标</text>
+    <text class="empty-subtext">点击右上角按钮设置你的目标</text>
+    <t-button size="small" theme="primary" bind:tap="onCreate">创建目标</t-button>
+  </view>
+
+  <!-- 目标内容 -->
+  <view wx:else class="goal-content">
+    <!-- 目标文本 -->
+    <view class="goal-text">{{goal.content}}</view>
+
+    <!-- 时间阶段 -->
+    <view class="goal-phase">
+      <t-icon name="calendar" size="28rpx" />
+      <text class="phase-text">
+        {{formatDate(goal.start_time)}} 至 {{formatDate(goal.deadline)}}
+      </text>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-section">
+      <view class="progress-header">
+        <text class="progress-label">目标进度</text>
+        <text class="progress-value">{{goal.process}}%</text>
+      </view>
+      <t-progress 
+        percentage="{{goal.process}}" 
+        color="#0052D9"
+        track-color="#E5E5E5"
+        stroke-width="12rpx"
+      />
+    </view>
+
+    <!-- 进度更新按钮 -->
+    <view class="progress-actions">
+      <t-button 
+        size="small" 
+        theme="outline" 
+        variant="base"
+        bind:tap="onUpdateProgress"
+      >更新进度</t-button>
+    </view>
+
+    <!-- 复盘/回顾 -->
+    <view wx:if="{{goal.review}}" class="review-section">
+      <view class="review-header">
+        <t-icon name="edit" size="28rpx" />
+        <text class="review-title">回顾与复盘</text>
+      </view>
+      <view class="review-content">{{goal.review}}</view>
+    </view>
+  </view>
+</view>

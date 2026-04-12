@@ -2,12 +2,8 @@
   "navigationBarTitleText": "目标",
   "navigationStyle": "custom",
   "usingComponents": {
-    "t-popup": "tdesign-miniprogram/popup/popup",
-    "t-icon": "tdesign-miniprogram/icon/icon",
-    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
-    "t-cell": "tdesign-miniprogram/cell/cell",
-    "t-user-center-card": "./components/user-center-card/index",
-    "t-order-group": "./components/order-group/index"
+    "top3-recommendation": "./components/top3-recommendation/index",
+    "goal-card": "./components/goal-card/index"
   },
   "enablePullDownRefresh": true
 }

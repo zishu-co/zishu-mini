@@ -1,0 +1,114 @@
+<wxml>
+<view class="recommendation-card">
+  <!-- 卡片头部 -->
+  <view class="card-header">
+    <view class="card-title">
+      <t-icon name="aim" size="40rpx" />
+      <text>今日最值得做</text>
+    </view>
+    <view class="card-actions">
+      <t-icon 
+        name="info-circle" 
+        size="36rpx" 
+        class="info-icon"
+        bind:tap="showAlgorithmInfo"
+      />
+      <t-icon 
+        name="refresh" 
+        size="36rpx" 
+        class="refresh-icon {{refreshing ? 'refreshing' : ''}}"
+        bind:tap="onRefresh"
+      />
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <t-loading indicator theme="circular" size="40rpx" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{recommendations.length === 0}}" class="empty-container">
+    <t-icon name="check-circle" size="80rpx" class="empty-icon" />
+    <text class="empty-text">暂无待办任务</text>
+    <text class="empty-subtext">休息一下，明天继续加油</text>
+  </view>
+
+  <!-- 推荐列表 -->
+  <view wx:else class="recommendation-list">
+    <view 
+      wx:for="{{recommendations}}"
+      wx:key="id"
+      class="recommendation-item"
+      bindtap="onItemTap"
+      data-item="{{item}}"
+    >
+      <!-- 推荐序号 -->
+      <view class="item-index">
+        <text class="index-number">{{index + 1}}</text>
+        <t-icon 
+          name="{{getTypeIcon(item.type)}}" 
+          size="32rpx" 
+          class="type-icon {{getTypeIconClass(item.type)}}"
+        />
+      </view>
+
+      <!-- 推荐内容 -->
+      <view class="item-content">
+        <view class="item-header">
+          <text class="item-title">{{item.title}}</text>
+          <view class="urgency-tag urgency-{{item.urgency_level}}">
+            {{getUrgencyText(item.urgency_level)}}
+          </view>
+        </view>
+
+        <text class="item-description">{{item.description}}</text>
+
+        <view class="item-meta">
+          <view class="meta-item">
+            <t-icon name="time" size="24rpx" />
+            <text>{{item.estimated_time}}</text>
+          </view>
+          <view wx:if="{{item.deadline}}" class="meta-item">
+            <t-icon name="calendar" size="24rpx" />
+            <text>{{formatDeadline(item.deadline)}}</text>
+          </view>
+          <view class="meta-item score">
+            <t-icon name="chart" size="24rpx" />
+            <text>{{item.score}}分</text>
+          </view>
+        </view>
+
+        <!-- 推荐理由标签 -->
+        <view wx:if="{{item.reasons.length > 0}}" class="item-reasons">
+          <text 
+            wx:for="{{item.reasons}}"
+            wx:for-item="reason"
+            wx:for-index="reasonIndex"
+            wx:key="reasonIndex"
+            class="reason-tag"
+            wx:if="{{reasonIndex < 2}}"
+          >{{reason}}</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="item-actions">
+        <t-button 
+          size="small" 
+          theme="primary" 
+          variant="base"
+          catchtap="onActionTap"
+          data-item="{{item}}"
+        >{{item.action_text}}</t-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 更新时间 -->
+  <view wx:if="{{lastUpdated && !loading}}" class="update-info">
+    <text>更新于 {{lastUpdated}}</text>
+  </view>
+</view>
+</wxml>

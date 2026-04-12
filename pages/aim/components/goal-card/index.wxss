@@ -1,0 +1,161 @@
+.goal-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.edit-icon {
+  color: #0052D9;
+  padding: 8rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  gap: 16rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #909399;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  gap: 12rpx;
+}
+
+.empty-icon {
+  color: #909399;
+  margin-bottom: 8rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.empty-subtext {
+  font-size: 26rpx;
+  color: #909399;
+  margin-bottom: 16rpx;
+}
+
+/* 目标内容 */
+.goal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.goal-text {
+  font-size: 32rpx;
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: #f8f9fa;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+/* 时间阶段 */
+.goal-phase {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.phase-text {
+  color: #909399;
+}
+
+/* 进度条 */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-label {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.progress-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #0052D9;
+}
+
+/* 进度更新按钮 */
+.progress-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 复盘/回顾 */
+.review-section {
+  background: #f8f9fa;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-top: 8rpx;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+  color: #666;
+}
+
+.review-title {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.review-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,247 @@
+.recommendation-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.info-icon,
+.refresh-icon {
+  color: #909399;
+  padding: 8rpx;
+}
+
+.refresh-icon.refreshing {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  gap: 16rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #909399;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.empty-icon {
+  color: #67C23A;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.empty-subtext {
+  font-size: 26rpx;
+  color: #909399;
+}
+
+/* 推荐列表 */
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.recommendation-item {
+  display: flex;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  position: relative;
+}
+
+/* 推荐序号 */
+.item-index {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  min-width: 56rpx;
+}
+
+.index-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  background: #0052D9;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.type-icon {
+  font-size: 28rpx;
+}
+
+.course-icon { color: #67C23A; }
+.task-icon { color: #E6A23C; }
+.goal-icon { color: #0052D9; }
+.report-icon { color: #F56C6C; }
+.profile-icon { color: #909399; }
+.default-icon { color: #333; }
+
+/* 推荐内容 */
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8rpx;
+}
+
+.item-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* 紧急度标签 */
+.urgency-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+
+.urgency-critical {
+  background: #F56C6C;
+  color: #fff;
+}
+
+.urgency-high {
+  background: #E6A23C;
+  color: #fff;
+}
+
+.urgency-medium {
+  background: #0052D9;
+  color: #fff;
+}
+
+.urgency-low {
+  background: #909399;
+  color: #fff;
+}
+
+.item-description {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* 元信息 */
+.item-meta {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 12rpx;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: #909399;
+}
+
+.meta-item.score {
+  color: #0052D9;
+  font-weight: 500;
+}
+
+/* 推荐理由标签 */
+.item-reasons {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.reason-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  background: #E8F4FF;
+  color: #0052D9;
+  border-radius: 6rpx;
+}
+
+/* 操作按钮 */
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 120rpx;
+}
+
+/* 更新时间 */
+.update-info {
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid #eee;
+  font-size: 24rpx;
+  color: #909399;
+  text-align: center;
+}
