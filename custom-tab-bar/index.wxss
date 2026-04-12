@@ -9,18 +9,4 @@
   color: #666;
 }
 
-/* 选中状态紫色 - 穿透组件样式 */
-:host {
-  --td-tab-bar-active-color: #a0f;
-}
 
-:host ::v-deep .t-tab-bar-item--selected .t-tab-bar-item__icon,
-:host ::v-deep .t-tab-bar-item--selected .t-tab-bar-item__text,
-:host ::v-deep .t-tab-bar-item--selected .t-icon,
-:host ::v-deep .t-tab-bar-item--selected .custom-tab-bar-wrapper .text {
-  color: #a0f !important;
-}
-
-:host ::v-deep .t-tab-bar__active-line {
-  background-color: #a0f !important;
-}

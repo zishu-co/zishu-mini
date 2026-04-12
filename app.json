@@ -1,6 +1,6 @@
 {
   "pages":[
-    "pages/usercenter/index",
+    "pages/aim/index",
     "pages/index/index",
     "pages/inno/index",
     "pages/test/test",
@@ -25,7 +25,7 @@
         "text": "创新"
       },
       {
-        "pagePath": "pages/usercenter/index",
+        "pagePath": "pages/aim/index",
         "text": "目标"
       },
       {

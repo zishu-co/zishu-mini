@@ -5,6 +5,18 @@ page {
   --td-tab-bar-color: #666666;
 }
 
+/* 自定义 tab-bar 选中态样式 - 穿透 TDesign 组件 */
+.t-tab-bar-item--selected .t-tab-bar-item__icon,
+.t-tab-bar-item--selected .t-tab-bar-item__text,
+.t-tab-bar-item--selected .t-icon,
+.t-tab-bar-item--selected .custom-tab-bar-wrapper .text {
+  color: #a0f !important;
+}
+
+.t-tab-bar__active-line {
+  background-color: #a0f !important;
+}
+
 .container {
   height: 100%;
   display: flex;
