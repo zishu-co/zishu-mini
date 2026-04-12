@@ -166,7 +166,7 @@ Page<IData, IData>({
 
       // 跳转到首页
       wx.switchTab({
-        url: '/pages/usercenter/index',
+        url: '/pages/aim/index',
       })
     } else {
       wx.showToast({

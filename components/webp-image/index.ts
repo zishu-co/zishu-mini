@@ -1,5 +1,3 @@
-const systemInfo = wx.getSystemInfoSync();
-
 Component({
   externalClasses: ['t-class', 't-class-load'],
   properties: {
@@ -35,10 +33,22 @@ Component({
   data: {
     thumbHeight: 375,
     thumbWidth: 375,
-    systemInfo,
+    systemInfo: {
+      screenWidth: 375,
+      pixelRatio: 2,
+    },
   },
   lifetimes: {
     ready() {
+      // 使用新的 API 获取屏幕信息
+      const info = wx.getWindowInfo();
+      this.setData({
+        systemInfo: {
+          screenWidth: info.screenWidth || 375,
+          pixelRatio: info.pixelRatio || 2,
+        },
+      });
+
       const { mode } = this.properties;
       this.getRect('.J-image').then((res: any) => {
         if (res) {
@@ -58,7 +68,7 @@ Component({
   },
   methods: {
     px2rpx(px: number) {
-      return (750 / (systemInfo.screenWidth || 375)) * px;
+      return (750 / (this.data.systemInfo.screenWidth || 375)) * px;
     },
     getRect(selector: string) {
       return new Promise((resolve) => {
