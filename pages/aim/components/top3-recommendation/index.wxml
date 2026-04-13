@@ -2,23 +2,9 @@
 <view class="recommendation-card">
   <!-- 卡片头部 -->
   <view class="card-header">
-    <view class="card-title">
-      <t-icon name="aim" size="40rpx" />
-      <text>今日最值得做</text>
-    </view>
-    <view class="card-actions">
-      <t-icon 
-        name="info-circle" 
-        size="36rpx" 
-        class="info-icon"
-        bind:tap="showAlgorithmInfo"
-      />
-      <t-icon 
-        name="refresh" 
-        size="36rpx" 
-        class="refresh-icon {{refreshing ? 'refreshing' : ''}}"
-        bind:tap="onRefresh"
-      />
+    <view class="card-title center">
+      <t-icon name="aim" size="40rpx" color="#a0f" />
+      <text style="color: #a0f;">今日最值得做</text>
     </view>
   </view>
 
@@ -46,11 +32,12 @@
     >
       <!-- 推荐序号 -->
       <view class="item-index">
-        <text class="index-number">{{index + 1}}</text>
+        <text class="index-number" style="background: #a0f; color: #fff;">{{index + 1}}</text>
         <t-icon 
           name="{{getTypeIcon(item.type)}}" 
           size="32rpx" 
           class="type-icon {{getTypeIconClass(item.type)}}"
+          color="#a0f"
         />
       </view>
 
@@ -99,6 +86,7 @@
           size="small" 
           theme="primary" 
           variant="base"
+          color="#fff"
           catchtap="onActionTap"
           data-item="{{item}}"
         >{{item.action_text}}</t-button>

@@ -13,3 +13,33 @@
 .section-goal {
   margin-bottom: 24rpx;
 }
+
+/* 覆盖 TDesign 按钮样式 - 简化版本 */
+.aim-page .t-button {
+  --td-button-primary-color: #a0f;
+  --td-button-primary-color-hover: #90e;
+  --td-button-primary-color-active: #80d;
+  --td-button-primary-text-color: #fff;
+  --td-button-primary-border-color: #a0f;
+}
+
+.aim-page .t-button--primary {
+  background-color: var(--td-button-primary-color) !important;
+  border-color: var(--td-button-primary-border-color) !important;
+  color: var(--td-button-primary-text-color) !important;
+}
+
+.aim-page .t-button--primary .t-button__text {
+  color: var(--td-button-primary-text-color) !important;
+}
+
+.aim-page .t-button--outline {
+  --td-button-default-border-color: #a0f;
+  --td-button-default-text-color: #a0f;
+  
+  border-color: var(--td-button-default-border-color) !important;
+}
+
+.aim-page .t-button--outline .t-button__text {
+  color: var(--td-button-default-text-color) !important;
+}

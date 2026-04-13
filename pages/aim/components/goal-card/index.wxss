@@ -29,7 +29,7 @@
 }
 
 .edit-icon {
-  color: #0052D9;
+  color: #a0f;
   padding: 8rpx;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .empty-icon {
-  color: #909399;
+  color: #a0f;
   margin-bottom: 8rpx;
 }
 
@@ -123,7 +123,7 @@
 .progress-value {
   font-size: 32rpx;
   font-weight: 600;
-  color: #0052D9;
+  color: #a0f;
 }
 
 /* 进度更新按钮 */

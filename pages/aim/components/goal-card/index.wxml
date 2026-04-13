@@ -2,8 +2,8 @@
   <!-- 卡片头部 -->
   <view class="card-header">
     <view class="card-title">
-      <t-icon name="flag" size="40rpx" />
-      <text>当前目标</text>
+      <t-icon name="flag" size="40rpx" color="#a0f" />
+      <text style="color: #a0f;">当前目标</text>
     </view>
     <view class="card-actions">
       <t-icon 
@@ -26,7 +26,7 @@
     <t-icon name="flag" size="80rpx" class="empty-icon" />
     <text class="empty-text">暂无目标</text>
     <text class="empty-subtext">点击右上角按钮设置你的目标</text>
-    <t-button size="small" theme="primary" bind:tap="onCreate">创建目标</t-button>
+    <t-button size="small" theme="primary" color="#fff" bind:tap="onCreate">创建目标</t-button>
   </view>
 
   <!-- 目标内容 -->
@@ -36,7 +36,7 @@
 
     <!-- 时间阶段 -->
     <view class="goal-phase">
-      <t-icon name="calendar" size="28rpx" />
+      <t-icon name="calendar" size="28rpx" color="#a0f" />
       <text class="phase-text">
         {{formatDate(goal.start_time)}} 至 {{formatDate(goal.deadline)}}
       </text>
@@ -50,7 +50,7 @@
       </view>
       <t-progress 
         percentage="{{goal.process}}" 
-        color="#0052D9"
+        color="#a0f"
         track-color="#E5E5E5"
         stroke-width="12rpx"
       />
@@ -69,7 +69,7 @@
     <!-- 复盘/回顾 -->
     <view wx:if="{{goal.review}}" class="review-section">
       <view class="review-header">
-        <t-icon name="edit" size="28rpx" />
+        <t-icon name="edit" size="28rpx" color="#a0f" />
         <text class="review-title">回顾与复盘</text>
       </view>
       <view class="review-content">{{goal.review}}</view>

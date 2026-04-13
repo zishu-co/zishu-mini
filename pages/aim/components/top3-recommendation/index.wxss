@@ -9,7 +9,7 @@
 /* 卡片头部 */
 .card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 24rpx;
 }
@@ -23,19 +23,9 @@
   color: #333;
 }
 
-.card-actions {
-  display: flex;
-  gap: 24rpx;
-}
-
-.info-icon,
-.refresh-icon {
-  color: #909399;
-  padding: 8rpx;
-}
-
-.refresh-icon.refreshing {
-  animation: rotate 1s linear infinite;
+.card-title.center {
+  justify-content: center;
+  width: 100%;
 }
 
 @keyframes rotate {
@@ -112,7 +102,7 @@
   justify-content: center;
   width: 40rpx;
   height: 40rpx;
-  background: #0052D9;
+  background: #a0f;
   color: #fff;
   border-radius: 50%;
   font-size: 24rpx;
@@ -123,12 +113,12 @@
   font-size: 28rpx;
 }
 
-.course-icon { color: #67C23A; }
-.task-icon { color: #E6A23C; }
-.goal-icon { color: #0052D9; }
-.report-icon { color: #F56C6C; }
-.profile-icon { color: #909399; }
-.default-icon { color: #333; }
+.course-icon { color: #a0f; }
+.task-icon { color: #a0f; }
+.goal-icon { color: #a0f; }
+.report-icon { color: #a0f; }
+.profile-icon { color: #a0f; }
+.default-icon { color: #a0f; }
 
 /* 推荐内容 */
 .item-content {
@@ -209,7 +199,7 @@
 }
 
 .meta-item.score {
-  color: #0052D9;
+  color: #a0f;
   font-weight: 500;
 }
 
@@ -223,8 +213,8 @@
 .reason-tag {
   font-size: 22rpx;
   padding: 4rpx 12rpx;
-  background: #E8F4FF;
-  color: #0052D9;
+  background: #f0e6ff;
+  color: #a0f;
   border-radius: 6rpx;
 }
 

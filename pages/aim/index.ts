@@ -119,6 +119,10 @@ Page<IData, IAimData>({
   },
 
   onShow() {
+    // 初始化 tabBar 高亮状态
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().init();
+    }
     this.init();
   },
 
