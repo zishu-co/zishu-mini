@@ -1,3 +1,5 @@
+<wxs src="./date.wxs" module="dateUtil" />
+
 <view class="goal-card">
   <!-- 卡片头部 -->
   <view class="card-header">
@@ -38,7 +40,7 @@
     <view class="goal-phase">
       <t-icon name="calendar" size="28rpx" color="#a0f" />
       <text class="phase-text">
-        {{formatDate(goal.start_time)}} 至 {{formatDate(goal.deadline)}}
+        {{dateUtil.formatDate(goal.start_time)}} 至 {{dateUtil.formatDate(goal.deadline)}}
       </text>
     </view>
 
@@ -46,13 +48,14 @@
     <view class="progress-section">
       <view class="progress-header">
         <text class="progress-label">目标进度</text>
-        <text class="progress-value">{{goal.process}}%</text>
+        <text class="progress-value">{{dateUtil.formatProgress(goal.process)}}%</text>
       </view>
       <t-progress 
-        percentage="{{goal.process}}" 
+        percentage="{{dateUtil.formatProgress(goal.process)}}" 
         color="#a0f"
         track-color="#E5E5E5"
         stroke-width="12rpx"
+        label="{{false}}"
       />
     </view>
 
@@ -60,8 +63,8 @@
     <view class="progress-actions">
       <t-button 
         size="small" 
-        theme="outline" 
-        variant="base"
+        theme="primary"
+        color="#a0f"
         bind:tap="onUpdateProgress"
       >更新进度</t-button>
     </view>

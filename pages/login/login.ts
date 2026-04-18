@@ -11,6 +11,7 @@ type IData = {
   hasPhoneNumber: boolean;
   avatarUrl: string | null;
   nickName: string | null;
+  userId: number | null;
 };
 
 Page<IData, IData>({
@@ -22,7 +23,8 @@ Page<IData, IData>({
     phoneNumber: '',
     hasPhoneNumber: false,
     avatarUrl: null,
-    nickName: null
+    nickName: null,
+    userId: null
   },
 
   onLoad() {
@@ -122,6 +124,7 @@ Page<IData, IData>({
         success: (res: any) => {
           console.log(res.data)
           app.globalData.phoneNumber = res.data.phone
+          app.globalData.userId = res.data.id
           app.globalData.accessToken = res.data.atoken
           app.globalData.refreshToken = res.data.rtoken
           app.globalData.hasPhoneNumber = true
@@ -129,7 +132,8 @@ Page<IData, IData>({
           // 更新页面数据
           that.setData({
             phoneNumber: res.data.phone,
-            hasPhoneNumber: true
+            hasPhoneNumber: true,
+            userId: res.data.id
           })
 
           if (1 == res.data.status) {
@@ -159,7 +163,7 @@ Page<IData, IData>({
       // 确保全局状态已更新
       app.globalData.hasUserInfo = true
       app.globalData.hasPhoneNumber = true
-      app.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName }
+      app.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName, userId: app.globalData.userId}
       wx.setStorageSync('userInfo', app.globalData.userInfo)
       wx.setStorageSync('accessToken', app.globalData.accessToken)
       wx.setStorageSync('refreshToken', app.globalData.refreshToken)

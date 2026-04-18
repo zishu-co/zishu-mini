@@ -93,13 +93,17 @@
 .goal-phase {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  font-size: 26rpx;
+  gap: 12rpx;
+  font-size: 32rpx;
   color: #666;
 }
 
+
+
 .phase-text {
-  color: #909399;
+  color: #666;
+  font-size: 32rpx;
+  line-height: 1;
 }
 
 /* 进度条 */

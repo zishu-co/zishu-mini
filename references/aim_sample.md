@@ -8,7 +8,9 @@
 ```
 
 后端python接口
+
 ```python
+# base_url : "http://127.0.0.1:8008/api/users/"
 @router.get("/fetch_goal/{user_id}")
 async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
     goalitem = db.query(Goals).filter_by(user_id=user_id, end_time=None).first()

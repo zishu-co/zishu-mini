@@ -175,8 +175,16 @@ Page<IData, IData>({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          // 清除登录信息
+          // 清除本地存储
           wx.clearStorageSync();
+          // 清除全局数据
+          const app = getApp<any>();
+          app.globalData.userInfo = null;
+          app.globalData.hasUserInfo = false;
+          app.globalData.phoneNumber = '';
+          app.globalData.hasPhoneNumber = false;
+          app.globalData.accessToken = '';
+          app.globalData.refreshToken = '';
           this.setData({
             userInfo: {
               avatarUrl: '',

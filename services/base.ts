@@ -1,9 +1,42 @@
 /**
  * 微信小程序请求基类 (TypeScript)
  * 实现双 Token 无感刷新机制
+ * 特性：
+ * 1. 根据环境自动切换 BASE_URL
+ * 2. 支持请求/响应拦截器
+ * 3. 统一的错误处理
+ * 4. RESTful 快捷方法 (get/post/put/delete)
+ * 5. 完善的 TypeScript 类型支持
  */
 
-// 获取存储的 token
+// ==================== 环境配置 ====================
+
+/**
+ * 根据小程序环境自动获取 API 基础地址
+ */
+const getBaseUrl = (): string => {
+  try {
+    const { envVersion } = wx.getAccountInfoSync().miniProgram;
+    switch (envVersion) {
+      case 'develop':
+        return 'http://127.0.0.1:8008';
+      case 'trial':
+        return 'https://staging-api.example.com';
+      case 'release':
+        return 'https://api.example.com';
+      default:
+        return 'http://127.0.0.1:8008';
+    }
+  } catch {
+    return 'http://127.0.0.1:8008';
+  }
+};
+
+const BASE_URL = getBaseUrl();
+const TIMEOUT = 80000;
+
+// ==================== Token 管理 ====================
+
 const getAccessToken = (): string => (wx.getStorageSync('accessToken') as string) || '';
 const getRefreshToken = (): string => (wx.getStorageSync('refreshToken') as string) || '';
 const setTokens = (accessToken: string, refreshToken: string): void => {
@@ -11,24 +44,165 @@ const setTokens = (accessToken: string, refreshToken: string): void => {
   wx.setStorageSync('refreshToken', refreshToken);
 };
 
-// 基础配置
-const BASE_URL = 'https://your-api-domain.com'; // 替换为实际 API 地址
-const TIMEOUT = 80000;
-
 // 是否正在刷新的标记
 let isRefreshing = false;
 // 重试请求队列
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-// 将请求加入刷新队列
 const subscribeTokenRefresh = (callback: (token: string) => void): void => {
   refreshSubscribers.push(callback);
 };
 
-// 刷新 Token
+const onTokenRefreshed = (newToken: string): void => {
+  refreshSubscribers.forEach(callback => callback(newToken));
+  refreshSubscribers = [];
+};
+
+// ==================== 类型定义 ====================
+
+/**
+ * 请求配置接口
+ */
+interface RequestOptions {
+  url: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  data?: any;
+  header?: Record<string, string>;
+  timeout?: number;
+  /** 是否显示加载提示 */
+  showLoading?: boolean;
+  /** 加载提示文字 */
+  loadingText?: string;
+}
+
+/**
+ * 统一的 API 响应结构
+ */
+interface ApiResult<T = any> {
+  code: number;
+  data: T;
+  message: string;
+}
+
+/**
+ * 旧版 API 响应接口（兼容现有代码）
+ */
+interface ApiResponse {
+  code?: number;
+  data?: any;
+  message?: string;
+  detail?: {
+    code: number;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+/**
+ * 自定义 API 错误类
+ */
+class ApiError extends Error {
+  constructor(
+    public code: number,
+    message: string,
+    public data?: any,
+    public originalError?: any
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+// ==================== 拦截器 ====================
+
+interface Interceptors {
+  request: ((config: RequestOptions) => RequestOptions | Promise<RequestOptions>)[];
+  response: ((response: any) => any | Promise<any>)[];
+  error: ((error: ApiError) => any | Promise<any>)[];
+}
+
+const interceptors: Interceptors = {
+  request: [],
+  response: [],
+  error: []
+};
+
+/**
+ * 添加请求拦截器
+ */
+const addRequestInterceptor = (
+  onFulfilled: (config: RequestOptions) => RequestOptions | Promise<RequestOptions>
+): (() => void) => {
+  interceptors.request.push(onFulfilled);
+  return () => {
+    const index = interceptors.request.indexOf(onFulfilled);
+    if (index > -1) interceptors.request.splice(index, 1);
+  };
+};
+
+/**
+ * 添加响应拦截器
+ */
+const addResponseInterceptor = (
+  onFulfilled: (response: any) => any | Promise<any>,
+  onRejected?: (error: ApiError) => any | Promise<any>
+): (() => void) => {
+  interceptors.response.push(onFulfilled);
+  if (onRejected) interceptors.error.push(onRejected);
+  return () => {
+    const index = interceptors.response.indexOf(onFulfilled);
+    if (index > -1) interceptors.response.splice(index, 1);
+    if (onRejected) {
+      const errIndex = interceptors.error.indexOf(onRejected);
+      if (errIndex > -1) interceptors.error.splice(errIndex, 1);
+    }
+  };
+};
+
+/**
+ * 执行请求拦截器
+ */
+const runRequestInterceptors = async (config: RequestOptions): Promise<RequestOptions> => {
+  let result = config;
+  for (const interceptor of interceptors.request) {
+    result = await interceptor(result);
+  }
+  return result;
+};
+
+/**
+ * 执行响应拦截器
+ */
+const runResponseInterceptors = async (response: any): Promise<any> => {
+  let result = response;
+  for (const interceptor of interceptors.response) {
+    result = await interceptor(result);
+  }
+  return result;
+};
+
+/**
+ * 执行错误拦截器
+ */
+const runErrorInterceptors = async (error: ApiError): Promise<any> => {
+  let result = error;
+  for (const interceptor of interceptors.error) {
+    try {
+      result = await interceptor(result);
+    } catch (e) {
+      result = e as ApiError;
+    }
+  }
+  throw result;
+};
+
+// ==================== 核心请求逻辑 ====================
+
+/**
+ * 刷新 Token
+ */
 const refreshToken = (): Promise<any> => {
   return new Promise((resolve, reject) => {
-    // 先清空 accessToken，强制使用 refreshToken
     wx.removeStorageSync('accessToken');
 
     wx.request({
@@ -42,61 +216,94 @@ const refreshToken = (): Promise<any> => {
       success: (res) => {
         const data = res.data as any;
         if (data && data.id > 0) {
-          // 保存新 token
           setTokens(data.atoken, data.rtoken);
           resolve(data);
         } else {
-          reject(data);
+          reject(new ApiError(401, '刷新 Token 失败', data));
         }
       },
       fail: (err) => {
-        reject(err);
+        reject(new ApiError(-1, '网络请求失败', null, err));
       }
     });
   });
 };
 
-// 处理刷新后的请求
-const onTokenRefreshed = (newToken: string): void => {
-  refreshSubscribers.forEach(callback => callback(newToken));
-  refreshSubscribers = [];
+/**
+ * 处理 401 未授权
+ */
+const handleUnauthorized = <T = any>(
+  _options: RequestOptions,
+  _resolve: (value: T) => void,
+  reject: (reason?: any) => void
+): void => {
+  wx.removeStorageSync('accessToken');
+  wx.removeStorageSync('refreshToken');
+
+  wx.showToast({
+    title: '登录已过期，请重新登录',
+    icon: 'none'
+  });
+
+  setTimeout(() => {
+    wx.navigateTo({ url: '/pages/login/login' });
+  }, 1500);
+
+  reject(new ApiError(401, '未授权'));
 };
 
-// 请求配置接口
-interface RequestOptions {
-  url: string;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  data?: any;
-  header?: Record<string, string>;
-  timeout?: number;
-}
+/**
+ * 处理 Token 过期
+ */
+const handleTokenExpired = <T = any>(
+  options: RequestOptions,
+  resolve: (value: T) => void,
+  reject: (reason?: any) => void
+): void => {
+  wx.removeStorageSync('accessToken');
 
-// API 响应接口
-interface ApiResponse {
-  code?: number;
-  data?: any;
-  message?: string;
-  detail?: {
-    code: number;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
+  if (isRefreshing) {
+    return subscribeTokenRefresh(() => {
+      requestWithRefresh<T>(options).then(resolve).catch(reject);
+    });
+  }
+
+  isRefreshing = true;
+
+  refreshToken()
+    .then((res) => {
+      isRefreshing = false;
+      onTokenRefreshed(res.atoken);
+      requestWithRefresh<T>(options).then(resolve).catch(reject);
+    })
+    .catch(() => {
+      isRefreshing = false;
+      refreshSubscribers = [];
+      handleUnauthorized<T>(options, resolve, reject);
+    });
+};
 
 /**
- * 请求封装
+ * 构建请求头
+ */
+const buildHeaders = (options: RequestOptions): Record<string, string> => {
+  const header: Record<string, string> = {
+    'content-type': 'application/x-www-form-urlencoded',
+    ...options.header
+  };
+
+  const accessToken = getAccessToken();
+  header['token'] = accessToken || getRefreshToken();
+
+  return header;
+};
+
+/**
+ * 基础请求封装
  */
 const request = <T = any>(options: RequestOptions): Promise<T> => {
   return new Promise((resolve, reject) => {
-    // 构建 header
-    const header: Record<string, string> = {
-      'content-type': 'application/x-www-form-urlencoded',
-      ...options.header
-    };
-
-    // 添加 token
-    const accessToken = getAccessToken();
-    header['token'] = accessToken || getRefreshToken();
+    const header = buildHeaders(options);
 
     wx.request({
       url: `${BASE_URL}${options.url}`,
@@ -108,27 +315,23 @@ const request = <T = any>(options: RequestOptions): Promise<T> => {
         resolve(res.data as T);
       },
       fail: (err) => {
-        reject(err);
+        reject(new ApiError(-1, err.errMsg || '请求失败', null, err));
       }
     });
   });
 };
 
 /**
- * 带 Token 刷新的请求封装
+ * 带 Token 刷新的请求封装（核心方法）
  */
 const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
   return new Promise((resolve, reject) => {
-    const accessToken = getAccessToken();
+    const header = buildHeaders(options);
 
-    // 构建 header
-    const header: Record<string, string> = {
-      'content-type': 'application/x-www-form-urlencoded',
-      ...options.header
-    };
-
-    // 根据是否有 accessToken 选择使用哪个 token
-    header['token'] = accessToken || getRefreshToken();
+    // 显示加载提示
+    if (options.showLoading) {
+      wx.showLoading({ title: options.loadingText || '加载中...', mask: true });
+    }
 
     wx.request({
       url: `${BASE_URL}${options.url}`,
@@ -136,13 +339,20 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
       data: options.data,
       header,
       timeout: options.timeout || TIMEOUT,
-      success: (res) => {
+      success: async (res) => {
+        if (options.showLoading) wx.hideLoading();
+
         const { statusCode, data } = res;
         const responseData = data as ApiResponse;
 
         // 请求成功
         if (statusCode >= 200 && statusCode < 300) {
-          resolve(responseData as T);
+          try {
+            const result = await runResponseInterceptors(responseData);
+            resolve(result as T);
+          } catch (e) {
+            reject(e);
+          }
           return;
         }
 
@@ -153,126 +363,136 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
         }
 
         // 5000 业务错误码（Token 过期）
-        if (responseData.detail && responseData.detail.code === 5000 && !options.url.includes('/refresh')) {
+        if (responseData.detail?.code === 5000 && !options.url.includes('/refresh')) {
           handleTokenExpired(options, resolve, reject);
           return;
         }
 
         // 其他错误
-        reject(responseData);
+        const error = new ApiError(
+          responseData.code || statusCode,
+          responseData.message || '请求失败',
+          responseData
+        );
+        reject(error);
       },
       fail: (err) => {
-        // 网络错误
-        if (err.errMsg && err.errMsg.includes('request:fail')) {
-          wx.showToast({
-            title: '网络请求失败',
-            icon: 'none'
-          });
+        if (options.showLoading) wx.hideLoading();
+
+        if (err.errMsg?.includes('request:fail')) {
+          wx.showToast({ title: '网络请求失败', icon: 'none' });
         }
-        reject(err);
+
+        reject(new ApiError(-1, err.errMsg || '网络请求失败', null, err));
       }
     });
   });
 };
 
 /**
- * 处理 401 未授权
+ * 执行请求（带拦截器支持）
  */
-const handleUnauthorized = <T = any>(
-  options: RequestOptions,
-  resolve: (value: T) => void,
-  reject: (reason?: any) => void
-): void => {
-  // 跳转到登录页
-  wx.removeStorageSync('accessToken');
-  wx.removeStorageSync('refreshToken');
+const executeRequest = async <T = any>(options: RequestOptions): Promise<T> => {
+  try {
+    // 执行请求拦截器
+    const config = await runRequestInterceptors(options);
+    // 执行请求
+    const response = await requestWithRefresh<T>(config);
+    return response;
+  } catch (error) {
+    // 执行错误拦截器
+    if (error instanceof ApiError) {
+      await runErrorInterceptors(error);
+    }
+    throw error;
+  }
+};
 
-  wx.showToast({
-    title: '登录已过期，请重新登录',
-    icon: 'none'
-  });
+// ==================== RESTful 快捷方法 ====================
 
-  // 延迟跳转登录页
-  setTimeout(() => {
-    wx.navigateTo({
-      url: '/pages/login/login'
-    });
-  }, 1500);
-
-  reject({ code: 401, message: '未授权' } as any);
+/**
+ * GET 请求
+ */
+const get = <T = any>(url: string, params?: any, options?: Omit<RequestOptions, 'url' | 'method' | 'data'>): Promise<T> => {
+  return executeRequest<T>({ url, method: 'GET', data: params, ...options });
 };
 
 /**
- * 处理 Token 过期，尝试刷新
+ * POST 请求
  */
-const handleTokenExpired = <T = any>(
-  options: RequestOptions,
-  resolve: (value: T) => void,
-  reject: (reason?: any) => void
-): void => {
-  // 清空 accessToken，标记需要刷新
-  wx.removeStorageSync('accessToken');
-
-  if (isRefreshing) {
-    // 正在刷新，将请求加入队列
-    return subscribeTokenRefresh(() => {
-      // 刷新成功后，重新执行请求
-      requestWithRefresh<T>(options).then(resolve).catch(reject);
-    });
-  }
-
-  isRefreshing = true;
-
-  // 执行刷新
-  refreshToken()
-    .then((res) => {
-      isRefreshing = false;
-      onTokenRefreshed(res.atoken);
-
-      // 重试当前请求
-      requestWithRefresh<T>(options).then(resolve).catch(reject);
-    })
-    .catch((err) => {
-      isRefreshing = false;
-      refreshSubscribers = [];
-
-      // 刷新失败，跳转登录
-      handleUnauthorized<T>(options, resolve, reject);
-    });
+const post = <T = any>(url: string, data?: any, options?: Omit<RequestOptions, 'url' | 'method' | 'data'>): Promise<T> => {
+  return executeRequest<T>({ url, method: 'POST', data, ...options });
 };
 
-// 导出请求方法
+/**
+ * PUT 请求
+ */
+const put = <T = any>(url: string, data?: any, options?: Omit<RequestOptions, 'url' | 'method' | 'data'>): Promise<T> => {
+  return executeRequest<T>({ url, method: 'PUT', data, ...options });
+};
+
+/**
+ * DELETE 请求
+ */
+const del = <T = any>(url: string, params?: any, options?: Omit<RequestOptions, 'url' | 'method' | 'data'>): Promise<T> => {
+  return executeRequest<T>({ url, method: 'DELETE', data: params, ...options });
+};
+
+// ==================== 默认拦截器配置 ====================
+
+// 添加默认的请求拦截器：自动添加 userId（如果本地存储中有）
+addRequestInterceptor((config) => {
+  const userInfo = wx.getStorageSync('userInfo');
+  if (userInfo?.userId && config.data && typeof config.data === 'object') {
+    // 如果是 GET 请求，userId 加到 URL 参数；POST/PUT 加到 body
+    if (config.method === 'GET') {
+      const separator = config.url.includes('?') ? '&' : '?';
+      config.url = `${config.url}${separator}user_id=${userInfo.userId}`;
+    } else {
+      config.data = { ...config.data, user_id: userInfo.userId };
+    }
+  }
+  return config;
+});
+
+// ==================== 导出 ====================
+
 export default {
-  // 基础请求（无 token 刷新）
+  // RESTful 快捷方法（推荐使用）
+  get,
+  post,
+  put,
+  delete: del,
+
+  // 底层请求方法
   request,
-
-  // 带 token 刷新的请求
   requestWithRefresh,
+  executeRequest,
 
-  // 刷新 token
+  // 拦截器
+  interceptors: {
+    request: addRequestInterceptor,
+    response: addResponseInterceptor
+  },
+
+  // Token 管理
   refreshToken,
-
-  // 设置 token
   setTokens,
-
-  // 获取 token
   getAccessToken,
   getRefreshToken,
-
-  // 清空 token
   clearTokens: (): void => {
     wx.removeStorageSync('accessToken');
     wx.removeStorageSync('refreshToken');
   },
+  isLoggedIn: (): boolean => !!getRefreshToken(),
 
-  // 检查是否已登录
-  isLoggedIn: (): boolean => {
-    return !!getRefreshToken();
-  }
+  // 工具
+  getBaseUrl: () => BASE_URL
 };
 
-// 导出类型
 export {
   RequestOptions,
-  ApiResponse
+  ApiResult,
+  ApiResponse,
+  ApiError
 };

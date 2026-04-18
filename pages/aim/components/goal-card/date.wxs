@@ -1,0 +1,23 @@
+var formatDate = function(dateStr) {
+  if (!dateStr) {
+    return '未设置';
+  }
+  // 提取前10个字符 (YYYY-MM-DD)
+  if (dateStr.length >= 10) {
+    return dateStr.substring(0, 10);
+  }
+  return dateStr;
+};
+
+var formatProgress = function(process) {
+  if (process === undefined || process === null) {
+    return 0;
+  }
+  // 后端进度值乘以10转换为百分比
+  return process * 10;
+};
+
+module.exports = {
+  formatDate: formatDate,
+  formatProgress: formatProgress
+};

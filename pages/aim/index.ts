@@ -1,6 +1,7 @@
 // pages/aim/index.ts
 // Toast 使用 require 方式导入
 const Toast = require('tdesign-miniprogram/toast/index').default;
+import http from '../../services/base';
 
 // 推荐项接口
 interface RecommendationItem {
@@ -149,18 +150,58 @@ Page<IData, IAimData>({
     }, 500);
   },
 
-  // 加载目标数据（使用 Mock）
+  // 加载目标数据（使用真实后端接口）
   loadGoal() {
     this.setData({ goalLoading: true });
-    
-    // 模拟 API 延迟
-    setTimeout(() => {
+
+    // 从本地存储获取 userId
+    const userInfo = wx.getStorageSync('userInfo') || {};
+    const userId = userInfo.userId;
+
+    if (!userId) {
       this.setData({
-        currentGoal: mockGoal,
+        currentGoal: null,
         goalLoading: false
       });
       wx.stopPullDownRefresh();
-    }, 300);
+      Toast({
+        context: this,
+        selector: '#t-toast',
+        message: '请先登录',
+        icon: 'info-circle',
+        duration: 2000,
+      });
+      return;
+    }
+
+    // 发起真实请求
+    http.requestWithRefresh({
+      url: `/api/users/fetch_goal/${userId}`,
+      method: 'GET'
+    }).then((res: any) => {
+      console.log('获取目标数据:', res);
+      // 后端返回的是 goal_dict，可能是空对象
+      const goal = res && Object.keys(res).length > 0 ? res : null;
+      this.setData({
+        currentGoal: goal,
+        goalLoading: false
+      });
+      wx.stopPullDownRefresh();
+    }).catch((err: any) => {
+      console.error('获取目标数据失败:', err);
+      this.setData({
+        currentGoal: null,
+        goalLoading: false
+      });
+      wx.stopPullDownRefresh();
+      Toast({
+        context: this,
+        selector: '#t-toast',
+        message: '获取目标数据失败',
+        icon: 'close-circle',
+        duration: 2000,
+      });
+    });
   },
 
   // 刷新推荐
@@ -239,7 +280,8 @@ Page<IData, IAimData>({
     const goal = this.data.currentGoal;
     if (!goal) return;
 
-    const newProgress = Math.min(goal.process + 10, 100);
+    // 后端存储的进度是 0-10，每次加 1（对应显示增加 10%）
+    const newProgress = Math.min(goal.process + 1, 10);
     
     this.setData({
       'currentGoal.process': newProgress
@@ -248,7 +290,7 @@ Page<IData, IAimData>({
     Toast({
       context: this,
       selector: '#t-toast',
-      message: `进度已更新至 ${newProgress}%`,
+      message: `进度已更新至 ${newProgress * 10}%`,
       icon: 'check-circle',
       duration: 1500,
     });
