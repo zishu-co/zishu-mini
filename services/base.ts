@@ -19,16 +19,16 @@ const getBaseUrl = (): string => {
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
     switch (envVersion) {
       case 'develop':
-        return 'http://127.0.0.1:8008';
+        return 'https://zishu.co';
       case 'trial':
         return 'https://staging-api.example.com';
       case 'release':
         return 'https://api.example.com';
       default:
-        return 'http://127.0.0.1:8008';
+        return 'https://zishu.co';
     }
   } catch {
-    return 'http://127.0.0.1:8008';
+    return 'https://zishu.co';
   }
 };
 

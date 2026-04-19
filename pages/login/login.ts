@@ -115,7 +115,7 @@ Page<IData, IData>({
       console.log(telparam)
       console.log('加密的手机号信息：', e.detail)
       wx.request({
-        url: 'http://127.0.0.1:8008/api/users/token_miniprogram',
+        url: 'https://zishu.co/api/users/token_miniprogram',
         data: telparam,
         method: 'POST',
         header: {

@@ -49,7 +49,7 @@ App<IAppOption>({
           setTimeout(() => {
             const that = this
             wx.request({
-              url: 'http://127.0.0.1:8008/api/users/openid',
+              url: 'https://zishu.co/api/users/openid',
               data: {
                 code: res.code,
               },

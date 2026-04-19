@@ -1,12 +1,12 @@
 import { delay } from '../_utils/delay';
 
 const images = [
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131419.jpg',
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131515.jpg',
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131539.jpg',
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131603.jpg',
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131643.jpg',
-  'http://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131705.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131419.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131515.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131539.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131603.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131643.jpg',
+  'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131705.jpg',
 ];
 
 interface TabItem {
