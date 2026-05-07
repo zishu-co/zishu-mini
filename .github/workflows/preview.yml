@@ -2,7 +2,7 @@ name: 小程序预览
 
 on:
   push:
-    branches: [preview]
+    branches: [dev]
 
 jobs:
   preview:
