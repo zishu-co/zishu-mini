@@ -1,0 +1,55 @@
+const ci = require('miniprogram-ci');
+const fs = require('fs');
+const path = require('path');
+
+(async () => {
+  const appid = process.env.APPID;
+  const privateKey = process.env.PRIVATE_KEY;
+  const projectPath = process.env.PROJECT_PATH;
+
+  if (!appid || !privateKey || !projectPath) {
+    console.error('缺少必要的环境变量: APPID, PRIVATE_KEY, PROJECT_PATH');
+    process.exit(1);
+  }
+
+  // 将私钥写入临时文件（miniprogram-ci 需要文件路径）
+  const privateKeyPath = path.join(__dirname, '..', 'private.key');
+  fs.writeFileSync(privateKeyPath, privateKey);
+  fs.chmodSync(privateKeyPath, 0o600);
+
+  const project = new ci.Project({
+    appid,
+    type: 'miniProgram',
+    projectPath,
+    privateKey: privateKeyPath,
+  });
+
+  console.log('开始编译预览...');
+  console.log('appid:', appid);
+  console.log('projectPath:', projectPath);
+
+  const previewResult = await ci.preview({
+    project,
+    desc: '预览发布 - ' + new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
+    setting: {
+      es6: true,
+      enhance: true,
+      postcss: true,
+      minified: true,
+    },
+    qrcodeFormat: 'image',
+    qrcodeOutputPath: path.join(__dirname, '..', 'preview-qrcode.png'),
+    // 指定页面，不指定则默认首页
+    // pagePath: 'pages/aim/index',
+  });
+
+  console.log('预览结果:', JSON.stringify(previewResult, null, 2));
+  console.log('✅ 二维码已生成:', path.join(__dirname, '..', 'preview-qrcode.png'));
+
+  // 清理私钥文件
+  try {
+    fs.unlinkSync(privateKeyPath);
+  } catch (e) {
+    // ignore
+  }
+})();
