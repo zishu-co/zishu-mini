@@ -26,52 +26,11 @@ jobs:
       - name: 安装最新版 miniprogram-ci
         run: npm install miniprogram-ci@latest
 
-      - name: 调试密钥格式
-        run: |
-          echo '=== 原始 PRIVATE_KEY 环境变量长度 ==='
-          echo ${#PRIVATE_KEY}
-          echo ''
-          echo '=== 检查是否有换行符 ==='
-          if echo "$PRIVATE_KEY" | grep -q $'\n'; then
-            echo '含换行符（多行 PEM）'
-          else
-            echo '无换行符（单行，需格式化）'
-          fi
-          echo ''
-          echo '=== 格式化并验证密钥 ==='
-          # 写入临时文件
-          echo "$PRIVATE_KEY" > /tmp/raw_key.pem
-          # 检查格式
-          head -c 80 /tmp/raw_key.pem
-          echo ''
-          # 转为标准 PEM
-          python3 -c "
-import sys
-key = open('/tmp/raw_key.pem').read().strip()
-if '-----BEGIN' in key:
-    # 提取 body
-    if '-----BEGIN PRIVATE KEY-----' in key:
-        body = key.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','').strip()
-        lines = [body[i:i+64] for i in range(0,len(body),64)]
-        pem = '-----BEGIN PRIVATE KEY-----' + chr(10) + chr(10).join(lines) + chr(10) + '-----END PRIVATE KEY-----'
-        open('/tmp/formatted_key.pem','w').write(pem)
-        print('已格式化为 PKCS#8 PEM')
-    elif '-----BEGIN RSA PRIVATE KEY-----' in key:
-        body = key.replace('-----BEGIN RSA PRIVATE KEY-----','').replace('-----END RSA PRIVATE KEY-----','').strip()
-        lines = [body[i:i+64] for i in range(0,len(body),64)]
-        pem = '-----BEGIN RSA PRIVATE KEY-----' + chr(10) + chr(10).join(lines) + chr(10) + '-----END RSA PRIVATE KEY-----'
-        open('/tmp/formatted_key.pem','w').write(pem)
-        print('已格式化为 PKCS#1 PEM')
-"
-          # 用 openssl 验证密钥
-          openssl rsa -in /tmp/formatted_key.pem -check -noout 2>&1
-          echo ''
-          echo '=== 测试 RSA 加密（openssl 命令行）==='
-          echo 'hello' | openssl rsautl -encrypt -inkey /tmp/formatted_key.pem -pubin -in /dev/stdin -out /tmp/enc.bin 2>&1 || echo 'rsautl failed, trying pkeyutl...'
-          echo 'test' | openssl pkeyutl -encrypt -inkey /tmp/formatted_key.pem -pkeyopt rsa_padding_mode:pkcs1 -in /dev/stdin -out /tmp/enc2.bin 2>&1
-          echo 'Result:'$?
+      - name: 诊断密钥问题
+        run: node scripts/test-key.js
         env:
           PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
+          PROJECT_PATH: ${{ github.workspace }}
 
       - name: 生成预览二维码
         id: preview
