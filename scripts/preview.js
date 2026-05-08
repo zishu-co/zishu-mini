@@ -13,35 +13,42 @@ const { execSync } = require("child_process");
     process.exit(1);
   }
 
-  // 确保私钥格式正确
   privateKey = privateKey.trim();
 
-  // 如果是单行格式（GitHub Secrets 存储方式会移除换行），重新格式化为标准 PEM
+  // 格式化单行 PEM
   if (!privateKey.includes("\n") && privateKey.includes("-----BEGIN")) {
-    const body = privateKey
-      .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-      .replace("-----END RSA PRIVATE KEY-----", "");
-    const lines = body.match(/.{1,64}/g) || [];
-    privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" + lines.join("\n") + "\n-----END RSA PRIVATE KEY-----";
-    console.log("检测到单行格式密钥，已重新格式化为标准 PEM");
-  }
-
-  // 如果是 PKCS#1 格式，转为 PKCS#8
-  if (privateKey.includes("-----BEGIN RSA PRIVATE KEY-----")) {
-    const tmpPath = path.join(projectPath, "tmp_private.key");
-    fs.writeFileSync(tmpPath, privateKey);
-    const pkcs8 = execSync("openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt < " + tmpPath + " 2>&1", { encoding: "utf8" });
-    fs.unlinkSync(tmpPath);
-    if (pkcs8.includes("-----BEGIN PRIVATE KEY-----")) {
-      privateKey = pkcs8;
-      console.log("密钥已从 PKCS#1 转换为 PKCS#8 格式");
+    let body, header, footer;
+    if (privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+      header = "-----BEGIN PRIVATE KEY-----"; footer = "-----END PRIVATE KEY-----";
+    } else {
+      header = "-----BEGIN RSA PRIVATE KEY-----"; footer = "-----END RSA PRIVATE KEY-----";
     }
+    body = privateKey.replace(header, "").replace(footer, "");
+    const lines = body.match(/.{1,64}/g) || [];
+    privateKey = header + "\n" + lines.join("\n") + "\n" + footer;
+    console.log("检测到单行格式密钥，已重新格式化");
   }
 
   // 将私钥写入临时文件
   const privateKeyPath = path.join(projectPath, "private.key");
   fs.writeFileSync(privateKeyPath, privateKey);
   fs.chmodSync(privateKeyPath, 0o600);
+
+  // Patch miniprogram-ci 的签名模块，替换 crypto.privateEncrypt 为 openssl 命令
+  const signJsPath = path.join(projectPath, "node_modules/miniprogram-ci/dist/utils/sign.js");
+  let signJsContent = fs.readFileSync(signJsPath, "utf8");
+
+  if (!signJsContent.includes("PATCHED_BY_ZISHU_CI")) {
+    // 原始的 getSignature 函数
+    const originalSign = `async function getSignature(r, e) { const t = { appid: e, rand_str: await getRandomString(e) }; try { return crypto_1.default.privateEncrypt({ key: r, padding: crypto_1.default.constants.RSA_PKCS1_PADDING }, Buffer.from(JSON.stringify(t))).toString("base64"); } catch (r) { throw new error_1.CodeError(locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(r.toString()), config_1.GENERATE_LOCAL_SIGNATURE_ERR); } }`;
+
+    // 用 openssl rsautl 替换
+    const patchedSign = `async function getSignature(r, e) { const t = { appid: e, rand_str: await getRandomString(e) }; const dataStr = JSON.stringify(t); const keyPath = path.join(projectPath, "private.key"); try { const sig = execSync("echo '" + Buffer.from(dataStr).toString("base64") + "' | base64 -d | openssl rsautl -sign -inkey " + keyPath + " -keyform PEM -rsapadding | openssl base64 -A", { encoding: "utf8" }); return sig.trim(); } catch (err) { throw new error_1.CodeError(locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(err.message), config_1.GENERATE_LOCAL_SIGNATURE_ERR); } }`;
+
+    signJsContent = signJsContent.replace(originalSign, patchedSign + "\n// PATCHED_BY_ZISHU_CI");
+    fs.writeFileSync(signJsPath, signJsContent);
+    console.log("已 patch miniprogram-ci sign.js，替换为 openssl rsautl 签名");
+  }
 
   const project = new ci.Project({
     appid,
@@ -55,7 +62,6 @@ const { execSync } = require("child_process");
   console.log("开始编译预览...");
   console.log("appid:", appid);
   console.log("projectPath:", projectPath);
-  console.log("qrcodeOutputPath:", qrcodeOutputPath);
 
   const previewResult = await ci.preview({
     project,
