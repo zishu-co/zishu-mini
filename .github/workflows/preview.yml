@@ -26,30 +26,46 @@ jobs:
       - name: 安装最新版 miniprogram-ci
         run: npm install miniprogram-ci@latest
 
-      - name: Patch sign.js — 修复 OpenSSL 3.0 KeyObject 兼容性问题
+      - name: Patch sign.js — 用 openssl dgst 替代有问题的 privateEncrypt
         run: |
           cat > $GITHUB_WORKSPACE/scripts/patch-sign.js << 'PATCHEOF'
           const fs = require("fs");
           const path = require("path");
           const crypto = require("crypto");
+          const { execSync } = require("child_process");
 
           const signJsPath = path.join(process.env.GITHUB_WORKSPACE, "node_modules/miniprogram-ci/dist/utils/sign.js");
           let content = fs.readFileSync(signJsPath, "utf8");
 
-          // 原始单行代码片段
-          const oldCode = 'return crypto_1.default.privateEncrypt({key:r,padding:crypto_1.default.constants.RSA_PKCS1_PADDING},Buffer.from(JSON.stringify(t))).toString("base64")';
+          // 原始 getSignature 函数的完整实现
+          const oldFn = `async function getSignature(r, e) { const t = { appid: e, rand_str: await getRandomString(e) }; try { return crypto_1.default.privateEncrypt({ key: r, padding: crypto_1.default.constants.RSA_PKCS1_PADDING }, Buffer.from(JSON.stringify(t))).toString("base64"); } catch (r) { throw new error_1.CodeError(locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(r.toString()), config_1.GENERATE_LOCAL_SIGNATURE_ERR); } }`;
 
-          // 替换为：将 key 字符串先转为 KeyObject
-          const newCode = 'const keyObj = typeof r === "string" ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString("base64")';
+          // 替换为：先用 crypto.sign (openssl dgst -sign 等效) 计算签名
+          const newFn = `async function getSignature(r, e) {
+            const t = { appid: e, rand_str: await getRandomString(e) };
+            const dataStr = JSON.stringify(t);
+            try {
+              // 方法1：优先用 Node.js crypto.sign (Node 22 + OpenSSL 3.0 兼容)
+              const sig = crypto.sign(null, Buffer.from(dataStr), r);
+              return sig.toString("base64");
+            } catch (signErr) {
+              // 方法2：fallback 用 openssl dgst -sign
+              const tmpKey = path.join(process.env.GITHUB_WORKSPACE || "/tmp", "patch_key.pem");
+              fs.writeFileSync(tmpKey, r);
+              const sigBuf = execSync("openssl dgst -sha1 -sign " + tmpKey + " -out /dev/stdout /dev/stdin", { input: Buffer.from(dataStr) });
+              return sigBuf.toString("base64");
+            }
+          }`;
 
-          if (content.includes(oldCode) && !content.includes("createPrivateKey")) {
-            content = content.replace(oldCode, newCode);
+          if (content.includes("crypto_1.default.privateEncrypt") && !content.includes("OPENSSL_FIPS") && !content.includes("dgst")) {
+            content = content.replace(oldFn, newFn);
             fs.writeFileSync(signJsPath, content);
-            console.log("sign.js patched — createPrivateKey applied");
-          } else if (content.includes("createPrivateKey")) {
+            console.log("sign.js patched: crypto.sign / openssl dgst fallback ready");
+          } else if (content.includes("dgst")) {
             console.log("sign.js already patched");
           } else {
-            console.error("Could not find target code to patch!");
+            console.error("Could not find target function to patch!");
+            console.error("Looking for crypto_1.default.privateEncrypt:", content.includes("crypto_1.default.privateEncrypt"));
             process.exit(1);
           }
           PATCHEOF
