@@ -1,10 +1,12 @@
 const ci = require("miniprogram-ci");
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 
 (async () => {
   const appid = process.env.APPID;
-  let privateKey = process.env.PRIVATE_KEY;
+  const privateKey = (process.env.PRIVATE_KEY || "").trim();
+  const appSecret = (process.env.APP_SECRET || "").trim();
   const projectPath = process.env.PROJECT_PATH;
 
   if (!appid || !privateKey || !projectPath) {
@@ -12,25 +14,23 @@ const path = require("path");
     process.exit(1);
   }
 
-  privateKey = privateKey.trim();
-
-  // 格式化单行 PEM
-  if (!privateKey.includes("\n") && privateKey.includes("-----BEGIN")) {
+  // 格式化私钥为标准多行 PEM
+  let pemKey = privateKey;
+  if (!pemKey.includes("\n") && pemKey.includes("-----BEGIN")) {
     let header, footer;
-    if (privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+    if (pemKey.includes("-----BEGIN PRIVATE KEY-----")) {
       header = "-----BEGIN PRIVATE KEY-----"; footer = "-----END PRIVATE KEY-----";
     } else {
       header = "-----BEGIN RSA PRIVATE KEY-----"; footer = "-----END RSA PRIVATE KEY-----";
     }
-    const body = privateKey.replace(header, "").replace(footer, "");
+    const body = pemKey.replace(header, "").replace(footer, "");
     const lines = body.match(/.{1,64}/g) || [];
-    privateKey = header + "\n" + lines.join("\n") + "\n" + footer;
-    console.log("Key formatted to multi-line PEM");
+    pemKey = header + "\n" + lines.join("\n") + "\n" + footer;
   }
 
-  // 写入密钥文件
+  // 写入私钥文件
   const privateKeyPath = path.join(projectPath, "private.key");
-  fs.writeFileSync(privateKeyPath, privateKey);
+  fs.writeFileSync(privateKeyPath, pemKey);
   fs.chmodSync(privateKeyPath, 0o600);
 
   const project = new ci.Project({
@@ -42,20 +42,30 @@ const path = require("path");
 
   const qrcodeOutputPath = path.resolve(projectPath, "preview-qrcode.png");
 
-  console.log("Starting preview...");
+  console.log("开始预览...");
   console.log("appid:", appid);
   console.log("projectPath:", projectPath);
 
-  const previewResult = await ci.preview({
+  const previewOptions = {
     project,
-    desc: "Preview - " + new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }),
+    desc: "预览发布 - " + new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }),
     setting: { es6: true, enhance: true, postcss: true, minified: true },
     qrcodeFormat: "image",
     qrcodeOutputDest: qrcodeOutputPath,
-  });
+  };
 
-  console.log("Preview result:", JSON.stringify(previewResult, null, 2));
-  console.log("QR code generated:", qrcodeOutputPath);
+  // 如果提供了 APP_SECRET，传入 miniprogram-ci
+  if (appSecret) {
+    previewOptions.appSecret = appSecret;
+    console.log("使用 APP_SECRET 进行 access_token 认证");
+  } else {
+    console.log("警告: 未提供 APP_SECRET，将使用 RSA 签名认证");
+  }
+
+  const previewResult = await ci.preview(previewOptions);
+
+  console.log("预览结果:", JSON.stringify(previewResult, null, 2));
+  console.log("二维码已生成:", qrcodeOutputPath);
 
   try { fs.unlinkSync(privateKeyPath); } catch (e) { /* ignore */ }
 })();
