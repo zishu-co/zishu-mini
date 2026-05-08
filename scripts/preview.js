@@ -13,7 +13,7 @@ const path = require('path');
   }
 
   // 将私钥写入临时文件（miniprogram-ci 需要文件路径）
-  const privateKeyPath = path.join(__dirname, '..', 'private.key');
+  const privateKeyPath = path.join(projectPath, 'private.key');
   fs.writeFileSync(privateKeyPath, privateKey);
   fs.chmodSync(privateKeyPath, 0o600);
 
@@ -24,9 +24,13 @@ const path = require('path');
     privateKey: privateKeyPath,
   });
 
+  // 使用绝对路径，避免 relative path 导致的 invalid qrcodeOutputDest
+  const qrcodeOutputPath = path.resolve(projectPath, 'preview-qrcode.png');
+
   console.log('开始编译预览...');
   console.log('appid:', appid);
   console.log('projectPath:', projectPath);
+  console.log('qrcodeOutputPath:', qrcodeOutputPath);
 
   const previewResult = await ci.preview({
     project,
@@ -38,13 +42,11 @@ const path = require('path');
       minified: true,
     },
     qrcodeFormat: 'image',
-    qrcodeOutputPath: path.join(__dirname, '..', 'preview-qrcode.png'),
-    // 指定页面，不指定则默认首页
-    // pagePath: 'pages/aim/index',
+    qrcodeOutputPath,
   });
 
   console.log('预览结果:', JSON.stringify(previewResult, null, 2));
-  console.log('✅ 二维码已生成:', path.join(__dirname, '..', 'preview-qrcode.png'));
+  console.log('✅ 二维码已生成:', qrcodeOutputPath);
 
   // 清理私钥文件
   try {
