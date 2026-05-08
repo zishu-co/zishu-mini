@@ -1,15 +1,32 @@
 const ci = require('miniprogram-ci');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 (async () => {
   const appid = process.env.APPID;
-  const privateKey = process.env.PRIVATE_KEY;
+  let privateKey = process.env.PRIVATE_KEY;
   const projectPath = process.env.PROJECT_PATH;
 
   if (!appid || !privateKey || !projectPath) {
     console.error('缺少必要的环境变量: APPID, PRIVATE_KEY, PROJECT_PATH');
     process.exit(1);
+  }
+
+  // 确保私钥格式正确（GitHub Secrets 存储时可能去掉了换行或改变了格式）
+  // miniprogram-ci 需要 PKCS#8 格式（-----BEGIN PRIVATE KEY-----）
+  privateKey = privateKey.trim();
+
+  // 如果是 PKCS#1 格式（BEGIN RSA PRIVATE KEY），转换为 PKCS#8
+  if (privateKey.includes('-----BEGIN RSA PRIVATE KEY-----')) {
+    const tmpPath = path.join(projectPath, 'tmp_private.key');
+    fs.writeFileSync(tmpPath, privateKey);
+    const pkcs8 = execSync(, { encoding: 'utf8' });
+    fs.unlinkSync(tmpPath);
+    if (pkcs8.includes('-----BEGIN PRIVATE KEY-----')) {
+      privateKey = pkcs8;
+      console.log('密钥已从 PKCS#1 转换为 PKCS#8 格式');
+    }
   }
 
   // 将私钥写入临时文件
@@ -24,7 +41,6 @@ const path = require('path');
     privateKey: privateKeyPath,
   });
 
-  // miniprogram-ci v2.x 使用 qrcodeOutputDest（不是 qrcodeOutputPath）
   const qrcodeOutputPath = path.resolve(projectPath, 'preview-qrcode.png');
 
   console.log('开始编译预览...');
