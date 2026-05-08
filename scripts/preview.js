@@ -12,7 +12,7 @@ const path = require('path');
     process.exit(1);
   }
 
-  // 将私钥写入临时文件（miniprogram-ci 需要文件路径）
+  // 将私钥写入临时文件
   const privateKeyPath = path.join(projectPath, 'private.key');
   fs.writeFileSync(privateKeyPath, privateKey);
   fs.chmodSync(privateKeyPath, 0o600);
@@ -24,7 +24,7 @@ const path = require('path');
     privateKey: privateKeyPath,
   });
 
-  // 使用绝对路径，避免 relative path 导致的 invalid qrcodeOutputDest
+  // miniprogram-ci v2.x 使用 qrcodeOutputDest（不是 qrcodeOutputPath）
   const qrcodeOutputPath = path.resolve(projectPath, 'preview-qrcode.png');
 
   console.log('开始编译预览...');
@@ -42,7 +42,7 @@ const path = require('path');
       minified: true,
     },
     qrcodeFormat: 'image',
-    qrcodeOutputPath,
+    qrcodeOutputDest: qrcodeOutputPath,
   });
 
   console.log('预览结果:', JSON.stringify(previewResult, null, 2));
