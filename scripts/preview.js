@@ -16,12 +16,21 @@ const { execSync } = require("child_process");
   // 确保私钥格式正确
   privateKey = privateKey.trim();
 
+  // 如果是单行格式（GitHub Secrets 存储方式会移除换行），重新格式化为标准 PEM
+  if (!privateKey.includes("\n") && privateKey.includes("-----BEGIN")) {
+    const body = privateKey
+      .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+      .replace("-----END RSA PRIVATE KEY-----", "");
+    const lines = body.match(/.{1,64}/g) || [];
+    privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" + lines.join("\n") + "\n-----END RSA PRIVATE KEY-----";
+    console.log("检测到单行格式密钥，已重新格式化为标准 PEM");
+  }
+
   // 如果是 PKCS#1 格式，转为 PKCS#8
   if (privateKey.includes("-----BEGIN RSA PRIVATE KEY-----")) {
     const tmpPath = path.join(projectPath, "tmp_private.key");
     fs.writeFileSync(tmpPath, privateKey);
-    const cmd = "openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt < " + tmpPath + " 2>&1";
-    const pkcs8 = execSync(cmd, { encoding: "utf8" });
+    const pkcs8 = execSync("openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt < " + tmpPath + " 2>&1", { encoding: "utf8" });
     fs.unlinkSync(tmpPath);
     if (pkcs8.includes("-----BEGIN PRIVATE KEY-----")) {
       privateKey = pkcs8;
@@ -51,12 +60,7 @@ const { execSync } = require("child_process");
   const previewResult = await ci.preview({
     project,
     desc: "预览发布 - " + new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }),
-    setting: {
-      es6: true,
-      enhance: true,
-      postcss: true,
-      minified: true,
-    },
+    setting: { es6: true, enhance: true, postcss: true, minified: true },
     qrcodeFormat: "image",
     qrcodeOutputDest: qrcodeOutputPath,
   });
@@ -64,10 +68,5 @@ const { execSync } = require("child_process");
   console.log("预览结果:", JSON.stringify(previewResult, null, 2));
   console.log("二维码已生成:", qrcodeOutputPath);
 
-  // 清理私钥文件
-  try {
-    fs.unlinkSync(privateKeyPath);
-  } catch (e) {
-    // ignore
-  }
+  try { fs.unlinkSync(privateKeyPath); } catch (e) { /* ignore */ }
 })();
