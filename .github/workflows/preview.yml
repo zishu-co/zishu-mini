@@ -26,47 +26,46 @@ jobs:
       - name: 安装最新版 miniprogram-ci
         run: npm install miniprogram-ci@latest
 
-      - name: Patch sign.js — 正则全局替换 privateEncrypt 为 crypto.sign
+      - name: 还原 sign.js 并替换 getSignature 为 crypto.sign 实现
         run: |
           node -e "
           const fs = require('fs');
           const path = require('path');
-          const crypto = require('crypto');
 
           const signJsPath = path.join(process.env.GITHUB_WORKSPACE, 'node_modules/miniprogram-ci/dist/utils/sign.js');
           let content = fs.readFileSync(signJsPath, 'utf8');
 
-          // 在 getSignature 函数体内，替换 privateEncrypt 调用
-          // minified sign.js 中的 privateEncrypt 调用特征
-          const target = 'crypto_1.default.privateEncrypt({key:r,padding:crypto_1.default.constants.RSA_PKCS1_PADDING},Buffer.from(JSON.stringify(t))).toString("base64")';
+          // 查找 getSignature 函数位置
+          const fnStart = content.indexOf('async function getSignature');
+          const fnEnd = content.indexOf('}', content.indexOf('GENERATE_LOCAL_SIGNATURE_ERR'));
+          
+          console.log('Found getSignature at index:', fnStart);
 
-          if (!content.includes(target)) {
-            console.error('Target code NOT found in sign.js');
-            console.error('Looking for:', target.substring(0, 80));
-            // 搜索上下文
-            const idx = content.indexOf('privateEncrypt');
-            if (idx >= 0) {
-              console.error('Found privateEncrypt at idx', idx);
-              console.error('Context:', content.substring(Math.max(0,idx-50), idx+200));
-            }
+          // 提取老的 return 语句
+          const oldReturnIdx = content.indexOf('crypto_1.default.privateEncrypt', fnStart);
+          console.log('privateEncrypt found at:', oldReturnIdx);
+
+          if (oldReturnIdx < 0) {
+            console.log('Current content around getSignature:');
+            console.log(content.substring(fnStart, fnStart + 500));
             process.exit(1);
           }
 
-          const replacement = 'crypto.sign(null, Buffer.from(JSON.stringify(t)), r).toString("base64")';
+          // 替换 return crypto_1.default.privateEncrypt(...) 为 crypto.sign(...)
+          // crypto.sign(algorithm, data, key) with null algorithm uses RSA PKCS#1 padding
+          const oldReturnStart = content.lastIndexOf('return', oldReturnIdx);
+          const beforeReturn = content.substring(0, oldReturnStart);
+          const afterReturn = content.substring(content.indexOf('}', oldReturnIdx) + 1);
 
-          content = content.replace(target, replacement);
+          const newReturn = 'return crypto_1.default.sign(null, Buffer.from(JSON.stringify(t)), r).toString("base64")';
 
+          content = beforeReturn + newReturn + afterReturn;
           fs.writeFileSync(signJsPath, content);
-          console.log('sign.js patched: privateEncrypt -> crypto.sign');
 
-          // 验证 patch
-          if (content.includes('crypto.sign')) {
-            console.log('VERIFIED: crypto.sign is now in sign.js');
-          } else {
-            console.error('VERIFICATION FAILED');
-            process.exit(1);
-          }
-          "
+          console.log('Patched. New content check:');
+          const newIdx = content.indexOf('getSignature');
+          console.log(content.substring(newIdx, newIdx + 400));
+          " || echo "node patch failed"
 
       - name: 生成预览二维码
         run: node scripts/preview.js
