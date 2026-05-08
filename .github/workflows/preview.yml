@@ -28,37 +28,32 @@ jobs:
 
       - name: Patch sign.js — 修复 OpenSSL 3.0 KeyObject 兼容性问题
         run: |
-          node -e "
-          const fs = require('fs');
-          const path = require('path');
-          const crypto = require('crypto');
-          const projectPath = process.env.GITHUB_WORKSPACE;
-          const signJsPath = path.join(projectPath, 'node_modules/miniprogram-ci/dist/utils/sign.js');
-          let content = fs.readFileSync(signJsPath, 'utf8');
+          cat > $GITHUB_WORKSPACE/scripts/patch-sign.js << 'PATCHEOF'
+          const fs = require("fs");
+          const path = require("path");
+          const crypto = require("crypto");
 
-          // 找到 getSignature 函数，替换 crypto.privateEncrypt 调用
-          // 关键修改：将 key 字符串转为 KeyObject
-          const oldCode = \`return crypto_1.default.privateEncrypt({key:r,padding:crypto_1.default.constants.RSA_PKCS1_PADDING},Buffer.from(JSON.stringify(t))).toString(\"base64\")\`;
+          const signJsPath = path.join(process.env.GITHUB_WORKSPACE, "node_modules/miniprogram-ci/dist/utils/sign.js");
+          let content = fs.readFileSync(signJsPath, "utf8");
 
-          const newCode = \`const keyObj = typeof r === 'string' ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString(\"base64\")\`;
+          // 原始单行代码片段
+          const oldCode = 'return crypto_1.default.privateEncrypt({key:r,padding:crypto_1.default.constants.RSA_PKCS1_PADDING},Buffer.from(JSON.stringify(t))).toString("base64")';
 
-          if (content.includes(oldCode) && !content.includes('createPrivateKey')) {
+          // 替换为：将 key 字符串先转为 KeyObject
+          const newCode = 'const keyObj = typeof r === "string" ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString("base64")';
+
+          if (content.includes(oldCode) && !content.includes("createPrivateKey")) {
             content = content.replace(oldCode, newCode);
             fs.writeFileSync(signJsPath, content);
-            console.log('✅ sign.js patched — crypto.createPrivateKey applied');
-          } else if (content.includes('createPrivateKey')) {
-            console.log('✅ sign.js already patched');
+            console.log("sign.js patched — createPrivateKey applied");
+          } else if (content.includes("createPrivateKey")) {
+            console.log("sign.js already patched");
           } else {
-            console.log('⚠️  could not find target code to patch, trying regex replacement');
-            // fallback: 通用正则替换
-            content = content.replace(
-              /return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)/g,
-              'const keyObj = typeof r === '"'"'string'"'"' ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString("base64")'
-            );
-            fs.writeFileSync(signJsPath, content);
-            console.log('✅ sign.js patched with regex fallback');
+            console.error("Could not find target code to patch!");
+            process.exit(1);
           }
-          "
+          PATCHEOF
+          node $GITHUB_WORKSPACE/scripts/patch-sign.js
 
       - name: 生成预览二维码
         run: node scripts/preview.js
