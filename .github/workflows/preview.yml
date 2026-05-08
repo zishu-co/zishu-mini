@@ -22,28 +22,24 @@ jobs:
 
       - name: 安装依赖
         run: |
-          cd zishu-mini
           npm ci
 
       - name: 安装 miniprogram-ci
         run: |
-          cd zishu-mini
           npm install miniprogram-ci
 
       - name: 生成预览二维码
         id: preview
-        run: |
-          cd zishu-mini
-          node scripts/preview.js
+        run: node scripts/preview.js
         env:
           APPID: ${{ secrets.WX_MINI_APPID }}
           PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
-          PROJECT_PATH: ${{ github.workspace }}/zishu-mini
+          PROJECT_PATH: ${{ github.workspace }}
 
       - name: 上传二维码图片
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: preview-qrcode
-          path: zishu-mini/preview-qrcode.png
+          path: preview-qrcode.png
           retention-days: 7
