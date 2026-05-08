@@ -26,47 +26,6 @@ jobs:
       - name: 安装最新版 miniprogram-ci
         run: npm install miniprogram-ci@latest
 
-      - name: 还原 sign.js 并替换 getSignature 为 crypto.sign 实现
-        run: |
-          node -e "
-          const fs = require('fs');
-          const path = require('path');
-
-          const signJsPath = path.join(process.env.GITHUB_WORKSPACE, 'node_modules/miniprogram-ci/dist/utils/sign.js');
-          let content = fs.readFileSync(signJsPath, 'utf8');
-
-          // 查找 getSignature 函数位置
-          const fnStart = content.indexOf('async function getSignature');
-          const fnEnd = content.indexOf('}', content.indexOf('GENERATE_LOCAL_SIGNATURE_ERR'));
-          
-          console.log('Found getSignature at index:', fnStart);
-
-          // 提取老的 return 语句
-          const oldReturnIdx = content.indexOf('crypto_1.default.privateEncrypt', fnStart);
-          console.log('privateEncrypt found at:', oldReturnIdx);
-
-          if (oldReturnIdx < 0) {
-            console.log('Current content around getSignature:');
-            console.log(content.substring(fnStart, fnStart + 500));
-            process.exit(1);
-          }
-
-          // 替换 return crypto_1.default.privateEncrypt(...) 为 crypto.sign(...)
-          // crypto.sign(algorithm, data, key) with null algorithm uses RSA PKCS#1 padding
-          const oldReturnStart = content.lastIndexOf('return', oldReturnIdx);
-          const beforeReturn = content.substring(0, oldReturnStart);
-          const afterReturn = content.substring(content.indexOf('}', oldReturnIdx) + 1);
-
-          const newReturn = 'return crypto_1.default.sign(null, Buffer.from(JSON.stringify(t)), r).toString("base64")';
-
-          content = beforeReturn + newReturn + afterReturn;
-          fs.writeFileSync(signJsPath, content);
-
-          console.log('Patched. New content check:');
-          const newIdx = content.indexOf('getSignature');
-          console.log(content.substring(newIdx, newIdx + 400));
-          " || echo "node patch failed"
-
       - name: 生成预览二维码
         run: node scripts/preview.js
         env:
