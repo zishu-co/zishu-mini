@@ -26,84 +26,46 @@ jobs:
       - name: 安装最新版 miniprogram-ci
         run: npm install miniprogram-ci@latest
 
-      - name: 生成预览二维码
-        id: preview
+      - name: Patch sign.js — 修复 OpenSSL 3.0 KeyObject 兼容性问题
         run: |
           node -e "
           const fs = require('fs');
           const path = require('path');
-          const { execSync } = require('child_process');
-          const projectPath = process.env.GITHUB_WORKSPACE;
-          const keyPath = path.join(projectPath, 'private.key');
-          
-          // 格式化并写入私钥
-          let privateKey = process.env.PRIVATE_KEY.trim();
-          if (!privateKey.includes('\n') && privateKey.includes('-----BEGIN')) {
-            let header, footer;
-            if (privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-              header = '-----BEGIN PRIVATE KEY-----'; footer = '-----END PRIVATE KEY-----';
-            } else {
-              header = '-----BEGIN RSA PRIVATE KEY-----'; footer = '-----END RSA PRIVATE KEY-----';
-            }
-            const body = privateKey.replace(header,'').replace(footer,'');
-            const lines = body.match(/.{1,64}/g) || [];
-            privateKey = header + '\n' + lines.join('\n') + '\n' + footer;
-          }
-          fs.writeFileSync(keyPath, privateKey);
-          fs.chmodSync(keyPath, 0o600);
-          
-          // Monkey-patch crypto.privateEncrypt
           const crypto = require('crypto');
-          const originalPrivateEncrypt = crypto.privateEncrypt.bind(crypto);
-          crypto.privateEncrypt = function(key, buffer, callback) {
-            const keyStr = typeof key === 'string' ? key : key.key;
-            const dataStr = buffer.toString('utf8');
-            try {
-              fs.writeFileSync(keyPath, keyStr);
-              const sig = execSync('echo \'' + Buffer.from(dataStr).toString('base64') + '\'' + ' | base64 -d | openssl rsautl -sign -inkey ' + keyPath + ' -keyform PEM -rsapadding | openssl base64 -A', { encoding: 'utf8', timeout: 30000 });
-              const result = Buffer.from(sig.trim(), 'base64');
-              if (typeof callback === 'function') {
-                callback(null, result);
-              }
-              return result;
-            } catch (e) {
-              if (typeof callback === 'function') {
-                callback(e);
-              }
-              throw e;
-            }
-          };
-          
-          // 运行预览
-          const ci = require('miniprogram-ci');
-          const project = new ci.Project({
-            appid: process.env.APPID,
-            type: 'miniProgram',
-            projectPath: projectPath,
-            privateKey: keyPath,
-          });
-          
-          const qrcodeOutputPath = path.resolve(projectPath, 'preview-qrcode.png');
-          console.log('开始编译预览...');
-          
-          ci.preview({
-            project,
-            desc: '预览发布 - ' + new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
-            setting: { es6: true, enhance: true, postcss: true, minified: true },
-            qrcodeFormat: 'image',
-            qrcodeOutputDest: qrcodeOutputPath,
-          }).then(result => {
-            console.log('预览结果:', JSON.stringify(result, null, 2));
-            console.log('二维码已生成:', qrcodeOutputPath);
-          }).catch(err => {
-            console.error('预览失败:', err.message);
-            process.exit(1);
-          });
+          const projectPath = process.env.GITHUB_WORKSPACE;
+          const signJsPath = path.join(projectPath, 'node_modules/miniprogram-ci/dist/utils/sign.js');
+          let content = fs.readFileSync(signJsPath, 'utf8');
+
+          // 找到 getSignature 函数，替换 crypto.privateEncrypt 调用
+          // 关键修改：将 key 字符串转为 KeyObject
+          const oldCode = \`return crypto_1.default.privateEncrypt({key:r,padding:crypto_1.default.constants.RSA_PKCS1_PADDING},Buffer.from(JSON.stringify(t))).toString(\"base64\")\`;
+
+          const newCode = \`const keyObj = typeof r === 'string' ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString(\"base64\")\`;
+
+          if (content.includes(oldCode) && !content.includes('createPrivateKey')) {
+            content = content.replace(oldCode, newCode);
+            fs.writeFileSync(signJsPath, content);
+            console.log('✅ sign.js patched — crypto.createPrivateKey applied');
+          } else if (content.includes('createPrivateKey')) {
+            console.log('✅ sign.js already patched');
+          } else {
+            console.log('⚠️  could not find target code to patch, trying regex replacement');
+            // fallback: 通用正则替换
+            content = content.replace(
+              /return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)/g,
+              'const keyObj = typeof r === '"'"'string'"'"' ? crypto.createPrivateKey(r) : r; return crypto_1.default.privateEncrypt({key: keyObj, padding: crypto_1.default.constants.RSA_PKCS1_PADDING}, Buffer.from(JSON.stringify(t))).toString("base64")'
+            );
+            fs.writeFileSync(signJsPath, content);
+            console.log('✅ sign.js patched with regex fallback');
+          }
           "
+
+      - name: 生成预览二维码
+        run: node scripts/preview.js
         env:
           APPID: ${{ secrets.WX_MINI_APPID }}
           PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
-          GITHUB_WORKSPACE: ${{ github.workspace }}
+          PROJECT_PATH: ${{ github.workspace }}
 
       - name: 上传二维码图片
         if: success()
