@@ -23,14 +23,15 @@ jobs:
       - name: 安装依赖
         run: npm ci
 
-      - name: 安装 miniprogram-ci v1.8.3 (RSA-only, no appsecret needed)
-        run: npm install miniprogram-ci@1.8.3
+      - name: 安装最新版 miniprogram-ci
+        run: npm install miniprogram-ci@latest
 
       - name: 生成预览二维码
         run: node scripts/preview.js
         env:
           APPID: ${{ secrets.WX_MINI_APPID }}
           PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
+          APP_SECRET: ${{ secrets.WX_MINI_APP_SECRET }}
           PROJECT_PATH: ${{ github.workspace }}
 
       - name: 上传二维码图片
