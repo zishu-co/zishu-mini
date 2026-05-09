@@ -16,48 +16,51 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
     process.exit(1);
   }
 
-  // 格式化 PEM（统一多行格式）
+  // 格式化 PEM
   let pemKey = privateKeyRaw;
   if (!pemKey.includes("\n") && pemKey.includes("-----BEGIN")) {
     let header, footer;
     if (pemKey.includes("-----BEGIN PRIVATE KEY-----")) {
       header = "-----BEGIN PRIVATE KEY-----"; footer = "-----END PRIVATE KEY-----";
-    } else {
+    } else if (pemKey.includes("-----BEGIN RSA PRIVATE KEY-----")) {
       header = "-----BEGIN RSA PRIVATE KEY-----"; footer = "-----END RSA PRIVATE KEY-----";
+    } else {
+      console.error("Unknown key format");
+      process.exit(1);
     }
     const body = pemKey.replace(header, "").replace(footer, "");
     const lines = body.match(/.{1,64}/g) || [];
     pemKey = header + "\n" + lines.join("\n") + "\n" + footer;
-    console.log("密钥已格式化");
   }
 
-  // 写入私钥文件
+  // 写私钥文件
   const privateKeyPath = path.join(projectPath, "private.key");
   fs.writeFileSync(privateKeyPath, pemKey);
   fs.chmodSync(privateKeyPath, 0o600);
+  console.log("密钥已写入");
 
-  // =========================================================
-  // 核心修复：patch miniprogram-ci 的 sign.js
-  // 用 openssl rsautl 替代 crypto.privateEncrypt
-  // 解决 Node.js v22 + OpenSSL 3.x 不支持 PKCS#8 的问题
-  // =========================================================
+  // ============================================================
+  // 修复 miniprogram-ci sign.js
+  // Node.js 22+ OpenSSL 3.x 不再支持 RSA PKCS#1 v1.5 加密
+  // 改用 openssl dgst -sha1 -sign（微信官方签名方式）
+  // ============================================================
   const signJsPath = path.join(projectPath, "node_modules/miniprogram-ci/dist/utils/sign.js");
   let signJsContent = fs.readFileSync(signJsPath, "utf8");
 
-  if (!signJsContent.includes("PATCHED_BY_ZISHU_CI")) {
-    // 找到 getSignature 函数并替换
-    const oldFunc = /async function getSignature\(r, e\)\{const t=\{appid:e,rand_str:await getRandomString\(e\)\};try\{return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)\}catch\(r\)\{throw new error_1\.CodeError\(locales_1\.default\.config\.GENERATE_LOCAL_SIGNATURE_FAIL\.format\(r\.toString\(\)\),config_1\.GENERATE_LOCAL_SIGNATURE_ERR\)\}\}/;
+  if (!signJsContent.includes("PATCHED_V2")) {
+    // 找到 getSignature 函数（单行模式匹配）
+    const oldSignPattern = /async function getSignature\(r, e\)\{const t=\{appid:e,rand_str:await getRandomString\(e)\};try\{return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)\}catch\(r\)\{throw new error_1\.CodeError\(locales_1\.default\.config\.GENERATE_LOCAL_SIGNATURE_FAIL\.format\(r\.toString\(\)\),config_1\.GENERATE_LOCAL_SIGNATURE_ERR\)\}\}/;
 
-    const newFunc = `async function getSignature(r, e) {
+    const newSignFunc = `async function getSignature(r, e) {
   const t = { appid: e, rand_str: await getRandomString(e) };
   const dataStr = JSON.stringify(t);
   try {
-    // 使用 openssl rsautl 替代 crypto.privateEncrypt
+    // 使用 openssl dgst -sha1 -sign（微信官方签名方式）
     const sig = execSync(
-      "openssl rsautl -sign -inkey " + r + " -keyform PEM -rsapadding | openssl base64 -A",
-      { input: Buffer.from(dataStr), timeout: 10000 }
+      "echo '" + Buffer.from(dataStr).toString("base64") + "' | base64 -d | openssl dgst -sha1 -sign " + r,
+      { encoding: "utf8", timeout: 15000 }
     );
-    return sig.toString().trim();
+    return sig.trim();
   } catch (err) {
     throw new error_1.CodeError(
       locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(err.message),
@@ -65,11 +68,11 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
     );
   }
 }
-// PATCHED_BY_ZISHU_CI`;
+// PATCHED_V2`;
 
-    signJsContent = signJsContent.replace(oldFunc, newFunc);
+    signJsContent = signJsContent.replace(oldSignPattern, newSignFunc);
     fs.writeFileSync(signJsPath, signJsContent);
-    console.log("已 patch sign.js：用 openssl rsautl 替换 crypto.privateEncrypt");
+    console.log("sign.js 已 patch: openssl dgst -sha1 -sign");
   }
 
   const project = new ci.Project({
@@ -83,7 +86,6 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
 
   console.log("开始预览...");
   console.log("appid:", appid);
-  console.log("projectPath:", projectPath);
 
   const previewOptions = {
     project,
@@ -95,12 +97,12 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
 
   if (appSecret) {
     previewOptions.appSecret = appSecret;
-    console.log("使用 APP_SECRET 进行认证");
+    console.log("使用 APP_SECRET 认证");
   }
 
-  const previewResult = await ci.preview(previewOptions);
-  console.log("预览结果:", JSON.stringify(previewResult, null, 2));
-  console.log("二维码已生成:", qrcodeOutputPath);
+  const result = await ci.preview(previewOptions);
+  console.log("预览成功:", JSON.stringify(result, null, 2));
+  console.log("二维码:", qrcodeOutputPath);
 
-  try { fs.unlinkSync(privateKeyPath); } catch (e) { /* ignore */ }
+  try { fs.unlinkSync(privateKeyPath); } catch (e) {}
 })();
