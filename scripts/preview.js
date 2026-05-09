@@ -9,22 +9,22 @@ const privateKeyPath = path.join(projectPath, "private.key");
 const logFile = path.join(projectPath, "preview.log");
 const responseFile = path.join(projectPath, "api-response.json");
 
-process.on('uncaughtException', (err) => {
-  fs.appendFileSync(logFile, "UNCAUGHT: " + err.message + "\n" + err.stack + "\n");
+// 全局错误捕获
+process.on('uncaughtException', function(err) {
+  fs.appendFileSync(logFile, "UNCAUGHT: " + err.message + "\n" + (err.stack||'').split("\n").slice(0,3).join("\n") + "\n");
   console.error("UNCAUGHT:", err.message);
   process.exit(0);
 });
-process.on('unhandledRejection', (reason) => {
-  const msg = "UNHANDLED: " + String(reason);
-  fs.appendFileSync(logFile, msg + "\n");
-  console.error(msg);
+process.on('unhandledRejection', function(reason) {
+  fs.appendFileSync(logFile, "UNHANDLED: " + String(reason) + "\n");
+  console.error("UNHANDLED:", String(reason));
   process.exit(0);
 });
 
-const log = (msg) => {
+function log(msg) {
   console.log("[preview] " + msg);
   fs.appendFileSync(logFile, msg + "\n");
-};
+}
 
 fs.writeFileSync(logFile, "");
 fs.writeFileSync(qrcodeFile, Buffer.alloc(0));
@@ -58,132 +58,153 @@ fs.writeFileSync(privateKeyPath, pem);
 fs.chmodSync(privateKeyPath, 0o600);
 log("Key written to " + privateKeyPath);
 
-// HTTP 工具
+// HTTP 工具函数
 function httpGet(url) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     const opts = new URL(url);
-    const req = https.get({ hostname: opts.hostname, path: opts.pathname + opts.search, headers: { "User-Agent": "miniprogram-ci/1.0" } }, (res) => {
-      const chunks = []; res.on("data", c => chunks.push(c)); res.on("end", () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch(e) { resolve(Buffer.concat(chunks).toString()); }
+    const req = https.get({
+      hostname: opts.hostname,
+      path: opts.pathname + opts.search,
+      headers: { "User-Agent": "miniprogram-ci/1.0" }
+    }, function(res) {
+      const chunks = [];
+      res.on("data", function(c) { chunks.push(c); });
+      res.on("end", function() {
+        try {
+          resolve(JSON.parse(Buffer.concat(chunks).toString()));
+        } catch(e) {
+          resolve(Buffer.concat(chunks).toString());
+        }
       });
     });
     req.on("error", reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error("HTTP GET timeout")); });
+    req.setTimeout(15000, function() { req.destroy(); reject(new Error("HTTP GET timeout")); });
   });
 }
 
 function httpPost(url, body) {
   const data = JSON.stringify(body);
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     const opts = new URL(url);
-    const req = https.request({ hostname: opts.hostname, path: opts.pathname + opts.search, method: "POST", headers: { "User-Agent": "miniprogram-ci/1.0", "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) } }, (res) => {
-      const chunks = []; res.on("data", c => chunks.push(c)); res.on("end", () => {
-        try { resolve(JSON.parse(Buffer.concat(chunks).toString())); }
-        catch(e) { resolve(Buffer.concat(chunks).toString()); }
+    const req = https.request({
+      hostname: opts.hostname,
+      path: opts.pathname + opts.search,
+      method: "POST",
+      headers: { "User-Agent": "miniprogram-ci/1.0", "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) }
+    }, function(res) {
+      const chunks = [];
+      res.on("data", function(c) { chunks.push(c); });
+      res.on("end", function() {
+        try {
+          resolve(JSON.parse(Buffer.concat(chunks).toString()));
+        } catch(e) {
+          resolve(Buffer.concat(chunks).toString());
+        }
       });
     });
     req.on("error", reject);
-    req.write(data); req.end();
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error("HTTP POST timeout")); });
+    req.write(data);
+    req.end();
+    req.setTimeout(15000, function() { req.destroy(); reject(new Error("HTTP POST timeout")); });
   });
 }
 
-// Step 1: 获取 access_token
+function exitOk() {
+  try { fs.unlinkSync(privateKeyPath); } catch(e) {}
+  log("EXIT OK");
+  process.exit(0);
+}
+
+function exitFail(msg) {
+  log("EXIT FAIL: " + msg);
+  try { fs.unlinkSync(privateKeyPath); } catch(e) {}
+  process.exit(0);
+}
+
+// 主流程
 log("Step 1: Getting access_token...");
-const tokenResp = await httpGet(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${appSecret}`);
-log("access_token response: " + JSON.stringify(tokenResp));
-
-if (!tokenResp.access_token) {
-  log("ERROR: No access_token! errcode=" + tokenResp.errcode + ", errmsg=" + tokenResp.errmsg);
-  // 保存错误响应
-  fs.writeFileSync(responseFile, JSON.stringify(tokenResp));
-  fs.writeFileSync(qrcodeFile, Buffer.from("TOKEN_ERROR:" + (tokenResp.errmsg || JSON.stringify(tokenResp))));
-  process.exit(0);
-}
-
-const accessToken = tokenResp.access_token;
-const apiBase = `https://api.weixin.qq.com/wxa?access_token=${accessToken}`;
-
-// Step 2: 调用 miniprogram-ci preview
-log("Step 2: Loading miniprogram-ci...");
-let ci;
-try {
-  const M = require("miniprogram-ci");
-  log("miniprogram-ci loaded, version: " + (M.version || "unknown"));
-  ci = new M.WxMiniprogramCI({
-    appid,
-    privateKey: pem,
-    privateKeyPath,
-    ignores: [],
-  });
-  log("WxMiniprogramCI instance created");
-} catch(err) {
-  log("miniprogram-ci init FAILED: " + err.message);
-  fs.writeFileSync(responseFile, Buffer.from("INIT_ERROR:" + err.message));
-  fs.writeFileSync(qrcodeFile, Buffer.from("INIT_ERROR:" + err.message));
-  process.exit(0);
-}
-
-const projectConfig = JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8"));
-
-log("Step 3: Calling ci.preview()...");
-let previewResp;
-try {
-  previewResp = await ci.preview({
-    projectConfig,
-    packageOptions: { ignoreExtFiles: false },
-    onProgressUpdate: (p) => log("PROGRESS: " + JSON.stringify(p)),
-  });
-  log("ci.preview() returned!");
-} catch(err) {
-  log("ci.preview() THREW: " + err.message);
-  if (err.code) log("  code: " + err.code);
-  if (err.response) log("  response: " + JSON.stringify(err.response).substring(0, 200));
-  // 尝试 upload 作为替代
-  log("Trying ci.upload() as fallback...");
-  try {
-    previewResp = await ci.upload({
-      projectConfig,
-      packageOptions: { ignoreExtFiles: false },
-      onProgressUpdate: (p) => log("UPLOAD PROGRESS: " + JSON.stringify(p)),
+httpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + appSecret)
+  .then(function(tokenResp) {
+    log("token response: " + JSON.stringify(tokenResp));
+    if (!tokenResp.access_token) {
+      fs.writeFileSync(responseFile, JSON.stringify(tokenResp));
+      fs.writeFileSync(qrcodeFile, Buffer.from("TOKEN_ERROR:" + (tokenResp.errmsg || JSON.stringify(tokenResp))));
+      exitFail("No access_token");
+      return null;
+    }
+    return tokenResp.access_token;
+  })
+  .then(function(accessToken) {
+    if (!accessToken) return;
+    log("Step 2: Loading miniprogram-ci...");
+    let M;
+    try { M = require("miniprogram-ci"); }
+    catch(err) {
+      log("require miniprogram-ci FAILED: " + err.message);
+      fs.writeFileSync(responseFile, Buffer.from("REQUIRE_ERROR:" + err.message));
+      fs.writeFileSync(qrcodeFile, Buffer.from("REQUIRE_ERROR"));
+      exitFail("require miniprogram-ci failed");
+      return;
+    }
+    log("miniprogram-ci loaded, version: " + (M.version || "unknown"));
+    
+    const ci = new M.WxMiniprogramCI({
+      appid: appid,
+      privateKey: pem,
+      privateKeyPath: privateKeyPath,
+      ignores: [],
     });
-    log("ci.upload() returned!");
-  } catch(uploadErr) {
-    log("ci.upload() also FAILED: " + uploadErr.message);
-    fs.writeFileSync(responseFile, Buffer.from("PREVIEW_ERROR:" + err.message + "\nUPLOAD_ERROR:" + uploadErr.message));
-    fs.writeFileSync(qrcodeFile, Buffer.from("API_ERROR"));
-    process.exit(0);
-  }
-}
-
-// 写入完整响应
-fs.writeFileSync(responseFile, JSON.stringify(previewResp, null, 2));
-log("Response saved. Keys: " + Object.keys(previewResp).join(","));
-
-log("qrCodeUrl: " + (previewResp.qrCodeUrl || "NONE"));
-log("qrcodeData: " + (previewResp.qrcodeData ? "SET(len=" + previewResp.qrcodeData.length + ")" : "NONE"));
-
-// 优先用 qrcodeData (PNG base64)
-if (previewResp.qrcodeData) {
-  const buf = Buffer.from(previewResp.qrcodeData, "base64");
-  fs.writeFileSync(qrcodeFile, buf);
-  log("QR from qrcodeData: " + buf.length + " bytes -> " + qrcodeFile);
-} else if (previewResp.qrCodeUrl) {
-  // qrCodeUrl 是一个相对路径，构建完整 URL
-  const fullUrl = previewResp.qrCodeUrl.startsWith("http") 
-    ? previewResp.qrCodeUrl 
-    : `https://open.weixin.qq.com${previewResp.qrCodeUrl}`;
-  log("qrCodeUrl full: " + fullUrl);
-  // 保存 URL 文本到 qrcodeFile（用于调试）
-  fs.writeFileSync(qrcodeFile, Buffer.from("QR_URL:" + fullUrl));
-  // 同时写一个文本文件记录完整信息
-  fs.writeFileSync(path.join(projectPath, "preview-url.txt"), Buffer.from(fullUrl));
-} else {
-  log("WARNING: No qrcodeData and no qrCodeUrl!");
-  fs.writeFileSync(qrcodeFile, Buffer.from("NO_QR_DATA"));
-}
-
-try { fs.unlinkSync(privateKeyPath); } catch(e) {}
-log("Done!");
-process.exit(0);
+    log("WxMiniprogramCI instance created");
+    
+    const projectConfig = JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8"));
+    
+    log("Step 3: Calling ci.preview()...");
+    return ci.preview({
+      projectConfig: projectConfig,
+      packageOptions: { ignoreExtFiles: false },
+      onProgressUpdate: function(p) { log("PROGRESS: " + JSON.stringify(p)); },
+    });
+  })
+  .then(function(previewResp) {
+    if (!previewResp) return;
+    
+    log("ci.preview() SUCCESS!");
+    log("Response keys: " + Object.keys(previewResp).join(","));
+    
+    fs.writeFileSync(responseFile, JSON.stringify(previewResp, null, 2));
+    
+    const qrCodeUrl = previewResp.qrCodeUrl;
+    const qrcodeData = previewResp.qrcodeData;
+    
+    log("qrCodeUrl: " + (qrCodeUrl || "NONE"));
+    log("qrcodeData: " + (qrcodeData ? "SET(len=" + qrcodeData.length + ")" : "NONE"));
+    
+    if (qrcodeData) {
+      const buf = Buffer.from(qrcodeData, "base64");
+      fs.writeFileSync(qrcodeFile, buf);
+      log("QR from qrcodeData: " + buf.length + " bytes");
+      exitOk();
+    } else if (qrCodeUrl) {
+      const fullUrl = qrCodeUrl.startsWith("http") ? qrCodeUrl : "https://open.weixin.qq.com" + qrCodeUrl;
+      log("qrCodeUrl full: " + fullUrl);
+      fs.writeFileSync(path.join(projectPath, "preview-url.txt"), Buffer.from(fullUrl));
+      fs.writeFileSync(qrcodeFile, Buffer.from("QR_URL:" + fullUrl));
+      exitOk();
+    } else {
+      log("WARNING: No qrcodeData and no qrCodeUrl!");
+      log("Full response: " + JSON.stringify(previewResp).substring(0, 300));
+      fs.writeFileSync(qrcodeFile, Buffer.from("NO_QR_DATA:" + JSON.stringify(previewResp).substring(0, 200)));
+      exitOk();
+    }
+  })
+  .catch(function(err) {
+    log("CATCH error: " + err.message);
+    if (err.code) log("  code: " + err.code);
+    if (err.response) log("  response: " + JSON.stringify(err.response).substring(0, 200));
+    if (err.stack) log("  stack: " + err.stack.split("\n").slice(0,3).join(" | "));
+    
+    // 保存错误响应
+    fs.writeFileSync(responseFile, Buffer.from("ERROR:" + err.message + "\ncode:" + String(err.code) + "\nresponse:" + JSON.stringify(err.response || {}).substring(0,200)));
+    fs.writeFileSync(qrcodeFile, Buffer.from("API_ERROR:" + err.message));
+    exitFail("preview API failed");
+  });
