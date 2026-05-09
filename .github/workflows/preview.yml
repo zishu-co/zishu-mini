@@ -34,10 +34,14 @@ jobs:
           APP_SECRET: ${{ secrets.WX_MINI_APP_SECRET }}
           PROJECT_PATH: ${{ github.workspace }}
 
-      - name: 上传二维码图片
-        if: success()
+      - name: 上传所有诊断文件
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: preview-qrcode
-          path: preview-qrcode.png
+          name: preview-artifacts
+          path: |
+            preview-qrcode.png
+            preview.log
+            api-response.json
+            preview-url.txt
           retention-days: 7
