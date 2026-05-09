@@ -34,39 +34,17 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
   fs.chmodSync(privateKeyPath, 0o600);
 
   // ============================================================
-  // Patch miniprogram-ci sign.js
-  // 使用 openssl dgst -sha1 -sign 替代 crypto.privateEncrypt
-  // 解决 Node.js 22 + OpenSSL 3.x 的兼容性问题
+  // 完全重写 sign.js，移除对 crypto.privateEncrypt 的依赖
   // ============================================================
   const signJsPath = path.join(projectPath, "node_modules/miniprogram-ci/dist/utils/sign.js");
-  let signJsContent = fs.readFileSync(signJsPath, "utf8");
 
-  // 查找原始 getSignature 函数（包含 privateEncrypt 的那一行）
-  const marker = "GENERATE_LOCAL_SIGNATURE_FAIL";
-  if (!signJsContent.includes("PATCHED_V3") && signJsContent.includes(marker)) {
-    // 用简单的字符串替换：找到包含 privateEncrypt 的那一行并替换
-    const lines = signJsContent.split("\n");
-    let found = false;
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes("privateEncrypt") && lines[i].includes("RSA_PKCS1_PADDING")) {
-        // 找到目标行，替换为 openssl dgst 调用
-        lines[i] = lines[i].replace(
-          /return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)/,
-          'return execSync("echo \'${Buffer.from(JSON.stringify(t)).toString("base64")}\' | base64 -d | openssl dgst -sha1 -sign " + r, {encoding:"utf8",timeout:15000}).trim()'
-        );
-        found = true;
-        console.log("sign.js 已 patch：替换 privateEncrypt 为 openssl dgst");
-        break;
-      }
-    }
-    if (found) {
-      signJsContent = lines.join("\n");
-      // 在文件末尾加 marker
-      signJsContent += "\n// PATCHED_V3";
-      fs.writeFileSync(signJsPath, signJsContent);
-    } else {
-      console.error("未找到 privateEncrypt 目标行！");
-    }
+  // 检查是否已经 patch 过
+  if (!fs.readFileSync(signJsPath, "utf8").includes("PATCHED_FINAL")) {
+    const newSignJs = `"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.getSignature=exports.getRandomString=void 0;const tslib_1=require("tslib"),config_1=require("../config/config"),url_config_1=require("../config/url.config"),request_1=require("./request"),error_1=require("./error"),locales_1=tslib_1.__importDefault(require("./locales/locales")),jsonParse_1=require("./jsonParse");async function getRandomString(r){try{const{body:e}=await(0,request_1.request)({url:url_config_1.GET_RAND_STRING,method:"post",body:JSON.stringify({appid:r,clientRand:Math.floor(1e8*Math.random())}),headers:{"content-type":"application/json"}}),t=(0,jsonParse_1.jsonRespParse)(e,url_config_1.GET_RAND_STRING);if(0===t.errCode)return t.data.randomString;throw new Error("errCode: "+t.errCode+"; errMsg: "+t.errMsg)}catch(r){throw new error_1.CodeError(r.toString(),config_1.GET_SIGNATURE_RAND_STRING_ERR)}}async function getSignature(r,e){const t={appid:e,rand_str:await getRandomString(e)};const dataStr=JSON.stringify(t);try{const {execSync:s}=require("child_process");const sig=s("echo '"+Buffer.from(dataStr).toString("base64")+"' | base64 -d | openssl dgst -sha1 -sign "+r,{encoding:"utf8",timeout:15000});return sig.toString().trim()}catch(r){throw new error_1.CodeError(locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(r.toString()),config_1.GENERATE_LOCAL_SIGNATURE_ERR)}}exports.getRandomString=getRandomString,exports.getSignature=getSignature;
+// PATCHED_FINAL`;
+
+    fs.writeFileSync(signJsPath, newSignJs);
+    console.log("sign.js 已完全重写：使用 openssl dgst -sha1 -sign");
   }
 
   const project = new ci.Project({
