@@ -2,7 +2,6 @@ const ci = require("miniprogram-ci");
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
-const crypto = require("crypto");
 
 const projectPath = process.env.PROJECT_PATH || process.cwd();
 
@@ -22,57 +21,52 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
     let header, footer;
     if (pemKey.includes("-----BEGIN PRIVATE KEY-----")) {
       header = "-----BEGIN PRIVATE KEY-----"; footer = "-----END PRIVATE KEY-----";
-    } else if (pemKey.includes("-----BEGIN RSA PRIVATE KEY-----")) {
-      header = "-----BEGIN RSA PRIVATE KEY-----"; footer = "-----END RSA PRIVATE KEY-----";
     } else {
-      console.error("Unknown key format");
-      process.exit(1);
+      header = "-----BEGIN RSA PRIVATE KEY-----"; footer = "-----END RSA PRIVATE KEY-----";
     }
     const body = pemKey.replace(header, "").replace(footer, "");
     const lines = body.match(/.{1,64}/g) || [];
     pemKey = header + "\n" + lines.join("\n") + "\n" + footer;
   }
 
-  // 写私钥文件
   const privateKeyPath = path.join(projectPath, "private.key");
   fs.writeFileSync(privateKeyPath, pemKey);
   fs.chmodSync(privateKeyPath, 0o600);
-  console.log("密钥已写入");
 
   // ============================================================
-  // 修复 miniprogram-ci sign.js
-  // Node.js 22+ OpenSSL 3.x 不再支持 RSA PKCS#1 v1.5 加密
-  // 改用 openssl dgst -sha1 -sign（微信官方签名方式）
+  // Patch miniprogram-ci sign.js
+  // 使用 openssl dgst -sha1 -sign 替代 crypto.privateEncrypt
+  // 解决 Node.js 22 + OpenSSL 3.x 的兼容性问题
   // ============================================================
   const signJsPath = path.join(projectPath, "node_modules/miniprogram-ci/dist/utils/sign.js");
   let signJsContent = fs.readFileSync(signJsPath, "utf8");
 
-  if (!signJsContent.includes("PATCHED_V2")) {
-    // 找到 getSignature 函数（单行模式匹配）
-    const oldSignPattern = /async function getSignature\(r, e\)\{const t=\{appid:e,rand_str:await getRandomString\(e)\};try\{return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)\}catch\(r\)\{throw new error_1\.CodeError\(locales_1\.default\.config\.GENERATE_LOCAL_SIGNATURE_FAIL\.format\(r\.toString\(\)\),config_1\.GENERATE_LOCAL_SIGNATURE_ERR\)\}\}/;
-
-    const newSignFunc = `async function getSignature(r, e) {
-  const t = { appid: e, rand_str: await getRandomString(e) };
-  const dataStr = JSON.stringify(t);
-  try {
-    // 使用 openssl dgst -sha1 -sign（微信官方签名方式）
-    const sig = execSync(
-      "echo '" + Buffer.from(dataStr).toString("base64") + "' | base64 -d | openssl dgst -sha1 -sign " + r,
-      { encoding: "utf8", timeout: 15000 }
-    );
-    return sig.trim();
-  } catch (err) {
-    throw new error_1.CodeError(
-      locales_1.default.config.GENERATE_LOCAL_SIGNATURE_FAIL.format(err.message),
-      config_1.GENERATE_LOCAL_SIGNATURE_ERR
-    );
-  }
-}
-// PATCHED_V2`;
-
-    signJsContent = signJsContent.replace(oldSignPattern, newSignFunc);
-    fs.writeFileSync(signJsPath, signJsContent);
-    console.log("sign.js 已 patch: openssl dgst -sha1 -sign");
+  // 查找原始 getSignature 函数（包含 privateEncrypt 的那一行）
+  const marker = "GENERATE_LOCAL_SIGNATURE_FAIL";
+  if (!signJsContent.includes("PATCHED_V3") && signJsContent.includes(marker)) {
+    // 用简单的字符串替换：找到包含 privateEncrypt 的那一行并替换
+    const lines = signJsContent.split("\n");
+    let found = false;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes("privateEncrypt") && lines[i].includes("RSA_PKCS1_PADDING")) {
+        // 找到目标行，替换为 openssl dgst 调用
+        lines[i] = lines[i].replace(
+          /return crypto_1\.default\.privateEncrypt\(\{key:r,padding:crypto_1\.default\.constants\.RSA_PKCS1_PADDING\},Buffer\.from\(JSON\.stringify\(t\)\)\)\.toString\("base64"\)/,
+          'return execSync("echo \'${Buffer.from(JSON.stringify(t)).toString("base64")}\' | base64 -d | openssl dgst -sha1 -sign " + r, {encoding:"utf8",timeout:15000}).trim()'
+        );
+        found = true;
+        console.log("sign.js 已 patch：替换 privateEncrypt 为 openssl dgst");
+        break;
+      }
+    }
+    if (found) {
+      signJsContent = lines.join("\n");
+      // 在文件末尾加 marker
+      signJsContent += "\n// PATCHED_V3";
+      fs.writeFileSync(signJsPath, signJsContent);
+    } else {
+      console.error("未找到 privateEncrypt 目标行！");
+    }
   }
 
   const project = new ci.Project({
@@ -102,7 +96,6 @@ const projectPath = process.env.PROJECT_PATH || process.cwd();
 
   const result = await ci.preview(previewOptions);
   console.log("预览成功:", JSON.stringify(result, null, 2));
-  console.log("二维码:", qrcodeOutputPath);
 
   try { fs.unlinkSync(privateKeyPath); } catch (e) {}
 })();
