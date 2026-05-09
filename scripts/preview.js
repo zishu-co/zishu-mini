@@ -4,23 +4,20 @@ const { execSync } = require("child_process");
 const https = require("https");
 
 const projectPath = process.env.PROJECT_PATH || process.cwd();
-const logFile = path.join(projectPath, "preview-qrcode.png"); // overwrite qrcode with log
+const logFile = path.join(projectPath, "preview_debug.log");
+const log = (msg) => { console.log(msg); fs.appendFileSync(logFile, msg + "\n"); };
 
 const privateKeyRaw = (process.env.PRIVATE_KEY || "").trim();
 const appid = process.env.APPID;
 const appSecret = (process.env.APP_SECRET || "").trim();
 
-const log = (msg) => {
-  console.log(msg);
-  fs.appendFileSync(logFile, msg + "\n");
-};
+fs.writeFileSync(logFile, "=== START " + new Date().toISOString() + " ===\n");
 
-fs.writeFileSync(logFile, "");
-log("=== START " + new Date().toISOString() + " ===");
 log("NODE: " + process.version);
 log("projectPath: " + projectPath);
 log("appid: " + (appid ? "SET" : "MISSING"));
-log("privateKey len: " + privateKeyRaw.length + ", first50: " + privateKeyRaw.substring(0, 50));
+log("privateKey len: " + privateKeyRaw.length);
+log("privateKey first50: " + privateKeyRaw.substring(0, 50));
 log("appSecret: " + (appSecret ? "SET" : "MISSING"));
 
 function formatPEM(raw) {
@@ -68,7 +65,7 @@ function httpsPost(url, body) {
 }
 
 if (!appid || !privateKeyRaw || !appSecret) {
-  log("FATAL: Missing env vars"); process.exit(0); // exit 0 so artifact uploads
+  log("FATAL: Missing env vars"); process.exit(1);
 }
 
 const keyPath = path.join(projectPath, "private.key");
@@ -83,24 +80,25 @@ try {
   execSync(`echo test | openssl dgst -sha1 -sign ${keyPath}`, {encoding: "utf8", timeout: 5000});
   log("KEY_VALIDATION: OK");
 } catch(e) {
-  log("KEY_VALIDATION FAILED: " + e.message); process.exit(0);
+  log("KEY_VALIDATION FAILED: " + e.message);
+  process.exit(1);
 }
 
 (async () => {
   try {
     log("STEP1: Getting access_token...");
-    const tokenResp = await httpsPost(
-      `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${appSecret}`, {});
+    const tokenUrl = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${appSecret}`;
+    const tokenResp = await httpsPost(tokenUrl, {});
     log("STEP1 response: " + JSON.stringify(tokenResp));
-    if (!tokenResp.access_token) { log("STEP1 FAILED"); process.exit(0); }
+    if (!tokenResp.access_token) { log("STEP1 FAILED"); process.exit(1); }
     const accessToken = tokenResp.access_token;
-    log("STEP1 OK, token: " + accessToken.substring(0, 10) + "...");
+    log("STEP1 OK");
 
-    log("STEP2: Committing...");
+    log("STEP2: Committing code...");
     const randStr = "rp_" + Date.now() + "_" + Math.random().toString(36).substring(2, 10);
     const signStr = JSON.stringify({ appid, rand_str: randStr });
     const sig = signData(signStr, keyPath);
-    log("STEP2 sig: " + sig.substring(0, 40) + "...");
+    log("STEP2 sig: " + sig.substring(0, 40));
 
     const projectConfig = JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8"));
     const version = "1.0." + Date.now();
@@ -112,15 +110,17 @@ try {
     );
     log("STEP2 response: " + JSON.stringify(commitResp));
     if (commitResp.errcode && commitResp.errcode !== 0 && commitResp.errcode !== 87056) {
-      log("STEP2 FAILED: " + JSON.stringify(commitResp)); process.exit(0);
+      log("STEP2 FAILED"); process.exit(1);
     }
 
     log("SUCCESS! version: " + version);
-    // 成功时覆盖为真实 QR 码数据
-    fs.writeFileSync(logFile, "QRCODE_PLACEHOLDER_" + version);
+    const qrPath = path.resolve(projectPath, "preview-qrcode.png");
+    fs.writeFileSync(qrPath, "QRCODE");
     try { fs.unlinkSync(keyPath); } catch(e) {}
+    fs.appendFileSync(logFile, "=== END ===\n");
     process.exit(0);
   } catch(e) {
-    log("FATAL: " + e.message); process.exit(0);
+    log("FATAL: " + e.message);
+    process.exit(1);
   }
 })();
