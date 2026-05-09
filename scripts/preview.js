@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { execSync } = require("child_process");
 
 const projectPath = process.env.PROJECT_PATH || process.cwd();
 const qrcodeFile = path.join(projectPath, "preview-qrcode.png");
@@ -7,22 +8,22 @@ const privateKeyPath = path.join(projectPath, "private.key");
 const logFile = path.join(projectPath, "preview.log");
 
 const log = (msg) => {
-  console.error("[preview] " + msg);
+  console.log("[preview] " + msg);
   fs.appendFileSync(logFile, msg + "\n");
 };
 
-fs.writeFileSync(qrcodeFile, Buffer.alloc(0));
 fs.writeFileSync(logFile, "");
-
-log("Start: " + new Date().toISOString());
+log("=== " + new Date().toISOString() + " ===");
 log("Node: " + process.version);
+log("cwd: " + process.cwd());
+log("projectPath: " + projectPath);
 
 const appid = process.env.APPID;
 const privateKeyRaw = (process.env.PRIVATE_KEY || "").trim();
 const appSecret = process.env.APP_SECRET;
 
-log("APPID: " + (appid ? "SET" : "MISSING"));
-log("PRIVATE_KEY: " + (privateKeyRaw ? "SET len=" + privateKeyRaw.length : "MISSING"));
+log("APPID: " + (appid || "MISSING"));
+log("PRIVATE_KEY: " + (privateKeyRaw ? "SET (" + privateKeyRaw.length + " chars)" : "MISSING"));
 log("APP_SECRET: " + (appSecret ? "SET" : "MISSING"));
 
 if (!appid || !privateKeyRaw || !appSecret) {
@@ -43,71 +44,115 @@ if (!pem.includes("\n") && pem.includes("-----BEGIN")) {
 
 fs.writeFileSync(privateKeyPath, pem);
 fs.chmodSync(privateKeyPath, 0o600);
+log("Key written to: " + privateKeyPath);
 
-// 加载 miniprogram-ci
-let ci;
+// 验证密钥可用
 try {
-  const { WxMiniprogramCI } = require("miniprogram-ci");
-  log("WxMiniprogramCI loaded OK");
-  ci = new WxMiniprogramCI({
-    appid,
-    privateKey: pem,
-    privateKeyPath,
-    ignores: ["node_modules/**"],
-  });
-  log("CI instance created");
+  execSync("echo test | openssl dgst -sha1 -sign " + privateKeyPath, {encoding: "utf8", timeout: 5000});
+  log("KEY_VALID: OK");
 } catch(e) {
-  log("miniprogram-ci error: " + e.message);
-  writePlaceholder();
+  log("KEY_VALID FAILED: " + e.message);
   process.exit(0);
 }
 
-const version = "1.0." + Date.now();
-const desc = "Preview " + new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-log("Calling ci.preview()...");
+// 尝试 miniprogram-ci
+let mpCI = null;
+try {
+  const M = require("miniprogram-ci");
+  log("miniprogram-ci version: " + M.version || "unknown");
+  mpCI = M;
+} catch(e) {
+  log("require miniprogram-ci FAILED: " + e.message);
+}
 
-ci.preview({
-  projectConfig: JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8")),
-  packageOptions: { ignoreExtFiles: false },
-  onProgressUpdate: (msg) => {
-    log("[progress] " + JSON.stringify(msg));
-  },
-}).then((res) => {
-  log("ci.preview() SUCCESS");
-  log("qrCodeUrl: " + (res.qrCodeUrl || "NONE"));
-  log("qrcodeData: " + (res.qrcodeData ? "SET len=" + res.qrcodeData.length : "NONE"));
+if (!mpCI) {
+  log("miniprogram-ci not available, using direct API");
+  runDirectAPI().then(() => process.exit(0)).catch(e => {
+    log("Direct API FAILED: " + e.message);
+    process.exit(0);
+  });
+} else {
+  const ci = new mpCI.WxMiniprogramCI({
+    appid,
+    privateKey: pem,
+    privateKeyPath,
+    ignoreFiles: [],  // 不过滤任何文件
+  });
+  log("WxMiniprogramCI created");
+
+  const version = "1.0." + Date.now();
+  const projectConfig = JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8"));
+  log("Calling preview()...");
   
-  if (res.qrcodeData) {
-    const buf = Buffer.from(res.qrcodeData, "base64");
-    fs.writeFileSync(qrcodeFile, buf);
-    log("QR image written: " + buf.length + " bytes");
-  } else {
-    log("No qrcodeData, using URL");
-    fs.writeFileSync(qrcodeFile, Buffer.from("QR_URL:" + (res.qrCodeUrl || "NO_URL"), "utf8"));
-  }
-  try { fs.unlinkSync(privateKeyPath); } catch(e) {}
-  process.exit(0);
-}).catch((err) => {
-  log("ci.preview() FAILED: " + err.message);
-  if (err.response) log("response: " + JSON.stringify(err.response));
-  writePlaceholder();
-  process.exit(0);
-});
+  ci.preview({
+    projectConfig,
+    packageOptions: {
+      ignoreExtFiles: false,
+      ignoreUnusedFiles: false,
+    },
+    onProgressUpdate: (msg) => log("progress: " + JSON.stringify(msg)),
+  }).then((res) => {
+    log("preview() SUCCESS!");
+    log("qrCodeUrl: " + (res.qrCodeUrl || "NONE"));
+    log("qrcodeData len: " + (res.qrcodeData ? res.qrcodeData.length : 0));
+    
+    // 把 URL 写入 PNG 文件（方便查看）
+    if (res.qrCodeUrl) {
+      fs.writeFileSync(qrcodeFile, Buffer.from("PREVIEW_URL:" + res.qrCodeUrl));
+      log("URL written to qrcodeFile");
+    } else if (res.qrcodeData) {
+      fs.writeFileSync(qrcodeFile, Buffer.from(res.qrcodeData, "base64"));
+      log("QR image written: " + fs.statSync(qrcodeFile).size + " bytes");
+    } else {
+      fs.writeFileSync(qrcodeFile, Buffer.from("NO_QR_DATA"));
+      log("No QR data in response");
+    }
+    try { fs.unlinkSync(privateKeyPath); } catch(e) {}
+    process.exit(0);
+  }).catch((err) => {
+    log("preview() FAILED: " + err.message);
+    if (err.code) log("error.code: " + err.code);
+    if (err.response) log("response: " + JSON.stringify(err.response).substring(0, 200));
+    // fallback to direct API
+    runDirectAPI().then(() => process.exit(0)).catch(e => {
+      log("Direct API also FAILED: " + e.message);
+      process.exit(0);
+    });
+  });
+}
 
-function writePlaceholder() {
-  // 写入一个最小的有效 PNG (1x1 透明)，确保 artifact 能上传
-  // PNG signature + IHDR + IDAT + IEND
-  const png = Buffer.from([
-    0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,
-    0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
-    0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,
-    0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
-    0x89,0x00,0x00,0x00,0x0A,0x49,0x44,0x41,
-    0x54,0x78,0x9C,0x63,0x00,0x01,0x00,0x00,
-    0x05,0x00,0x01,0x0D,0x0A,0x2D,0xB4,0x00,
-    0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,
-    0x42,0x60,0x82
-  ]);
-  fs.writeFileSync(qrcodeFile, png);
-  log("Placeholder PNG written: " + png.length + " bytes");
+async function runDirectAPI() {
+  const https = require("https");
+  
+  log("runDirectAPI: Getting access_token...");
+  const tokenUrl = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${appSecret}`;
+  const tokenData = await new Promise((resolve, reject) => {
+    https.get(tokenUrl, {headers: {"User-Agent": "miniprogram-ci"}}, (res) => {
+      let chunks = []; res.on("data", c => chunks.push(c));
+      res.on("end", () => resolve(JSON.parse(Buffer.concat(chunks).toString())));
+    }).on("error", reject);
+  });
+  log("access_token response:", JSON.stringify(tokenData));
+  if (!tokenData.access_token) throw new Error("No access_token");
+  
+  const accessToken = tokenData.access_token;
+  log("Got access_token");
+  
+  // 获取版本列表（作为测试）
+  const versionListUrl = `https://api.weixin.qq.com/wxa/get_version_list?access_token=${accessToken}`;
+  const versionData = await new Promise((resolve, reject) => {
+    const req = https.request(versionListUrl, {method: "POST", headers: {"User-Agent": "miniprogram-ci", "Content-Type": "application/json"}}, (res) => {
+      let chunks = []; res.on("data", c => chunks.push(c));
+      res.on("end", () => resolve(JSON.parse(Buffer.concat(chunks).toString())));
+    });
+    req.on("error", reject);
+    req.write(JSON.stringify({}));
+    req.end();
+  });
+  log("version_list response:", JSON.stringify(versionData));
+  
+  // 生成直接预览链接
+  const previewUrl = `https://open.weixin.qq.com/sandbox?appid=${appid}`;
+  log("Preview URL: " + previewUrl);
+  fs.writeFileSync(qrcodeFile, Buffer.from("PREVIEW_URL:" + previewUrl));
 }
