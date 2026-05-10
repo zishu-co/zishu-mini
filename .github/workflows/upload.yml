@@ -21,7 +21,7 @@ jobs:
       - name: 安装依赖
         run: |
           cd zishu-mini
-          npm ci
+          npm install
 
       - name: 安装 miniprogram-ci
         run: |
@@ -36,7 +36,7 @@ jobs:
       - name: 上传小程序
         run: |
           cd zishu-mini
-          npx miniprogram-ci upload --pp project.config.json --pk private.key --appid ${{ secrets.WX_MINI_APPID }} --version ${{ github.run_number }}.0.0 --desc "CI上传 ${{ github.event_name }}#${{ github.run_number }}"
+          npx miniprogram-ci upload --pp project.config.json --pk private.key --appid ${{ secrets.WX_MINI_APPID }} --version ${{ github.run_number }}.0.0 --desc "CI上传"
 
       - name: 上传构建产物
         if: always()
