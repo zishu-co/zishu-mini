@@ -17,8 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: zishu-mini/package-lock.json
 
       - name: 安装依赖
         run: |
@@ -38,14 +36,17 @@ jobs:
       - name: 上传小程序
         run: |
           cd zishu-mini
-          npx miniprogram-ci upload             --pp project.config.json             --pk private.key             --appid ${{ secrets.WX_MINI_APPID }}             --version ${{ github.run_number }}.0.0             --desc "CI上传 ${{ github.event_name }} ${{ github.run_number }}"
+          npx miniprogram-ci upload \
+            --pp project.config.json \
+            --pk private.key \
+            --appid ${{ secrets.WX_MINI_APPID }} \
+            --version ${{ github.run_number }}.0.0 \
+            --desc "CI上传 ${{ github.event_name }} ${{ github.run_number }}"
 
       - name: 上传构建产物
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            zishu-mini/miniprogram/
-            zishu-mini/package-lock.json
+          path: zishu-mini/
           retention-days: 3
