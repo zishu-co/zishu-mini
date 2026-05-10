@@ -1,0 +1,51 @@
+name: 小程序上传
+
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: zishu-mini/package-lock.json
+
+      - name: 安装依赖
+        run: |
+          cd zishu-mini
+          npm ci
+
+      - name: 安装 miniprogram-ci
+        run: |
+          cd zishu-mini
+          npm install miniprogram-ci
+
+      - name: 生成私钥文件
+        run: |
+          echo "${{ secrets.WX_MINI_PRIVATE_KEY }}" > zishu-mini/private.key
+          chmod 600 zishu-mini/private.key
+
+      - name: 上传小程序
+        run: |
+          cd zishu-mini
+          npx miniprogram-ci upload             --pp project.config.json             --pk private.key             --appid ${{ secrets.WX_MINI_APPID }}             --version ${{ github.run_number }}.0.0             --desc "CI上传 ${{ github.event_name }} ${{ github.run_number }}"
+
+      - name: 上传构建产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            zishu-mini/miniprogram/
+            zishu-mini/package-lock.json
+          retention-days: 3
