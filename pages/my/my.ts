@@ -49,8 +49,12 @@ Page<IData, IData>({
     const globalData = app.globalData
     const userInfo = globalData.userInfo || {}
     const phoneNumber = globalData.phoneNumber || ""
-    // 只要有用户信息或手机号之一，即视为已登录（退出按钮应始终可见）
-    const isLoggedIn = !!(globalData.hasUserInfo || globalData.hasPhoneNumber)
+
+    // 直接读取 storage 中的实际值判断是否已登录
+    // 不依赖 hasUserInfo/hasPhoneNumber 标志（避免异步时序问题）
+    const storedUserInfo = wx.getStorageSync('userInfo')
+    const storedPhoneNumber = wx.getStorageSync('phoneNumber')
+    const isLoggedIn = !!(storedUserInfo || storedPhoneNumber)
 
     this.setData({
       userInfo: {
