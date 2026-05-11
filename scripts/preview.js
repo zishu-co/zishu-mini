@@ -1,3 +1,4 @@
+const ci = require("miniprogram-ci");
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
@@ -46,10 +47,10 @@ if (!appid || !privateKeyRaw || !appSecret) {
 let pem = privateKeyRaw.replace(/\\n/g, "\n").trim();
 if (!pem.includes("\n") && pem.includes("-----BEGIN")) {
   const isRSA = pem.includes("RSA");
-  const h = isRSA ? "-----BEGIN RSA PRIVATE KEY-----" : "-----BEGIN PRIVATE KEY-----";
-  const f = isRSA ? "-----END RSA PRIVATE KEY-----" : "-----END PRIVATE KEY-----";
-  const body = pem.replace(h, "").replace(f, "");
-  pem = h + "\n" + (body.match(/.{1,64}/g) || []).join("\n") + "\n" + f;
+  const header = isRSA ? "-----BEGIN RSA PRIVATE KEY-----" : "-----BEGIN PRIVATE KEY-----";
+  const footer = isRSA ? "-----END RSA PRIVATE KEY-----" : "-----END PRIVATE KEY-----";
+  const body = pem.replace(header, "").replace(footer, "");
+  pem = header + "\n" + (body.match(/.{1,64}/g) || []).join("\n") + "\n" + footer;
 }
 
 fs.writeFileSync(privateKeyPath, pem);
@@ -107,6 +108,61 @@ function exitOk(data) {
   process.exit(0);
 }
 
+// 使用新版 miniprogram-ci API
+async function runPreview() {
+  log("Creating project with new API...");
+  
+  const project = new ci.Project({
+    appid: appid,
+    type: "miniProgram",
+    projectPath: projectPath,
+    privateKeyPath: privateKeyPath,
+    ignores: [],
+  });
+
+  log("Calling preview()...");
+  const result = await ci.preview({
+    project: project,
+    desc: "预览发布 - " + new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" }),
+    setting: { es6: true, enhance: true, postcss: true, minified: true },
+    qrcodeFormat: "image",
+    qrcodeOutputDest: qrcodeFile,
+    onProgressUpdate: function(p) { log("PROGRESS: " + JSON.stringify(p)); },
+  });
+
+  log("Preview result keys: " + Object.keys(result).join(","));
+  log("qrcodeData: " + (result.qrcodeData ? "SET(len=" + result.qrcodeData.length + ")" : "NONE"));
+  log("qrCodeUrl: " + (result.qrCodeUrl || "NONE"));
+
+  fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
+
+  if (result.qrcodeData) {
+    fs.writeFileSync(qrcodeFile, Buffer.from(result.qrcodeData, "base64"));
+    log("QR written from qrcodeData: " + result.qrcodeData.length + " chars");
+    exitOk();
+    return true;
+  } else if (result.qrCodeUrl) {
+    const fullUrl = result.qrCodeUrl.startsWith("http") ? result.qrCodeUrl : "https://open.weixin.qq.com" + result.qrCodeUrl;
+    fs.writeFileSync(path.join(projectPath, "preview-url.txt"), Buffer.from(fullUrl));
+    log("No qrcodeData, using qrCodeUrl: " + fullUrl);
+    try {
+      const imgData = await httpGet(fullUrl, 10000);
+      if (Buffer.isBuffer(imgData) || (typeof imgData === 'string' && imgData.length > 100)) {
+        const buf = Buffer.isBuffer(imgData) ? imgData : Buffer.from(imgData);
+        if (buf.length > 100) {
+          fs.writeFileSync(qrcodeFile, buf);
+          log("Downloaded QR image: " + buf.length + " bytes");
+          exitOk();
+          return true;
+        }
+      }
+    } catch(e) {
+      log("URL download failed: " + e.message);
+    }
+  }
+  return false;
+}
+
 // Step 1: 获取 access_token
 log("Step 1: Getting access_token...");
 httpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + appSecret)
@@ -122,76 +178,13 @@ httpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&ap
   })
   .then(function(accessToken) {
     if (!accessToken) return;
-    
-    log("Step 2: Trying miniprogram-ci preview...");
-    let M;
-    try { M = require("miniprogram-ci"); }
-    catch(err) {
-      log("require miniprogram-ci FAILED: " + err.message);
-      return null;
-    }
-    
-    const ci = new M.WxMiniprogramCI({
-      appid: appid,
-      privateKey: pem,
-      privateKeyPath: privateKeyPath,
-      ignores: [],
-    });
-    
-    const projectConfig = JSON.parse(fs.readFileSync(path.join(projectPath, "project.config.json"), "utf8"));
-    
-    return ci.preview({
-      projectConfig: projectConfig,
-      packageOptions: { ignoreExtFiles: false },
-      onProgressUpdate: function(p) { log("PROGRESS: " + JSON.stringify(p)); },
-    }).then(function(resp) {
-      log("miniprogram-ci preview SUCCESS");
-      log("Response keys: " + Object.keys(resp).join(","));
-      log("qrcodeData: " + (resp.qrcodeData ? "SET(len=" + resp.qrcodeData.length + ")" : "NONE"));
-      log("qrCodeUrl: " + (resp.qrCodeUrl || "NONE"));
-      
-      fs.writeFileSync(responseFile, JSON.stringify(resp, null, 2));
-      
-      if (resp.qrcodeData) {
-        fs.writeFileSync(qrcodeFile, Buffer.from(resp.qrcodeData, "base64"));
-        exitOk();
-        return true;
-      } else if (resp.qrCodeUrl) {
-        const fullUrl = resp.qrCodeUrl.startsWith("http") ? resp.qrCodeUrl : "https://open.weixin.qq.com" + resp.qrCodeUrl;
-        fs.writeFileSync(path.join(projectPath, "preview-url.txt"), Buffer.from(fullUrl));
-        log("No qrcodeData, using qrCodeUrl: " + fullUrl);
-        // 尝试用 qrCodeUrl 下载图片
-        return httpGet(fullUrl, 10000).then(function(imgData) {
-          if (Buffer.isBuffer(imgData) || (typeof imgData === 'string' && imgData.length > 100)) {
-            const buf = Buffer.isBuffer(imgData) ? imgData : Buffer.from(imgData);
-            if (buf.length > 100) {
-              fs.writeFileSync(qrcodeFile, buf);
-              log("Downloaded QR image: " + buf.length + " bytes");
-              exitOk();
-              return true;
-            }
-          }
-          log("Could not download QR image from URL");
-          return false;
-        }).catch(function() {
-          log("URL download failed");
-          return false;
-        });
-      }
-      return false;
-    }).catch(function(err) {
-      log("miniprogram-ci preview FAILED: " + err.message);
-      fs.writeFileSync(responseFile, Buffer.from("MINIPROGRAM_CI_ERROR:" + err.message));
-      return false;
-    });
+    return runPreview();
   })
   .then(function(hasQR) {
-    if (hasQR === true) return; // already exited with QR
+    if (hasQR === true) return;
     if (hasQR === false) {
       log("miniprogram-ci did not produce QR, trying WeChat API...");
     }
-    
-    // 获取 access_token 重试
     return httpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + appSecret)
       .then(function(tokenResp2) {
         if (!tokenResp2.access_token) throw new Error("No access_token in retry");
@@ -200,28 +193,23 @@ httpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&ap
   })
   .then(function(accessToken) {
     if (!accessToken) return;
-    
     log("Step 3: Trying WeChat generateQrcode API...");
-    // 尝试用微信官方的 generateQrcode API
     return httpPost("https://api.weixin.qq.com/wxa/get_qrcode?access_token=" + accessToken, {
       path: "pages/index/index",
       width: 430,
-      env_version: "trial"  // trial=体验版, release=正式版
+      env_version: "trial"
     }).then(function(qrResp) {
       log("generateQrcode response keys: " + Object.keys(qrResp).join(","));
       fs.writeFileSync(responseFile, JSON.stringify(qrResp, null, 2));
-      
+
       if (qrResp.buffer) {
-        // 返回的是 base64 编码的图片
         fs.writeFileSync(qrcodeFile, Buffer.from(qrResp.buffer, "base64"));
         log("QR from generateQrcode buffer: " + qrResp.buffer.length + " chars");
         exitOk();
       } else if (qrResp.show_qrcode) {
-        // 返回的是 URL
         const qrUrl = qrResp.show_qrcode;
         log("show_qrcode URL: " + qrUrl);
         fs.writeFileSync(path.join(projectPath, "preview-url.txt"), Buffer.from(qrUrl));
-        // 尝试下载
         return httpGet(qrUrl, 10000).then(function(imgData) {
           if (Buffer.isBuffer(imgData) && imgData.length > 100) {
             fs.writeFileSync(qrcodeFile, imgData);
