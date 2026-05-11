@@ -141,10 +141,19 @@ page {
 }
 
 .status-pending {
+  color: #fa4126;
+  background-color: #fff1ed;
+}
 
 .status-in-progress {
+  color: #00b42a;
+  background-color: #e8ffef;
+}
 
 .status-completed {
+  color: #999;
+  background-color: #f5f5f5;
+}
 
 .card-title {
   font-size: 32rpx;
