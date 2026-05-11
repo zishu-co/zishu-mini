@@ -51,7 +51,6 @@ Page<IData, IData>({
     const phoneNumber = globalData.phoneNumber || ""
 
     // 直接读取 storage 中的实际值判断是否已登录
-    // 不依赖 hasUserInfo/hasPhoneNumber 标志（避免异步时序问题）
     const storedUserInfo = wx.getStorageSync('userInfo')
     const storedPhoneNumber = wx.getStorageSync('phoneNumber')
     const isLoggedIn = !!(storedUserInfo || storedPhoneNumber)
@@ -124,6 +123,12 @@ Page<IData, IData>({
   },
 
   logOut() {
+    // 未登录时提示
+    if (!this.data.isLoggedIn) {
+      wx.showToast({ title: "未登录", icon: "none" })
+      return
+    }
+
     wx.showModal({
       title: "提示",
       content: "确定要退出登录吗？",

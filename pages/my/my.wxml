@@ -137,7 +137,7 @@
   </view>
 
   <!-- 退出登录 -->
-  <view class="logout-wrapper" wx:if="{{isLoggedIn}}">
+  <view class="logout-wrapper">
     <button class="logout-btn" bindtap="logOut">退出登录</button>
   </view>
 
