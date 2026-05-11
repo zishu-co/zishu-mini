@@ -146,17 +146,17 @@ page {
   border-radius: 20rpx;
 }
 
-.status-待认领 {
+.status-pending {
   color: #fa4126;
   background-color: #fff1ed;
 }
 
-.status-进行中 {
+.status-in-progress {
   color: #00b42a;
   background-color: #e8ffef;
 }
 
-.status-已完成 {
+.status-completed {
   color: #999;
   background-color: #f5f5f5;
 }
