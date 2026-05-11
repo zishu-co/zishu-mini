@@ -17,25 +17,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: 安装依赖
         run: |
-          cd zishu-mini
-          npm install
+          npm ci
 
       - name: 安装 miniprogram-ci
         run: |
-          cd zishu-mini
           npm install miniprogram-ci
 
       - name: 生成私钥文件
         run: |
-          echo "${{ secrets.WX_MINI_PRIVATE_KEY }}" > zishu-mini/private.key
-          chmod 600 zishu-mini/private.key
+          echo "${{ secrets.WX_MINI_PRIVATE_KEY }}" > private.key
+          chmod 600 private.key
 
       - name: 上传小程序
         run: |
-          cd zishu-mini
           npx miniprogram-ci upload --pp project.config.json --pk private.key --appid ${{ secrets.WX_MINI_APPID }} --version ${{ github.run_number }}.0.0 --desc "CI上传"
 
       - name: 上传构建产物
@@ -43,5 +41,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: zishu-mini/
+          path: .
           retention-days: 3
