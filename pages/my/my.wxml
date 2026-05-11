@@ -7,7 +7,7 @@
     <view class="user-card__avatar" bindtap="goToEditProfile">
       <image
         class="avatar-img"
-        src="{{userInfo.avatarUrl || \"/img/logo.png\"}}"
+        src="{{userInfo.avatarUrl || '/img/logo.png'}}"
         mode="aspectFill"
       />
     </view>
