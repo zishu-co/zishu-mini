@@ -1,16 +1,20 @@
-// pages/inno/index.ts
-import { fetchInno, InnoData } from '../../services/inno/inno';
-import { fetchGoodsList, Goods } from '../../services/good/fetchGoods';
+/**
+ * pages/inno/index.ts
+ * 创新页面 - 项目列表
+ */
 
-// Toast 使用 require 方式导入
-const Toast = require('tdesign-miniprogram/toast/index').default;
+import { fetchInno, fetchProjectsFromApi, claimProject, Project, TabItem } from '../../services/inno/inno';
+
+const app = getApp<any>();
 
 type IData = {
   imgSrcs: string[];
-  tabList: { text: string; key: number }[];
-  goodsList: Goods[];
-  goodsListLoadStatus: number;
+  tabList: TabItem[];
+  projectList: Project[];
+  filteredList: Project[];
+  activeTab: string;
   pageLoading: boolean;
+  listLoading: boolean;
   current: number;
   autoplay: boolean;
   duration: string;
@@ -23,9 +27,11 @@ Page<IData, IData>({
   data: {
     imgSrcs: [],
     tabList: [],
-    goodsList: [],
-    goodsListLoadStatus: 0,
+    projectList: [],
+    filteredList: [],
+    activeTab: '',
     pageLoading: false,
+    listLoading: false,
     current: 1,
     autoplay: true,
     duration: '500',
@@ -34,11 +40,7 @@ Page<IData, IData>({
     swiperImageProps: { mode: 'scaleToFill' },
   },
 
-  goodListPagination: {
-    index: 0,
-    num: 20,
-  },
-
+  // 当前标签索引
   privateData: {
     tabIndex: 0,
   },
@@ -52,95 +54,121 @@ Page<IData, IData>({
   },
 
   onPullDownRefresh() {
-    this.init();
+    this.loadProjects(true);
   },
 
   init() {
-    console.log('初始化页面')
-    this.loadInnoPage();
-  },
+    this.setData({ pageLoading: true });
 
-  loadInnoPage() {
-    wx.stopPullDownRefresh();
-
-    this.setData({
-      pageLoading: true,
-    });
-
-    fetchInno().then((res: InnoData) => {
+    // 加载轮播图和标签（使用本地 mock，保证始终有数据）
+    fetchInno().then((res) => {
       this.setData({
-        tabList: res.tabList,
         imgSrcs: res.swiper,
+        tabList: res.tabList,
         pageLoading: false,
       });
-      this.loadGoodsList(true);
+      this.loadProjects(true);
     });
   },
 
+  loadProjects(fresh = false) {
+    if (fresh) {
+      wx.pageScrollTo({ scrollTop: 0 });
+    }
+
+    this.setData({ listLoading: true });
+
+    fetchProjectsFromApi()
+      .then((list) => {
+        this.setData({ projectList: list });
+        this.filterByTab('');
+        this.setData({ listLoading: false });
+        wx.stopPullDownRefresh();
+      })
+      .catch(() => {
+        this.setData({ listLoading: false });
+        wx.stopPullDownRefresh();
+      });
+  },
+
+  /** 标签切换 */
   tabChangeHandle(e: any) {
-    this.privateData.tabIndex = e.detail;
-    this.loadGoodsList(true);
+    const index = e.detail;
+    const tab = this.data.tabList[index];
+    const key = tab?.key || '';
+    this.privateData.tabIndex = index;
+    this.filterByTab(key);
   },
 
-  onReTry() {
-    this.loadGoodsList();
-  },
-
-  async loadGoodsList(fresh = false) {
-    if (fresh) {
-      wx.pageScrollTo({
-        scrollTop: 0,
-      });
+  /** 按类型过滤 */
+  filterByTab(key: string) {
+    if (!key) {
+      this.setData({ filteredList: this.data.projectList, activeTab: '' });
+      return;
     }
-
-    this.setData({ goodsListLoadStatus: 1 });
-
-    const pageSize = this.goodListPagination.num;
-    let pageIndex = this.privateData.tabIndex * pageSize + this.goodListPagination.index + 1;
-    if (fresh) {
-      pageIndex = 0;
-    }
-
-    try {
-      const nextList = await fetchGoodsList(pageIndex, pageSize);
-      this.setData({
-        goodsList: fresh ? nextList : this.data.goodsList.concat(nextList),
-        goodsListLoadStatus: 0,
-      });
-
-      this.goodListPagination.index = pageIndex;
-      this.goodListPagination.num = pageSize;
-      console.log(this.data.goodsList.length)
-    } catch (err) {
-      console.log('获取失败')
-      this.setData({ goodsListLoadStatus: 3 });
-    }
+    const filtered = this.data.projectList.filter(
+      (p) => p.task_serial && p.task_serial[0].toUpperCase() === key.toUpperCase()
+    );
+    this.setData({ filteredList: filtered, activeTab: key });
   },
 
-  goodListClickHandle(e: any) {
-    const { index } = e.detail;
-    const { spuId } = this.data.goodsList[index];
-    wx.navigateTo({
-      url: `/pages/goods/details/index?spuId=${spuId}`,
-    });
-  },
-
-  goodListAddCartHandle() {
-    Toast({
-      context: this,
-      selector: '#t-toast',
-      message: '点击加入购物车',
-    });
-  },
-
-  navToSearchPage() {
-    // 待实现
-  },
-
+  /** 点击轮播图 */
   navToActivityDetail(detail: any) {
-    const { index: promotionID = 0 } = detail || {};
-    wx.navigateTo({
-      url: `/pages/promotion/promotion-detail/index?promotion_id=${promotionID}`,
+    // 轮播图目前是展示用途，点击不跳转
+  },
+
+  /** 点击项目卡片 → 跳转详情页 */
+  goToProjectDetail(e: any) {
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({ url: `/pages/inno-detail/index?id=${id}` });
+  },
+
+  /** 认领项目 */
+  claimProject(e: any) {
+    const { id, index } = e.currentTarget.dataset;
+
+    // 检查登录状态
+    const token = wx.getStorageSync('refreshToken');
+    if (!token) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+
+    wx.showModal({
+      title: '确认认领',
+      content: '确定要认领该项目吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '提交中...', mask: true });
+          claimProject(id)
+            .then(() => {
+              wx.hideLoading();
+              wx.showToast({ title: '认领成功', icon: 'success' });
+              // 刷新列表
+              this.loadProjects(true);
+            })
+            .catch(() => {
+              wx.hideLoading();
+              wx.showToast({ title: '认领失败', icon: 'none' });
+            });
+        }
+      },
     });
+  },
+
+  /** 获取项目状态标签 */
+  getStatusTag(status: string, taker: string): string {
+    if (status === '已完成') return '已完成';
+    if (taker) return '进行中';
+    return '待认领';
+  },
+
+  /** 获取截止日期颜色 */
+  getDeadlineColor(deadline: string): string {
+    if (!deadline) return '';
+    const now = new Date();
+    const dl = new Date(deadline);
+    if (dl < now) return 'red';
+    return '';
   },
 });

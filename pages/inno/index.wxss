@@ -1,107 +1,241 @@
+/* pages/inno/index.wxss */
+/* 创新页面样式 */
+
 page {
-  box-sizing: border-box;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 96rpx);
+  background-color: #f5f5f5;
+}
+
+/* ========== 页面结构 ========== */
+
+.page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20rpx);
+}
+
+/* ========== 加载状态 ========== */
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 200rpx 0;
+}
+
+/* ========== 顶部区域 ========== */
+
+.home-page-header {
+  background: linear-gradient(#fff, #f5f5f5);
+  padding: 0 24rpx 0;
+}
+
+.search-wrap {
+  padding: 16rpx 0 0;
+}
+
+.search-wrap .t-search__input-container {
+  border-radius: 32rpx !important;
+  height: 64rpx !important;
+}
+
+.search-wrap .t-search__input {
+  font-size: 28rpx !important;
+  color: rgb(116, 116, 116) !important;
+}
+
+.swiper-wrap {
+  margin-top: 12rpx;
+}
+
+.swiper-wrap .t-image__swiper {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 16rpx;
+}
+
+/* ========== 标签栏 ========== */
+
+.tab-bar {
+  padding: 0 16rpx;
+  background-color: #f5f5f5;
 }
 
 .t-tabs.t-tabs--top .t-tabs__scroll {
   border-bottom: none !important;
 }
 
-.home-page-header {
-  background: linear-gradient(#fff, #f5f5f5);
-}
-
-.home-page-container {
-  background: #f5f5f5;
-}
-
-.home-page-container,
-.home-page-header {
-  display: block;
-  padding: 0 24rpx;
-}
-
-.home-page-header .t-search__input-container {
-  border-radius: 32rpx !important;
-  height: 64rpx !important;
-}
-
-.home-page-header .t-search__input {
-  font-size: 28rpx !important;
-  color: rgb(116, 116, 116) !important;
-}
-
-.home-page-header .swiper-wrap {
-  margin-top: 20rpx;
-}
-
-.home-page-header .t-image__swiper {
-  width: 100%;
-  height: 300rpx;
-  border-radius: 10rpx;
-}
-
-.home-page-container .t-tabs {
+.t-tabs {
   background: #f5f5f5 !important;
 }
 
-.home-page-container .t-tabs .t-tabs-nav {
+.t-tabs .t-tabs-nav {
   background-color: transparent;
   line-height: 80rpx;
   font-size: 28rpx;
   color: #333;
 }
 
-.home-page-container .t-tabs .t-tabs-scroll {
+.t-tabs .t-tabs-scroll {
   border: none !important;
 }
 
-/* 半个字 */
-.home-page-container .tab.order-nav .order-nav-item.scroll-width {
-  min-width: 165rpx;
-}
-.home-page-container .tab .order-nav-item.active {
-  color: #fa550f !important;
-}
-
-.home-page-container .tab .bottom-line {
-  border-radius: 4rpx;
-}
-
-.home-page-container .tab .order-nav-item.active .bottom-line {
-  background-color: #fa550f !important;
-}
-
-.home-page-container .tabs-external__item {
-  /* color: #666 !important; */
+.tabs-external__item {
   font-size: 28rpx;
+  color: #666;
 }
 
-.home-page-container .tabs-external__active {
-  color: #333333 !important;
+.tabs-external__active {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #aa00ff !important;
+}
+
+/* ========== 项目列表 ========== */
+
+.project-list {
+  padding: 24rpx 24rpx 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* ========== 项目卡片 ========== */
+
+.project-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.card-serial {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #aa00ff;
+  background-color: #f3e8ff;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.card-status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.status-待认领 {
+  color: #fa4126;
+  background-color: #fff1ed;
+}
+
+.status-进行中 {
+  color: #00b42a;
+  background-color: #e8ffef;
+}
+
+.status-已完成 {
+  color: #999;
+  background-color: #f5f5f5;
+}
+
+.card-title {
   font-size: 32rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
 }
 
-.home-page-container .tabs-external__track {
-  /* background-color: #fa4126 !important; */
-  height: 6rpx !important;
-  border-radius: 4rpx !important;
-  width: 48rpx !important;
+.card-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-.t-tabs.t-tabs--top .t-tabs__item,
-.t-tabs.t-tabs--bottom .t-tabs__item {
-  height: 86rpx !important;
+.card-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20rpx;
 }
 
-.home-page-container .goods-list-container {
-  background: #f5f5f5 !important;
-  margin-top: 16rpx;
+.footer-item {
+  display: flex;
+  align-items: center;
 }
 
-.home-page-tabs {
-  --td-tab-nav-bg-color: transparent;
-  --td-tab-border-color: transparent;
-  --td-tab-item-color: #666;
-  --td-tab-track-color: red;
+.footer-icon {
+  font-size: 26rpx;
+  margin-right: 6rpx;
+}
+
+.footer-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.footer-text.bonus {
+  color: #fa4126;
+  font-weight: bold;
+}
+
+.footer-text.deadline-red {
+  color: #fa4126;
+}
+
+.footer-text.deadline- {
+  color: #666;
+}
+
+/* ========== 认领按钮 ========== */
+
+.claim-btn {
+  position: absolute;
+  right: 28rpx;
+  bottom: 28rpx;
+  background: linear-gradient(135deg, #c6f, #aa00ff);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: bold;
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(170, 0, 255, 0.3);
+}
+
+/* ========== 加载更多 ========== */
+
+.list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32rpx 0;
 }

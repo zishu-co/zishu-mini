@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "创新",
   "onReachBottomDistance": 10,
-  "backgroundTextStyle": "light",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "t-search": "tdesign-miniprogram/search/search",
@@ -11,8 +10,6 @@
     "t-image": "/components/webp-image/index",
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-tabs": "tdesign-miniprogram/tabs/tabs",
-    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel",
-    "goods-list": "/components/goods-list/index",
-    "load-more": "/components/load-more/index"
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel"
   }
 }

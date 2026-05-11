@@ -1,0 +1,225 @@
+/* pages/inno-detail/index.wxss */
+/* 创新项目详情页样式 */
+
+page {
+  background-color: #f5f5f5;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+}
+
+/* ========== 加载 / 空状态 ========== */
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 200rpx 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 0;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* ========== 通用卡片 ========== */
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.serial-tag {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #aa00ff;
+  background-color: #f3e8ff;
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.status-red {
+  color: #fa4126;
+  background-color: #fff1ed;
+}
+
+.status-green {
+  color: #00b42a;
+  background-color: #e8ffef;
+}
+
+.status-gray {
+  color: #999;
+  background-color: #f5f5f5;
+}
+
+.project-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  line-height: 1.5;
+  margin-bottom: 24rpx;
+}
+
+/* ========== 信息网格 ========== */
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.info-label {
+  width: 140rpx;
+  font-size: 26rpx;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.info-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.info-value.bonus {
+  color: #fa4126;
+  font-weight: bold;
+}
+
+.info-value.text-red {
+  color: #fa4126;
+}
+
+/* ========== 描述 / 课程 ========== */
+
+.card-title-bar {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #aa00ff;
+  margin-bottom: 16rpx;
+}
+
+/* t-chat-markdown 渲染内容样式 */
+.t-chat-markdown {
+  font-size: 28rpx !important;
+  line-height: 1.8 !important;
+  color: #333 !important;
+}
+
+/* TDesign markdown 组件自带类名（保证基础可读性）*/
+.t-chat-markdown .t-chat-markdown__p {
+  margin: 8rpx 0;
+}
+
+.t-chat-markdown .t-chat-markdown__h1,
+.t-chat-markdown .t-chat-markdown__h2,
+.t-chat-markdown .t-chat-markdown__h3 {
+  color: #1a1a2e;
+  font-weight: bold;
+  margin: 16rpx 0 8rpx;
+}
+
+.t-chat-markdown .t-chat-markdown__code {
+  background-color: #f5f5f5;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  font-family: monospace;
+}
+
+.t-chat-markdown .t-chat-markdown__pre {
+  background-color: #1a1a2e;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  overflow-x: auto;
+  margin: 12rpx 0;
+}
+
+.t-chat-markdown .t-chat-markdown__ul,
+.t-chat-markdown .t-chat-markdown__ol {
+  padding-left: 40rpx;
+  margin: 8rpx 0;
+}
+
+.courses-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ========== 操作按钮 ========== */
+
+.action-wrap {
+  margin-top: 8rpx;
+}
+
+.btn-claim {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #c6f, #aa00ff);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 44rpx;
+  border: none;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.3);
+}
+
+.btn-claim::after {
+  border: none;
+}
+
+.btn-done {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #f0f0f0;
+  color: #999;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  border: none;
+  text-align: center;
+}
+
+.btn-done::after {
+  border: none;
+}

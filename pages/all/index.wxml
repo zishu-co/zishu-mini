@@ -1,0 +1,4 @@
+<view class="page">
+  <view class="header"><text class="title">all</text></view>
+  <view class="content"><view class="placeholder">页面建设中...</view></view>
+</view>

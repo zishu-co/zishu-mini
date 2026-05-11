@@ -1,0 +1,91 @@
+<view class="page">
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+
+  <!-- 项目不存在 -->
+  <view class="empty-state" wx:if="{{!loading && !project}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">项目不存在或已被删除</text>
+  </view>
+
+  <!-- 项目详情 -->
+  <view class="detail-wrap" wx:if="{{!loading && project}}">
+
+    <!-- 基本信息卡片 -->
+    <view class="card">
+      <view class="card-top">
+        <view class="serial-tag">{{project.task_serial || '—'}}</view>
+        <view class="status-tag status-{{getStatusColor(project)}}">
+          {{getStatusText(project)}}
+        </view>
+      </view>
+
+      <view class="project-title">{{project.title || '无标题'}}</view>
+
+      <view class="info-grid">
+        <view class="info-row">
+          <text class="info-label">发布人</text>
+          <text class="info-value">{{project.publisher || '—'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">执行人</text>
+          <text class="info-value">{{project.taker || '待认领'}}</text>
+        </view>
+        <view class="info-row" wx:if="{{project.shushi}}">
+          <text class="info-label">塾师</text>
+          <text class="info-value">{{project.shushi}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">赏金</text>
+          <text class="info-value bonus">{{project.bonus || 0}} 塾值</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">开始日期</text>
+          <text class="info-value">{{project.start_date || '—'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">截止日期</text>
+          <text class="info-value {{isDeadlinePassed(project.deadline) ? 'text-red' : ''}}">
+            {{project.deadline || '—'}}
+          </text>
+        </view>
+        <view class="info-row" wx:if="{{project.planed_hour}}">
+          <text class="info-label">建议用时</text>
+          <text class="info-value">{{project.planed_hour}} 小时</text>
+        </view>
+        <view class="info-row" wx:if="{{project.half_progress}}">
+          <text class="info-label">半程进度</text>
+          <text class="info-value">{{project.half_progress}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 项目描述（Markdown 渲染 via TDesign ChatMarkdown）-->
+    <view class="card" wx:if="{{project.desc}}">
+      <view class="card-title-bar">项目描述</view>
+      <t-chat-markdown content="{{project.desc}}" />
+    </view>
+
+    <!-- 先修课程 -->
+    <view class="card" wx:if="{{project.required_courses && !project.desc}}">
+      <view class="card-title-bar">先修课程</view>
+      <view class="courses-text">{{project.required_courses}}</view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-wrap" wx:if="{{!project.taker && !project.finish_date}}">
+      <button class="btn-claim" bindtap="claimProject">认领该项目</button>
+    </view>
+
+    <!-- 已完成状态 -->
+    <view class="action-wrap" wx:if="{{project.finish_date}}">
+      <button class="btn-done" disabled>该项目已结项</button>
+    </view>
+
+  </view>
+</view>
+
+<!-- TDesign toast 组件 -->
+<t-toast id="t-toast" />
