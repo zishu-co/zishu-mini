@@ -49,7 +49,8 @@ Page<IData, IData>({
     const globalData = app.globalData
     const userInfo = globalData.userInfo || {}
     const phoneNumber = globalData.phoneNumber || ""
-    const isLoggedIn = !!(userInfo.nickName && phoneNumber)
+    // 只要有用户信息或手机号之一，即视为已登录（退出按钮应始终可见）
+    const isLoggedIn = !!(globalData.hasUserInfo || globalData.hasPhoneNumber)
 
     this.setData({
       userInfo: {
