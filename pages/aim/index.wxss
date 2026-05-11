@@ -4,6 +4,17 @@
   padding: 24rpx;
   padding-top: calc(env(safe-area-inset-top) + 44px + 24rpx);
   padding-top: calc(constant(safe-area-inset-top) + 44px + 24rpx);
+  /* 底部安全区域 - 防止被自定义 tabBar 遮挡 */
+  /* 使用 max 确保至少有 160rpx 的底部间距（约 60px tabBar + 额外空间） */
+  padding-bottom: max(env(safe-area-inset-bottom) + 120rpx, 160rpx);
+  box-sizing: border-box;
+}
+
+/* 额外的底部占位元素，确保内容不被遮挡 */
+.aim-page::after {
+  content: '';
+  display: block;
+  height: 40rpx;
 }
 
 .section-recommendation {
@@ -42,4 +53,31 @@
 
 .aim-page .t-button--outline .t-button__text {
   color: var(--td-button-default-text-color) !important;
+}
+
+/* Dev 模式提示条 */
+.dev-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2rpx solid #f59e0b;
+  border-radius: 16rpx;
+  padding: 20rpx 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.dev-banner-text {
+  font-size: 26rpx;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.dev-banner-login {
+  font-size: 26rpx;
+  color: #d97706;
+  font-weight: 600;
+  padding: 8rpx 20rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 24rpx;
 }

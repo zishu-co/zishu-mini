@@ -17,17 +17,20 @@
 const getBaseUrl = (): string => {
   try {
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
+    console.log('[base.ts] 当前环境:', envVersion);
     switch (envVersion) {
       case 'develop':
         return 'https://zishu.co';
       case 'trial':
-        return 'https://staging-api.example.com';
+        // 体验版也使用生产环境地址
+        return 'https://zishu.co';
       case 'release':
-        return 'https://api.example.com';
+        return 'https://zishu.co';
       default:
         return 'https://zishu.co';
     }
-  } catch {
+  } catch (e) {
+    console.error('[base.ts] 获取环境失败:', e);
     return 'https://zishu.co';
   }
 };
@@ -327,6 +330,16 @@ const request = <T = any>(options: RequestOptions): Promise<T> => {
 const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
   return new Promise((resolve, reject) => {
     const header = buildHeaders(options);
+    const fullUrl = `${BASE_URL}${options.url}`;
+
+    // 详细日志，用于排查体验版问题
+    console.log('[requestWithRefresh] 请求信息:', {
+      url: fullUrl,
+      method: options.method || 'GET',
+      headerKeys: Object.keys(header),
+      hasToken: !!header['token'],
+      tokenLength: header['token']?.length || 0
+    });
 
     // 显示加载提示
     if (options.showLoading) {
@@ -334,7 +347,7 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
     }
 
     wx.request({
-      url: `${BASE_URL}${options.url}`,
+      url: fullUrl,
       method: options.method || 'GET',
       data: options.data,
       header,
@@ -344,6 +357,12 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
 
         const { statusCode, data } = res;
         const responseData = data as ApiResponse;
+
+        console.log('[requestWithRefresh] 响应:', {
+          url: options.url,
+          statusCode,
+          hasData: !!data
+        });
 
         // 请求成功
         if (statusCode >= 200 && statusCode < 300) {
@@ -379,8 +398,16 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
       fail: (err) => {
         if (options.showLoading) wx.hideLoading();
 
+        // 详细错误日志
+        console.error('[requestWithRefresh] 请求失败:', {
+          url: options.url,
+          fullUrl,
+          errMsg: err.errMsg,
+          err
+        });
+
         if (err.errMsg?.includes('request:fail')) {
-          wx.showToast({ title: '网络请求失败', icon: 'none' });
+          wx.showToast({ title: '网络请求失败: ' + err.errMsg, icon: 'none' });
         }
 
         reject(new ApiError(-1, err.errMsg || '网络请求失败', null, err));
@@ -496,3 +523,6 @@ export {
   ApiResponse,
   ApiError
 };
+
+// 导出环境判断工具（从 utils/env.ts 重新导出，方便统一使用）
+export { isDevMode, isGuestMode, isLoggedIn, getEnvVersion } from '../utils/env';

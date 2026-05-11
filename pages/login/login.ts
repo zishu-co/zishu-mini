@@ -1,6 +1,7 @@
 // pages/login/login.ts
 // IAppOption 和 IGlobalData 在 app.ts 中定义
 const app = getApp<any>()
+import { isDevMode, isLoggedIn } from '../../utils/env'
 
 type IData = {
   userInfo: any;
@@ -12,6 +13,11 @@ type IData = {
   avatarUrl: string | null;
   nickName: string | null;
   userId: number | null;
+  // Dev 模式新增字段
+  isDev: boolean;
+  phoneInput: string;
+  pwdInput: string;
+  canDevLogin: boolean;
 };
 
 Page<IData, IData>({
@@ -24,10 +30,26 @@ Page<IData, IData>({
     hasPhoneNumber: false,
     avatarUrl: null,
     nickName: null,
-    userId: null
+    userId: null,
+    // Dev 模式初始化
+    isDev: false,
+    phoneInput: '',
+    pwdInput: '',
+    canDevLogin: false,
   },
 
   onLoad() {
+    // 检测环境
+    const devMode = isDevMode()
+    this.setData({ isDev: devMode })
+
+    // Dev 模式下，如果已有 token 也算已登录，可以直接回跳
+    if (devMode && isLoggedIn()) {
+      console.log('[Dev模式] 已登录，直接跳转')
+      wx.switchTab({ url: '/pages/aim/index' })
+      return
+    }
+
     // 检查是否可以使用 getUserProfile API
     if (wx.getUserProfile) {
       this.setData({
@@ -179,5 +201,86 @@ Page<IData, IData>({
         duration: 2000
       })
     }
+  },
+
+  // ========== Dev 模式新增方法 ==========
+
+  onPhoneInput(e: any) {
+    const val = e.detail.value
+    this.setData({
+      phoneInput: val,
+      canDevLogin: val.length >= 10 && this.data.pwdInput.length >= 4
+    })
+  },
+
+  onPwdInput(e: any) {
+    const val = e.detail.value
+    this.setData({
+      pwdInput: val,
+      canDevLogin: this.data.phoneInput.length >= 10 && val.length >= 4
+    })
+  },
+
+  /** 手机号+密码登录（Dev 模式） */
+  loginByPassword() {
+    if (!this.data.canDevLogin) return
+
+    const { phoneInput: phone, pwdInput: password } = this.data
+
+    wx.showLoading({ title: '登录中...', mask: true })
+
+    // 调用后端密码登录接口
+    wx.request({
+      url: 'https://zishu.co/api/users/token',
+      method: 'POST',
+      header: {
+        'content-type': 'application/x-www-form-urlencoded'
+      },
+      data: { phone, password },
+      success: (res: any) => {
+        wx.hideLoading()
+        const data = res.data
+        if (data && data.id > 0) {
+          // 登录成功，保存 token 和用户信息
+          const userInfo = {
+            userId: data.id,
+            nickName: data.username || data.nickName || `用户${phone.slice(-4)}`,
+            avatarUrl: ''
+          }
+
+          wx.setStorageSync('userInfo', userInfo)
+          wx.setStorageSync('accessToken', data.atoken)
+          wx.setStorageSync('refreshToken', data.rtoken)
+          wx.setStorageSync('phoneNumber', data.phone || phone)
+          // 清除游客标记
+          wx.removeStorageSync('guestMode')
+
+          app.globalData.userInfo = userInfo
+          app.globalData.hasUserInfo = true
+          app.globalData.phoneNumber = data.phone || phone
+          app.globalData.hasPhoneNumber = true
+          app.globalData.accessToken = data.atoken
+          app.globalData.refreshToken = data.rtoken
+          app.globalData.userId = data.id
+
+          wx.showToast({ title: '登录成功', icon: 'success' })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/aim/index' })
+          }, 1000)
+        } else {
+          wx.showToast({ title: data.message || '用户名或密码错误', icon: 'none' })
+        }
+      },
+      fail: () => {
+        wx.hideLoading()
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      }
+    })
+  },
+
+  /** 以游客身份进入（Dev 模式） */
+  enterAsGuest() {
+    wx.setStorageSync('guestMode', true)
+    wx.switchTab({ url: '/pages/aim/index' })
   }
 })

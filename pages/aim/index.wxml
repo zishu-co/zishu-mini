@@ -1,7 +1,13 @@
 <view class="aim-page">
+  <!-- Dev 模式游客提示条 -->
+  <view class="dev-banner" wx:if="{{showDevBanner}}">
+    <text class="dev-banner-text">🔧 Dev 模式 · 游客身份（数据为模拟）</text>
+    <text class="dev-banner-login" bindtap="goLogin">去登录</text>
+  </view>
+
   <!-- 顶部区域：今日推荐 -->
   <view class="section-recommendation">
-    <top3-recommendation 
+    <top3-recommendation
       recommendations="{{recommendations}}"
       loading="{{recommendationLoading}}"
       refreshing="{{recommendationRefreshing}}"

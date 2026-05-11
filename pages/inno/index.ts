@@ -80,7 +80,14 @@ Page<IData, IData>({
 
     fetchProjectsFromApi()
       .then((list) => {
-        this.setData({ projectList: list });
+        // 格式化日期（只保留到日）
+        const formattedList = list.map((item: any) => ({
+          ...item,
+          deadline: item.deadline && item.deadline.length > 10
+            ? item.deadline.substring(0, 10)
+            : item.deadline,
+        }));
+        this.setData({ projectList: formattedList });
         this.filterByTab('');
         this.setData({ listLoading: false });
         wx.stopPullDownRefresh();

@@ -2,6 +2,7 @@
 // Toast 使用 require 方式导入
 const Toast = require('tdesign-miniprogram/toast/index').default;
 import http from '../../services/base';
+import { isDevMode, isGuestMode } from '../../utils/env';
 
 // 推荐项接口
 interface RecommendationItem {
@@ -92,6 +93,9 @@ interface IAimData {
   // 目标数据
   currentGoal: Goal | null;
   goalLoading: boolean;
+
+  // Dev 模式
+  showDevBanner: boolean;
 }
 
 // 格式化更新时间
@@ -110,6 +114,8 @@ const getDefaultData = (): IAimData => ({
 
   currentGoal: null,
   goalLoading: false,
+
+  showDevBanner: false,
 });
 
 Page<IData, IAimData>({
@@ -124,7 +130,16 @@ Page<IData, IAimData>({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
+    // 更新 Dev 模式提示条显示状态
+    this.setData({
+      showDevBanner: isDevMode() && isGuestMode()
+    });
     this.init();
+  },
+
+  // 跳转到登录页
+  goLogin() {
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 
   onPullDownRefresh() {
@@ -154,9 +169,33 @@ Page<IData, IAimData>({
   loadGoal() {
     this.setData({ goalLoading: true });
 
+    // Dev 游客模式：直接返回 Mock 数据
+    if (isDevMode() && isGuestMode()) {
+      console.log('[Dev模式-游客] 使用 Mock 目标数据')
+      setTimeout(() => {
+        this.setData({
+          currentGoal: mockGoal,
+          goalLoading: false
+        });
+        wx.stopPullDownRefresh();
+      }, 300);
+      return;
+    }
+
     // 从本地存储获取 userId
     const userInfo = wx.getStorageSync('userInfo') || {};
     const userId = userInfo.userId;
+    const accessToken = wx.getStorageSync('accessToken');
+    const refreshToken = wx.getStorageSync('refreshToken');
+
+    console.log('[aim/loadGoal] 存储信息:', {
+      hasUserId: !!userId,
+      userId,
+      hasAccessToken: !!accessToken,
+      accessTokenLength: accessToken?.length || 0,
+      hasRefreshToken: !!refreshToken,
+      refreshTokenLength: refreshToken?.length || 0
+    });
 
     if (!userId) {
       this.setData({
@@ -175,11 +214,12 @@ Page<IData, IAimData>({
     }
 
     // 发起真实请求
+    console.log('[aim/loadGoal] 开始获取目标数据, userId:', userId);
     http.requestWithRefresh({
       url: `/api/users/fetch_goal/${userId}`,
       method: 'GET'
     }).then((res: any) => {
-      console.log('获取目标数据:', res);
+      console.log('[aim/loadGoal] 获取目标数据成功:', res);
       // 后端返回的是 goal_dict，可能是空对象
       const goal = res && Object.keys(res).length > 0 ? res : null;
       this.setData({
@@ -188,18 +228,33 @@ Page<IData, IAimData>({
       });
       wx.stopPullDownRefresh();
     }).catch((err: any) => {
-      console.error('获取目标数据失败:', err);
+      console.error('[aim/loadGoal] 获取目标数据失败:', err);
+      // 详细错误信息
+      const errorMsg = err?.message || err?.errMsg || '未知错误';
+      const errorCode = err?.code || '无错误码';
+      const originalError = err?.originalError;
+
+      console.error('[aim/loadGoal] 错误详情:', {
+        message: errorMsg,
+        code: errorCode,
+        originalError,
+        data: err?.data
+      });
+
       this.setData({
         currentGoal: null,
         goalLoading: false
       });
       wx.stopPullDownRefresh();
+
+      // 显示更详细的错误信息用于排查
+      const displayMsg = `获取失败[${errorCode}]: ${errorMsg}`;
       Toast({
         context: this,
         selector: '#t-toast',
-        message: '获取目标数据失败',
+        message: displayMsg,
         icon: 'close-circle',
-        duration: 2000,
+        duration: 3000,
       });
     });
   },

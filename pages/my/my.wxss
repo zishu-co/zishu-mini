@@ -126,7 +126,7 @@ page {
 /* ========== 功能菜单 ========== */
 
 .menu-wrapper {
-  padding: 240rpx 32rpx 32rpx;
+  padding: 240rpx 32rpx 180rpx;
 }
 
 .menu-group {
@@ -172,11 +172,16 @@ page {
   color: #ccc;
 }
 
+/* ========== 底部区域 ========== */
+
+.bottom-wrapper {
+  padding: 32rpx 32rpx 32rpx;
+}
+
 /* ========== 退出登录 ========== */
 
 .logout-wrapper {
-  padding: 0 32rpx;
-  margin-top: 16rpx;
+  width: 100%;
 }
 
 .logout-btn {
