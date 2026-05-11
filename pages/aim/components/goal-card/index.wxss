@@ -134,6 +134,9 @@
 .progress-actions {
   display: flex;
   justify-content: flex-end;
+  /* 增加底部间距，防止被 tabBar 遮挡 */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: constant(safe-area-inset-bottom);
 }
 
 /* 复盘/回顾 */

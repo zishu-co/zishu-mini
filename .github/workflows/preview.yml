@@ -2,8 +2,7 @@ name: 小程序预览
 
 on:
   push:
-    branches: [preview, dev]
-  workflow_dispatch:
+    branches: [dev]
 
 jobs:
   preview:
@@ -16,37 +15,33 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 安装 Node.js
+      - name: 安装 Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: zishu-mini/package-lock.json
+          node-version: '18'
 
       - name: 安装依赖
-        run: |
-          cd zishu-mini
-          npm ci
+        run: npm ci
 
-      - name: 安装 miniprogram-ci
-        run: |
-          cd zishu-mini
-          npm install miniprogram-ci
+      - name: 安装最新版 miniprogram-ci
+        run: npm install miniprogram-ci@latest
 
       - name: 生成预览二维码
-        id: preview
-        run: |
-          cd zishu-mini
-          node scripts/preview.js
+        run: node scripts/preview.js
         env:
           APPID: ${{ secrets.WX_MINI_APPID }}
           PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
-          PROJECT_PATH: ${{ github.workspace }}/zishu-mini
+          APP_SECRET: ${{ secrets.WX_MINI_APP_SECRET }}
+          PROJECT_PATH: ${{ github.workspace }}
 
-      - name: 上传二维码图片
-        if: success()
+      - name: 上传所有诊断文件
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: preview-qrcode
-          path: zishu-mini/preview-qrcode.png
+          name: preview-artifacts
+          path: |
+            preview-qrcode.png
+            preview.log
+            api-response.json
+            preview-url.txt
           retention-days: 7

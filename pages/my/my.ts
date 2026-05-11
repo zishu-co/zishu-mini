@@ -1,6 +1,9 @@
-// pages/my/my.ts
-// Toast 使用 require 方式导入
-const Toast = require('tdesign-miniprogram/toast/index').default;
+/**
+ * pages/my/my.ts
+ * 自塾小程序 - 我的页面
+ */
+
+const app = getApp<any>()
 
 interface IData {
   userInfo: {
@@ -8,198 +11,150 @@ interface IData {
     nickName: string;
     phoneNumber: string;
   };
-  currAuthStep: number;
-  showMakePhone: boolean;
-  customerServiceInfo: {
-    servicePhone: string;
-    serviceTimeDuration: string;
+  isLoggedIn: boolean;
+  stats: {
+    reportCount: number;
+    shuzhiCount: number;
+    courseCount: number;
+    favCount: number;
   };
-  showKefu: boolean;
-  versionNo: string;
 }
 
 Page<IData, IData>({
   data: {
     userInfo: {
-      avatarUrl: '',
-      nickName: '未登录',
-      phoneNumber: '',
+      avatarUrl: "",
+      nickName: "",
+      phoneNumber: "",
     },
-    currAuthStep: 1,
-    showMakePhone: false,
-    customerServiceInfo: {
-      servicePhone: '4006336868',
-      serviceTimeDuration: '每周三至周五 9:00-12:00  13:00-15:00',
+    isLoggedIn: false,
+    stats: {
+      reportCount: 0,
+      shuzhiCount: 0,
+      courseCount: 0,
+      favCount: 0,
     },
-    showKefu: true,
-    versionNo: '',
   },
 
-  onLoad() {
-    this.getVersionInfo();
-  },
+  onLoad() {},
 
   onShow() {
-    this.getTabBar().init();
-    this.init();
+    this.init()
+    if (typeof this.getTabBar === "function") {
+      this.getTabBar().init()
+    }
   },
 
   init() {
-    // 从本地存储读取真实的用户信息
-    const localUserInfo = wx.getStorageSync('userInfo') || {};
-    const localPhoneNumber = wx.getStorageSync('phoneNumber') || '';
+    const globalData = app.globalData
+    const userInfo = globalData.userInfo || {}
+    const phoneNumber = globalData.phoneNumber || ""
 
-    const userInfo = {
-      avatarUrl: localUserInfo.avatarUrl || '',
-      nickName: localUserInfo.nickName || '未登录',
-      phoneNumber: localPhoneNumber,
-    };
-
-    // 判断登录状态
-    const isLoggedIn = localUserInfo && localUserInfo.nickName && localPhoneNumber;
+    // 直接读取 storage 中的实际值判断是否已登录
+    const storedUserInfo = wx.getStorageSync('userInfo')
+    const storedPhoneNumber = wx.getStorageSync('phoneNumber')
+    const isLoggedIn = !!(storedUserInfo || storedPhoneNumber)
 
     this.setData({
-      userInfo,
-      currAuthStep: isLoggedIn ? 2 : 1,
-    });
-  },
+      userInfo: {
+        avatarUrl: userInfo.avatarUrl || "",
+        nickName: userInfo.nickName || "",
+        phoneNumber: phoneNumber,
+      },
+      isLoggedIn: isLoggedIn,
+    })
 
-  onClickCell(e: any) {
-    const { type } = e.currentTarget.dataset;
-
-    switch (type) {
-      case 'address': {
-        wx.navigateTo({ url: '/pages/user/address/list/index' });
-        break;
-      }
-      case 'service': {
-        this.openMakePhone();
-        break;
-      }
-      case 'help-center': {
-        Toast({
-          context: this,
-          selector: '#t-toast',
-          message: '你点击了帮助中心',
-          icon: '',
-          duration: 1000,
-        });
-        break;
-      }
-      case 'point': {
-        Toast({
-          context: this,
-          selector: '#t-toast',
-          message: '你点击了积分菜单',
-          icon: '',
-          duration: 1000,
-        });
-        break;
-      }
-      case 'coupon': {
-        wx.navigateTo({ url: '/pages/coupon/coupon-list/index' });
-        break;
-      }
-      default: {
-        Toast({
-          context: this,
-          selector: '#t-toast',
-          message: '未知跳转',
-          icon: '',
-          duration: 1000,
-        });
-        break;
-      }
+    if (isLoggedIn) {
+      this.fetchStats()
     }
   },
 
-  jumpNav(e: any) {
-    let status: number;
-    if (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.status !== undefined) {
-      // 来自自定义菜单的点击
-      status = parseInt(e.currentTarget.dataset.status);
-    } else if (e.detail && e.detail.tabType !== undefined) {
-      // 来自组件的事件
-      status = e.detail.tabType;
-    } else {
-      return;
+  fetchStats() {
+    const token = wx.getStorageSync("accessToken") || wx.getStorageSync("refreshToken")
+    if (!token) return
+
+    const userId = app.globalData.userInfo?.userId || 0
+
+    wx.request({
+      url: "https://zishu.co/api/users/fetch_reports/" + userId,
+      method: "GET",
+      header: { token },
+      success: (res: any) => {
+        if (res.data && Array.isArray(res.data)) {
+          this.setData({ "stats.reportCount": res.data.length })
+        }
+      },
+    })
+
+    wx.request({
+      url: "https://zishu.co/api/users/fetch_shuzhi/" + userId,
+      method: "GET",
+      header: { token },
+      success: (res: any) => {
+        if (res.data && Array.isArray(res.data)) {
+          this.setData({ "stats.shuzhiCount": res.data.length })
+        }
+      },
+    })
+  },
+
+  goToEditProfile() {
+    if (!this.data.isLoggedIn) {
+      wx.navigateTo({ url: "/pages/login/login" })
+      return
     }
+    wx.navigateTo({ url: "/pages/editprofile/editprofile" })
+  },
 
-    if (status === 0) {
-      wx.navigateTo({ url: '/pages/order/after-service-list/index' });
-    } else {
-      wx.navigateTo({ url: `/pages/order/order-list/index?status=${status}` });
+  navigateTo(e: any) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    if (!this.data.isLoggedIn) {
+      wx.navigateTo({ url: "/pages/login/login" })
+      return
     }
+    wx.navigateTo({ url })
   },
 
-  jumpAllOrder() {
-    wx.navigateTo({ url: '/pages/order/order-list/index' });
-  },
-
-  openMakePhone() {
-    this.setData({ showMakePhone: true });
-  },
-
-  closeMakePhone() {
-    this.setData({ showMakePhone: false });
-  },
-
-  call() {
-    wx.makePhoneCall({
-      phoneNumber: this.data.customerServiceInfo.servicePhone,
-    });
-  },
-
-  gotoUserEditPage() {
-    // 已登录，跳转到编辑页面
-    if (this.data.currAuthStep === 2) {
-      wx.navigateTo({ url: '/pages/user/person-info/index' });
-    } else {
-      // 未登录，跳转到登录页
-      wx.navigateTo({ url: '/pages/login/login' });
-    }
-  },
-
-  getVersionInfo() {
-    const versionInfo = wx.getAccountInfoSync();
-    const version = versionInfo.miniProgram.version;
-    const envVersion = (versionInfo.miniProgram as any).envVersion || __wxConfig;
-    this.setData({
-      versionNo: envVersion === 'release' ? version : envVersion,
-    });
+  switchToTab(e: any) {
+    const tab = e.currentTarget.dataset.tab
+    if (!tab) return
+    wx.switchTab({ url: tab })
   },
 
   logOut() {
+    // 未登录时提示
+    if (!this.data.isLoggedIn) {
+      wx.showToast({ title: "未登录", icon: "none" })
+      return
+    }
+
     wx.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
+      title: "提示",
+      content: "确定要退出登录吗？",
       success: (res) => {
         if (res.confirm) {
-          // 清除本地存储
-          wx.clearStorageSync();
-          // 清除全局数据
-          const app = getApp<any>();
-          app.globalData.userInfo = null;
-          app.globalData.hasUserInfo = false;
-          app.globalData.phoneNumber = '';
-          app.globalData.hasPhoneNumber = false;
-          app.globalData.accessToken = '';
-          app.globalData.refreshToken = '';
+          wx.clearStorageSync()
+          app.globalData.userInfo = null
+          app.globalData.hasUserInfo = false
+          app.globalData.phoneNumber = ""
+          app.globalData.hasPhoneNumber = false
+          app.globalData.accessToken = null
+          app.globalData.refreshToken = null
+
           this.setData({
-            userInfo: {
-              avatarUrl: '',
-              nickName: '未登录',
-              phoneNumber: '',
-            },
-            currAuthStep: 1,
-          });
-          Toast({
-            context: this,
-            selector: '#t-toast',
-            message: '已退出登录',
-          });
+            userInfo: { avatarUrl: "", nickName: "", phoneNumber: "" },
+            isLoggedIn: false,
+            stats: { reportCount: 0, shuzhiCount: 0, courseCount: 0, favCount: 0 },
+          })
+
+          wx.showToast({ title: "已退出登录", icon: "success" })
+
+          setTimeout(() => {
+            wx.navigateTo({ url: "/pages/login/login" })
+          }, 1500)
         }
       },
-    });
+    })
   },
-});
+})

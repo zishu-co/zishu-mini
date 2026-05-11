@@ -1,0 +1,8 @@
+<view class="page">
+  <view class="header">
+    <text class="title">编辑信息</text>
+  </view>
+  <view class="content">
+    <view class="placeholder">编辑个人信息</view>
+  </view>
+</view>

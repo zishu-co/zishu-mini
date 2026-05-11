@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "项目详情",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-chat-markdown": "tdesign-miniprogram/chat-markdown/chat-markdown"
+  }
+}

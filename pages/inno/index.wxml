@@ -1,34 +1,42 @@
-<view style="text-align: center; color: #b9b9b9" wx:if="{{pageLoading}}">
-  <t-loading theme="circular" size="40rpx" text="加载中..." inherit-color />
-</view>
-<view class="home-page-header">
-  <view class="search" bind:tap="navToSearchPage">
-    <t-search
-      t-class-input="t-search__input"
-      t-class-input-container="t-search__input-container"
-      placeholder="AI Agent真实场景落地"
-      leftIcon=""
-      disabled
-    >
-      <t-icon slot="left-icon" prefix="wr" name="search" size="40rpx" color="#bbb" />
-    </t-search>
+<view class="page">
+  <!-- 加载中 -->
+  <view class="loading-wrap" wx:if="{{pageLoading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." inherit-color />
   </view>
-  <view class="swiper-wrap">
-    <t-swiper
-      wx:if="{{imgSrcs.length > 0}}"
-      current="{{current}}"
-      autoplay="{{autoplay}}"
-      duration="{{duration}}"
-      interval="{{interval}}"
-      navigation="{{navigation}}"
-      imageProps="{{swiperImageProps}}"
-      list="{{imgSrcs}}"
-      bind:click="navToActivityDetail"
-    />
+
+  <!-- 顶部区域：搜索 + 轮播图 -->
+  <view class="home-page-header" wx:if="{{!pageLoading}}">
+    <!-- 搜索栏（保留占位） -->
+    <view class="search-wrap">
+      <t-search
+        t-class-input="t-search__input"
+        t-class-input-container="t-search__input-container"
+        placeholder="AI Agent真实场景落地"
+        leftIcon=""
+        disabled
+      >
+        <t-icon slot="left-icon" prefix="wr" name="search" size="40rpx" color="#bbb" />
+      </t-search>
+    </view>
+
+    <!-- 轮播图（保留） -->
+    <view class="swiper-wrap">
+      <t-swiper
+        wx:if="{{imgSrcs.length > 0}}"
+        current="{{current}}"
+        autoplay="{{autoplay}}"
+        duration="{{duration}}"
+        interval="{{interval}}"
+        navigation="{{navigation}}"
+        imageProps="{{swiperImageProps}}"
+        list="{{imgSrcs}}"
+        bind:click="navToActivityDetail"
+      />
+    </view>
   </view>
-</view>
-<view class="home-page-container">
-  <view class="home-page-tabs">
+
+  <!-- 标签栏（保留改造） -->
+  <view class="tab-bar" wx:if="{{!pageLoading}}">
     <t-tabs
       t-class="t-tabs"
       t-class-active="tabs-external__active"
@@ -42,17 +50,78 @@
         wx:for-index="index"
         wx:key="index"
         label="{{item.text}}"
-        value="{{item.key}}"
+        value="{{index}}"
       />
     </t-tabs>
   </view>
 
-  <goods-list
-    wr-class="goods-list-container"
-    goodsList="{{goodsList}}"
-    bind:click="goodListClickHandle"
-    bind:addcart="goodListAddCartHandle"
-  />
-  <!-- <load-more list-is-empty="{{!goodsList.length}}" status="{{goodsListLoadStatus}}" bind:retry="onReTry" />
-  <t-toast id="t-toast" /> -->
+  <!-- 项目列表 -->
+  <view class="project-list" wx:if="{{!pageLoading}}">
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{filteredList.length === 0 && !listLoading}}">
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">暂无项目</text>
+    </view>
+
+    <!-- 项目卡片 -->
+    <view
+      class="project-card"
+      wx:for="{{filteredList}}"
+      wx:key="id"
+      bindtap="goToProjectDetail"
+      data-id="{{item.id}}"
+    >
+      <!-- 卡片头部 -->
+      <view class="card-header">
+        <view class="card-serial">{{item.task_serial || '—'}}</view>
+        <view class="card-status status-{{getStatusTag(item.half_progress, item.taker)}}">
+          {{item.finish_date ? '已完成' : (item.taker ? '进行中' : '待认领')}}
+        </view>
+      </view>
+
+      <!-- 项目名称 -->
+      <view class="card-title">{{item.title || '无标题'}}</view>
+
+      <!-- 描述 -->
+      <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+
+      <!-- 底部信息行 -->
+      <view class="card-footer">
+        <!-- 执行人 -->
+        <view class="footer-item">
+          <text class="footer-icon">👤</text>
+          <text class="footer-text">{{item.taker || '待认领'}}</text>
+        </view>
+        <!-- 赏金 -->
+        <view class="footer-item" wx:if="{{item.bonus > 0}}">
+          <text class="footer-icon">💰</text>
+          <text class="footer-text bonus">{{item.bonus}}</text>
+        </view>
+        <!-- 截止日期 -->
+        <view class="footer-item" wx:if="{{item.deadline}}">
+          <text class="footer-icon">📅</text>
+          <text class="footer-text deadline-{{getDeadlineColor(item.deadline)}}">
+            {{item.deadline}}
+          </text>
+        </view>
+      </view>
+
+      <!-- 认领按钮（未认领时显示） -->
+      <view
+        class="claim-btn"
+        wx:if="{{!item.taker && !item.finish_date}}"
+        catchtap="claimProject"
+        data-id="{{item.id}}"
+        data-index="{{index}}"
+      >
+        认领
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="list-loading" wx:if="{{listLoading}}">
+      <t-loading theme="circular" size="32rpx" text="加载中..." />
+    </view>
+  </view>
+
 </view>

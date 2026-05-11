@@ -1,101 +1,147 @@
-<view class="user-card">
-  <view class="user-card__bg"></view>
-  <view class="user-card__content">
-    <view class="user-card__avatar" bindtap="gotoUserEditPage">
+<view class="page">
+  <!-- 顶部背景 -->
+  <view class="top-bg"></view>
+
+  <!-- 用户卡片 -->
+  <view class="user-card">
+    <view class="user-card__avatar" bindtap="goToEditProfile">
       <image
         class="avatar-img"
-        src="{{userInfo.avatarUrl || '/img/logo.png'}}"
+        src="{{userInfo.avatarUrl || \"/img/logo.png\"}}"
         mode="aspectFill"
       />
     </view>
-    <view class="user-card__info" bindtap="gotoUserEditPage">
-      <view class="nickname">{{userInfo.nickName || '未登录'}}</view>
+    <view class="user-card__info" bindtap="goToEditProfile">
+      <view class="nickname">{{userInfo.nickName || "未登录"}}</view>
       <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
     </view>
-    <view class="user-card__arrow" bindtap="gotoUserEditPage">
-      <text class="arrow-icon">></text>
+    <view class="user-card__arrow" bindtap="goToEditProfile">
+      <text class="arrow-icon">›</text>
     </view>
   </view>
-</view>
 
-<view class="content-wrapper">
-  <!-- 订单入口 -->
-  <view class="order-section">
-    <view class="section-header">
-      <text class="section-title">我的订单</text>
-      <text class="section-more" bindtap="jumpAllOrder">全部订单 ></text>
+  <!-- 学习数据统计条 -->
+  <view class="stats-bar">
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/report/report">
+      <view class="stats-num">{{stats.reportCount || 0}}</view>
+      <view class="stats-label">汇报</view>
     </view>
-    <view class="order-icons">
-      <view class="order-item" bindtap="jumpNav" data-status="5">
-        <text class="order-icon">💳</text>
-        <text class="order-label">待付款</text>
-      </view>
-      <view class="order-item" bindtap="jumpNav" data-status="10">
-        <text class="order-icon">📦</text>
-        <text class="order-label">待发货</text>
-      </view>
-      <view class="order-item" bindtap="jumpNav" data-status="40">
-        <text class="order-icon">🚚</text>
-        <text class="order-label">待收货</text>
-      </view>
-      <view class="order-item" bindtap="jumpNav" data-status="60">
-        <text class="order-icon">⭐</text>
-        <text class="order-label">待评价</text>
-      </view>
-      <view class="order-item" bindtap="jumpNav" data-status="0">
-        <text class="order-icon">🔧</text>
-        <text class="order-label">退款/售后</text>
-      </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/shuzhi/shuzhi">
+      <view class="stats-num">{{stats.shuzhiCount || 0}}</view>
+      <view class="stats-label">塾值</view>
+    </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item" bindtap="switchToTab" data-tab="/pages/index/index">
+      <view class="stats-num">{{stats.courseCount || 0}}</view>
+      <view class="stats-label">课程</view>
+    </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/favorites/favorites">
+      <view class="stats-num">{{stats.favCount || 0}}</view>
+      <view class="stats-label">收藏</view>
     </view>
   </view>
 
   <!-- 功能菜单 -->
-  <view class="menu-section">
-    <view class="menu-item" bindtap="onClickCell" data-type="address">
-      <text class="menu-icon">📍</text>
-      <text class="menu-text">收货地址</text>
-      <text class="menu-arrow">></text>
+  <view class="menu-wrapper">
+
+    <!-- 学习与成长 -->
+    <view class="menu-group">
+      <view class="menu-group__title">学习与成长</view>
+      <view class="menu-group__list">
+        <view class="menu-cell" bindtap="switchToTab" data-tab="/pages/index/index">
+          <text class="cell-icon">📚</text>
+          <text class="cell-text">我的课程</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/report/report">
+          <text class="cell-icon">📊</text>
+          <text class="cell-text">学习汇报</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/shuzhi/shuzhi">
+          <text class="cell-icon">💎</text>
+          <text class="cell-text">塾值明细</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/supervise/supervise">
+          <text class="cell-icon">📐</text>
+          <text class="cell-text">学习监督</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
     </view>
-    <view class="menu-item" bindtap="onClickCell" data-type="coupon">
-      <text class="menu-icon">🎫</text>
-      <text class="menu-text">优惠券</text>
-      <text class="menu-arrow">></text>
+
+    <!-- 师生与创新 -->
+    <view class="menu-group">
+      <view class="menu-group__title">师生与创新</view>
+      <view class="menu-group__list">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/goaltalk/goaltalk">
+          <text class="cell-icon">💬</text>
+          <text class="cell-text">目标面谈</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/mentors/mentors">
+          <text class="cell-icon">🤝</text>
+          <text class="cell-text">师生关系</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/followup/followup">
+          <text class="cell-icon">🚀</text>
+          <text class="cell-text">创新项目</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
     </view>
-    <view class="menu-item" bindtap="onClickCell" data-type="point">
-      <text class="menu-icon">💰</text>
-      <text class="menu-text">积分</text>
-      <text class="menu-arrow">></text>
+
+    <!-- 创作与收藏 -->
+    <view class="menu-group">
+      <view class="menu-group__title">创作与收藏</view>
+      <view class="menu-group__list">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/favorites/favorites">
+          <text class="cell-icon">❤️</text>
+          <text class="cell-text">我的收藏</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="switchToTab" data-tab="/pages/article/article">
+          <text class="cell-icon">📝</text>
+          <text class="cell-text">我的文章</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/all/all">
+          <text class="cell-icon">🏫</text>
+          <text class="cell-text">全塾动态</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
     </view>
+
+    <!-- 账户管理 -->
+    <view class="menu-group">
+      <view class="menu-group__title">账户管理</view>
+      <view class="menu-group__list">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/editprofile/editprofile">
+          <text class="cell-icon">✏️</text>
+          <text class="cell-text">编辑信息</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/changepass/changepass">
+          <text class="cell-icon">🔑</text>
+          <text class="cell-text">修改密码</text>
+          <text class="cell-arrow">›</text>
+        </view>
+        <view class="menu-cell" bindtap="logOut">
+          <text class="cell-icon">🚪</text>
+          <text class="cell-text">退出登录</text>
+          <text class="cell-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
   </view>
 
-  <view class="menu-section">
-    <view class="menu-item" bindtap="onClickCell" data-type="help-center">
-      <text class="menu-icon">❓</text>
-      <text class="menu-text">帮助中心</text>
-      <text class="menu-arrow">></text>
-    </view>
-    <view class="menu-item" bindtap="onClickCell" data-type="service">
-      <text class="menu-icon">📞</text>
-      <text class="menu-text">客服热线</text>
-      <text class="menu-arrow">></text>
-    </view>
-  </view>
+  <!-- 底部安全区 -->
+  <view class="safe-area-bottom"></view>
 
-  <!-- 退出登录按钮 -->
-  <view class="logout-wrapper" wx:if="{{currAuthStep === 2}}">
-    <button class="logout-btn" bindtap="logOut">退出登录</button>
-  </view>
 </view>
-
-
-<!-- 客服弹窗 -->
-<t-popup visible="{{showMakePhone}}" placement="bottom" bind:visible-change="closeMakePhone">
-  <view class="popup-content">
-    <view class="popup-title border-bottom-1px" wx:if="{{customerServiceInfo.serviceTimeDuration}}">
-      服务时间: {{customerServiceInfo.serviceTimeDuration}}
-    </view>
-    <view class="popup-phone" bind:tap="call">电话客服</view>
-    <view class="popup-close" bind:tap="closeMakePhone">取消</view>
-  </view>
-</t-popup>
-<t-toast id="t-toast" />

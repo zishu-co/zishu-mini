@@ -1,0 +1,5 @@
+.page { min-height: 100vh; background: #f5f5f5; }
+.header { padding: 32rpx; background: #c6f; }
+.title { font-size: 36rpx; color: #fff; font-weight: bold; }
+.content { padding: 32rpx; padding-bottom: 180rpx; }
+.placeholder { text-align: center; color: #999; padding: 100rpx 0; }
