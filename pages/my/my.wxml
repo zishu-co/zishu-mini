@@ -22,12 +22,12 @@
 
   <!-- 学习数据统计条 -->
   <view class="stats-bar">
-    <view class="stats-item" bindtap="navigateTo" data-url="/pages/report/report">
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/report/index">
       <view class="stats-num">{{stats.reportCount || 0}}</view>
       <view class="stats-label">汇报</view>
     </view>
     <view class="stats-divider"></view>
-    <view class="stats-item" bindtap="navigateTo" data-url="/pages/shuzhi/shuzhi">
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/shuzhi/index">
       <view class="stats-num">{{stats.shuzhiCount || 0}}</view>
       <view class="stats-label">塾值</view>
     </view>
@@ -37,7 +37,7 @@
       <view class="stats-label">课程</view>
     </view>
     <view class="stats-divider"></view>
-    <view class="stats-item" bindtap="navigateTo" data-url="/pages/favorites/favorites">
+    <view class="stats-item" bindtap="navigateTo" data-url="/pages/favorites/index">
       <view class="stats-num">{{stats.favCount || 0}}</view>
       <view class="stats-label">收藏</view>
     </view>
@@ -55,17 +55,17 @@
           <text class="cell-text">我的课程</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/report/report">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/report/index">
           <text class="cell-icon">📊</text>
           <text class="cell-text">学习汇报</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/shuzhi/shuzhi">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/shuzhi/index">
           <text class="cell-icon">💎</text>
           <text class="cell-text">塾值明细</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/supervise/supervise">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/supervise/index">
           <text class="cell-icon">📐</text>
           <text class="cell-text">学习监督</text>
           <text class="cell-arrow">›</text>
@@ -77,17 +77,17 @@
     <view class="menu-group">
       <view class="menu-group__title">师生与创新</view>
       <view class="menu-group__list">
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/goaltalk/goaltalk">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/goaltalk/index">
           <text class="cell-icon">💬</text>
           <text class="cell-text">目标面谈</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/mentors/mentors">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/mentors/index">
           <text class="cell-icon">🤝</text>
           <text class="cell-text">师生关系</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/followup/followup">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/followup/index">
           <text class="cell-icon">🚀</text>
           <text class="cell-text">创新项目</text>
           <text class="cell-arrow">›</text>
@@ -99,17 +99,17 @@
     <view class="menu-group">
       <view class="menu-group__title">创作与收藏</view>
       <view class="menu-group__list">
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/favorites/favorites">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/favorites/index">
           <text class="cell-icon">❤️</text>
           <text class="cell-text">我的收藏</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="switchToTab" data-tab="/pages/article/article">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/article/index">
           <text class="cell-icon">📝</text>
           <text class="cell-text">我的文章</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/all/all">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/all/index">
           <text class="cell-icon">🏫</text>
           <text class="cell-text">全塾动态</text>
           <text class="cell-arrow">›</text>
@@ -121,12 +121,12 @@
     <view class="menu-group">
       <view class="menu-group__title">账户管理</view>
       <view class="menu-group__list">
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/editprofile/editprofile">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/editprofile/index">
           <text class="cell-icon">✏️</text>
           <text class="cell-text">编辑信息</text>
           <text class="cell-arrow">›</text>
         </view>
-        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/changepass/changepass">
+        <view class="menu-cell" bindtap="navigateTo" data-url="/pages/changepass/index">
           <text class="cell-icon">🔑</text>
           <text class="cell-text">修改密码</text>
           <text class="cell-arrow">›</text>

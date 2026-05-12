@@ -1,0 +1,42 @@
+<view class="page">
+  <!-- 顶部 Banner -->
+  <view class="banner">
+    <view class="banner-title">我的文章</view>
+    <view class="banner-sub">记录学习点滴</view>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="login-tip" wx:if="{{!hasLogin}}">
+    <text>登录后可查看和管理您的文章</text>
+    <button class="login-btn" bindtap="goToLogin">去登录</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading && hasLogin}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 文章列表 -->
+  <view class="article-list" wx:if="{{!loading && hasLogin}}">
+    <view class="article-item" wx:for="{{articles}}" wx:key="articleid" bindtap="onViewArticle" data-id="{{item.articleid}}">
+      <view class="article-header">
+        <text class="article-title">{{item.title}}</text>
+        <text class="article-arrow">›</text>
+      </view>
+      <view class="article-meta">
+        <text class="author">{{item.author_name}}</text>
+        <text class="date" wx:if="{{item.create_time}}">{{item.create_time}}</text>
+      </view>
+      <view class="article-preview">{{item.fulltext}}</view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{articles.length === 0}}">
+      <text>暂无文章</text>
+      <view class="empty-tip">开始创作你的第一篇文章吧</view>
+    </view>
+  </view>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom"></view>
+</view>

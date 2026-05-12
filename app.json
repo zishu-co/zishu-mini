@@ -1,5 +1,5 @@
 {
-  "pages":[
+  "pages": [
     "pages/aim/index",
     "pages/learn/index",
     "pages/inno/index",
@@ -18,7 +18,8 @@
     "pages/mentors/index",
     "pages/followup/index",
     "pages/all/index",
-    "pages/inno-detail/index"
+    "pages/inno-detail/index",
+    "pages/article/index"
   ],
   "tabBar": {
     "custom": true,
@@ -49,11 +50,11 @@
       }
     ]
   },
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#c6f",
     "navigationBarTitleText": "学本领 上自塾",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle": "black"
   },
   "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"
