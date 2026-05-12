@@ -32,7 +32,7 @@
       <view class="stats-label">塾值</view>
     </view>
     <view class="stats-divider"></view>
-    <view class="stats-item" bindtap="switchToTab" data-tab="/pages/index/index">
+    <view class="stats-item" bindtap="switchToTab" data-tab="/pages/learn/index">
       <view class="stats-num">{{stats.courseCount || 0}}</view>
       <view class="stats-label">课程</view>
     </view>
@@ -50,7 +50,7 @@
     <view class="menu-group">
       <view class="menu-group__title">学习与成长</view>
       <view class="menu-group__list">
-        <view class="menu-cell" bindtap="switchToTab" data-tab="/pages/index/index">
+        <view class="menu-cell" bindtap="switchToTab" data-tab="/pages/learn/index">
           <text class="cell-icon">📚</text>
           <text class="cell-text">我的课程</text>
           <text class="cell-arrow">›</text>

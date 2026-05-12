@@ -1,7 +1,7 @@
 {
   "pages":[
     "pages/aim/index",
-    "pages/index/index",
+    "pages/learn/index",
     "pages/inno/index",
     "pages/event/index",
     "pages/my/my",
@@ -28,7 +28,7 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/learn/index",
         "text": "学习"
       },
       {

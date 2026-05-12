@@ -8,7 +8,7 @@ const TabMenu: TabItem[] = [
   {
     icon: 'book',
     text: '学习',
-    url: 'pages/index/index',
+    url: 'pages/learn/index',
   },
   {
     icon: 'lightbulb',
