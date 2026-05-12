@@ -49,18 +49,20 @@ Page<IMyPageData, IMyPageData>({
 
   init() {
     const globalData = _appMy.globalData
-    const userInfo = globalData.userInfo || {}
-    const phoneNumber = globalData.phoneNumber || ""
-
-    // 直接读取 storage 中的实际值判断是否已登录
-    const storedUserInfo = wx.getStorageSync('userInfo')
-    const storedPhoneNumber = wx.getStorageSync('phoneNumber')
+    const storedUserInfo = wx.getStorageSync('userInfo') || {}
+    const storedPhoneNumber = wx.getStorageSync('phoneNumber') || ''
     const isLoggedIn = !!(storedUserInfo || storedPhoneNumber)
+
+    // 优先取 globalData，回退到 Storage
+    const userInfo = globalData.userInfo && Object.keys(globalData.userInfo).length > 0
+      ? globalData.userInfo
+      : storedUserInfo
+    const phoneNumber = globalData.phoneNumber || storedPhoneNumber
 
     this.setData({
       userInfo: {
-        avatarUrl: userInfo.avatarUrl || "",
-        nickName: userInfo.nickName || "",
+        avatarUrl: userInfo.avatarUrl || '',
+        nickName: userInfo.nickName || '',
         phoneNumber: phoneNumber,
       },
       isLoggedIn: isLoggedIn,
@@ -105,7 +107,7 @@ Page<IMyPageData, IMyPageData>({
       wx.navigateTo({ url: "/pages/login/login" })
       return
     }
-    wx.navigateTo({ url: "/pages/editprofile/editprofile" })
+    wx.navigateTo({ url: "/pages/editprofile/index" })
   },
 
   navigateTo(e: any) {
