@@ -34,7 +34,9 @@ Page<IInnoDetailPageData, IInnoDetailPageData>({
   },
 
   onShow() {
-    this.getTabBar().init();
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().init();
+    }
   },
 
   onPullDownRefresh() {

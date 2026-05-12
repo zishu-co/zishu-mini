@@ -28,11 +28,12 @@ Page<IArticlePageData, IArticlePageData>({
   },
 
   onLoad() {
+    wx.setNavigationBarTitle({ title: '我的文章' })
     this.checkLogin()
   },
 
   onShow() {
-    if (typeof this.getTabBar === 'function') {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init()
     }
     this.checkLogin()
@@ -40,8 +41,7 @@ Page<IArticlePageData, IArticlePageData>({
 
   checkLogin() {
     const storedUserInfo = wx.getStorageSync('userInfo')
-    const storedPhoneNumber = wx.getStorageSync('phoneNumber')
-    const hasLogin = !!(storedUserInfo || storedPhoneNumber)
+    const hasLogin = !!(storedUserInfo && storedUserInfo.nickName)
     this.setData({ hasLogin })
 
     if (hasLogin) {

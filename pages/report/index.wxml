@@ -9,15 +9,15 @@
   </view>
 
   <view class="record-list" wx:if="{{!loading && records.length > 0}}">
-    <view class="record-card" wx:for="{{records}}" wx:key="pperformid">
+    <view class="record-card" wx:for="{{records}}" wx:key="pperformid" data-pperformid="{{item.pperformid}}" data-paperid="{{item.testpaperid}}" bindtap="onViewDetail">
       <view class="record-top">
-        <text class="record-title">{{item.target_title}}</text>
-        <text class="record-score {{getScoreClass(item.getscore, item.fullscore)}}">
-          {{item.getscore}}/{{item.fullscore}}
+        <text class="record-title">{{item.testpaper_title}}</text>
+        <text class="record-score {{getScoreClass(item.test_score, item.full_score)}}">
+          {{item.test_score}}/{{item.full_score}}
         </text>
       </view>
       <view class="record-meta">
-        <text>完成时间：{{item.finish_time}}</text>
+        <text>完成时间：{{item.test_time}}</text>
       </view>
     </view>
   </view>

@@ -96,6 +96,11 @@ function request<T = any>(options: {
       timeout: 80000,
       success: (res: any) => {
         if (options.showLoading) wx.hideLoading();
+        // 检查 HTTP 状态码，401 需要鉴权
+        if (res.statusCode === 401) {
+          reject({ statusCode: 401, errMsg: 'Unauthorized' });
+          return;
+        }
         resolve(res.data as T);
       },
       fail: (err) => {
@@ -128,20 +133,18 @@ export function quitCourse(id: number, courseid: number, reason: string): Promis
   return request({ url: '/api/course/quit_course', method: 'POST', data: { id, courseid, reason } });
 }
 
-/** 申报学习时长
- * 注意：后端字段名是 reported_time，不是 reported_hour
- */
+/** 申报学习时长 */
 export function reportLearn(
   chapter_id: number,
   course_id: number,
   chapter_title: string,
   sele_id: number,
-  reported_time: string
+  reported_hour: string
 ): Promise<any> {
   return request({
     url: '/api/course/report_learn',
     method: 'POST',
-    data: { chapter_id, course_id, chapter_title, sele_id, reported_time },
+    data: { chapter_id, course_id, chapter_title, sele_id, reported_hour },
     showLoading: true,
   });
 }

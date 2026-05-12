@@ -1,0 +1,92 @@
+<view class="page">
+  <view class="header-card">
+    <view class="paper-title">{{papertitle}}</view>
+    <view class="score-row">
+      <text class="score-label">得分</text>
+      <text class="score-value {{test_score >= full_score * 0.6 ? 'pass' : 'fail'}}">
+        {{test_score}}/{{full_score}}
+      </text>
+      <text class="score-percent">({{full_score > 0 ? Math.ceil(test_score * 100 / full_score) : 0}}%)</text>
+    </view>
+    <view class="test-time" wx:if="{{test_time}}">
+      <text>考试时间：{{test_time}}</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="question-list" wx:if="{{!loading && questions.length > 0}}">
+    <view class="question-card {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{questions}}" wx:key="quesid">
+      <view class="question-header">
+        <text class="question-num">第{{index + 1}}题</text>
+        <text class="question-type">{{item.ques_type}}</text>
+        <text class="question-result {{item.is_correct ? 'result-correct' : 'result-wrong'}}">
+          {{item.is_correct ? '✓ 正确' : '✗ 错误'}}
+        </text>
+      </view>
+      <view class="question-title">{{item.ques_title}}</view>
+
+      <!-- 选择题选项 -->
+      <view class="options" wx:if="{{item.ques_type == '选择题'}}">
+        <view class="option {{item.user_answer.includes('A') ? 'user-selected' : ''}} {{item.answer.includes('A') ? 'correct-answer' : ''}}">
+          <text>A. {{item.item_a}}</text>
+          <text wx:if="{{item.answer.includes('A')}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer.includes('A') && !item.answer.includes('A')}}" class="tag-wrong">你的选择</text>
+        </view>
+        <view class="option {{item.user_answer.includes('B') ? 'user-selected' : ''}} {{item.answer.includes('B') ? 'correct-answer' : ''}}">
+          <text>B. {{item.item_b}}</text>
+          <text wx:if="{{item.answer.includes('B')}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer.includes('B') && !item.answer.includes('B')}}" class="tag-wrong">你的选择</text>
+        </view>
+        <view class="option {{item.item_c ? 'has-content' : ''}} {{item.user_answer.includes('C') ? 'user-selected' : ''}} {{item.answer.includes('C') ? 'correct-answer' : ''}}" wx:if="{{item.item_c}}">
+          <text>C. {{item.item_c}}</text>
+          <text wx:if="{{item.answer.includes('C')}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer.includes('C') && !item.answer.includes('C')}}" class="tag-wrong">你的选择</text>
+        </view>
+        <view class="option {{item.item_d ? 'has-content' : ''}} {{item.user_answer.includes('D') ? 'user-selected' : ''}} {{item.answer.includes('D') ? 'correct-answer' : ''}}" wx:if="{{item.item_d}}">
+          <text>D. {{item.item_d}}</text>
+          <text wx:if="{{item.answer.includes('D')}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer.includes('D') && !item.answer.includes('D')}}" class="tag-wrong">你的选择</text>
+        </view>
+      </view>
+
+      <!-- 判断题选项 -->
+      <view class="options" wx:if="{{item.ques_type == '判断题'}}">
+        <view class="option {{item.user_answer == '正确' ? 'user-selected' : ''}} {{item.answer == '正确' ? 'correct-answer' : ''}}">
+          <text>正确</text>
+          <text wx:if="{{item.answer == '正确'}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer == '正确' && item.answer != '正确'}}" class="tag-wrong">你的选择</text>
+        </view>
+        <view class="option {{item.user_answer == '错误' ? 'user-selected' : ''}} {{item.answer == '错误' ? 'correct-answer' : ''}}">
+          <text>错误</text>
+          <text wx:if="{{item.answer == '错误'}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.user_answer == '错误' && item.answer != '错误'}}" class="tag-wrong">你的选择</text>
+        </view>
+      </view>
+
+      <!-- 用户答案 -->
+      <view class="answer-row" wx:if="{{item.user_answer}}">
+        <text class="answer-label">你的答案：</text>
+        <text class="answer-value {{item.is_correct ? 'text-correct' : 'text-wrong'}}">{{item.user_answer}}</text>
+      </view>
+      <view class="answer-row" wx:else>
+        <text class="answer-label">你的答案：</text>
+        <text class="answer-value text-empty">未作答</text>
+      </view>
+
+      <!-- 解析 -->
+      <view class="explain-card" wx:if="{{item.explain}}">
+        <text class="explain-title">解析：</text>
+        <text class="explain-text">{{item.explain}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && questions.length == 0}}">
+    <text>暂无答题详情</text>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

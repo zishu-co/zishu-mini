@@ -12,6 +12,7 @@ interface QuestionItem {
   ques_type: string;
   ques_title: string;
   answer: string;
+  explain?: string;
   reply?: string | string[];
   check?: boolean;
   submitted?: boolean;
@@ -74,6 +75,35 @@ Page<ITestPageData, ITestData>({
         const qdata: QuestionItem[] = res.data?.qdata || [];
         const paper = res.data?.paper;
 
+        // 从 paper.answers 解析正确答案和解析
+        let answerMap: Record<number, { answer: string; explain: string }> = {};
+        if (paper?.answers) {
+          try {
+            const answers = JSON.parse(paper.answers);
+            for (const a of answers) {
+              answerMap[a.quesid] = { answer: a.answer, explain: a.explain || '' };
+            }
+          } catch (e) {
+            console.error('解析答案失败', e);
+          }
+        }
+
+        for (const q of qdata) {
+          // 补充正确答案和解析
+          if (answerMap[q.quesid]) {
+            q.answer = answerMap[q.quesid].answer;
+            q.explain = answerMap[q.quesid].explain;
+          }
+
+          if (q.ques_type === '填空题') {
+            q.reply = ['', '', '', ''];
+          } else {
+            q.reply = '';
+          }
+          q.check = false;
+          q.submitted = false;
+        }
+
         for (const q of qdata) {
           if (q.ques_type === '填空题') {
             q.reply = ['', '', '', ''];
@@ -108,6 +138,7 @@ Page<ITestPageData, ITestData>({
     const q = this.data.checkData[ind];
     q.reply = (event.detail.value as string[]).slice().sort().join('');
     q.check = q.reply === q.answer;
+    console.log('选择题 - 用户答案:', q.reply, '正确答案:', q.answer, '是否正确:', q.check);
     this.setData({ checkData: this.data.checkData });
   },
 
@@ -116,6 +147,7 @@ Page<ITestPageData, ITestData>({
     const q = this.data.checkData[ind];
     q.reply = event.detail.value as string;
     q.check = q.reply === q.answer;
+    console.log('判断题 - 用户答案:', q.reply, '正确答案:', q.answer, '是否正确:', q.check);
     this.setData({ checkData: this.data.checkData });
   },
 

@@ -18,7 +18,7 @@ Page<IReportPageData, IReportData>({
   onLoad() {},
 
   onShow() {
-    if (typeof this.getTabBar === 'function') {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
     this.fetchRecords();
@@ -32,14 +32,16 @@ Page<IReportPageData, IReportData>({
   fetchRecords() {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const userId = (_appReport.globalData as any)?.userInfo?.userId;
-    if (!token || !userId) {
+    const userInfo = wx.getStorageSync('userInfo') || {};
+    const username = userInfo.nickName;
+    if (!token || !username) {
       this.setData({ loading: false, records: [] });
+      wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
     // 成绩单接口
     wx.request({
-      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(_appReport.globalData?.userInfo?.username || ''),
+      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(username),
       method: 'GET',
       header: { token },
       success: (res: any) => {
@@ -57,6 +59,17 @@ Page<IReportPageData, IReportData>({
     if (pct >= 0.7) return 'score-good';
     if (pct >= 0.6) return 'score-ok';
     return 'score-fail';
+  },
+
+  onViewDetail(e: any) {
+    const pperformid = e.currentTarget.dataset.pperformid;
+    const paperid = e.currentTarget.dataset.paperid;
+    if (!pperformid) return;
+    let url = '/pages/report-detail/index?pperformid=' + pperformid;
+    if (paperid) {
+      url += '&paperid=' + paperid;
+    }
+    wx.navigateTo({ url });
   },
 });
 

@@ -86,15 +86,27 @@ Page<ILearnPageData, ILearnPageData>({
         fetchCurrentSelections(),
         fetchAllCourses(),
       ]);
-      const selectedIds = myCourses.map((c: CurrentSelection) => c.course_id);
+      // 确保 myCourses 和 allCourses 都是数组
+      const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
+      const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+      const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
       this.setData({
-        myCourses,
-        allCourses,
+        myCourses: safeMyCourses,
+        allCourses: safeAllCourses,
         selectedIds,
         loading: false,
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error('加载数据失败', e);
+      // 如果是 401 未授权，清除 token 并跳转登录
+      if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
+        wx.removeStorageSync('accessToken');
+        wx.removeStorageSync('refreshToken');
+        this.setData({ hasLogin: false, loading: false });
+        wx.showToast({ title: '请先登录', icon: 'none' });
+        setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
+        return;
+      }
       this.setData({ loading: false });
     }
   },
@@ -256,7 +268,7 @@ Page<ILearnPageData, ILearnPageData>({
     this.setData({ showReportModal: false });
   },
 
-  // ========== 跳转到章节学习 ==========
+  // ========== 跳转到章节学习（外部链接） ==========
 
   onGoToChapter(e: any) {
     const url = e.currentTarget.dataset.url;
@@ -264,7 +276,18 @@ Page<ILearnPageData, ILearnPageData>({
       wx.showToast({ title: '暂无学习链接', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url });
+    // 复制链接到剪贴板，提示用户在浏览器打开
+    wx.setClipboardData({
+      data: url,
+      success: () => {
+        wx.showModal({
+          title: '学习链接',
+          content: '链接已复制，请在浏览器中粘贴打开',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      }
+    });
   },
 
   // ========== 截止日期颜色 ==========

@@ -8,6 +8,7 @@
     "pages/login/login",
     "pages/logs/logs",
     "pages/test/test",
+    "pages/exam/index",
     "pages/report/index",
     "pages/shuzhi/index",
     "pages/favorites/index",
@@ -19,7 +20,8 @@
     "pages/followup/index",
     "pages/all/index",
     "pages/inno-detail/index",
-    "pages/article/index"
+    "pages/article/index",
+    "pages/report-detail/index"
   ],
   "tabBar": {
     "custom": true,
