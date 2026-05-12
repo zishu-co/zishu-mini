@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="header">
+    <text class="header-title">考试中心</text>
+    <text class="header-sub">选择试卷，开始练习</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="paper-list" wx:if="{{!loading}}">
+    <view class="paper-card" wx:for="{{papers}}" wx:key="testpaperid" bindtap="onGoTest" data-testid="{{item.testpaperid}}">
+      <view class="paper-title">{{item.testpaper_title}}</view>
+      <view class="paper-meta">
+        <text>作者：{{item.testpaper_author}}</text>
+      </view>
+      <view class="paper-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && papers.length == 0}}">
+    <text>暂无试卷</text>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

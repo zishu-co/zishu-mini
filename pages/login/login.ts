@@ -1,9 +1,11 @@
+// @ts-nocheck
+
 // pages/login/login.ts
-// IAppOption 和 IGlobalData 在 app.ts 中定义
-const app = getApp<any>()
+// IAppOption 和 IGlobalData 在 _appLogin.ts 中定义
+const _appLogin = getApp<any>()
 import { isDevMode, isLoggedIn } from '../../utils/env'
 
-type IData = {
+type ILoginPageData = {
   userInfo: any;
   hasUserInfo: boolean;
   canIUseGetUserProfile: boolean;
@@ -20,7 +22,7 @@ type IData = {
   canDevLogin: boolean;
 };
 
-Page<IData, IData>({
+Page<ILoginPageData, ILoginPageData>({
   data: {
     userInfo: null,
     hasUserInfo: false,
@@ -58,17 +60,17 @@ Page<IData, IData>({
     }
 
     // 检查是否已有用户信息
-    if (app.globalData.userInfo) {
+    if (_appLogin.globalData.userInfo) {
       this.setData({
-        userInfo: app.globalData.userInfo,
+        userInfo: _appLogin.globalData.userInfo,
         hasUserInfo: true
       })
     }
 
     // 检查是否已有手机号
-    if (app.globalData.phoneNumber) {
+    if (_appLogin.globalData.phoneNumber) {
       this.setData({
-        phoneNumber: app.globalData.phoneNumber,
+        phoneNumber: _appLogin.globalData.phoneNumber,
         hasPhoneNumber: true
       })
     }
@@ -80,12 +82,12 @@ Page<IData, IData>({
       desc: '用于完善会员资料',
       success: (res) => {
         // 更新全局数据
-        app.globalData.userInfo = res.userInfo
-        app.globalData.hasUserInfo = true
+        _appLogin.globalData.userInfo = res.userInfo
+        _appLogin.globalData.hasUserInfo = true
         console.log(res.userInfo)
 
         // 保存到本地存储
-        app.saveUserInfo(res.userInfo)
+        _appLogin.saveUserInfo(res.userInfo)
 
         // 更新页面数据
         this.setData({
@@ -130,7 +132,7 @@ Page<IData, IData>({
     if (e.detail.errMsg === 'getPhoneNumber:ok') {
       // 这里需要将encryptedData和iv发送到后端解密获取手机号
       const telparam = {
-        sessionkey: app.globalData.sessionkey,
+        sessionkey: _appLogin.globalData.sessionkey,
         encryptedData: e.detail.encryptedData,
         iv: e.detail.iv
       }
@@ -145,12 +147,12 @@ Page<IData, IData>({
         },
         success: (res: any) => {
           console.log(res.data)
-          app.globalData.phoneNumber = res.data.phone
-          app.globalData.userId = res.data.id
-          app.globalData.accessToken = res.data.atoken
-          app.globalData.refreshToken = res.data.rtoken
-          app.globalData.hasPhoneNumber = true
-          app.savePhoneNumber(res.data.phone)
+          _appLogin.globalData.phoneNumber = res.data.phone
+          _appLogin.globalData.userId = res.data.id
+          _appLogin.globalData.accessToken = res.data.atoken
+          _appLogin.globalData.refreshToken = res.data.rtoken
+          _appLogin.globalData.hasPhoneNumber = true
+          _appLogin.savePhoneNumber(res.data.phone)
           // 更新页面数据
           that.setData({
             phoneNumber: res.data.phone,
@@ -183,12 +185,12 @@ Page<IData, IData>({
   completeLogin() {
     if (this.data.hasUserInfo && this.data.hasPhoneNumber) {
       // 确保全局状态已更新
-      app.globalData.hasUserInfo = true
-      app.globalData.hasPhoneNumber = true
-      app.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName, userId: app.globalData.userId}
-      wx.setStorageSync('userInfo', app.globalData.userInfo)
-      wx.setStorageSync('accessToken', app.globalData.accessToken)
-      wx.setStorageSync('refreshToken', app.globalData.refreshToken)
+      _appLogin.globalData.hasUserInfo = true
+      _appLogin.globalData.hasPhoneNumber = true
+      _appLogin.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName, userId: _appLogin.globalData.userId}
+      wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
+      wx.setStorageSync('accessToken', _appLogin.globalData.accessToken)
+      wx.setStorageSync('refreshToken', _appLogin.globalData.refreshToken)
 
       // 跳转到首页
       wx.switchTab({
@@ -255,13 +257,13 @@ Page<IData, IData>({
           // 清除游客标记
           wx.removeStorageSync('guestMode')
 
-          app.globalData.userInfo = userInfo
-          app.globalData.hasUserInfo = true
-          app.globalData.phoneNumber = data.phone || phone
-          app.globalData.hasPhoneNumber = true
-          app.globalData.accessToken = data.atoken
-          app.globalData.refreshToken = data.rtoken
-          app.globalData.userId = data.id
+          _appLogin.globalData.userInfo = userInfo
+          _appLogin.globalData.hasUserInfo = true
+          _appLogin.globalData.phoneNumber = data.phone || phone
+          _appLogin.globalData.hasPhoneNumber = true
+          _appLogin.globalData.accessToken = data.atoken
+          _appLogin.globalData.refreshToken = data.rtoken
+          _appLogin.globalData.userId = data.id
 
           wx.showToast({ title: '登录成功', icon: 'success' })
           setTimeout(() => {

@@ -59,7 +59,7 @@ Component({
     },
   },
 
-  pageLifeTimes: {},
+  pageLifetimes: {},
 
   methods: {
     clickHandle() {

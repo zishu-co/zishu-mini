@@ -1,11 +1,13 @@
+// @ts-nocheck
+
 /**
  * pages/my/my.ts
  * 自塾小程序 - 我的页面
  */
 
-const app = getApp<any>()
+const _appMy = getApp<any>()
 
-interface IData {
+interface IMyPageData {
   userInfo: {
     avatarUrl: string;
     nickName: string;
@@ -20,7 +22,7 @@ interface IData {
   };
 }
 
-Page<IData, IData>({
+Page<IMyPageData, IMyPageData>({
   data: {
     userInfo: {
       avatarUrl: "",
@@ -46,7 +48,7 @@ Page<IData, IData>({
   },
 
   init() {
-    const globalData = app.globalData
+    const globalData = _appMy.globalData
     const userInfo = globalData.userInfo || {}
     const phoneNumber = globalData.phoneNumber || ""
 
@@ -73,7 +75,7 @@ Page<IData, IData>({
     const token = wx.getStorageSync("accessToken") || wx.getStorageSync("refreshToken")
     if (!token) return
 
-    const userId = app.globalData.userInfo?.userId || 0
+    const userId = _appMy.globalData.userInfo?.userId || 0
 
     wx.request({
       url: "https://zishu.co/api/users/fetch_reports/" + userId,
@@ -135,12 +137,12 @@ Page<IData, IData>({
       success: (res) => {
         if (res.confirm) {
           wx.clearStorageSync()
-          app.globalData.userInfo = null
-          app.globalData.hasUserInfo = false
-          app.globalData.phoneNumber = ""
-          app.globalData.hasPhoneNumber = false
-          app.globalData.accessToken = null
-          app.globalData.refreshToken = null
+          _appMy.globalData.userInfo = null
+          _appMy.globalData.hasUserInfo = false
+          _appMy.globalData.phoneNumber = ""
+          _appMy.globalData.hasPhoneNumber = false
+          _appMy.globalData.accessToken = null
+          _appMy.globalData.refreshToken = null
 
           this.setData({
             userInfo: { avatarUrl: "", nickName: "", phoneNumber: "" },

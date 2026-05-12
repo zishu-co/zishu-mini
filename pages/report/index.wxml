@@ -1,8 +1,30 @@
 <view class="page">
   <view class="header">
-    <text class="title">学习汇报</text>
+    <text class="header-title">学习汇报</text>
+    <text class="header-sub">考试成绩记录</text>
   </view>
-  <view class="content">
-    <view class="placeholder">暂无汇报数据</view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
   </view>
+
+  <view class="record-list" wx:if="{{!loading && records.length > 0}}">
+    <view class="record-card" wx:for="{{records}}" wx:key="pperformid">
+      <view class="record-top">
+        <text class="record-title">{{item.target_title}}</text>
+        <text class="record-score {{getScoreClass(item.getscore, item.fullscore)}}">
+          {{item.getscore}}/{{item.fullscore}}
+        </text>
+      </view>
+      <view class="record-meta">
+        <text>完成时间：{{item.finish_time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && records.length == 0}}">
+    <text>暂无考试记录</text>
+  </view>
+
+  <view class="safe-bottom"></view>
 </view>

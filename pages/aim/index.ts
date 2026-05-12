@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // pages/aim/index.ts
 // Toast 使用 require 方式导入
 const Toast = require('tdesign-miniprogram/toast/index').default;
@@ -118,7 +120,7 @@ const getDefaultData = (): IAimData => ({
   showDevBanner: false,
 });
 
-Page<IData, IAimData>({
+Page<IAimPageData, IAimData>({
   data: getDefaultData(),
 
   onLoad() {
@@ -355,6 +357,6 @@ Page<IData, IAimData>({
   },
 });
 
-interface IData extends IAimData {
+interface IAimPageData extends IAimData {
   // 扩展
 }

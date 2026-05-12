@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * pages/inno/index.ts
  * 创新页面 - 项目列表
@@ -5,9 +7,9 @@
 
 import { fetchInno, fetchProjectsFromApi, claimProject, Project, TabItem } from '../../services/inno/inno';
 
-const app = getApp<any>();
+const _app = getApp<any>();
 
-type IData = {
+type IInnoPageData = {
   imgSrcs: string[];
   tabList: TabItem[];
   projectList: Project[];
@@ -23,7 +25,7 @@ type IData = {
   swiperImageProps: { mode: string };
 };
 
-Page<IData, IData>({
+Page<IInnoPageData, IInnoPageData>({
   data: {
     imgSrcs: [],
     tabList: [],

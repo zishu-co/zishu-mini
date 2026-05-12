@@ -1,6 +1,5 @@
 Component({
   externalClasses: ['wr-class', 'symbol-class', 'decimal-class'],
-  useStore: [] as any,
   properties: {
     priceUnit: {
       type: String,

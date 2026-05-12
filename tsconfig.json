@@ -3,12 +3,11 @@
     "target": "ES2020",
     "module": "CommonJS",
     "strict": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "lib": ["ES2020", "DOM"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
       "tdesign-miniprogram/*": ["./miniprogram_npm/tdesign-miniprogram/*"]
@@ -19,6 +18,7 @@
     "**/*.d.ts"
   ],
   "exclude": [
+    "pages/my/_backup",
     "node_modules",
     "miniprogram_npm",
     "dist"

@@ -1,4 +1,4 @@
-/** pages/report/index.wxss */
+/* pages/exam/index.wxss */
 page {
   background-color: #f5f5f5;
   font-size: 28rpx;
@@ -26,65 +26,45 @@ page {
   color: #999;
 }
 
-.record-list {
+.paper-list {
   padding: 20rpx 30rpx;
 }
 
-.record-card {
+.paper-card {
   background: white;
   border-radius: 16rpx;
   padding: 28rpx;
   margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.record-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-
-.record-title {
+.paper-title {
+  flex: 1;
   font-size: 30rpx;
   font-weight: 600;
   color: #1a1a2e;
-  flex: 1;
+  margin-bottom: 8rpx;
 }
 
-.record-score {
-  font-size: 32rpx;
-  font-weight: 700;
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-}
-
-.record-score.score-excellent {
-  background: #d1fae5;
-  color: #059669;
-}
-.record-score.score-good {
-  background: #dbeafe;
-  color: #2563eb;
-}
-.record-score.score-ok {
-  background: #fef3c7;
-  color: #d97706;
-}
-.record-score.score-fail {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.record-meta {
+.paper-meta {
   font-size: 22rpx;
   color: #888;
+}
+
+.paper-arrow {
+  font-size: 40rpx;
+  color: #ccc;
+  flex-shrink: 0;
+  margin-left: 16rpx;
 }
 
 .empty {
   text-align: center;
   padding: 80rpx;
   color: #999;
+  font-size: 26rpx;
 }
 
 .safe-bottom {

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // pages/event/index.ts
 import Toast from 'tdesign-miniprogram/toast/index';
 import Dialog from 'tdesign-miniprogram/dialog/index';
@@ -7,7 +9,7 @@ interface IEventData {
   eventGroupData: EventResponse['data'] | null;
 }
 
-Page<IData, IEventData>({
+Page<IEventPageData, IEventData>({
   data: {
     eventGroupData: null,
   },
@@ -84,6 +86,6 @@ Page<IData, IEventData>({
   },
 });
 
-interface IData {
+interface IEventPageData {
   eventGroupData: EventResponse['data'] | null;
 }

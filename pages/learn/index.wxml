@@ -1,22 +1,148 @@
-<!--index.wxml-->
-<image class="logoimg" src="../../img/logo.png"></image>
-<view class="container">
-  <view class="papercard" wx:for="{{paperdata}}" wx:key="paperid">
-    <navigator open-type="navigate" url="/pages/test/test?pid={{item.paperid}}">
-    <view class="papertitle">{{item.papertitle}}</view>
-    <view>
-      <text>题数：{{item.num}}</text>
-      <text style="margin-left:100rpx;">作者：{{item.author}}</text>
-    </view>
-    </navigator>
+<view class="page">
+
+  <!-- 顶部 Banner -->
+  <view class="banner">
+    <view class="banner-title">学习中心</view>
+    <view class="banner-sub">学本领 上自塾</view>
   </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-btns">
+    <view class="quick-btn primary" bindtap="onGotoExam">
+      <text class="quick-icon">📝</text>
+      <text class="quick-text">考试</text>
+    </view>
+    <view class="quick-btn" bindtap="onGotoReport">
+      <text class="quick-icon">📊</text>
+      <text class="quick-text">成绩单</text>
+    </view>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="login-tip" wx:if="{{!hasLogin}}">
+    <text>登录后可使用完整学习功能</text>
+    <button class="login-btn" bindtap="goToLogin">去登录</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 我的选课 -->
+  <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">我的选课</text>
+    </view>
+    <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
+      <view class="course-card-top">
+        <view class="course-info">
+          <view class="course-name">{{item.course_title}}</view>
+          <view class="course-meta">
+            <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
+          </view>
+          <view class="course-meta">
+            <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{item.deadline}}</text>
+          </view>
+        </view>
+        <view class="course-actions">
+          <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
+          <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
+        </view>
+      </view>
+      <view class="course-card-bottom">
+        <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">去学习</view>
+        <view class="action-btn primary" data-course="{{item}}" bindtap="onReportLearn">申报学时</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 全部课程 -->
+  <view class="section" wx:if="{{!loading}}">
+    <view class="section-header">
+      <text class="section-title">全部课程</text>
+      <text class="section-tip">最多选3门课</text>
+    </view>
+    <view class="course-item {{selectedIds.includes(item.id) ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
+      <view class="course-item-left">
+        <view class="course-item-name">{{item.title}}</view>
+        <view class="course-item-meta">
+          <text>塾主：{{item.director_name}}</text>
+          <text>在学：{{item.current_selections_num}} | 学完：{{item.finish_selections_num}}</text>
+        </view>
+      </view>
+      <view class="course-item-right">
+        <view
+          class="select-btn {{selectedIds.includes(item.id) ? 'selected' : ''}}"
+          data-id="{{item.id}}"
+          data-title="{{item.title}}"
+          bindtap="onSelectCourse"
+        >
+          {{selectedIds.includes(item.id) ? '退选' : '选课'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && allCourses.length == 0}}">
+    <text>暂无课程</text>
+  </view>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom"></view>
+
+  <!-- 选塾师弹窗 -->
+  <view class="modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
+  <view class="modal" wx:if="{{showMentorModal}}">
+    <view class="modal-header">
+      <text class="modal-title">选择塾师</text>
+      <text class="modal-close" bindtap="onCloseMentorModal">✕</text>
+    </view>
+    <view class="modal-body">
+      <view class="mentor-item" wx:for="{{mentorList}}" wx:key="shushi_id">
+        <text class="mentor-name">{{item.shushi_name}}</text>
+        <view
+          class="mentor-select-btn"
+          data-shushiid="{{item.shushi_id}}"
+          data-shushiname="{{item.shushi_name}}"
+          bindtap="onConfirmMentor"
+        >选择</view>
+      </view>
+      <view class="mentor-empty" wx:if="{{mentorList.length == 0}}">
+        <text>暂无可选塾师</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申报学时弹窗 -->
+  <view class="modal-mask" wx:if="{{showReportModal}}" bindtap="onCloseReportModal"></view>
+  <view class="modal" wx:if="{{showReportModal}}">
+    <view class="modal-header">
+      <text class="modal-title">申报学时</text>
+      <text class="modal-close" bindtap="onCloseReportModal">✕</text>
+    </view>
+    <view class="modal-body">
+      <view class="report-info" wx:if="{{reportCourse}}">
+        <text>课程：{{reportCourse.course_title}}</text>
+        <text>章节：{{reportCourse.chapter_title}}</text>
+      </view>
+      <view class="input-row">
+        <text class="input-label">学习时长（小时）</text>
+        <input
+          class="input-field"
+          type="digit"
+          placeholder="请输入，如 1.5"
+          value="{{reportHour}}"
+          bindinput="onReportHourInput"
+        />
+        <text class="input-tip">最多申报5小时</text>
+      </view>
+      <view class="modal-actions">
+        <view class="action-btn secondary" bindtap="onCloseReportModal">取消</view>
+        <view class="action-btn primary" bindtap="onConfirmReport">确认申报</view>
+      </view>
+    </view>
+  </view>
+
 </view>
-
-<!-- <view>
-  <t-tab-bar t-class="t-tab-bar" value="{{value}}" bindchange="onChange" theme="tag" fixed="{{true}}" split="{{false}}">
-    <t-tab-bar-item wx:for="{{list}}" wx:key="value" value="{{item.value}}" icon="{{item.icon}}">
-      {{item.label}}
-    </t-tab-bar-item>
-  </t-tab-bar>
-</view> -->
-

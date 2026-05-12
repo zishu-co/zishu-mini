@@ -23,7 +23,7 @@ interface EventData {
   invalidGoodItems: any[];
 }
 
-interface EventResponse {
+export interface EventResponse {
   data: EventData;
 }
 
