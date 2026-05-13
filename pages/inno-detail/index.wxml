@@ -43,12 +43,12 @@
         </view>
         <view class="info-row">
           <text class="info-label">开始日期</text>
-          <text class="info-value">{{project.start_date || '—'}}</text>
+          <text class="info-value">{{project.start_date ? project.start_date.substring(0, 10) : '—'}}</text>
         </view>
         <view class="info-row">
           <text class="info-label">截止日期</text>
           <text class="info-value {{isDeadlinePassed(project.deadline) ? 'text-red' : ''}}">
-            {{project.deadline || '—'}}
+            {{project.deadline ? project.deadline.substring(0, 10) : '—'}}
           </text>
         </view>
         <view class="info-row" wx:if="{{project.planed_hour}}">
@@ -59,19 +59,23 @@
           <text class="info-label">半程进度</text>
           <text class="info-value">{{project.half_progress}}</text>
         </view>
+        <view class="info-row" wx:if="{{project.required_courses}}">
+          <text class="info-label">先修课程</text>
+          <text class="info-value">{{project.required_courses}}</text>
+        </view>
       </view>
     </view>
 
-    <!-- 项目描述（Markdown 渲染 via TDesign ChatMarkdown）-->
-    <view class="card" wx:if="{{project.desc}}">
-      <view class="card-title-bar">项目描述</view>
-      <t-chat-markdown content="{{project.desc}}" />
+    <!-- 任务详情（Markdown 渲染）-->
+    <view class="card" wx:if="{{project.task_text}}">
+      <view class="card-title-bar">任务详情</view>
+      <t-chat-markdown content="{{project.task_text}}" />
     </view>
 
-    <!-- 先修课程 -->
-    <view class="card" wx:if="{{project.required_courses && !project.desc}}">
-      <view class="card-title-bar">先修课程</view>
-      <view class="courses-text">{{project.required_courses}}</view>
+    <!-- 解决方案（Markdown 渲染）-->
+    <view class="card" wx:if="{{project.sln_text}}">
+      <view class="card-title-bar">解决方案</view>
+      <t-chat-markdown content="{{project.sln_text}}" />
     </view>
 
     <!-- 操作按钮 -->
