@@ -236,12 +236,13 @@ const refreshToken = (): Promise<any> => {
  * 处理 401 未授权
  */
 const handleUnauthorized = <T = any>(
-  _options: RequestOptions,
+  options: RequestOptions,
   _resolve: (value: T) => void,
   reject: (reason?: any) => void
 ): void => {
   wx.removeStorageSync('accessToken');
   wx.removeStorageSync('refreshToken');
+  if (options.showLoading) wx.hideLoading();
 
   wx.showToast({
     title: '登录已过期，请重新登录',
@@ -264,6 +265,7 @@ const handleTokenExpired = <T = any>(
   reject: (reason?: any) => void
 ): void => {
   wx.removeStorageSync('accessToken');
+  if (options.showLoading) wx.hideLoading();
 
   if (isRefreshing) {
     return subscribeTokenRefresh(() => {
@@ -377,12 +379,14 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
 
         // 401 未授权
         if (statusCode === 401) {
+          if (options.showLoading) wx.hideLoading();
           handleUnauthorized(options, resolve, reject);
           return;
         }
 
         // 5000 业务错误码（Token 过期）
         if (responseData.detail?.code === 5000 && !options.url.includes('/refresh')) {
+          if (options.showLoading) wx.hideLoading();
           handleTokenExpired(options, resolve, reject);
           return;
         }
