@@ -1,4 +1,59 @@
 <view class="page">
-  <view class="header"><text class="title">supervise</text></view>
-  <view class="content"><view class="placeholder">页面建设中...</view></view>
+  <view class="header">
+    <text class="title">学习监督</text>
+  </view>
+
+  <!-- 统计 -->
+  <view class="stats-row">
+    <view class="stat-card">
+      <text class="stat-num">{{listData.length}}</text>
+      <text class="stat-label">总记录</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num danger">{{overdueCount}}</text>
+      <text class="stat-label">已逾期</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num warning">{{nearCount}}</text>
+      <text class="stat-label">即将到期</text>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list-area">
+    <view wx:if="{{loading}}">
+      <view class="loading-row"><text>加载中...</text></view>
+    </view>
+    <view wx:elif="{{listData.length === 0}}">
+      <view class="empty-row"><text>暂无学习记录</text></view>
+    </view>
+    <view wx:else>
+      <view class="record-card" wx:for="{{listData}}" wx:key="id">
+        <view class="record-top">
+          <view class="persons">
+            <view class="person-tag">
+              <text class="role">塾生</text>
+              <text class="name">{{item.user_name}}</text>
+            </view>
+            <text class="arrow">›</text>
+            <view class="person-tag">
+              <text class="role">塾师</text>
+              <text class="name">{{item.shushi_name}}</text>
+            </view>
+          </view>
+          <view class="deadline-badge {{getDeadlineClass(item.deadline)}}">
+            <text>{{item.deadline ? item.deadline.slice(0,10) : '-'}}</text>
+          </view>
+        </view>
+        <view class="record-course">
+          <text class="course-title">{{item.course_title}}</text>
+        </view>
+        <view class="record-chapter">
+          <text class="chapter-label">章节：</text>
+          <text class="chapter-title">{{item.chapter_title}}</text>
+          <text class="serial">第{{item.current_serial}}次</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

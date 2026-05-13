@@ -1,4 +1,54 @@
 <view class="page">
-  <view class="header"><text class="title">all</text></view>
-  <view class="content"><view class="placeholder">页面建设中...</view></view>
+  <view class="header">
+    <text class="title">全塾成员</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-row">
+    <view class="stat-card">
+      <text class="stat-num">{{totalCount}}</text>
+      <text class="stat-label">总人数</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num brand">{{activeCount}}</text>
+      <text class="stat-label">活跃用户</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num muted">{{inactiveCount}}</text>
+      <text class="stat-label">待激活</text>
+    </view>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="member-list">
+    <view wx:if="{{loading}}">
+      <view class="loading-row"><text>加载中...</text></view>
+    </view>
+    <view wx:elif="{{members.length === 0}}">
+      <view class="empty-row"><text>暂无成员数据</text></view>
+    </view>
+    <view wx:else>
+      <view class="member-card" wx:for="{{members}}" wx:key="id">
+        <view class="member-avatar">
+          <text class="avatar-text">{{item.username ? item.username.slice(0,1) : '?'}}</text>
+        </view>
+        <view class="member-info">
+          <view class="member-top">
+            <text class="member-name">{{item.username}}</text>
+            <view class="shuzhi-badge {{item.shuzhi >= 10 ? 'active' : 'inactive'}}">
+              <text>塾值 {{item.shuzhi || 0}}</text>
+            </view>
+          </view>
+          <view class="member-meta">
+            <text wx:if="{{item.gender}}">{{item.gender}}</text>
+            <text wx:if="{{item.location}}">· {{item.location}}</text>
+            <text>· 学时 {{item.learn_hour || 0}}h</text>
+          </view>
+          <view class="member-meta" wx:if="{{item.total_hours_7d}}">
+            <text class="meta-accent">7天计时: {{item.total_hours_7d.toFixed(1)}}h</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

@@ -1,5 +1,202 @@
-.page { min-height: 100vh; background: #f5f5f5; }
-.header { padding: 32rpx; background: #c6f; }
+.page { min-height: 100vh; background: #faf9f7; }
+
+.header {
+  padding: 32rpx;
+  background: #c6f;
+}
 .title { font-size: 36rpx; color: #fff; font-weight: bold; }
-.content { padding: 32rpx; }
-.placeholder { text-align: center; color: #999; padding: 100rpx 0; }
+
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #9a9ab0;
+  border-bottom: 4rpx solid transparent;
+}
+
+.tab-item.active {
+  color: #8800cc;
+  border-bottom-color: #8800cc;
+  font-weight: 600;
+}
+
+.tab-badge {
+  background: #c6f;
+  color: #fff;
+  padding: 2rpx 12rpx;
+  border-radius: 100rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tab-content {
+  padding: 24rpx;
+}
+
+.loading-row,
+.empty-row {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #9a9ab0;
+  font-size: 28rpx;
+}
+
+/* 预定面谈卡片 */
+.talk-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.talk-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.person-badge {
+  padding: 6rpx 20rpx;
+  border-radius: 100rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.person-badge.person {
+  background: rgba(160,0,255,0.10);
+  color: #8800cc;
+}
+
+.person-badge.group {
+  background: rgba(249,115,22,0.10);
+  color: #f97316;
+}
+
+.status-badge {
+  padding: 4rpx 16rpx;
+  border-radius: 100rpx;
+  font-size: 22rpx;
+}
+
+.status-badge.pending {
+  background: rgba(59,130,246,0.10);
+  color: #3b82f6;
+}
+
+.status-badge.confirmed {
+  background: rgba(34,197,94,0.10);
+  color: #22c55e;
+}
+
+.status-badge.overdue {
+  background: rgba(233,69,96,0.10);
+  color: #e94560;
+}
+
+.talk-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+.info-value {
+  font-size: 24rpx;
+  color: #1a1a2e;
+  font-weight: 500;
+}
+
+.info-value.success {
+  color: #22c55e;
+}
+
+/* 目标卡片 */
+.goal-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.goal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.goal-student {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8800cc;
+}
+
+.goal-progress {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+.goal-dates {
+  display: flex;
+  gap: 16rpx;
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+/* 历史卡片 */
+.history-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.history-student {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.history-duration {
+  font-size: 26rpx;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.history-time {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}

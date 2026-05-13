@@ -1,5 +1,116 @@
 .page { min-height: 100vh; background: #f5f5f5; }
-.header { padding: 32rpx; background: #c6f; }
+
+.header {
+  padding: 32rpx;
+  background: #c6f;
+}
 .title { font-size: 36rpx; color: #fff; font-weight: bold; }
-.content { padding: 32rpx; }
-.placeholder { text-align: center; color: #999; padding: 100rpx 0; }
+
+.form-card {
+  margin: 24rpx;
+  padding: 32rpx 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 24rpx;
+}
+
+.form-item {
+  margin-bottom: 28rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 80rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: #fafafa;
+}
+
+.form-input:focus {
+  border-color: #c6f;
+  background: #fff;
+}
+
+.radio-group {
+  display: flex;
+  gap: 24rpx;
+}
+
+.radio-item {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #666;
+  background: #fafafa;
+}
+
+.radio-checked {
+  border-color: #c6f;
+  background: #f3e8ff;
+  color: #8800cc;
+  font-weight: 600;
+}
+
+.form-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20rpx 24rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: #fafafa;
+  min-height: 200rpx;
+  resize: none;
+}
+
+.form-textarea:focus {
+  border-color: #c6f;
+  background: #fff;
+}
+
+.char-count {
+  display: block;
+  text-align: right;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.error-tip {
+  padding: 16rpx 0;
+  color: #e64340;
+  font-size: 26rpx;
+}
+
+.submit-btn {
+  margin-top: 16rpx;
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #c6f;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 44rpx;
+  border: none;
+}

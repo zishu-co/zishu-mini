@@ -1,5 +1,135 @@
-.page { min-height: 100vh; background: #f5f5f5; }
+.page { min-height: 100vh; background: #faf9f7; }
+
 .header { padding: 32rpx; background: #c6f; }
 .title { font-size: 36rpx; color: #fff; font-weight: bold; }
-.content { padding: 32rpx; }
-.placeholder { text-align: center; color: #999; padding: 100rpx 0; }
+
+.stats-row {
+  display: flex;
+  gap: 12rpx;
+  padding: 24rpx;
+  background: #faf9f7;
+}
+
+.stat-card {
+  flex: 1;
+  background: #fff;
+  border: 1rpx solid rgba(0,0,0,0.06);
+  border-radius: 12rpx;
+  padding: 24rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.stat-num {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #8800cc;
+  line-height: 1.2;
+  margin-bottom: 6rpx;
+}
+.stat-num.danger { color: #e94560; }
+.stat-num.warning { color: #f97316; }
+
+.stat-label {
+  font-size: 22rpx;
+  color: #9a9ab0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.list-area { padding: 0 24rpx 40rpx; }
+
+.loading-row, .empty-row {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #9a9ab0;
+  font-size: 28rpx;
+}
+
+.record-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.record-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.persons {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.person-tag {
+  display: flex;
+  flex-direction: column;
+}
+
+.role {
+  font-size: 22rpx;
+  color: #9a9ab0;
+}
+
+.name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8800cc;
+}
+
+.arrow {
+  font-size: 32rpx;
+  color: #c6f;
+}
+
+.deadline-badge {
+  padding: 6rpx 20rpx;
+  border-radius: 100rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.deadline-badge.blue { background: rgba(59,130,246,0.10); color: #3b82f6; }
+.deadline-badge.orange { background: rgba(249,115,22,0.10); color: #f97316; }
+.deadline-badge.purple { background: rgba(160,0,255,0.10); color: #8800cc; }
+.deadline-badge.red { background: rgba(233,69,96,0.10); color: #e94560; }
+
+.record-course {
+  margin-bottom: 8rpx;
+}
+
+.course-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.record-chapter {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.chapter-label {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+.chapter-title {
+  font-size: 24rpx;
+  color: #666;
+  flex: 1;
+}
+
+.serial {
+  font-size: 24rpx;
+  color: #22c55e;
+  font-weight: 600;
+}

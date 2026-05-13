@@ -2,7 +2,63 @@
   <view class="header">
     <text class="title">编辑信息</text>
   </view>
-  <view class="content">
-    <view class="placeholder">编辑个人信息</view>
+
+  <view class="form-card">
+    <!-- 基本信息 -->
+    <view class="section-title">基本信息</view>
+
+    <view class="form-item">
+      <text class="form-label">名字</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="请输入名字"
+        value="{{form.name}}"
+        bindinput="onNameInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">性别</text>
+      <view class="radio-group">
+        <view class="radio-item {{form.gender === '男' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="男">
+          <text>男</text>
+        </view>
+        <view class="radio-item {{form.gender === '女' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="女">
+          <text>女</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">居住地</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="请输入居住地"
+        value="{{form.region}}"
+        bindinput="onRegionInput"
+      />
+    </view>
+
+    <!-- 知识资产 -->
+    <view class="section-title" style="margin-top: 48rpx;">知识资产</view>
+
+    <view class="form-item">
+      <textarea
+        class="form-textarea"
+        placeholder="写下你的知识资产，展示你的专业能力..."
+        value="{{form.desc}}"
+        bindinput="onDescInput"
+        maxlength="500"
+      />
+      <text class="char-count">{{form.desc.length}}/500</text>
+    </view>
+
+    <view class="error-tip" wx:if="{{errorMsg}}">
+      <text>{{errorMsg}}</text>
+    </view>
+
+    <button class="submit-btn" bindtap="submitForm">保存修改</button>
   </view>
 </view>

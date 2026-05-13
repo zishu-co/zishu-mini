@@ -1,5 +1,149 @@
-.page { min-height: 100vh; background: #f5f5f5; }
-.header { padding: 32rpx; background: #c6f; }
+.page { min-height: 100vh; background: #faf9f7; }
+
+.header {
+  padding: 32rpx;
+  background: #c6f;
+}
 .title { font-size: 36rpx; color: #fff; font-weight: bold; }
-.content { padding: 32rpx; padding-bottom: 180rpx; }
-.placeholder { text-align: center; color: #999; padding: 100rpx 0; }
+
+.filter-row {
+  padding: 24rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter-btn {
+  padding: 12rpx 32rpx;
+  background: #f5f5f5;
+  color: #666;
+  font-size: 26rpx;
+  border-radius: 100rpx;
+  border: none;
+  line-height: 1.5;
+}
+
+.filter-btn.active {
+  background: #c6f;
+  color: #fff;
+}
+
+.list-area {
+  padding: 0 24rpx 40rpx;
+}
+
+.loading-row,
+.empty-row {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #9a9ab0;
+  font-size: 28rpx;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(0,0,0,0.06);
+}
+
+.project-top {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.project-serial {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  background: rgba(160,0,255,0.10);
+  color: #8800cc;
+  border-radius: 100rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.project-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  flex: 1;
+}
+
+.project-persons {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.person-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.person-role {
+  font-size: 22rpx;
+  color: #9a9ab0;
+  margin-bottom: 2rpx;
+}
+
+.person-name {
+  font-size: 26rpx;
+  color: #8800cc;
+  font-weight: 500;
+}
+
+.project-meta {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-size: 22rpx;
+  color: #9a9ab0;
+  margin-bottom: 2rpx;
+}
+
+.meta-value {
+  font-size: 26rpx;
+  color: #1a1a2e;
+  font-weight: 500;
+}
+
+.meta-value.deadline {
+  color: #f97316;
+}
+
+.meta-value.accent {
+  color: #22c55e;
+}
+
+.project-progress {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.progress-label {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+.progress-value {
+  font-size: 24rpx;
+  color: #8800cc;
+  font-weight: 600;
+}

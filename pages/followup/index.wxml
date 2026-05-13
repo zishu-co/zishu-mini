@@ -1,4 +1,62 @@
 <view class="page">
-  <view class="header"><text class="title">followup</text></view>
-  <view class="content"><view class="placeholder">页面建设中...</view></view>
+  <view class="header">
+    <text class="title">创新结项</text>
+  </view>
+
+  <!-- 筛选按钮 -->
+  <view class="filter-row">
+    <button class="filter-btn {{showMine ? '' : 'active'}}" bindtap="toggleFilter">
+      {{showMine ? '显示全部' : '显示我的'}}
+    </button>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list-area">
+    <view wx:if="{{loading}}">
+      <view class="loading-row"><text>加载中...</text></view>
+    </view>
+    <view wx:elif="{{listData.length === 0}}">
+      <view class="empty-row"><text>暂无结项记录</text></view>
+    </view>
+    <view wx:else>
+      <view class="project-card" wx:for="{{listData}}" wx:key="id">
+        <view class="project-top">
+          <text class="project-serial">{{item.task_serial}}</text>
+          <text class="project-title">{{item.title}}</text>
+        </view>
+        <view class="project-persons">
+          <view class="person-item">
+            <text class="person-role">执行人</text>
+            <text class="person-name">{{item.taker}}</text>
+          </view>
+          <view class="person-item">
+            <text class="person-role">塾师</text>
+            <text class="person-name">{{item.shushi}}</text>
+          </view>
+        </view>
+        <view class="project-meta">
+          <view class="meta-item">
+            <text class="meta-label">开始</text>
+            <text class="meta-value">{{item.start_date ? item.start_date.slice(0,10) : '-'}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">截止</text>
+            <text class="meta-value deadline">{{item.deadline ? item.deadline.slice(0,10) : '-'}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">计划</text>
+            <text class="meta-value">{{item.planed_hour}}h</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">实际</text>
+            <text class="meta-value accent">{{item.actual_hour}}h</text>
+          </view>
+        </view>
+        <view class="project-progress" wx:if="{{item.half_progress}}">
+          <text class="progress-label">半程进度</text>
+          <text class="progress-value">{{item.half_progress}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
