@@ -314,19 +314,54 @@ page {
   box-shadow: 0 6rpx 16rpx rgba(139, 92, 246, 0.3);
 }
 
-.privacy-policy {
+.privacy-checkbox {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+  padding: 0 20rpx;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #d1d5db;
+  border-radius: 8rpx;
+  margin-right: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4rpx;
+  transition: all 0.2s ease;
+}
+
+.checkbox.checked {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  border-color: #7c3aed;
+}
+
+.check-icon {
+  color: #fff;
   font-size: 24rpx;
-  color: #8b5cf6;
-  line-height: 1.6;
-  text-align: center;
-  opacity: 0.8;
+  font-weight: bold;
+}
+
+.checkbox-text {
+  font-size: 24rpx;
+  color: #6b7280;
+  line-height: 1.5;
+  flex: 1;
 }
 
 .link {
   color: #7c3aed;
-  text-decoration: none;
   font-weight: 500;
-  border-bottom: 1rpx solid rgba(124, 58, 237, 0.3);
+}
+
+.complete-btn[disabled] {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  box-shadow: none !important;
 }
 
 /* ========== Dev 模式登录表单样式 ========== */
@@ -335,6 +370,10 @@ page {
   max-width: 600rpx;
   padding: 40rpx 32rpx;
   animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.dev-privacy {
+  margin: 24rpx 0;
 }
 
 .form-item {

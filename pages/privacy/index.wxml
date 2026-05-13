@@ -1,0 +1,77 @@
+<!--pages/privacy/index.wxml-->
+<view class="page">
+  <view class="header">
+    <text class="title">隐私政策</text>
+    <text class="update-date">更新日期：2024年1月1日</text>
+  </view>
+
+  <view class="content">
+    <view class="section">
+      <view class="section-title">引言</view>
+      <view class="section-content">
+        我们高度重视您的个人信息和隐私保护。本隐私政策旨在向您说明我们如何收集、使用、存储和保护您的个人信息，以及您享有的相关权利。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">一、信息收集</view>
+      <view class="section-content">
+        1. <text class="bold">手机号码</text>：用于用户账号注册和登录，以及必要的联系沟通。
+      </view>
+      <view class="section-content">
+        2. <text class="bold">昵称和头像</text>：用于在应用中展示您的个人形象。
+      </view>
+      <view class="section-content">
+        3. <text class="bold">学习记录</text>：包括您的学习进度、答题记录、考试成绩等，用于为您提供个性化的学习服务。
+      </view>
+      <view class="section-content">
+        4. <text class="bold">设备信息</text>：包括设备型号、操作系统版本等，用于优化产品体验和保障服务安全。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">二、信息使用</view>
+      <view class="section-content">
+        我们仅使用您授权收集的信息，用于：
+      </view>
+      <view class="section-content">
+        1. 提供、维护和改进我们的服务；
+      </view>
+      <view class="section-content">
+        2. 为您提供个性化的学习内容推荐；
+      </view>
+      <view class="section-content">
+        3. 记录您的学习进度和考试成绩；
+      </view>
+      <view class="section-content">
+        4. 向您推送重要的服务通知。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">三、信息存储</view>
+      <view class="section-content">
+        我们采用合理的安全措施保护您的个人信息，包括加密存储、访问控制等。我们不会将您的个人信息出售给任何第三方。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">四、您的权利</view>
+      <view class="section-content">
+        您有权随时查看、修改或删除您的个人信息。如需注销账号或删除个人数据，请联系我们的客服。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">五、联系我们</view>
+      <view class="section-content">
+        如您对本隐私政策有任何疑问，请通过以下方式联系我们：
+      </view>
+      <view class="section-content">
+        邮箱：service@zishu.co
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-safe"></view>
+</view>

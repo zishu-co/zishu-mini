@@ -32,23 +32,29 @@ Page<IReportPageData, IReportData>({
   fetchRecords() {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const userInfo = wx.getStorageSync('userInfo') || {};
-    const username = userInfo.nickName;
-    if (!token || !username) {
+    const userInfo = wx.getStorageSync('userInfo') || _appReport.globalData.userInfo || {};
+    const nickName = userInfo.nickName || '';
+    
+    if (!token || !nickName) {
       this.setData({ loading: false, records: [] });
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
-    // 成绩单接口
+    
     wx.request({
-      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(username),
+      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(nickName),
       method: 'GET',
       header: { token },
       success: (res: any) => {
-        this.setData({ records: res.data || [], loading: false });
+        if (res.statusCode === 200) {
+          this.setData({ records: res.data || [], loading: false });
+        } else {
+          this.setData({ loading: false, records: [] });
+        }
       },
       fail: () => {
         this.setData({ loading: false, records: [] });
+        wx.showToast({ title: '网络请求失败', icon: 'none' });
       },
     });
   },

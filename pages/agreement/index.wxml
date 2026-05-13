@@ -1,0 +1,100 @@
+<!--pages/agreement/index.wxml-->
+<view class="page">
+  <view class="header">
+    <text class="title">用户服务协议</text>
+    <text class="update-date">更新日期：2024年1月1日</text>
+  </view>
+
+  <view class="content">
+    <view class="section">
+      <view class="section-title">一、协议的接受</view>
+      <view class="section-content">
+        欢迎使用自塾学习平台（以下简称"本平台"）。在您开始使用本平台服务之前，请您仔细阅读并理解本协议的全部内容。如果您不同意本协议的任何内容，请不要注册或使用本平台服务。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">二、服务内容</view>
+      <view class="section-content">
+        本平台为用户提供在线学习服务，包括：
+      </view>
+      <view class="section-content">
+        1. 在线课程学习和练习；
+      </view>
+      <view class="section-content">
+        2. 考试测验功能；
+      </view>
+      <view class="section-content">
+        3. 学习进度记录和成绩统计；
+      </view>
+      <view class="section-content">
+        4. 其他相关的学习服务。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">三、用户账号</view>
+      <view class="section-content">
+        1. 您在使用本平台服务前需要注册账号。您承诺所提供的信息真实、准确、完整；
+      </view>
+      <view class="section-content">
+        2. 您应妥善保管账号信息，因保管不善造成的损失由您自行承担；
+      </view>
+      <view class="section-content">
+        3. 您不得以任何方式转让或授权他人使用您的账号。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">四、使用规则</view>
+      <view class="section-content">
+        您在使用本平台服务时，不得：
+      </view>
+      <view class="section-content">
+        1. 违反法律法规、本协议或公序良俗；
+      </view>
+      <view class="section-content">
+        2. 干扰、破坏本平台的正常运行；
+      </view>
+      <view class="section-content">
+        3. 试图未经授权访问其他用户的账号；
+      </view>
+      <view class="section-content">
+        4. 传播任何违法、有害、骚扰性、诽谤他人等信息。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">五、知识产权</view>
+      <view class="section-content">
+        本平台上的所有内容（包括但不限于文字、图片、音频、视频、课程内容）的知识产权归本平台或相关权利人所有。您不得未经授权复制、传播或用于商业目的。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">六、服务变更和终止</view>
+      <view class="section-content">
+        本平台保留随时修改、中断或终止部分或全部服务的权利。我们将通过公告或通知的方式向您告知。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">七、免责声明</view>
+      <view class="section-content">
+        本平台会努力保障服务的稳定性和连续性，但不对因不可抗力、网络原因等导致的损失承担责任。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">八、联系我们</view>
+      <view class="section-content">
+        如您对本协议有任何疑问，请通过以下方式联系我们：
+      </view>
+      <view class="section-content">
+        邮箱：service@zishu.co
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-safe"></view>
+</view>

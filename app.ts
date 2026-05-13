@@ -6,6 +6,7 @@ interface GlobalData {
   hasPhoneNumber: boolean;
   accessToken: string | null;
   refreshToken: string | null;
+  userId: number | null;  // 添加 userId 字段
   openid: string | null;
   sessionkey: string | null;
   code: string | null;
@@ -30,6 +31,12 @@ App<IAppOption>({
     if (phoneNumber) {
       this.globalData.phoneNumber = phoneNumber;
       this.globalData.hasPhoneNumber = true;
+    }
+
+    // 获取本地存储的用户ID
+    const userId = wx.getStorageSync('userId');
+    if (userId) {
+      this.globalData.userId = userId;
     }
 
     // 检查登录状态
@@ -112,6 +119,14 @@ App<IAppOption>({
     }
   },
 
+  // 保存用户ID到本地存储
+  saveUserId(userId: number) {
+    if (userId) {
+      wx.setStorageSync('userId', userId);
+      this.globalData.userId = userId;
+    }
+  },
+
   globalData: {
     userInfo: null,
     hasUserInfo: false,
@@ -119,6 +134,7 @@ App<IAppOption>({
     hasPhoneNumber: false,
     accessToken: null,
     refreshToken: null,
+    userId: null,
     openid: null,
     sessionkey: null,
     code: null,
@@ -131,4 +147,5 @@ interface IAppOption {
   checkNeedLogin(): void;
   saveUserInfo(userInfo: any): void;
   savePhoneNumber(phoneNumber: string): void;
+  saveUserId(userId: number): void;
 }

@@ -1,0 +1,69 @@
+/* pages/privacy/index.wxss */
+page {
+  background: #f8fafc;
+}
+
+.page {
+  padding: 32rpx;
+}
+
+.header {
+  text-align: center;
+  padding: 40rpx 0;
+  margin-bottom: 32rpx;
+}
+
+.title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 16rpx;
+}
+
+.update-date {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.content {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.section {
+  margin-bottom: 40rpx;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #7c3aed;
+  margin-bottom: 20rpx;
+}
+
+.section-content {
+  font-size: 28rpx;
+  color: #475569;
+  line-height: 1.8;
+  margin-bottom: 12rpx;
+}
+
+.section-content:last-child {
+  margin-bottom: 0;
+}
+
+.bold {
+  font-weight: 600;
+  color: #334155;
+}
+
+.bottom-safe {
+  height: 100rpx;
+}

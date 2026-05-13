@@ -35,9 +35,23 @@
           bindinput="onPwdInput"
         />
       </view>
+
+      <!-- 隐私政策勾选 -->
+      <view class="privacy-checkbox dev-privacy" bindtap="togglePrivacyAgreement">
+        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
+          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
+        </view>
+        <view class="checkbox-text">
+          我已阅读并同意
+          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
+          和
+          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
+        </view>
+      </view>
+
       <button
-        class="dev-login-btn {{canDevLogin ? 'active' : ''}}"
-        disabled="{{!canDevLogin}}"
+        class="dev-login-btn {{canDevLogin && privacyAgreed ? 'active' : ''}}"
+        disabled="{{!canDevLogin || !privacyAgreed}}"
         bindtap="loginByPassword"
       >登 录</button>
 
@@ -112,11 +126,20 @@
     </view>
 
     <view class="footer">
-      <button class="complete-btn" bindtap="completeLogin">完成授权并进入</button>
-      <view class="privacy-policy">
-        点击上方按钮，即表示您已阅读并同意
-        <text class="link">《用户协议》</text>和<text class="link">《隐私政策》</text>
+      <!-- 隐私政策勾选 -->
+      <view class="privacy-checkbox" bindtap="togglePrivacyAgreement">
+        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
+          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
+        </view>
+        <view class="checkbox-text">
+          我已阅读并同意
+          <text class="link" bindtap="viewAgreement">《用户服务协议》</text>
+          和
+          <text class="link" bindtap="viewPrivacy">《隐私政策》</text>
+        </view>
       </view>
+      
+      <button class="complete-btn {{privacyAgreed ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed}}">完成授权并进入</button>
     </view>
   </block>
 </view>

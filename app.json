@@ -21,7 +21,9 @@
     "pages/all/index",
     "pages/inno-detail/index",
     "pages/article/index",
-    "pages/report-detail/index"
+    "pages/report-detail/index",
+    "pages/privacy/index",
+    "pages/agreement/index"
   ],
   "tabBar": {
     "custom": true,

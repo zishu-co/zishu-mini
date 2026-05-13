@@ -20,6 +20,8 @@ type ILoginPageData = {
   phoneInput: string;
   pwdInput: string;
   canDevLogin: boolean;
+  // 隐私政策勾选
+  privacyAgreed: boolean;
 };
 
 Page<ILoginPageData, ILoginPageData>({
@@ -38,6 +40,8 @@ Page<ILoginPageData, ILoginPageData>({
     phoneInput: '',
     pwdInput: '',
     canDevLogin: false,
+    // 隐私政策勾选默认未勾选
+    privacyAgreed: false,
   },
 
   onLoad() {
@@ -153,6 +157,7 @@ Page<ILoginPageData, ILoginPageData>({
           _appLogin.globalData.refreshToken = res.data.rtoken
           _appLogin.globalData.hasPhoneNumber = true
           _appLogin.savePhoneNumber(res.data.phone)
+          _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
           // 更新页面数据
           that.setData({
             phoneNumber: res.data.phone,
@@ -183,6 +188,14 @@ Page<ILoginPageData, ILoginPageData>({
 
   // 完成登录，跳转到首页
   completeLogin() {
+    if (!this.data.privacyAgreed) {
+      wx.showToast({
+        title: '请先阅读并同意用户协议和隐私政策',
+        icon: 'none',
+        duration: 2500
+      })
+      return
+    }
     if (this.data.hasUserInfo && this.data.hasPhoneNumber) {
       // 确保全局状态已更新
       _appLogin.globalData.hasUserInfo = true
@@ -226,6 +239,14 @@ Page<ILoginPageData, ILoginPageData>({
   /** 手机号+密码登录（Dev 模式） */
   loginByPassword() {
     if (!this.data.canDevLogin) return
+    if (!this.data.privacyAgreed) {
+      wx.showToast({
+        title: '请先阅读并同意用户协议和隐私政策',
+        icon: 'none',
+        duration: 2500
+      })
+      return
+    }
 
     const { phoneInput: phone, pwdInput: password } = this.data
 
@@ -284,5 +305,28 @@ Page<ILoginPageData, ILoginPageData>({
   enterAsGuest() {
     wx.setStorageSync('guestMode', true)
     wx.switchTab({ url: '/pages/aim/index' })
+  },
+
+  // ========== 隐私政策相关方法 ==========
+
+  /** 切换隐私协议勾选状态 */
+  togglePrivacyAgreement() {
+    this.setData({
+      privacyAgreed: !this.data.privacyAgreed
+    })
+  },
+
+  /** 查看隐私政策 */
+  viewPrivacy() {
+    wx.navigateTo({
+      url: '/pages/privacy/index'
+    })
+  },
+
+  /** 查看用户服务协议 */
+  viewAgreement() {
+    wx.navigateTo({
+      url: '/pages/agreement/index'
+    })
   }
 })
