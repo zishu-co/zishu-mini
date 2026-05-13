@@ -33,6 +33,9 @@ export interface Project {
   required_courses: string;
   bonus: number;
   desc: string;
+  task_text: string;
+  sln_text: string;
+  comment: string;
   start_date: string;
   deadline: string;
   planed_hour: number;
