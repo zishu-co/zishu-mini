@@ -3,7 +3,8 @@
  * services/user/user.ts
  * 用户相关 API
  */
-import { get, post } from '../base'
+import base from '../base'
+const { get, post } = base
 
 /**
  * 修改密码
@@ -16,11 +17,10 @@ export const changePass = (data: { name: string; newpass: string }) => {
 
 /**
  * 获取个人资料
- * GET /api/users/get_profile
- * params: { userid }
+ * GET /api/users/get_profile/{userid}
  */
 export const getProfile = (params: { userid: number }) => {
-  return get('/api/users/get_profile', params)
+  return get('/api/users/get_profile/' + params.userid)
 }
 
 /**
@@ -110,7 +110,7 @@ export const fetchSupervise = () => {
  * GET /api/users/fetch_goaltalk?presenter=塾师
  */
 export const fetchGoaltalk = () => {
-  return get('/api/users/fetch_goaltalk?presenter=塾师')
+  return post('/api/users/fetch_goaltalk', { presenter: '塾师' })
 }
 
 /**
@@ -118,7 +118,7 @@ export const fetchGoaltalk = () => {
  * GET /api/users/fetch_finished_goaltalk?presenter=塾师
  */
 export const fetchFinishedGoaltalk = () => {
-  return get('/api/users/fetch_finished_goaltalk?presenter=塾师')
+  return post('/api/users/fetch_finished_goaltalk', { presenter: '塾师' })
 }
 
 /**
@@ -126,7 +126,7 @@ export const fetchFinishedGoaltalk = () => {
  * GET /api/users/fetch_all_goals?presenter=塾师
  */
 export const fetchAllGoals = () => {
-  return get('/api/users/fetch_all_goals?presenter=塾师')
+  return post('/api/users/fetch_all_goals', { presenter: '塾师' })
 }
 
 /**

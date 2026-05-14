@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { get } from '../../services/base'
+import base from '../../services/base'
+const { get } = base
 
 Page({
   data: {
@@ -14,16 +15,13 @@ Page({
   },
 
   fetchData() {
-    wx.showLoading({ title: '加载中...', mask: true })
-
+    this.setData({ loading: true })
     get('/api/inno/fetch_finished_projects')
       .then((res: any) => {
-        wx.hideLoading()
         const allData = Array.isArray(res) ? res : []
         this.setData({ allData, listData: allData, loading: false })
       })
-      .catch(() => {
-        wx.hideLoading()
+      .catch((e) => {
         this.setData({ allData: [], listData: [], loading: false })
       })
   },

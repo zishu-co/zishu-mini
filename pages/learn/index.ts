@@ -18,21 +18,14 @@ import {
 const app = getApp();
 
 interface ILearnPageData {
-  // 我的选课
   myCourses: CurrentSelection[];
-  // 全部课程
   allCourses: Course[];
-  // 当前已选的课程ID列表
   selectedIds: number[];
-  // 加载状态
   loading: boolean;
-  // 是否有登录
   hasLogin: boolean;
-  // 弹窗相关
   showMentorModal: boolean;
   mentorList: Mentor[];
   currentMentorCourseId: number;
-  // 申报弹窗
   showReportModal: boolean;
   reportCourse: CurrentSelection | null;
   reportHour: string;
@@ -86,7 +79,6 @@ Page<ILearnPageData, ILearnPageData>({
         fetchCurrentSelections(),
         fetchAllCourses(),
       ]);
-      // 确保 myCourses 和 allCourses 都是数组
       const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
       const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
       const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
@@ -98,7 +90,6 @@ Page<ILearnPageData, ILearnPageData>({
       });
     } catch (e: any) {
       console.error('加载数据失败', e);
-      // 如果是 401 未授权，清除 token 并跳转登录
       if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
         wx.removeStorageSync('accessToken');
         wx.removeStorageSync('refreshToken');
@@ -111,14 +102,11 @@ Page<ILearnPageData, ILearnPageData>({
     }
   },
 
-  // ========== 选课 / 退选 ==========
-
   async onSelectCourse(e: any) {
     const courseId = e.currentTarget.dataset.id;
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     const userId = app.globalData.userInfo?.userId;
 
-    // userId 为 0 或 undefined/null 时都视为未登录
     if (!token || userId == null) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1000);
@@ -127,7 +115,6 @@ Page<ILearnPageData, ILearnPageData>({
 
     const isSelected = this.data.selectedIds.includes(courseId);
     if (isSelected) {
-      // 退选
       try {
         wx.showLoading({ title: '退选处理中...', mask: true });
         await quitCourse(userId, courseId, '主动退选');
@@ -139,7 +126,6 @@ Page<ILearnPageData, ILearnPageData>({
         wx.showToast({ title: '退选失败', icon: 'none' });
       }
     } else {
-      // 选课
       if (this.data.selectedIds.length >= 3) {
         wx.showToast({ title: '最多选3门课', icon: 'none' });
         return;
@@ -157,8 +143,6 @@ Page<ILearnPageData, ILearnPageData>({
     }
   },
 
-  // ========== 选塾师 ==========
-
   async onSelectMentor(e: any) {
     const courseId = e.currentTarget.dataset.courseid;
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
@@ -171,8 +155,6 @@ Page<ILearnPageData, ILearnPageData>({
       const res = await calMentors(courseId);
       const mentors: Mentor[] = [];
 
-      // 后端 cal_mentors 返回的 mentors 始终是数组（可能为空）
-      // director 信息始终在 res.director_id / director_name 中（即使已选过塾师也有值）
       if (res.director_id && res.mentor_count < 3) {
         mentors.push({
           shushi_id: res.director_id,
@@ -212,8 +194,6 @@ Page<ILearnPageData, ILearnPageData>({
   onCloseMentorModal() {
     this.setData({ showMentorModal: false });
   },
-
-  // ========== 申报学时 ==========
 
   onReportLearn(e: any) {
     const course: CurrentSelection = e.currentTarget.dataset.course;
@@ -268,15 +248,12 @@ Page<ILearnPageData, ILearnPageData>({
     this.setData({ showReportModal: false });
   },
 
-  // ========== 跳转到章节学习（外部链接） ==========
-
   onGoToChapter(e: any) {
     const url = e.currentTarget.dataset.url;
     if (!url) {
       wx.showToast({ title: '暂无学习链接', icon: 'none' });
       return;
     }
-    // 复制链接到剪贴板，提示用户在浏览器打开
     wx.setClipboardData({
       data: url,
       success: () => {
@@ -290,12 +267,9 @@ Page<ILearnPageData, ILearnPageData>({
     });
   },
 
-  // ========== 截止日期颜色 ==========
-
   getDeadlineClass(deadline: string): string {
     if (!deadline) return '';
     const ts = new Date(deadline).getTime();
-    // 无效日期（如 null、""、非法字符串）→ NaN，按已过期处理
     if (isNaN(ts)) return 'deadline-red';
     const diffDays = (ts - Date.now()) / (1000 * 60 * 60 * 24);
     if (diffDays < 0 && diffDays > -30) return 'deadline-brand';
@@ -305,7 +279,12 @@ Page<ILearnPageData, ILearnPageData>({
     return '';
   },
 
-  // ========== 导航 ==========
+  onCourseItemTap(e: any) {
+    const courseId = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title || '课程详情';
+    const url = '/pages/course-detail/index?id=' + courseId + '&title=' + encodeURIComponent(title);
+    wx.navigateTo({ url });
+  },
 
   onGotoExam() {
     wx.navigateTo({ url: '/pages/exam/index' });

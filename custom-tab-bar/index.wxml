@@ -6,14 +6,14 @@
 	<t-tab-bar-item
 	 wx:for="{{list}}"
 	 wx:for-item="item"
-	 wx:for-index="index"
-	 wx:key="index"
-	>
-		<view class="custom-tab-bar-wrapper">
-			<t-icon name="{{item.icon}}" size="48rpx" color="{{active === index ? '#a0f' : '#666'}}" />
-			<view class="text" style="{{active === index ? 'color: #a0f;' : 'color: #666;'}}">{{ item.text }}</view>
-		</view>
-	</t-tab-bar-item>
+	 wx:for-index="index"\n\t wx:key="index"
+\t>
+\t\t<view class="custom-tab-bar-wrapper">
+\t\t\t<t-icon name="{{item.icon}}" size="48rpx" color="{{active === index ? '#a0f' : '#666'}}" />
+\t\t\t<view class="text" style="{{active === index ? 'color: #a0f;' : 'color: #666;'}}">{{ item.text }}</view>
+\t\t</view>
+\t</t-tab-bar-item>
 </t-tab-bar>
 
-
+<!-- AI 助理悬浮按钮 -->
+<ai-assistant-btn />

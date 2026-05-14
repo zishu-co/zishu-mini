@@ -1,0 +1,144 @@
+<view class="page">
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && !courseDetail}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">课程不存在或已被删除</text>
+  </view>
+
+  <!-- 课程详情 -->
+  <view class="detail-wrap" wx:if="{{!loading && courseDetail}}">
+
+    <!-- ========== 课程头部卡片 ========== -->
+    <view class="card course-header-card">
+      <view class="header-top">
+        <view class="course-title">{{courseDetail.course.title}}</view>
+        <!-- 选课 / 退选按钮 -->
+        <view class="header-actions" wx:if="{{hasLogin}}">
+          <view
+            class="action-btn quit-btn"
+            wx:if="{{selectedIds.includes(courseDetail.course.id)}}"
+            bindtap="onQuitCourse"
+          >退选</view>
+          <view
+            class="action-btn select-btn"
+            wx:elif="{{currentSelectionsCount < 3}}"
+            bindtap="onSelectCourse"
+          >选课</view>
+          <view class="action-btn disabled-btn" wx:else>禁选</view>
+        </view>
+      </view>
+      <view class="course-meta-row">
+        <text class="meta-label">塾主：</text>
+        <text class="meta-value">{{courseDetail.course.director_name}}</text>
+      </view>
+      <view class="course-desc" wx:if="{{courseDetail.course.desc}}">
+        {{courseDetail.course.desc}}
+      </view>
+    </view>
+
+    <!-- ========== 课程章节 ========== -->
+    <view class="card" wx:if="{{courseDetail.chapters.length > 0}}">
+      <view class="card-title-bar">课程章节</view>
+      <view class="chapter-list">
+        <view
+          class="chapter-item"
+          wx:for="{{courseDetail.chapters}}"
+          wx:key="id"
+          data-url="{{item.url}}"
+          bindtap="onChapterTap"
+        >
+          <view class="chapter-left">
+            <view class="chapter-index">{{index + 1}}</view>
+            <view class="chapter-info">
+              <view class="chapter-name">{{item.title}}</view>
+              <view class="chapter-meta">
+                <text>{{item.author_name}}</text>
+                <text wx:if="{{item.period}}"> · {{item.period}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="chapter-arrow">›</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无章节提示 -->
+    <view class="card empty-card" wx:if="{{courseDetail.chapters.length === 0}}">
+      <view class="card-title-bar">课程章节</view>
+      <view class="empty-section">暂无章节内容</view>
+    </view>
+
+    <!-- ========== 当前同塾 ========== -->
+    <view class="card" wx:if="{{courseDetail.current.length > 0}}">
+      <view class="card-title-bar">当前同塾</view>
+      <view class="student-table">
+        <view class="table-header">
+          <view class="th th-index">序</view>
+          <view class="th th-name">塾生</view>
+          <view class="th th-name">塾师</view>
+          <view class="th th-serial">课次</view>
+          <view class="th th-date">截止日期</view>
+        </view>
+        <view
+          class="table-row"
+          wx:for="{{courseDetail.current}}"
+          wx:key="user_id"
+        >
+          <view class="td td-index">{{index + 1}}</view>
+          <view class="td td-name">{{item.user_name || '—'}}</view>
+          <view class="td td-name">{{item.shushi_name || '—'}}</view>
+          <view class="td td-serial">{{item.current_serial || '—'}}</view>
+          <view class="td td-date {{getDeadlineClass(item.deadline)}}">
+            {{formatDate(item.deadline)}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无当前同塾提示 -->
+    <view class="card empty-card" wx:if="{{courseDetail.current.length === 0}}">
+      <view class="card-title-bar">当前同塾</view>
+      <view class="empty-section">暂无在读塾生</view>
+    </view>
+
+    <!-- ========== 结课同塾 ========== -->
+    <view class="card" wx:if="{{courseDetail.finish.length > 0}}">
+      <view class="card-title-bar">结课同塾</view>
+      <view class="student-table">
+        <view class="table-header">
+          <view class="th th-index">序</view>
+          <view class="th th-name">塾生</view>
+          <view class="th th-name">塾师</view>
+          <view class="th th-date">结课日期</view>
+        </view>
+        <view
+          class="table-row"
+          wx:for="{{courseDetail.finish}}"
+          wx:key="user_id"
+        >
+          <view class="td td-index">{{index + 1}}</view>
+          <view class="td td-name">{{item.user_name || '—'}}</view>
+          <view class="td td-name">{{item.shushi_name || '—'}}</view>
+          <view class="td td-date">{{formatDate(item.finish_date)}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无结课同塾提示 -->
+    <view class="card empty-card" wx:if="{{courseDetail.finish.length === 0}}">
+      <view class="card-title-bar">结课同塾</view>
+      <view class="empty-section">暂无结课记录</view>
+    </view>
+
+  </view>
+
+</view>
+
+<!-- TDesign toast -->
+<t-toast id="t-toast" />

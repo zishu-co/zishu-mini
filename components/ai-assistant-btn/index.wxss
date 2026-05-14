@@ -1,0 +1,61 @@
+.fab-container {
+  position: fixed;
+  right: 32rpx;
+  bottom: 200rpx;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.fab-btn {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #aa00ff, #6c2aff);
+  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab-btn.pressed {
+  transform: scale(0.92);
+  box-shadow: 0 4rpx 12rpx rgba(170, 0, 255, 0.3);
+}
+
+.fab-icon {
+  font-size: 44rpx;
+  line-height: 1;
+}
+
+.fab-dot {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #ff4757;
+  border: 2rpx solid #fff;
+}
+
+.fab-badge {
+  position: absolute;
+  top: 4rpx;
+  right: 4rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  background: #ff4757;
+  color: #fff;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6rpx;
+  border: 2rpx solid #fff;
+}

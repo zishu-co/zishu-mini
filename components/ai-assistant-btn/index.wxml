@@ -1,0 +1,7 @@
+<view class="fab-container" bindtap="onTap" bindlongpress="onLongPress">
+  <view class="fab-btn {{isPressed ? 'pressed' : ''}}">
+    <text class="fab-icon">💬</text>
+  </view>
+  <view wx:if="{{dot}}" class="fab-dot"></view>
+  <view wx:elif="{{badge}}" class="fab-badge"></view>
+</view>

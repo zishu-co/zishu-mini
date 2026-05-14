@@ -36,7 +36,7 @@ Page({
           this.setData({ listData: [], loading: false })
         }
       })
-      .catch(() => {
+      .catch((e) => {
         wx.hideLoading()
         this.setData({ listData: [], loading: false })
       })
