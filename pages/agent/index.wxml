@@ -1,0 +1,52 @@
+<view class="agent-page">
+  <!-- 消息列表 -->
+  <scroll-view class="message-list" scroll-y="true" scroll-top="{{scrollTop}}">
+    <view wx:for="{{messages}}" wx:key="id" class="message-item {{item.role}}">
+      <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">🤖</view>
+      <view wx:else class="avatar user-avatar">👤</view>
+      <view class="message-bubble {{item.role}}">
+        <text class="message-text">{{item.content}}</text>
+        <text wx:if="{{item.time}}" class="message-time">{{item.time}}</text>
+      </view>
+    </view>
+
+    <!-- 加载指示器 -->
+    <view wx:if="{{isLoading}}" class="message-item assistant">
+      <view class="avatar assistant-avatar">🤖</view>
+      <view class="message-bubble assistant loading-bubble">
+        <text class="loading-dots">●●●</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <!-- 语音按钮（按住说话） -->
+    <view
+      class="voice-btn {{isRecording ? (recordCancel ? 'cancel' : 'recording') : ''}}"
+      bindtouchstart="onVoiceTouchStart"
+      bindtouchmove="onVoiceTouchMove"
+      bindtouchend="onVoiceTouchEnd"
+      bindtouchcancel="onVoiceCancel"
+    >
+      <text class="voice-icon">{{isRecording ? (recordCancel ? '✕' : '🔴') : '🎤'}}</text>
+      <text wx:if="{{isRecording}}" class="voice-hint">{{recordCancel ? '松开取消' : '上滑取消'}}</text>
+    </view>
+
+    <!-- 文字输入框 -->
+    <input
+      class="text-input"
+      value="{{inputText}}"
+      bindinput="onInput"
+      bindconfirm="onSend"
+      placeholder="说点什么..."
+      confirm-type="send"
+      cursor-spacing="16"
+    />
+
+    <!-- 发送按钮 -->
+    <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="onSend">
+      <text>发送</text>
+    </view>
+  </view>
+</view>
