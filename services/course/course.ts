@@ -158,3 +158,33 @@ export function calMentors(courseId: number): Promise<CalMentorsResult> {
 export function selectMentor(shushi_id: number, courseid: number): Promise<any> {
   return request({ url: '/api/course/select_mentor', method: 'POST', data: { shushi_id, courseid }, showLoading: true });
 }
+
+// ==================== 课程详情相关类型 ====================
+
+export interface CourseDetail {
+  course: {
+    id: number;
+    title: string;
+    director_id: number;
+    director_name: string;
+    desc: string;
+  };
+  chapters: Chapter[];
+  current: StudentRecord[];
+  finish: StudentRecord[];
+}
+
+export interface StudentRecord {
+  user_id?: number;
+  user_name?: string;
+  shushi_id?: number;
+  shushi_name?: string;
+  current_serial?: number;
+  deadline?: string;
+  finish_date?: string;
+}
+
+/** 获取课程详情（章节 + 同塾信息） */
+export function getCourseDetail(courseId: number): Promise<CourseDetail> {
+  return request<CourseDetail>({ url: '/api/course/get_course/' + courseId, showLoading: true });
+}
