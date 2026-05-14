@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { get } from '../../services/base'
+import base from '../../services/base'
+const { get } = base
 
 Page({
   data: {
@@ -12,16 +13,13 @@ Page({
   },
 
   fetchData() {
-    wx.showLoading({ title: '加载中...', mask: true })
-
+    this.setData({ loading: true })
     get('/api/course/list_all_mentors')
       .then((res: any) => {
-        wx.hideLoading()
         const listData = Array.isArray(res) ? res : []
         this.setData({ listData, loading: false })
       })
-      .catch(() => {
-        wx.hideLoading()
+      .catch((e) => {
         this.setData({ listData: [], loading: false })
       })
   },
