@@ -33,7 +33,7 @@ Page({
         const scheduledData = Array.isArray(res) ? res : []
         this.setData({ scheduledData, loading: false })
       })
-      .catch(() => {
+      .catch((e) => {
         this.setData({ scheduledData: [], loading: false })
       })
   },
@@ -45,7 +45,7 @@ Page({
         const goalsData = Array.isArray(res) ? res : []
         this.setData({ goalsData, loadingGoals: false })
       })
-      .catch(() => {
+      .catch((e) => {
         this.setData({ goalsData: [], loadingGoals: false })
       })
   },
@@ -57,7 +57,7 @@ Page({
         const historyData = Array.isArray(res) ? res : []
         this.setData({ historyData, loadingHistory: false })
       })
-      .catch(() => {
+      .catch((e) => {
         this.setData({ historyData: [], loadingHistory: false })
       })
   },

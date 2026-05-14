@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { get } from '../../services/base'
+import base from '../../services/base'
+const { get } = base
 
 Page({
   data: {
@@ -12,19 +13,16 @@ Page({
   },
 
   fetchMembers() {
-    wx.showLoading({ title: '加载中...', mask: true })
-
-    get('/api/users/fetch_all')
+    this.setData({ loading: true })
+    get('/api/users/fetch_all_users')
       .then((res: any) => {
-        wx.hideLoading()
         const members = Array.isArray(res) ? res : []
         this.setData({
           members,
           loading: false,
         })
       })
-      .catch(() => {
-        wx.hideLoading()
+      .catch((e) => {
         this.setData({ members: [], loading: false })
       })
   },

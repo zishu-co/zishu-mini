@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { get } from '../../services/base'
+import { fetchCurrentSelections } from '../../services/course/course'
 
 Page({
   data: {
@@ -11,18 +11,15 @@ Page({
     this.fetchData()
   },
 
-  fetchData() {
-    wx.showLoading({ title: '加载中...', mask: true })
-    get('/api/course/fetch_all_selection')
-      .then((res: any) => {
-        wx.hideLoading()
-        const listData = Array.isArray(res) ? res : []
-        this.setData({ listData, loading: false })
-      })
-      .catch(() => {
-        wx.hideLoading()
-        this.setData({ listData: [], loading: false })
-      })
+  async fetchData() {
+    this.setData({ loading: true })
+    try {
+      const res = await fetchCurrentSelections()
+      const listData = Array.isArray(res) ? res : []
+      this.setData({ listData, loading: false })
+    } catch (e) {
+      this.setData({ listData: [], loading: false })
+    }
   },
 
   get overdueCount(): number {

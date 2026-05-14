@@ -4,6 +4,6 @@
   "usingComponents": {
     "t-loading": "tdesign-miniprogram/loading/loading",
     "t-toast": "tdesign-miniprogram/toast/toast",
-    "t-chat-markdown": "tdesign-miniprogram/miniprogram_dist/chat-markdown/chat-markdown"
+    "t-chat-markdown": "tdesign-miniprogram/chat-markdown/chat-markdown"
   }
 }
