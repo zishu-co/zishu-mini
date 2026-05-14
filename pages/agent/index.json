@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "AI 助理",
+  "navigationStyle": "default",
+  "usingComponents": {
+    "chat-message": "tdesign-miniprogram/chat-message/chat-message"
+  }
+}
