@@ -1,0 +1,119 @@
+<!-- pages/ark-detail/index.wxml -->
+<!-- spec: specs/miniprogram/active/004-complete-ark-detail.md -->
+<view class="page">
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 顶部信息卡 -->
+    <view class="header-card">
+      <view class="ark-name">{{ark.arkname || '方舟详情'}}</view>
+      <view class="status-row">
+        <text class="stage-badge {{stageClass(ark.stage)}}">{{ark.stage || '筹建中'}}</text>
+        <text class="finished-tag" wx:if="{{ark.finished}}">已结束</text>
+      </view>
+      <view class="meta-row">
+        <text class="teacher-text" wx:if="{{ark.teacher_name}}">塾师：{{ark.teacher_name}}</text>
+        <text class="captain-text" wx:if="{{ark.captain_id}}">舟长：#{{ark.captain_id}}</text>
+      </view>
+    </view>
+
+    <!-- 总进度条 -->
+    <view class="progress-card">
+      <view class="progress-header">
+        <text class="progress-title">总进度</text>
+        <text class="progress-percent">{{ark.total_progress_percent || 0}}%</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-bar__fill" style="width: {{ark.total_progress_percent || 0}}%;"></view>
+      </view>
+    </view>
+
+    <!-- 成员列表 -->
+    <view class="section">
+      <view class="section-title">舟员（{{ark.members.length || 0}}）</view>
+      <view
+        class="member-card"
+        wx:for="{{ark.members}}"
+        wx:key="crew_id"
+        wx:for-item="m"
+      >
+        <view class="member-row">
+          <view class="member-info">
+            <text class="member-name">{{m.username}}</text>
+            <text class="captain-tag" wx:if="{{m.is_captain}}">⭐ 舟长</text>
+            <text class="gender-tag {{genderClass(m.gender)}}" wx:if="{{m.gender}}">{{m.gender}}</text>
+          </view>
+          <view class="member-progress">
+            <text class="member-progress-text">{{m.current_serial}}/{{m.total_chapters}} ({{m.progress_percent}}%)</text>
+          </view>
+        </view>
+        <view class="progress-bar member-progress-bar">
+          <view class="progress-bar__fill" style="width: {{m.progress_percent}}%;"></view>
+        </view>
+        <view
+          class="learn-sheet-link"
+          wx:if="{{m.chapter_url}}"
+          bindtap="onGoLearnSheet"
+          data-userid="{{m.user_id}}"
+        >📖 查看学习单 ›</view>
+      </view>
+    </view>
+
+    <!-- 操作区 -->
+    <view class="actions">
+      <button
+        class="action-btn primary"
+        wx:if="{{canSelfSetCaptain()}}"
+        bindtap="onSetCaptain"
+      >设我为舟长</button>
+      <button
+        class="action-btn"
+        wx:if="{{canEditMeetings()}}"
+        bindtap="onOpenMeetings"
+      >📅 编辑三会</button>
+      <button
+        class="action-btn danger"
+        wx:if="{{canCloseArk()}}"
+        bindtap="onCloseArk"
+      >完结方舟</button>
+      <button
+        class="action-btn ghost"
+        wx:if="{{canLeaveArk()}}"
+        bindtap="onLeaveArk"
+      >退出方舟</button>
+    </view>
+
+    <!-- 三会弹窗 -->
+    <view class="modal-mask" wx:if="{{showMeetingsModal}}" bindtap="onCloseMeetings"></view>
+    <view class="modal" wx:if="{{showMeetingsModal}}">
+      <view class="modal-header">
+        <text class="modal-title">三会腾讯会议</text>
+        <text class="modal-close" bindtap="onCloseMeetings">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="form-row">
+          <text class="form-label">启动会</text>
+          <input class="form-input" type="text" placeholder="会议号/链接" value="{{meetingsForm.meet_start}}" data-field="meet_start" bindinput="onMeetingsInput" />
+          <input class="form-input" type="text" placeholder="时间（如 2026-07-01 19:00）" value="{{meetingsForm.meet_start_time}}" data-field="meet_start_time" bindinput="onMeetingsInput" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">中期会</text>
+          <input class="form-input" type="text" placeholder="会议号/链接" value="{{meetingsForm.meet_mid}}" data-field="meet_mid" bindinput="onMeetingsInput" />
+          <input class="form-input" type="text" placeholder="时间" value="{{meetingsForm.meet_mid_time}}" data-field="meet_mid_time" bindinput="onMeetingsInput" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">完航会</text>
+          <input class="form-input" type="text" placeholder="会议号/链接" value="{{meetingsForm.meet_end}}" data-field="meet_end" bindinput="onMeetingsInput" />
+          <input class="form-input" type="text" placeholder="时间" value="{{meetingsForm.meet_end_time}}" data-field="meet_end_time" bindinput="onMeetingsInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <view class="action-btn ghost" bindtap="onCloseMeetings">取消</view>
+        <view class="action-btn primary" bindtap="onSaveMeetings">保存</view>
+      </view>
+    </view>
+  </block>
+</view>

@@ -111,14 +111,15 @@ Page<IMyPageData, IMyPageData>({
     }
   },
 
-  /** 点击方舟卡片 → 跳方舟详情（暂跳 learn/index，B1/B2 完善后跳 detail） */
+  /** 点击方舟卡片 → 跳方舟详情 */
   onArkTap(e: any) {
     if (!this.data.isLoggedIn) {
       wx.navigateTo({ url: '/pages/login/login' })
       return
     }
-    // B1/B2 阶段会改成 wx.navigateTo 到独立 detail 页
-    wx.switchTab({ url: '/pages/learn/index' })
+    const arkId = e.currentTarget.dataset.arkId
+    if (!arkId) return
+    wx.navigateTo({ url: `/pages/ark-detail/index?arkId=${arkId}` })
   },
 
   fetchStats() {

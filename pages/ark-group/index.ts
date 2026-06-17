@@ -141,11 +141,11 @@ Page<IPageData, IPageData>({
     }
   },
 
-  /** 跳方舟详情（暂跳 learn/index，B2 阶段跳 detail） */
+  /** 跳方舟详情 */
   onGoDetail(e: any) {
     const arkId = e.currentTarget.dataset.arkid;
     if (!arkId) return;
-    wx.switchTab({ url: '/pages/learn/index' });
+    wx.navigateTo({ url: `/pages/ark-detail/index?arkId=${arkId}` });
   },
 
   /** 性别 chip class */

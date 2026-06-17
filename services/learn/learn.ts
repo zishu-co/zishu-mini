@@ -224,3 +224,110 @@ export function arkCreate(courseId: number): Promise<{ code: number; message?: s
     showLoading: true,
   })
 }
+
+// ==================== 方舟详情相关 ====================
+
+/** 成员（含进度） */
+export interface ArkDetailMember {
+  crew_id: number
+  user_id: number
+  username: string
+  gender: string | null
+  is_captain: number
+  current_serial: number
+  total_chapters: number
+  progress_percent: number
+  chapter_url: string
+}
+
+/** 方舟详情 */
+export interface ArkDetail {
+  ark_id: number
+  arkname: string
+  stage: string
+  captain_id: number | null
+  teacher_id: number | null
+  teacher_name: string
+  course_id: number | null
+  members: ArkDetailMember[]
+  total_progress_percent: number
+  meet_start: string | null
+  meet_mid: string | null
+  meet_end: string | null
+  meet_start_time: string | null
+  meet_mid_time: string | null
+  meet_end_time: string | null
+  all_meetings_done: number
+  closed: number
+  finished: number
+}
+
+/** 三会信息 */
+export interface ArkMeetings {
+  meet_start?: string
+  meet_mid?: string
+  meet_end?: string
+  meet_start_time?: string
+  meet_mid_time?: string
+  meet_end_time?: string
+}
+
+/** 拉方舟详情 */
+export function arkDetail(arkId: number): Promise<ArkDetail> {
+  return request<ArkDetail>({
+    url: `/api/learn/ark/detail/${arkId}`,
+    showLoading: true,
+  })
+}
+
+/** 设舟长（成员自荐：captain_user_id 省略；塾师指定：传 user_id） */
+export function arkSetCaptain(
+  arkId: number,
+  captainUserId?: number
+): Promise<{ code: number; message?: string }> {
+  const data: any = { ark_id: arkId }
+  if (captainUserId) data.captain_user_id = captainUserId
+  return request({
+    url: '/api/learn/ark/set_captain',
+    method: 'POST',
+    data,
+    showLoading: true,
+  })
+}
+
+/** 保存三会（塾师/舟长） */
+export function arkSaveMeetings(arkId: number, m: ArkMeetings): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/meetings',
+    method: 'POST',
+    data: { ark_id: arkId, ...m },
+    showLoading: true,
+  })
+}
+
+/** 拉三会 */
+export function arkGetMeetings(arkId: number): Promise<ArkMeetings> {
+  return request<ArkMeetings>({
+    url: `/api/learn/ark/meetings/${arkId}`,
+  })
+}
+
+/** 完结方舟（舟长） */
+export function arkClose(arkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/close',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
+
+/** 退出方舟（成员） */
+export function arkLeave(arkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/leave',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
