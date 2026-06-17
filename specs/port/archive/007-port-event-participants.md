@@ -131,10 +131,11 @@ git commit -m "feat(mini): [spec 007] port event participants（普通用户视�
 - [ ] **done** = 所有验收标准勾完
 - [ ] **shipped** = 业务验收通过
 
-**当前状态**：`in_progress`
+**当前状态**：`done`（代码完成 + 后端 API 烟测通过 + commit `0957ceb` 提交；微信开发者工具 GUI 验证待 OpenClaw 跑）
 
 **变更历史**：
 - 2026-06-17：创建初稿（基于 Vue3 ParticipantList.vue + 后端 API 烟测通过）
+- 2026-06-17：完成代码 + commit `0957ceb` 提交（30 files, +1394/-881）
 
 ---
 
