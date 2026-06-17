@@ -129,6 +129,176 @@ page {
   padding: 240rpx 32rpx 180rpx;
 }
 
+/* ========== 我的方舟区块（spec 002） ========== */
+
+.ark-block {
+  position: absolute;
+  top: 580rpx;
+  left: 32rpx;
+  right: 32rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx 24rpx 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.ark-block__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx 16rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.ark-block__title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+}
+
+.ark-block__count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.ark-loading {
+  padding: 40rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+}
+
+.ark-list {
+  margin-top: 8rpx;
+}
+
+.ark-item {
+  padding: 20rpx 8rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  transition: background 0.2s;
+}
+
+.ark-item:last-child {
+  border-bottom: none;
+}
+
+.ark-item:active {
+  background: #f8f8f8;
+}
+
+.ark-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.ark-item__name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12rpx;
+}
+
+.ark-item__tag {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+
+.tag-prep {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.tag-sail {
+  background: rgba(170, 0, 255, 0.1);
+  color: #aa00ff;
+}
+
+.tag-done {
+  background: rgba(103, 194, 58, 0.12);
+  color: #67c23a;
+}
+
+.tag-closed {
+  background: rgba(153, 153, 153, 0.12);
+  color: #999;
+}
+
+.ark-item__course {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ark-item__bottom {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #aa00ff 0%, #c6f 100%);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 22rpx;
+  color: #aa00ff;
+  font-weight: 600;
+  min-width: 64rpx;
+  text-align: right;
+}
+
+.ark-item__crew {
+  font-size: 22rpx;
+  color: #999;
+  min-width: 80rpx;
+  text-align: right;
+}
+
+.ark-empty {
+  padding: 40rpx 0 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ark-empty__icon {
+  font-size: 80rpx;
+  margin-bottom: 12rpx;
+}
+
+.ark-empty__text {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.ark-empty__tip {
+  font-size: 22rpx;
+  color: #999;
+}
+
 .menu-group {
   background-color: #ffffff;
   border-radius: 16rpx;

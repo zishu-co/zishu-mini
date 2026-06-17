@@ -122,3 +122,38 @@ export function submitHomework(
     showLoading: true,
   })
 }
+
+// ==================== 方舟列表相关 ====================
+
+/** 方舟条目（按阶段分组返回） */
+export interface ArkItem {
+  ark_id: number
+  arkname: string
+  course_id: number
+  course_title: string
+  teacher_id: number
+  teacher_name: string
+  captain_id: number | null
+  captain_name: string
+  create_time: string
+  crew_count: number
+  members_str: string
+  progress_percent: number
+  stage: string
+  finished: number
+  closed: number
+  finish_time: string
+  role: 'teacher' | 'captain' | 'member' | 'none'
+}
+
+/** 获取用户方舟列表（按阶段分组） */
+export function getUserArkList(): Promise<{
+  preparing: ArkItem[]
+  sailing: ArkItem[]
+  finished: ArkItem[]
+  closed: ArkItem[]
+}> {
+  return request({
+    url: '/api/learn/ark/user/list',
+  })
+}

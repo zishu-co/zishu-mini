@@ -43,6 +43,53 @@
     </view>
   </view>
 
+  <!-- 我的方舟区块（spec 002） -->
+  <view class="ark-block" wx:if="{{isLoggedIn}}">
+    <view class="ark-block__header">
+      <text class="ark-block__title">🚢 我的方舟</text>
+      <text class="ark-block__count">{{arkCount}} 个</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="ark-loading" wx:if="{{arkLoading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 有方舟 -->
+    <view class="ark-list" wx:elif="{{arkList.length > 0}}">
+      <view
+        class="ark-item"
+        wx:for="{{arkList}}"
+        wx:key="ark_id"
+        wx:for-item="ark"
+        bindtap="onArkTap"
+        data-ark-id="{{ark.ark_id}}"
+      >
+        <view class="ark-item__top">
+          <view class="ark-item__name">{{ark.arkname}}</view>
+          <view class="ark-item__tag tag-{{ark.finished ? 'done' : (ark.closed ? 'closed' : (ark.stage === '筹建中' ? 'prep' : 'sail'))}}">
+            {{ark.finished ? '已成舟' : (ark.closed ? '已解散' : ark.stage)}}
+          </view>
+        </view>
+        <view class="ark-item__course">{{ark.course_title}}</view>
+        <view class="ark-item__bottom">
+          <view class="progress-bar">
+            <view class="progress-bar__fill" style="width: {{ark.progress_percent}}%;"></view>
+          </view>
+          <text class="progress-text">{{ark.progress_percent}}%</text>
+          <text class="ark-item__crew">{{ark.members_str}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="ark-empty" wx:else>
+      <text class="ark-empty__icon">🛶</text>
+      <text class="ark-empty__text">暂未加入任何方舟</text>
+      <text class="ark-empty__tip">在"学习"页选课后可创建或加入方舟</text>
+    </view>
+  </view>
+
   <!-- 功能菜单 -->
   <view class="menu-wrapper">
 
