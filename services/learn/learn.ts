@@ -157,3 +157,70 @@ export function getUserArkList(): Promise<{
     url: '/api/learn/ark/user/list',
   })
 }
+
+// ==================== 组方舟相关 ====================
+
+/** 舟员（带性别） */
+export interface ArkMember {
+  user_id: number
+  username: string
+  gender: string | null
+  is_captain: number
+}
+
+/** 教师方舟列表条目 */
+export interface TeacherArkItem {
+  teacher_id: number
+  teacher_name: string
+  ark_id: number | null
+  arkname: string
+  stage: string
+  male_count: number
+  female_count: number
+  members: ArkMember[]
+  closed: number
+  finished: number
+}
+
+/** 我已加入的方舟 */
+export interface MyArk {
+  ark_id?: number
+  arkname?: string
+  // 后端返回可能还有其他字段，宽松处理
+  [key: string]: any
+}
+
+/** 拉取某课程下所有塾师的方舟列表 */
+export function arkListByTeacher(courseId: number): Promise<TeacherArkItem[]> {
+  return request<TeacherArkItem[]>({
+    url: `/api/learn/ark/list_by_teacher`,
+    data: { course_id: courseId },
+  })
+}
+
+/** 拉我已加入的方舟（不存在时返回 404） */
+export function arkMy(): Promise<MyArk | { code: number; message: string }> {
+  return request<MyArk>({
+    url: '/api/learn/ark/my',
+  })
+}
+
+/** 加入方舟 */
+export function arkJoin(arkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/join',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
+
+/** 创建方舟（创建者自动是塾师） */
+export function arkCreate(courseId: number): Promise<{ code: number; message?: string; ark_id?: number }> {
+  return request({
+    url: '/api/learn/ark/create',
+    method: 'POST',
+    data: { course_id: courseId },
+    showLoading: true,
+  })
+}

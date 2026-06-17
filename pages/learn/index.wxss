@@ -146,11 +146,20 @@ page {
   border-radius: 20rpx;
 }
 .no-mentor {
-  background: #fff0f0;
-  color: #ff6b6b;
   font-size: 22rpx;
-  padding: 6rpx 16rpx;
+  color: #aa00ff;
+  border: 1rpx solid #aa00ff;
+  padding: 4rpx 12rpx;
   border-radius: 20rpx;
+}
+
+.ark-link {
+  font-size: 22rpx;
+  color: #fff;
+  background: #aa00ff;
+  padding: 6rpx 14rpx;
+  border-radius: 20rpx;
+  margin-left: 8rpx;
 }
 .course-card-bottom {
   display: flex;

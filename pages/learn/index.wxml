@@ -48,6 +48,7 @@
         <view class="course-actions">
           <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
           <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
+          <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         </view>
       </view>
       <view class="course-card-bottom">

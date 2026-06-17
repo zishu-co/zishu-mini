@@ -195,6 +195,18 @@ Page<ILearnPageData, ILearnPageData>({
     this.setData({ showMentorModal: false });
   },
 
+  /** 组方舟：跳到独立 ark-group 页面 */
+  onJoinArk(e: any) {
+    const courseId = e.currentTarget.dataset.courseid;
+    if (!courseId) return;
+    if (!this.data.hasLogin) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1000);
+      return;
+    }
+    wx.navigateTo({ url: `/pages/ark-group/index?courseId=${courseId}` });
+  },
+
   onReportLearn(e: any) {
     const course: CurrentSelection = e.currentTarget.dataset.course;
     this.setData({

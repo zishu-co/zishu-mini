@@ -1,0 +1,175 @@
+/* pages/ark-group/index.wxss */
+/* spec: specs/miniprogram/active/003-complete-ark-group.md */
+
+.page {
+  min-height: 100vh;
+  background: #faf9f7;
+  padding: 24rpx 24rpx 80rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.loading {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.teacher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.teacher-card {
+  background: #ffffff;
+  border: 1rpx solid rgba(0, 0, 0, 0.06);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.teacher-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.teacher-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+  flex: 1;
+}
+
+.teacher-name {
+  font-weight: 600;
+  font-size: 32rpx;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+.ark-badge {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  white-space: nowrap;
+}
+
+.badge-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-waiting {
+  background: rgba(170, 0, 255, 0.12);
+  color: #aa00ff;
+}
+
+.teacher-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 0 20rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.action-btn.primary {
+  background: #aa00ff;
+  color: #fff;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.joined-tip {
+  font-size: 24rpx;
+  color: #67c23a;
+  font-weight: 600;
+}
+
+.closed-tip,
+.full-tip,
+.no-ark-tip,
+.no-ark-hint {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.detail-link {
+  font-size: 24rpx;
+  color: #aa00ff;
+  margin-left: 4rpx;
+}
+
+.members-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+}
+
+.member-count-tag {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.member-count-tag.male {
+  background: #e0f0ff;
+  color: #1e40af;
+}
+
+.member-count-tag.female {
+  background: #fff0f5;
+  color: #9d174d;
+}
+
+.member-chip {
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.gender-male {
+  background: #e0f0ff;
+  color: #1e40af;
+}
+
+.gender-female {
+  background: #fff0f5;
+  color: #9d174d;
+}
+
+.no-member {
+  font-size: 24rpx;
+  color: #9a9ab0;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #9a9ab0;
+  font-size: 28rpx;
+}
