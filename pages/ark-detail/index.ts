@@ -231,8 +231,7 @@ Page<IPageData, IPageData>({
   onGoLearnSheet(e: any) {
     const userId = e.currentTarget.dataset.userid;
     if (!userId) return;
-    // B3 阶段会改成独立页
-    wx.showToast({ title: '学习单功能开发中...', icon: 'none' });
+    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
   },
 
   genderClass(g: string | null): string {

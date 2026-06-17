@@ -331,3 +331,40 @@ export function arkLeave(arkId: number): Promise<{ code: number; message?: strin
     showLoading: true,
   })
 }
+
+// ==================== 学习单 ====================
+
+/** 训练营课程 */
+export interface CampCourse {
+  course_id: number
+  course_title: string
+  create_time: string | null
+  current_serial: number | null
+  deadline: string | null
+  finish_time: string | null
+}
+
+/** 训练营 */
+export interface Camp {
+  id: number
+  user_name: string
+  camp_name: string
+  must_course: string
+  course_list: CampCourse[]
+}
+
+/** 学习单数据 */
+export interface LearnSheetData {
+  camps: Camp[]
+  groups: any[]
+  other_learning: CampCourse[]
+  other_learned: CampCourse[]
+}
+
+/** 拉取学习单 */
+export function learnSheet(userId: number): Promise<LearnSheetData> {
+  return request<LearnSheetData>({
+    url: `/api/learn/learn_sheet/${userId}`,
+    showLoading: true,
+  })
+}
