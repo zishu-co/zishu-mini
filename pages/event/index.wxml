@@ -1,10 +1,139 @@
-<!-- 分层活动 -->
-<block wx:if="{{eventGroupData.isNotEmpty}}">
-  <event-group
-    store-goods="{{ eventGroupData.storeGoods }}"
-    invalid-good-items="{{ eventGroupData.invalidGoodItems }}"
-    binddelete="onGoodsDelete"
-  />
+<!-- pages/event/index.wxml -->
+<view class="page">
 
-  <view class="gap" />
-</block>
+  <!-- 顶部 Banner -->
+  <view class="banner">
+    <view class="banner-title">活动</view>
+    <view class="banner-sub">一起·发现更大的世界</view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view
+      class="tab {{activeTab === 'current' ? 'tab-active' : ''}}"
+      data-tab="current"
+      bindtap="onTabChange"
+    >
+      <text>当前活动</text>
+    </view>
+    <view
+      class="tab {{activeTab === 'historical' ? 'tab-active' : ''}}"
+      data-tab="historical"
+      bindtap="onTabChange"
+    >
+      <text>历史活动</text>
+    </view>
+  </view>
+
+  <!-- 加载态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 当前活动列表 -->
+  <block wx:if="{{activeTab === 'current'}}">
+    <view class="empty" wx:if="{{!loading && currentEvents.length === 0}}">
+      <text>暂无进行中的活动</text>
+    </view>
+
+    <view
+      class="event-card"
+      wx:for="{{currentEvents}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCardTap"
+    >
+      <!-- 海报 -->
+      <view
+        class="card-poster"
+        data-url="{{item.url}}"
+        catchtap="onPosterTap"
+      >
+        <image
+          wx:if="{{item.poster}}"
+          class="poster-img"
+          src="{{item.poster}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="poster-placeholder">
+          <text>暂无封面</text>
+        </view>
+        <view class="poster-overlay">
+          <text>点击查看详情</text>
+        </view>
+      </view>
+
+      <!-- 卡片信息 -->
+      <view class="card-body">
+        <view class="card-title">{{item.title}}</view>
+        <view class="card-meta">
+          <text class="meta-item">🕐 {{item.start_time}}</text>
+          <text class="meta-item">📍 {{item.location}}</text>
+          <text class="meta-item">👥 {{item.participant_count}} 人</text>
+        </view>
+        <view class="card-desc" wx:if="{{item.desc}}">
+          <text>{{item.desc}}</text>
+        </view>
+        <!-- 报名按钮 -->
+        <view class="card-actions">
+          <button
+            class="btn-primary"
+            data-id="{{item.id}}"
+            data-title="{{item.title}}"
+            catchtap="onJoinTap"
+          >报名参加</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 历史活动列表 -->
+  <block wx:if="{{activeTab === 'historical'}}">
+    <view class="empty" wx:if="{{!loading && historicalEvents.length === 0}}">
+      <text>暂无历史活动</text>
+    </view>
+
+    <view
+      class="event-card historical"
+      wx:for="{{historicalEvents}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCardTap"
+    >
+      <view
+        class="card-poster"
+        data-url="{{item.url}}"
+        catchtap="onPosterTap"
+      >
+        <image
+          wx:if="{{item.poster}}"
+          class="poster-img"
+          src="{{item.poster}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="poster-placeholder">
+          <text>暂无封面</text>
+        </view>
+        <view class="historical-badge">
+          <text>已结束</text>
+        </view>
+      </view>
+
+      <view class="card-body">
+        <view class="card-title">{{item.title}}</view>
+        <view class="card-meta">
+          <text class="meta-item">🕐 {{item.start_time}}</text>
+          <text class="meta-item">📍 {{item.location}}</text>
+          <text class="meta-item">👥 {{item.participant_count}} 人</text>
+        </view>
+        <view class="card-desc" wx:if="{{item.desc}}">
+          <text>{{item.desc}}</text>
+        </view>
+        <!-- 历史活动无报名按钮 -->
+      </view>
+    </view>
+  </block>
+
+  <!-- 底部安全区 -->
+  <view class="safe-bottom" />
+</view>

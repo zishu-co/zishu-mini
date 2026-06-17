@@ -1,0 +1,4 @@
+/* pages/event/webview/index.wxss */
+page {
+  background: #fff;
+}

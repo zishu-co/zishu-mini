@@ -4,6 +4,8 @@
     "pages/learn/index",
     "pages/inno/index",
     "pages/event/index",
+    "pages/event/participants/index",
+    "pages/event/webview/index",
     "pages/my/my",
     "pages/agent/index",
     "pages/login/login",

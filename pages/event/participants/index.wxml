@@ -1,0 +1,92 @@
+<!-- pages/event/participants/index.wxml -->
+<view class="page">
+
+  <!-- 加载态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 顶部活动信息卡 -->
+  <block wx:if="{{!loading && eventInfo}}">
+    <view class="event-header">
+      <view
+        class="event-poster"
+        bindtap="onPosterTap"
+      >
+        <image
+          wx:if="{{eventInfo.poster}}"
+          class="poster-img"
+          src="{{eventInfo.poster}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="poster-placeholder">
+          <text>暂无封面</text>
+        </view>
+      </view>
+      <view class="event-info">
+        <view class="info-title">{{eventInfo.title}}</view>
+        <view class="info-meta">
+          <text>🕐 {{eventInfo.start_time}}</text>
+        </view>
+        <view class="info-meta">
+          <text>📍 {{eventInfo.location}}</text>
+        </view>
+        <view class="info-desc" wx:if="{{eventInfo.desc}}">
+          <text>{{eventInfo.desc}}</text>
+        </view>
+        <view class="info-actions">
+          <button class="btn-secondary" bindtap="onGoBack">返回活动列表</button>
+          <button
+            class="btn-primary"
+            wx:if="{{eventInfo.url}}"
+            bindtap="onOpenPromo"
+          >查看宣传文案</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 参与者列表 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">参与人列表 ({{participants.length}}人)</text>
+    </view>
+
+    <view class="empty" wx:if="{{!loading && participants.length === 0}}">
+      <text>暂无参与人</text>
+    </view>
+
+    <view
+      class="participant-card"
+      wx:for="{{participants}}"
+      wx:key="id"
+    >
+      <view class="participant-name">{{item.username}}</view>
+      <view class="participant-row">
+        <text class="row-label">🕐 报名时间</text>
+        <text class="row-value">{{item.join_time}}</text>
+      </view>
+      <view class="participant-row">
+        <text class="row-label">💰 支付</text>
+        <view class="row-value">
+          <view class="tag {{item.is_payed ? 'tag-success' : 'tag-default'}}">
+            <text>{{item.is_payed ? '已支付' : '未支付'}}</text>
+          </view>
+          <text class="amount" wx:if="{{item.payed_amount > 0}}">¥{{item.payed_amount}}</text>
+          <text class="amount" wx:if="{{item.payed_amount > 0 && item.payment_method}}"> · {{item.payment_method}}</text>
+        </view>
+      </view>
+      <view class="participant-row">
+        <text class="row-label">✓ 签到</text>
+        <view class="row-value">
+          <view class="tag {{item.is_signed_in ? 'tag-success' : 'tag-info'}}">
+            <text>{{item.is_signed_in ? '已签到' : '未签到'}}</text>
+          </view>
+          <text class="amount" wx:if="{{item.is_signed_in && item.sign_in_time}}">{{item.sign_in_time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-bottom" />
+</view>

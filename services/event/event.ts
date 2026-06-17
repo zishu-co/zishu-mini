@@ -1,96 +1,153 @@
-import { delay } from '../_utils/delay';
+/**
+ * 活动 API 服务
+ * 对接后端 /api/event/* 接口
+ * spec: specs/port/archive/006-port-event-list.md
+ *      specs/port/archive/007-port-event-participants.md
+ */
 
-interface GoodsItem {
-  thumb: string;
-  title: string;
-  price: string;
+// ==================== 类型定义 ====================
+
+/** 活动条目 */
+export interface EventItem {
+  id: number
+  title: string
+  poster: string
+  url: string
+  desc: string | null
+  start_time: string
+  location: string
+  is_finished: boolean
+  finished_time: string | null
+  participant_count: number
+  related_id: number | null
+  related_type: string | null
+  created_at: string
+  updated_at: string
 }
 
-interface PromotionGoods {
-  goodsPromotionList: GoodsItem[];
+/** 参与者条目 */
+export interface ParticipantItem {
+  id: number
+  user_id: number
+  username: string
+  event_id: number
+  join_time: string
+  sign_in_time: string | null
+  payed_amount: number
+  payment_method: string
+  is_payed: boolean
+  is_signed_in: boolean
+  absence_reason: string | null
+  created_at: string
+  updated_at: string
 }
 
-interface StoreGoods {
-  storeId: string;
-  storeName: string;
-  promotionGoodsList: PromotionGoods[];
-  shortageGoodsList: any[];
+/** 报名响应 */
+export interface JoinEventResult {
+  code: string
+  message: string
+  participant_id?: number
 }
 
-interface EventData {
-  isNotEmpty: boolean;
-  storeGoods: StoreGoods[];
-  invalidGoodItems: any[];
+// ==================== 工具函数 ====================
+
+function getBaseUrl(): string {
+  try {
+    const { envVersion } = wx.getAccountInfoSync().miniProgram
+    switch (envVersion) {
+      case 'develop': return 'https://zishu.co'
+      case 'trial': return 'https://zishu.co'
+      case 'release': return 'https://zishu.co'
+      default: return 'https://zishu.co'
+    }
+  } catch (e) {
+    return 'https://zishu.co'
+  }
 }
 
-export interface EventResponse {
-  data: EventData;
+function getToken(): string {
+  return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
 }
 
-/** 生成活动数据 - 使用 16:9 比例的商品图片 */
-function genEventGroupData(): EventResponse {
-  return {
-    data: {
-      isNotEmpty: true,
-      storeGoods: [
-        {
-          storeId: '1000',
-          storeName: '云Mall深圳旗舰店',
-          promotionGoodsList: [
-            {
-              goodsPromotionList: [
-                {
-                  thumb: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400&h=225&fit=crop',
-                  title: '腾讯极光盒子4智能网络电视机顶盒6K千兆网络机顶盒4K高分辨率',
-                  price: '99',
-                },
-                {
-                  thumb: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=225&fit=crop',
-                  title: '白色短袖连衣裙荷叶边裙摆宽松韩版休闲纯白清爽优雅连衣裙',
-                  price: '298',
-                },
-                {
-                  thumb: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=225&fit=crop',
-                  title: '带帽午休毯虎年款多功能加厚加大加绒简约多功能午休毯连帽披肩',
-                  price: '299',
-                },
-                {
-                  thumb: 'https://images.unsplash.com/photo-1512631118612-7bf025940184?w=400&h=225&fit=crop',
-                  title: '不锈钢刀叉勺套装家用西餐餐具ins简约耐用不锈钢金色银色可选',
-                  price: '299',
-                },
-              ],
-            },
-            {
-              goodsPromotionList: [
-                {
-                  thumb: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&h=225&fit=crop',
-                  title: '运动连帽拉链卫衣休闲开衫长袖多色运动细绒面料运动上衣',
-                  price: '259',
-                },
-                {
-                  thumb: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=225&fit=crop',
-                  title: '迷你便携高颜值蓝牙无线耳机立体声只能触控式操作简约立体声耳机',
-                  price: '290',
-                },
-              ],
-            },
-          ],
-          shortageGoodsList: [
-            {
-              thumb: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=225&fit=crop',
-              title: '红色运动跑鞋专业减震透气轻便跑步鞋（已售罄）',
-              price: '399',
-            },
-          ],
-        },
-      ],
-      invalidGoodItems: [],
-    },
-  };
+function request<T = any>(options: {
+  url: string
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  data?: any
+  showLoading?: boolean
+  loadingText?: string
+}): Promise<T> {
+  return new Promise((resolve, reject) => {
+    if (options.showLoading) {
+      wx.showLoading({ title: options.loadingText || '加载中...', mask: true })
+    }
+    wx.request({
+      url: getBaseUrl() + options.url,
+      method: (options.method || 'GET') as any,
+      data: options.data,
+      header: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'token': getToken(),
+      },
+      timeout: 30000,
+      success: (res: any) => {
+        if (options.showLoading) wx.hideLoading()
+        if (res.statusCode === 401) {
+          reject({ statusCode: 401, errMsg: 'Unauthorized' })
+          return
+        }
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          reject(new Error(`HTTP ${res.statusCode}`))
+          return
+        }
+        resolve(res.data as T)
+      },
+      fail: (err) => {
+        if (options.showLoading) wx.hideLoading()
+        reject(new Error(err.errMsg || '网络请求失败'))
+      },
+    })
+  })
 }
 
-/** 获取活动数据 */
-export function fetchEventGroupData(): Promise<EventResponse> {
-  return delay().then(() => genEventGroupData());
+// ==================== 公开 API ====================
+
+/** 拉当前活动（is_finished=False） */
+export function fetchCurrentEvents(): Promise<EventItem[]> {
+  return request<EventItem[]>({
+    url: '/api/event/events/current/',
+  })
+}
+
+/** 拉历史活动（is_finished=True） */
+export function fetchHistoricalEvents(): Promise<EventItem[]> {
+  return request<EventItem[]>({
+    url: '/api/event/events/historical/',
+  })
+}
+
+/** 拉活动详情 */
+export function getEvent(eventId: number): Promise<EventItem> {
+  return request<EventItem>({
+    url: `/api/event/events/${eventId}/`,
+    showLoading: true,
+  })
+}
+
+/** 拉参与者列表 */
+export function fetchParticipants(eventId: number): Promise<ParticipantItem[]> {
+  return request<ParticipantItem[]>({
+    url: `/api/event/participants/${eventId}/`,
+    showLoading: true,
+  })
+}
+
+/** 报名参加活动（普通用户） */
+export function joinEvent(eventId: number): Promise<JoinEventResult> {
+  return request<JoinEventResult>({
+    url: '/api/event/participants/',
+    method: 'POST',
+    data: { event_id: eventId },
+    showLoading: true,
+    loadingText: '报名中...',
+  })
 }
