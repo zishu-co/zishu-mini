@@ -33,16 +33,17 @@ Page<IReportPageData, IReportData>({
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     const userInfo = wx.getStorageSync('userInfo') || _appReport.globalData.userInfo || {};
-    const userId = userInfo.userId;
+    const nickName = userInfo.nickName || '';
+    // TODO: 后端改为 userId 查询后，切换为 /api/ques/fetchtrans/{userId}
     
-    if (!token || !userId) {
+    if (!token || !nickName) {
       this.setData({ loading: false, records: [] });
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
     
     wx.request({
-      url: 'https://zishu.co/api/ques/fetchtrans/' + userId,
+      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(nickName),
       method: 'GET',
       header: { token },
       success: (res: any) => {

@@ -6,8 +6,9 @@
 	<t-tab-bar-item
 	 wx:for="{{list}}"
 	 wx:for-item="item"
-	 wx:for-index="index"\n\t wx:key="index"
-\t>
+	 wx:for-index="index"
+	 wx:key="index"
+	>
 \t\t<view class="custom-tab-bar-wrapper">
 \t\t\t<t-icon name="{{item.icon}}" size="48rpx" color="{{active === index ? '#a0f' : '#666'}}" />
 \t\t\t<view class="text" style="{{active === index ? 'color: #a0f;' : 'color: #666;'}}">{{ item.text }}</view>

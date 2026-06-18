@@ -75,7 +75,7 @@
     </view>
 
     <!-- 完全空 -->
-    <view class="empty" wx:if="{{!data.camps?.length && !data.other_learning?.length && !data.other_learned?.length}}">
+    <view class="empty" wx:if="{{(!data.camps || !data.camps.length) && (!data.other_learning || !data.other_learning.length) && (!data.other_learned || !data.other_learned.length)}}">
       <text>暂无学习记录</text>
     </view>
   </block>
