@@ -7,6 +7,7 @@
  */
 
 import { getUserArkList, ArkItem } from '../../services/learn/learn'
+import { getBaseUrl } from '../../services/base'
 
 const _appMy = getApp<any>()
 
@@ -61,7 +62,7 @@ Page<IMyPageData, IMyPageData>({
     const globalData = _appMy.globalData
     const storedUserInfo = wx.getStorageSync('userInfo') || {}
     const storedPhoneNumber = wx.getStorageSync('phoneNumber') || ''
-    const isLoggedIn = !!(storedUserInfo || storedPhoneNumber)
+    const isLoggedIn = globalData.hasUserInfo
 
     // 优先取 globalData，回退到 Storage
     const userInfo = globalData.userInfo && Object.keys(globalData.userInfo).length > 0
@@ -129,7 +130,7 @@ Page<IMyPageData, IMyPageData>({
     const userId = _appMy.globalData.userInfo?.userId || 0
 
     wx.request({
-      url: "https://zishu.co/api/users/fetch_reports/" + userId,
+      url: getBaseUrl() + "/api/users/fetch_reports/" + userId,
       method: "GET",
       header: { token },
       success: (res: any) => {
@@ -140,7 +141,7 @@ Page<IMyPageData, IMyPageData>({
     })
 
     wx.request({
-      url: "https://zishu.co/api/users/fetch_shuzhi/" + userId,
+      url: getBaseUrl() + "/api/users/fetch_shuzhi/" + userId,
       method: "GET",
       header: { token },
       success: (res: any) => {
@@ -173,6 +174,11 @@ Page<IMyPageData, IMyPageData>({
     const tab = e.currentTarget.dataset.tab
     if (!tab) return
     wx.switchTab({ url: tab })
+  },
+
+  /** 跳转到登录页 */
+  goToLogin() {
+    wx.navigateTo({ url: '/pages/login/login' })
   },
 
   logOut() {

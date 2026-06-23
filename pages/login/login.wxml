@@ -5,75 +5,29 @@
   <view class="decor-circle decor-circle-2"></view>
   <view class="decor-circle decor-circle-3"></view>
 
-  <!-- ====== Dev 模式：手机号+密码登录 ====== -->
-  <block wx:if="{{isDev}}">
-    <view class="header">
-      <view class="welcome-text">
-        <view class="welcome-title">开发者登录</view>
-        <view class="welcome-subtitle">Dev 模式 · 支持手机号+密码登录</view>
-      </view>
+  <view class="header">
+    <view class="welcome-text">
+      <view class="welcome-title">{{isDev ? '开发者登录' : '欢迎登录'}}</view>
+      <view class="welcome-subtitle">{{isDev ? 'Dev 模式 · 选择登录方式' : '授权登录后体验更多精彩功能'}}</view>
     </view>
+  </view>
 
-    <view class="dev-login-form">
-      <view class="form-item">
-        <input
-          class="form-input"
-          type="number"
-          maxlength="11"
-          placeholder="请输入手机号"
-          value="{{phoneInput}}"
-          bindinput="onPhoneInput"
-        />
+  <!-- ====== Dev 模式：登录方式 radio 选择 ====== -->
+  <view class="login-method-selector" wx:if="{{isDev}}">
+    <radio-group bindchange="onLoginMethodChange">
+      <view class="method-option {{loginMethod === 'wechat' ? 'selected' : ''}}" bindtap="selectWechat">
+        <radio value="wechat" checked="{{loginMethod === 'wechat'}}" color="#7c3aed" />
+        <view class="method-label">微信授权登录</view>
       </view>
-      <view class="form-item">
-        <input
-          class="form-input"
-          type="text"
-          password="{{true}}"
-          placeholder="请输入密码"
-          value="{{pwdInput}}"
-          bindinput="onPwdInput"
-        />
+      <view class="method-option {{loginMethod === 'password' ? 'selected' : ''}}" bindtap="selectPassword">
+        <radio value="password" checked="{{loginMethod === 'password'}}" color="#7c3aed" />
+        <view class="method-label">手机号密码登录</view>
       </view>
+    </radio-group>
+  </view>
 
-      <!-- 隐私政策勾选 -->
-      <view class="privacy-checkbox dev-privacy" bindtap="togglePrivacyAgreement">
-        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
-          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
-        </view>
-        <view class="checkbox-text">
-          我已阅读并同意
-          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
-          和
-          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
-        </view>
-      </view>
-
-      <button
-        class="dev-login-btn {{canDevLogin && privacyAgreed ? 'active' : ''}}"
-        disabled="{{!canDevLogin || !privacyAgreed}}"
-        bindtap="loginByPassword"
-      >登 录</button>
-
-      <view class="dev-hint">
-        <view class="hint-divider">
-          <text>或</text>
-        </view>
-        <button class="guest-btn" bindtap="enterAsGuest">以游客身份进入</button>
-        <view class="guest-desc">游客模式仅可查看演示数据</view>
-      </view>
-    </view>
-  </block>
-
-  <!-- ====== Prod 模式：原有微信授权流程 ====== -->
-  <block wx:else>
-    <view class="header">
-      <view class="welcome-text">
-        <view class="welcome-title">欢迎登录</view>
-        <view class="welcome-subtitle">授权登录后体验更多精彩功能</view>
-      </view>
-    </view>
-
+  <!-- ====== 微信授权登录 ====== -->
+  <block wx:if="{{!isDev || loginMethod === 'wechat'}}">
     <view class="auth-section">
       <!-- 头像授权 -->
       <view class="auth-item">
@@ -133,13 +87,63 @@
         </view>
         <view class="checkbox-text">
           我已阅读并同意
-          <text class="link" bindtap="viewAgreement">《用户服务协议》</text>
+          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
           和
-          <text class="link" bindtap="viewPrivacy">《隐私政策》</text>
+          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
         </view>
       </view>
       
       <button class="complete-btn {{privacyAgreed ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed}}">完成授权并进入</button>
+    </view>
+  </block>
+
+  <!-- ====== Dev 模式：手机号+密码登录 ====== -->
+  <block wx:if="{{isDev && loginMethod === 'password'}}">
+    <view class="dev-login-form">
+      <view class="form-item">
+        <input
+          class="form-input"
+          type="number"
+          maxlength="11"
+          placeholder="请输入手机号"
+          value="{{phoneInput}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+      <view class="form-item">
+        <input
+          class="form-input"
+          type="text"
+          password="{{true}}"
+          placeholder="请输入密码"
+          value="{{pwdInput}}"
+          bindinput="onPwdInput"
+        />
+      </view>
+
+      <!-- 隐私政策勾选 -->
+      <view class="privacy-checkbox dev-privacy" bindtap="togglePrivacyAgreement">
+        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
+          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
+        </view>
+        <view class="checkbox-text">
+          我已阅读并同意
+          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
+          和
+          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
+        </view>
+      </view>
+
+      <button
+        class="dev-login-btn {{canDevLogin && privacyAgreed ? 'active' : ''}}"
+        disabled="{{!canDevLogin || !privacyAgreed}}"
+        bindtap="loginByPassword"
+      >密码登录</button>
+
+      <view class="dev-hint">
+        <button class="guest-btn" bindtap="enterAsGuest">以游客身份进入</button>
+        <view class="guest-desc">游客模式仅可查看演示数据</view>
+      </view>
     </view>
   </block>
 </view>

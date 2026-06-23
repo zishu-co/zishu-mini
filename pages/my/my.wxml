@@ -4,24 +4,29 @@
 
   <!-- 用户卡片 -->
   <view class="user-card">
-    <view class="user-card__avatar" bindtap="goToEditProfile">
+    <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
       <image
         class="avatar-img"
         src="{{userInfo.avatarUrl || '/img/logo.png'}}"
         mode="aspectFill"
       />
     </view>
-    <view class="user-card__info" bindtap="goToEditProfile">
-      <view class="nickname">{{userInfo.nickName || "未登录"}}</view>
-      <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
-    </view>
-    <view class="user-card__arrow" bindtap="goToEditProfile">
-      <text class="arrow-icon">›</text>
-    </view>
+    <!-- 已登录：显示昵称 + 箭头 -->
+    <block wx:if="{{isLoggedIn}}">
+      <view class="user-card__info" bindtap="goToEditProfile">
+        <view class="nickname">{{userInfo.nickName}}</view>
+        <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+      </view>
+      <view class="user-card__arrow" bindtap="goToEditProfile">
+        <text class="arrow-icon">›</text>
+      </view>
+    </block>
+    <!-- 未登录：显示登录按钮 -->
+    <button wx:else class="user-card__login-btn" bindtap="goToLogin">登 录</button>
   </view>
 
-  <!-- 学习数据统计条 -->
-  <view class="stats-bar">
+  <!-- 学习数据统计条（已登录时显示） -->
+  <view class="stats-bar" wx:if="{{isLoggedIn}}">
     <view class="stats-item" bindtap="navigateTo" data-url="/pages/report/index">
       <view class="stats-num">{{stats.reportCount || 0}}</view>
       <view class="stats-label">汇报</view>

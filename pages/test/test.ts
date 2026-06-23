@@ -4,6 +4,7 @@
 // 答题页：调用 begintest 获取题目（含 quizitemid），答题后通过 checkreply 提交存库
 
 const _appTest = getApp();
+import { getBaseUrl } from '../../services/base';
 
 interface QuestionItem {
   quizitemid?: number;
@@ -67,7 +68,7 @@ Page<ITestPageData, ITestData>({
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     wx.showLoading({ title: '加载题目...', mask: true });
     wx.request({
-      url: 'https://zishu.co/api/ques/begintest/' + testid,
+      url: getBaseUrl() + '/api/ques/begintest/' + testid,
       method: 'GET',
       header: { token },
       success: (res: any) => {
@@ -209,7 +210,7 @@ Page<ITestPageData, ITestData>({
     });
 
     wx.request({
-      url: 'https://zishu.co/api/ques/checkreply/',
+      url: getBaseUrl() + '/api/ques/checkreply/',
       method: 'POST',
       data: {
         message: JSON.stringify(reply_array),

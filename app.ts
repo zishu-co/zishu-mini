@@ -1,4 +1,5 @@
 // app.ts
+import { getBaseUrl } from './services/base';
 interface GlobalData {
   userInfo: any;
   hasUserInfo: boolean;
@@ -49,36 +50,34 @@ App<IAppOption>({
     wx.login({
       success: res => {
         if (res.code) {
-          // 发送 res.code 到后台换取 openId, sessionKey, unionId
+          // 发送 res.code 到后台换取 openId 和 session_uuid
           console.log('登录成功，code:', res.code);
           this.globalData.code = res.code;
-          // 由服务器调用微信接口获取openid
-          setTimeout(() => {
-            const that = this;
-            wx.request({
-              url: 'https://zishu.co/api/users/openid',
-              data: {
-                code: res.code,
-              },
-              header: {
-                'content-type': 'application/json',
-              },
-              timeout: 10000,
-              success: (res: any) => {
-                console.log('调用openid的返回结果为：', res);
-                console.log('openid为：', res.data.openid);
-                console.log('session_key为：', res.data.session_key);
-                that.globalData.openid = res.data.openid;
-                that.globalData.sessionkey = res.data.session_key;
-              },
-              fail: (err) => {
-                console.error('获取openid失败', err);
-              },
-            });
-
-            // 检查是否需要跳转到登录页
-            this.checkNeedLogin();
-          }, 500);
+          // 立即发起请求，不再用 setTimeout 延迟
+          const that = this;
+          wx.request({
+            url: getBaseUrl() + '/api/users/openid',
+            data: {
+              code: res.code,
+            },
+            header: {
+              'content-type': 'application/json',
+            },
+            timeout: 10000,
+            success: (openidRes: any) => {
+              console.log('调用openid的返回结果为：', openidRes);
+              // 后端直接返回 UUID 字符串，不是 JSON 对象，所以 res.data 就是 UUID 本身
+              const uuid = openidRes.data
+              console.log('session_uuid为：', uuid);
+              if (uuid) {
+                that.globalData.sessionkey = uuid;
+              }
+              // 不再自动跳转登录页，用户可在"我的"页面点击"登录"按钮主动登录
+            },
+            fail: (err) => {
+              console.error('获取openid失败', err);
+            },
+          });
         } else {
           console.error('登录失败', res);
         }

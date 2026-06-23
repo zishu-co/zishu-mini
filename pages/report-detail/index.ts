@@ -1,6 +1,7 @@
 // pages/report-detail/index.ts
 // 成绩详情页：展示某次考试的答题详情
 const _app = getApp();
+import { getBaseUrl } from '../../services/base';
 
 interface QuestionItem {
   quesid: number;
@@ -51,7 +52,7 @@ Page<IReportDetailPageData, IReportDetailData>({
 
     // 先获取用户答题记录，从数据中获取 paperid
     wx.request({
-      url: 'https://zishu.co/api/ques/showwrong/' + pperformid,
+      url: getBaseUrl() + '/api/ques/showwrong/' + pperformid,
       method: 'GET',
       header: { token },
       success: (res: any) => {
@@ -99,7 +100,7 @@ Page<IReportDetailPageData, IReportDetailData>({
   // 获取试卷的正确答案
   fetchPaperAnswers(paperid: string, token: string) {
     wx.request({
-      url: 'https://zishu.co/api/ques/begintest/' + paperid,
+      url: getBaseUrl() + '/api/ques/begintest/' + paperid,
       method: 'GET',
       header: { token },
       success: (res: any) => {

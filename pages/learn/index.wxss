@@ -2,7 +2,7 @@
 
 page {
   background-color: #f5f5f5;
-  font-size: 28rpx;
+  font-size: 30rpx;
 }
 
 /* Banner */
@@ -17,7 +17,7 @@ page {
   margin-bottom: 8rpx;
 }
 .banner-sub {
-  font-size: 26rpx;
+  font-size: 30rpx;
   opacity: 0.85;
 }
 
@@ -48,7 +48,7 @@ page {
   font-size: 48rpx;
 }
 .quick-text {
-  font-size: 28rpx;
+  font-size: 32rpx;
   font-weight: 600;
 }
 
@@ -62,13 +62,13 @@ page {
   align-items: center;
   justify-content: space-between;
   color: #666;
-  font-size: 26rpx;
+  font-size: 30rpx;
 }
 .login-btn {
   background: #aa00ff;
   color: white;
-  font-size: 24rpx;
-  padding: 12rpx 24rpx;
+  font-size: 28rpx;
+  padding: 14rpx 28rpx;
   border-radius: 30rpx;
   border: none;
 }
@@ -78,7 +78,7 @@ page {
   text-align: center;
   padding: 60rpx;
   color: #999;
-  font-size: 26rpx;
+  font-size: 30rpx;
 }
 
 /* Section */
@@ -92,14 +92,14 @@ page {
   margin-bottom: 16rpx;
 }
 .section-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1a1a2e;
   border-left: 6rpx solid #aa00ff;
   padding-left: 16rpx;
 }
 .section-tip {
-  font-size: 22rpx;
+  font-size: 26rpx;
   color: #999;
 }
 
@@ -121,13 +121,13 @@ page {
   flex: 1;
 }
 .course-name {
-  font-size: 30rpx;
+  font-size: 34rpx;
   font-weight: 600;
   color: #1a1a2e;
   margin-bottom: 8rpx;
 }
 .course-meta {
-  font-size: 22rpx;
+  font-size: 28rpx;
   color: #888;
   margin-top: 4rpx;
 }
@@ -141,23 +141,23 @@ page {
 .mentor-tag {
   background: #f3e8ff;
   color: #aa00ff;
-  font-size: 22rpx;
-  padding: 6rpx 16rpx;
+  font-size: 28rpx;
+  padding: 8rpx 18rpx;
   border-radius: 20rpx;
 }
 .no-mentor {
-  font-size: 22rpx;
+  font-size: 28rpx;
   color: #aa00ff;
   border: 1rpx solid #aa00ff;
-  padding: 4rpx 12rpx;
+  padding: 6rpx 14rpx;
   border-radius: 20rpx;
 }
 
 .ark-link {
-  font-size: 22rpx;
+  font-size: 28rpx;
   color: #fff;
   background: #aa00ff;
-  padding: 6rpx 14rpx;
+  padding: 8rpx 16rpx;
   border-radius: 20rpx;
   margin-left: 8rpx;
 }
@@ -188,13 +188,13 @@ page {
   flex: 1;
 }
 .course-item-name {
-  font-size: 28rpx;
+  font-size: 32rpx;
   font-weight: 600;
   color: #1a1a2e;
   margin-bottom: 8rpx;
 }
 .course-item-meta {
-  font-size: 22rpx;
+  font-size: 28rpx;
   color: #888;
   display: flex;
   flex-direction: column;
@@ -207,8 +207,8 @@ page {
 .select-btn {
   background: #aa00ff;
   color: white;
-  font-size: 24rpx;
-  padding: 12rpx 28rpx;
+  font-size: 30rpx;
+  padding: 14rpx 30rpx;
   border-radius: 30rpx;
   white-space: nowrap;
 }
@@ -218,8 +218,8 @@ page {
 
 /* 通用操作按钮 */
 .action-btn {
-  font-size: 24rpx;
-  padding: 12rpx 24rpx;
+  font-size: 30rpx;
+  padding: 14rpx 28rpx;
   border-radius: 30rpx;
   text-align: center;
 }
@@ -243,7 +243,7 @@ page {
   text-align: center;
   padding: 80rpx;
   color: #999;
-  font-size: 26rpx;
+  font-size: 30rpx;
 }
 
 /* 安全区 */
@@ -277,7 +277,7 @@ page {
   border-bottom: 1rpx solid #f0f0f0;
 }
 .modal-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1a1a2e;
 }
@@ -302,21 +302,21 @@ page {
   border-bottom: none;
 }
 .mentor-name {
-  font-size: 28rpx;
+  font-size: 32rpx;
   color: #333;
 }
 .mentor-select-btn {
   background: #aa00ff;
   color: white;
-  font-size: 24rpx;
-  padding: 10rpx 24rpx;
+  font-size: 28rpx;
+  padding: 12rpx 26rpx;
   border-radius: 24rpx;
 }
 .mentor-empty {
   text-align: center;
   padding: 40rpx;
   color: #999;
-  font-size: 26rpx;
+  font-size: 30rpx;
 }
 
 /* 申报表单 */
@@ -324,7 +324,7 @@ page {
   display: flex;
   flex-direction: column;
   gap: 8rpx;
-  font-size: 26rpx;
+  font-size: 30rpx;
   color: #666;
   margin-bottom: 20rpx;
   padding: 16rpx;
@@ -335,7 +335,7 @@ page {
   margin-bottom: 20rpx;
 }
 .input-label {
-  font-size: 26rpx;
+  font-size: 30rpx;
   color: #333;
   display: block;
   margin-bottom: 10rpx;
@@ -344,11 +344,11 @@ page {
   border: 2rpx solid #e0e0e0;
   border-radius: 10rpx;
   padding: 16rpx;
-  font-size: 28rpx;
+  font-size: 32rpx;
   background: #fafafa;
 }
 .input-tip {
-  font-size: 22rpx;
+  font-size: 26rpx;
   color: #999;
   margin-top: 8rpx;
   display: block;

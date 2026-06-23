@@ -1,4 +1,5 @@
 import { delay } from '../_utils/delay';
+import { getBaseUrl } from '../base';
 
 const images = [
   'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131419.jpg',
@@ -75,7 +76,7 @@ function fetchProjectsFromApi(): Promise<Project[]> {
   return new Promise((resolve, reject) => {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     wx.request({
-      url: 'https://zishu.co/api/inno/fetch_current_projects',
+      url: getBaseUrl() + '/api/inno/fetch_current_projects',
       method: 'GET',
       header: { token },
       success: (res: any) => {
@@ -97,7 +98,7 @@ function claimProject(projectId: number): Promise<{ code: string }> {
   return new Promise((resolve, reject) => {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     wx.request({
-      url: 'https://zishu.co/api/inno/edit_project/' + projectId,
+      url: getBaseUrl() + '/api/inno/edit_project/' + projectId,
       method: 'PUT',
       data: { 'params[action]': 'apply' },
       header: { token, 'content-type': 'application/x-www-form-urlencoded' },

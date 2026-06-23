@@ -123,19 +123,45 @@ page {
   background-color: #f0f0f0;
 }
 
+/* ========== 用户卡片内的登录按钮（未登录时显示） ========== */
+
+.user-card__login-btn {
+  flex-shrink: 0;
+  width: 140rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background: linear-gradient(135deg, #aa00ff 0%, #8b5cf6 100%);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 32rpx;
+  padding: 0;
+  margin: 0 0 0 28rpx;
+  letter-spacing: 2rpx;
+  box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.3);
+}
+
+.user-card__login-btn::after {
+  border: none;
+}
+
+.user-card__login-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 8rpx rgba(139, 92, 246, 0.2);
+}
+
 /* ========== 功能菜单 ========== */
 
 .menu-wrapper {
-  padding: 240rpx 32rpx 180rpx;
+  padding: 32rpx 32rpx 180rpx;
 }
 
 /* ========== 我的方舟区块（spec 002） ========== */
 
 .ark-block {
-  position: absolute;
-  top: 580rpx;
-  left: 32rpx;
-  right: 32rpx;
+  margin-top: 220rpx;
+  margin-left: 32rpx;
+  margin-right: 32rpx;
   background-color: #ffffff;
   border-radius: 16rpx;
   padding: 24rpx 24rpx 16rpx;

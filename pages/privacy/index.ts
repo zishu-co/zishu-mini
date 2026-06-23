@@ -1,7 +1,7 @@
 // pages/privacy/index.ts
 Page({
   data: {},
-  onLoad() {
-    wx.setNavigationBarTitle({ title: '隐私政策' });
+  onLoad: function() {
+    // 导航栏标题由 index.json 的 navigationBarTitleText 控制
   }
 });

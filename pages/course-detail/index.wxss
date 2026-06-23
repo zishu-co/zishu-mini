@@ -37,6 +37,15 @@ page {
   color: #999;
 }
 
+.empty-retry {
+  margin-top: 32rpx;
+  padding: 16rpx 48rpx;
+  color: #aa00ff;
+  font-size: 26rpx;
+  border: 2rpx solid #aa00ff;
+  border-radius: 40rpx;
+}
+
 /* ========== 通用卡片 ========== */
 
 .card {
@@ -47,13 +56,14 @@ page {
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
-.card-title-bar {
+.section-title-bar {
   font-size: 28rpx;
-  font-weight: bold;
-  color: #aa00ff;
+  font-weight: 600;
+  color: #1a1a2e;
   margin-bottom: 20rpx;
   padding-bottom: 12rpx;
-  border-bottom: 2rpx solid #f0e8ff;
+  border-bottom: 2rpx solid #aa00ff;
+  display: inline-block;
 }
 
 .empty-section {
@@ -139,6 +149,12 @@ page {
   color: #666;
 }
 
+.meta-edit {
+  font-size: 24rpx;
+  color: #aa00ff;
+  margin-left: 20rpx;
+}
+
 .course-desc {
   font-size: 26rpx;
   color: #666;
@@ -146,79 +162,9 @@ page {
   margin-top: 8rpx;
 }
 
-/* ========== 章节列表 ========== */
+/* ========== 通用数据表格 ========== */
 
-.chapter-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.chapter-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.chapter-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.chapter-left {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  overflow: hidden;
-}
-
-.chapter-index {
-  width: 48rpx;
-  height: 48rpx;
-  background-color: #f3e8ff;
-  color: #aa00ff;
-  font-size: 24rpx;
-  font-weight: bold;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-right: 16rpx;
-}
-
-.chapter-info {
-  flex: 1;
-  overflow: hidden;
-}
-
-.chapter-name {
-  font-size: 28rpx;
-  color: #1a1a2e;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.chapter-meta {
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 4rpx;
-}
-
-.chapter-arrow {
-  font-size: 36rpx;
-  color: #ccc;
-  flex-shrink: 0;
-  margin-left: 16rpx;
-}
-
-/* ========== 学员表格 ========== */
-
-.student-table {
+.data-table {
   width: 100%;
   overflow-x: auto;
 }
@@ -277,8 +223,28 @@ page {
 
 .th-date,
 .td-date {
-  width: 130rpx;
+  width: 140rpx;
   flex-shrink: 0;
+}
+
+.th-period,
+.td-period {
+  width: 120rpx;
+  flex-shrink: 0;
+}
+
+/* 章节名称链接色 */
+.td-link {
+  color: #aa00ff;
+}
+
+/* 可点击的行效果 */
+.table-row--link {
+  transition: background-color 0.2s;
+}
+
+.table-row--link:active {
+  background-color: rgba(170, 0, 255, 0.04);
 }
 
 /* 日期颜色 */

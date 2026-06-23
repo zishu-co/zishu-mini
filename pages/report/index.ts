@@ -3,6 +3,7 @@
 // pages/report/index.ts
 // 成绩单页：展示用户的考试历史成绩
 const _appReport = getApp();
+import { getBaseUrl } from '../../services/base';
 
 interface IReportData {
   records: any[];
@@ -33,20 +34,22 @@ Page<IReportPageData, IReportData>({
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     const userInfo = wx.getStorageSync('userInfo') || _appReport.globalData.userInfo || {};
-    const nickName = userInfo.nickName || '';
-    // TODO: 后端改为 userId 查询后，切换为 /api/ques/fetchtrans/{userId}
+    const userId = userInfo.userId || _appReport.globalData.userId || '';
+    console.log('[report] userId:', userId, 'userInfo:', userInfo, 'token:', token);
     
-    if (!token || !nickName) {
+    if (!token || !userId) {
       this.setData({ loading: false, records: [] });
+      console.warn('[report] token或userId为空，无法请求');
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
     
     wx.request({
-      url: 'https://zishu.co/api/ques/fetchtrans/' + encodeURIComponent(nickName),
+      url: getBaseUrl() + '/api/ques/fetchtrans/by_id/' + userId,
       method: 'GET',
-      header: { token },
+      header: { Authorization: 'Bearer ' + token },
       success: (res: any) => {
+        console.log('[report] fetchtrans响应:', res.statusCode, res.data);
         if (res.statusCode === 200) {
           this.setData({ records: res.data || [], loading: false });
         } else {
