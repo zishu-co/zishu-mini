@@ -4,6 +4,7 @@
 // IAppOption 和 IGlobalData 在 _appLogin.ts 中定义
 const _appLogin = getApp<any>()
 import { isDevMode, isLoggedIn } from '../../utils/env'
+import { getBaseUrl } from '../../services/base'
 
 type ILoginPageData = {
   userInfo: any;
@@ -17,6 +18,7 @@ type ILoginPageData = {
   userId: number | null;
   // Dev 模式新增字段
   isDev: boolean;
+  loginMethod: string; // 'wechat' | 'password'
   phoneInput: string;
   pwdInput: string;
   canDevLogin: boolean;
@@ -37,6 +39,7 @@ Page<ILoginPageData, ILoginPageData>({
     userId: null,
     // Dev 模式初始化
     isDev: false,
+    loginMethod: 'wechat',
     phoneInput: '',
     pwdInput: '',
     canDevLogin: false,
@@ -56,7 +59,6 @@ Page<ILoginPageData, ILoginPageData>({
       return
     }
 
-    // 检查是否可以使用 getUserProfile API
     if (wx.getUserProfile) {
       this.setData({
         canIUseGetUserProfile: true
@@ -134,16 +136,22 @@ Page<ILoginPageData, ILoginPageData>({
   getPhoneNumber(e: any) {
     const that = this
     if (e.detail.errMsg === 'getPhoneNumber:ok') {
-      // 这里需要将encryptedData和iv发送到后端解密获取手机号
+      const sessionkey = _appLogin.globalData.sessionkey
+      if (!sessionkey) {
+        wx.showToast({ title: '授权凭证尚未就绪，请稍后再试', icon: 'none', duration: 2000 })
+        console.error('[login] sessionkey(UUID) 为空，可能 /openid 请求尚未返回')
+        return
+      }
+      // 后端 TokenRequest：sessionkey 字段现在传 UUID，后端从 dict 取出真实 session_key 解密
       const telparam = {
-        sessionkey: _appLogin.globalData.sessionkey,
+        sessionkey: sessionkey,
         encryptedData: e.detail.encryptedData,
         iv: e.detail.iv
       }
       console.log(telparam)
       console.log('加密的手机号信息：', e.detail)
       wx.request({
-        url: 'https://zishu.co/api/users/token_miniprogram',
+        url: getBaseUrl() + '/api/users/token_miniprogram',
         data: telparam,
         method: 'POST',
         header: {
@@ -220,6 +228,19 @@ Page<ILoginPageData, ILoginPageData>({
 
   // ========== Dev 模式新增方法 ==========
 
+  /** 切换登录方式 */
+  onLoginMethodChange(e: any) {
+    this.setData({ loginMethod: e.detail.value })
+  },
+
+  selectWechat() {
+    this.setData({ loginMethod: 'wechat' })
+  },
+
+  selectPassword() {
+    this.setData({ loginMethod: 'password' })
+  },
+
   onPhoneInput(e: any) {
     const val = e.detail.value
     this.setData({
@@ -254,7 +275,7 @@ Page<ILoginPageData, ILoginPageData>({
 
     // 调用后端密码登录接口
     wx.request({
-      url: 'https://zishu.co/api/users/token',
+      url: getBaseUrl() + '/api/users/token',
       method: 'POST',
       header: {
         'content-type': 'application/x-www-form-urlencoded'

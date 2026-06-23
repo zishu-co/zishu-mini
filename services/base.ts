@@ -20,7 +20,7 @@ const getBaseUrl = (): string => {
     console.log('[base.ts] 当前环境:', envVersion);
     switch (envVersion) {
       case 'develop':
-        return 'https://zishu.co';
+        return 'http://127.0.0.1:8008';
       case 'trial':
         // 体验版也使用生产环境地址
         return 'https://zishu.co';
@@ -530,3 +530,6 @@ export {
 
 // 导出环境判断工具（从 utils/env.ts 重新导出，方便统一使用）
 export { isDevMode, isGuestMode, isLoggedIn, getEnvVersion } from '../utils/env';
+
+// 导出 getBaseUrl 供其他页面直接使用
+export { getBaseUrl };

@@ -1,8 +1,5 @@
 {
   "navigationBarTitleText": "活动",
-  "usingComponents": {
-    "event-group": "./components/event-group/index",
-    "t-toast": "tdesign-miniprogram/toast/toast",
-    "t-dialog": "tdesign-miniprogram/dialog/dialog"
-  }
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f7f7f7"
 }

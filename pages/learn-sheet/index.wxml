@@ -1,0 +1,82 @@
+<!-- pages/learn-sheet/index.wxml -->
+<!-- spec: specs/miniprogram/active/005-port-learn-sheet.md -->
+<view class="page">
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 训练营 -->
+    <view class="section" wx:if="{{data.camps && data.camps.length > 0}}">
+      <view class="section-title">🏕️ 训练营</view>
+      <view
+        class="camp-card"
+        wx:for="{{data.camps}}"
+        wx:key="id"
+        wx:for-item="camp"
+      >
+        <view class="camp-name">{{camp.camp_name}}</view>
+        <view class="camp-meta" wx:if="{{camp.user_name}}">成员：{{camp.user_name}}</view>
+        <view class="camp-must" wx:if="{{camp.must_course}}">必选：{{camp.must_course}}</view>
+        <view class="course-list">
+          <view
+            class="course-item"
+            wx:for="{{camp.course_list}}"
+            wx:key="course_id"
+            wx:for-item="c"
+            bindtap="onGoCourse"
+            data-id="{{c.course_id}}"
+          >
+            <view class="course-name">{{c.course_title}}</view>
+            <view class="course-meta">
+              <text class="status-tag {{statusClass(c)}}">{{statusText(c)}}</text>
+              <text class="deadline" wx:if="{{c.deadline}}">截止：{{formatDate(c.deadline)}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他在学 -->
+    <view class="section" wx:if="{{data.other_learning && data.other_learning.length > 0}}">
+      <view class="section-title">📖 其他在学</view>
+      <view
+        class="course-item standalone"
+        wx:for="{{data.other_learning}}"
+        wx:key="course_id"
+        wx:for-item="c"
+        bindtap="onGoCourse"
+        data-id="{{c.course_id}}"
+      >
+        <view class="course-name">{{c.course_title}}</view>
+        <view class="course-meta">
+          <text class="status-tag {{statusClass(c)}}">{{statusText(c)}}</text>
+          <text class="deadline" wx:if="{{c.deadline}}">截止：{{formatDate(c.deadline)}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他学完 -->
+    <view class="section" wx:if="{{data.other_learned && data.other_learned.length > 0}}">
+      <view class="section-title">✅ 已学完</view>
+      <view
+        class="course-item standalone done"
+        wx:for="{{data.other_learned}}"
+        wx:key="course_id"
+        wx:for-item="c"
+        bindtap="onGoCourse"
+        data-id="{{c.course_id}}"
+      >
+        <view class="course-name">{{c.course_title}}</view>
+        <view class="course-meta">
+          <text class="status-tag status-done">已学完</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 完全空 -->
+    <view class="empty" wx:if="{{(!data.camps || !data.camps.length) && (!data.other_learning || !data.other_learning.length) && (!data.other_learned || !data.other_learned.length)}}">
+      <text>暂无学习记录</text>
+    </view>
+  </block>
+</view>

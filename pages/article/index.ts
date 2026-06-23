@@ -6,6 +6,7 @@
  */
 
 const app = getApp()
+import { getBaseUrl } from '../../services/base'
 
 interface IArticlePageData {
   hasLogin: boolean
@@ -56,7 +57,7 @@ Page<IArticlePageData, IArticlePageData>({
     this.setData({ loading: true })
 
     wx.request({
-      url: 'https://zishu.co/api/article/index',
+      url: getBaseUrl() + '/api/article/index',
       method: 'GET',
       header: { token },
       success: (res: any) => {

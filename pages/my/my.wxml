@@ -4,24 +4,29 @@
 
   <!-- 用户卡片 -->
   <view class="user-card">
-    <view class="user-card__avatar" bindtap="goToEditProfile">
+    <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
       <image
         class="avatar-img"
         src="{{userInfo.avatarUrl || '/img/logo.png'}}"
         mode="aspectFill"
       />
     </view>
-    <view class="user-card__info" bindtap="goToEditProfile">
-      <view class="nickname">{{userInfo.nickName || "未登录"}}</view>
-      <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
-    </view>
-    <view class="user-card__arrow" bindtap="goToEditProfile">
-      <text class="arrow-icon">›</text>
-    </view>
+    <!-- 已登录：显示昵称 + 箭头 -->
+    <block wx:if="{{isLoggedIn}}">
+      <view class="user-card__info" bindtap="goToEditProfile">
+        <view class="nickname">{{userInfo.nickName}}</view>
+        <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+      </view>
+      <view class="user-card__arrow" bindtap="goToEditProfile">
+        <text class="arrow-icon">›</text>
+      </view>
+    </block>
+    <!-- 未登录：显示登录按钮 -->
+    <button wx:else class="user-card__login-btn" bindtap="goToLogin">登 录</button>
   </view>
 
-  <!-- 学习数据统计条 -->
-  <view class="stats-bar">
+  <!-- 学习数据统计条（已登录时显示） -->
+  <view class="stats-bar" wx:if="{{isLoggedIn}}">
     <view class="stats-item" bindtap="navigateTo" data-url="/pages/report/index">
       <view class="stats-num">{{stats.reportCount || 0}}</view>
       <view class="stats-label">汇报</view>
@@ -40,6 +45,53 @@
     <view class="stats-item" bindtap="navigateTo" data-url="/pages/favorites/index">
       <view class="stats-num">{{stats.favCount || 0}}</view>
       <view class="stats-label">收藏</view>
+    </view>
+  </view>
+
+  <!-- 我的方舟区块（spec 002） -->
+  <view class="ark-block" wx:if="{{isLoggedIn}}">
+    <view class="ark-block__header">
+      <text class="ark-block__title">🚢 我的方舟</text>
+      <text class="ark-block__count">{{arkCount}} 个</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="ark-loading" wx:if="{{arkLoading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 有方舟 -->
+    <view class="ark-list" wx:elif="{{arkList.length > 0}}">
+      <view
+        class="ark-item"
+        wx:for="{{arkList}}"
+        wx:key="ark_id"
+        wx:for-item="ark"
+        bindtap="onArkTap"
+        data-ark-id="{{ark.ark_id}}"
+      >
+        <view class="ark-item__top">
+          <view class="ark-item__name">{{ark.arkname}}</view>
+          <view class="ark-item__tag tag-{{ark.finished ? 'done' : (ark.closed ? 'closed' : (ark.stage === '筹建中' ? 'prep' : 'sail'))}}">
+            {{ark.finished ? '已成舟' : (ark.closed ? '已解散' : ark.stage)}}
+          </view>
+        </view>
+        <view class="ark-item__course">{{ark.course_title}}</view>
+        <view class="ark-item__bottom">
+          <view class="progress-bar">
+            <view class="progress-bar__fill" style="width: {{ark.progress_percent}}%;"></view>
+          </view>
+          <text class="progress-text">{{ark.progress_percent}}%</text>
+          <text class="ark-item__crew">{{ark.members_str}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="ark-empty" wx:else>
+      <text class="ark-empty__icon">🛶</text>
+      <text class="ark-empty__text">暂未加入任何方舟</text>
+      <text class="ark-empty__tip">在"学习"页选课后可创建或加入方舟</text>
     </view>
   </view>
 

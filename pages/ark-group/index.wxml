@@ -1,0 +1,83 @@
+<!-- pages/ark-group/index.wxml -->
+<!-- spec: specs/miniprogram/active/003-complete-ark-group.md -->
+<view class="page">
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 方舟列表 -->
+  <view class="teacher-list" wx:else>
+    <view
+      class="teacher-card"
+      wx:for="{{arkList}}"
+      wx:key="teacher_id"
+      wx:for-item="ark"
+    >
+      <!-- 第一行：塾师名 + 状态 + 操作 -->
+      <view class="teacher-row">
+        <view class="teacher-info">
+          <text class="teacher-name">{{ark.teacher_name}} 塾师</text>
+          <text class="ark-badge {{statusClass(ark)}}" wx:if="{{ark.ark_id}}">{{statusText(ark)}}</text>
+        </view>
+        <view class="teacher-actions">
+          <!-- 有方舟 -->
+          <block wx:if="{{ark.ark_id}}">
+            <!-- 我已加入 -->
+            <text class="joined-tip" wx:if="{{isMyArk(ark)}}">已加入 ✓</text>
+            <!-- 我未加入 + 还能进 -->
+            <button
+              wx:elif="{{canJoin(ark)}}"
+              class="action-btn primary"
+              size="mini"
+              loading="{{joiningArkId === ark.ark_id}}"
+              data-arkid="{{ark.ark_id}}"
+              bindtap="onJoinArk"
+            >加入方舟</button>
+            <!-- 已结束 -->
+            <text class="closed-tip" wx:elif="{{ark.closed || ark.finished}}">方舟已{{ark.finished ? '结束' : '关闭'}}</text>
+            <!-- 名额已满 -->
+            <text class="full-tip" wx:else>名额已满</text>
+            <!-- 详情链接 -->
+            <text class="detail-link" bindtap="onGoDetail" data-arkid="{{ark.ark_id}}">详情 ›</text>
+          </block>
+          <!-- 无方舟 -->
+          <block wx:else>
+            <button
+              wx:if="{{ark.teacher_id === currentUserId}}"
+              class="action-btn primary"
+              size="mini"
+              loading="{{creating}}"
+              data-teacherid="{{ark.teacher_id}}"
+              bindtap="onCreateArk"
+            >创建方舟</button>
+            <text class="no-ark-tip" wx:else>该塾师尚未创建方舟</text>
+          </block>
+        </view>
+      </view>
+
+      <!-- 第二行：成员名单 -->
+      <view class="members-row">
+        <block wx:if="{{ark.ark_id}}">
+          <text class="member-count-tag male">{{ark.male_count}} 男</text>
+          <text class="member-count-tag female">{{ark.female_count}} 女</text>
+          <text class="no-member" wx:if="{{ark.members.length === 0}}">暂无成员</text>
+          <block wx:else>
+            <text
+              class="member-chip {{genderClass(m.gender)}}"
+              wx:for="{{ark.members}}"
+              wx:key="user_id"
+              wx:for-item="m"
+            >{{m.username}}{{m.is_captain ? ' ⭐' : ''}}</text>
+          </block>
+        </block>
+        <text class="no-ark-hint" wx:else>该塾师暂无方舟</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-tip" wx:if="{{arkList.length === 0 && !loading}}">
+      <text>当前暂无塾师开设方舟</text>
+    </view>
+  </view>
+</view>

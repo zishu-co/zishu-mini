@@ -1,6 +1,8 @@
 // pages/exam/index.ts
 // 试卷列表页 — 展示所有已发布试卷，点击进入答题
 
+import { getBaseUrl } from '../../services/base';
+
 Page({
   data: {
     papers: [] as any[],
@@ -24,7 +26,7 @@ Page({
   fetchPapers() {
     this.setData({ loading: true });
     wx.request({
-      url: 'https://zishu.co/api/ques/showtest',
+      url: getBaseUrl() + '/api/ques/showtest',
       method: 'GET',
       success: (res: any) => {
         // showtest 返回数组，admin/审核者可见全部试卷

@@ -1,0 +1,131 @@
+/* pages/learn-sheet/index.wxss */
+/* spec: specs/miniprogram/active/005-port-learn-sheet.md */
+
+.page {
+  min-height: 100vh;
+  background: #faf9f7;
+  padding: 24rpx 24rpx 80rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.loading {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  margin-bottom: 16rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+/* Camp 卡 */
+.camp-card {
+  padding: 16rpx 0;
+}
+
+.camp-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #aa00ff;
+  margin-bottom: 8rpx;
+}
+
+.camp-meta,
+.camp-must {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 4rpx;
+}
+
+.course-list {
+  margin-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+  padding-top: 12rpx;
+}
+
+/* 课程项 */
+.course-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+  transition: background 0.2s;
+}
+
+.course-item:last-child {
+  border-bottom: none;
+}
+
+.course-item:active {
+  background: #f8f8f8;
+}
+
+.course-item.standalone {
+  padding: 20rpx 8rpx;
+}
+
+.course-item.standalone.done {
+  opacity: 0.65;
+}
+
+.course-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8rpx;
+}
+
+.course-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  font-size: 24rpx;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  font-weight: 600;
+}
+
+.status-learning {
+  background: rgba(170, 0, 255, 0.12);
+  color: #aa00ff;
+}
+
+.status-done {
+  background: rgba(103, 194, 58, 0.12);
+  color: #67c23a;
+}
+
+.status-not-started {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.deadline {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #9a9ab0;
+  font-size: 28rpx;
+}

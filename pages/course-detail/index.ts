@@ -23,7 +23,7 @@ type IPageData = {
 
 Page<IPageData, IPageData>({
   data: {
-    loading: false,
+    loading: true,
     courseDetail: null,
     currentUserId: 0,
     selectedIds: [],
@@ -36,11 +36,11 @@ Page<IPageData, IPageData>({
   onLoad(options: any) {
     this.courseId = parseInt(options.id || '0', 10);
     const app = getApp<any>();
-    const userInfo = app.globalData?.userInfo || {};
-    this.setData({ currentUserId: userInfo.userId || 0 });
+    const userId = app.globalData.userId || wx.getStorageSync('userId') || 0;
+    this.setData({ currentUserId: userId });
     if (this.courseId) {
       wx.setNavigationBarTitle({ title: options.title || '课程详情' });
-      this.loadDetail();
+      Promise.all([this.loadDetail(), this.loadSelections()]);
     } else {
       wx.showToast({ title: '参数错误', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
@@ -48,8 +48,9 @@ Page<IPageData, IPageData>({
   },
 
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().init();
+    // 从登录页返回后刷新选课状态
+    if (this.courseId) {
+      this.loadSelections();
     }
   },
 
@@ -69,6 +70,7 @@ Page<IPageData, IPageData>({
       })
       .catch(() => {
         this.setData({ loading: false });
+        wx.showToast({ title: '加载失败，请下拉重试', icon: 'none' });
       });
   },
 
@@ -194,5 +196,10 @@ Page<IPageData, IPageData>({
         });
       },
     });
+  },
+
+  /** 编辑课程（仅塾主可见） */
+  onEditCourse() {
+    wx.showToast({ title: '编辑功能开发中', icon: 'none' });
   },
 });

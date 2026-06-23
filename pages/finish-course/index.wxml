@@ -1,0 +1,100 @@
+<!-- pages/finish-course/index.wxml -->
+<!-- spec: specs/miniprogram/active/001-port-finish-course.md -->
+<view class="finish-page">
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="finish-card" wx:if="{{!loading}}">
+    <!-- 顶部标题 -->
+    <view class="finish-header">
+      <view class="congrats-icon">🎓</view>
+      <view class="finish-title">恭喜你完成课程！</view>
+      <view class="subtitle">《{{courseInfo.course_title}}》</view>
+    </view>
+
+    <!-- 祝福语 -->
+    <view class="blessing-section">
+      <text class="blessing-text">
+        祝贺 {{courseInfo.user_name}} 成功学完《{{courseInfo.course_title}}》！
+        祝愿你在人生路上能好好利用所学知识和技能，为自己创造更好的生活。
+      </text>
+    </view>
+
+    <!-- 测验成绩区域（quiz_info 存在时显示） -->
+    <view class="quiz-section" wx:if="{{courseInfo.quiz_info}}">
+      <view class="section-title">📋 结课测验</view>
+      <view class="quiz-score-box {{quizScoreClass()}}">
+        <view class="quiz-score-inner">
+          <text class="quiz-label">当前成绩</text>
+          <text class="quiz-score" wx:if="{{courseInfo.quiz_info.has_taken}}">
+            {{courseInfo.quiz_info.current_score}} / {{courseInfo.quiz_info.full_score}}
+          </text>
+          <text class="quiz-score no-attempt" wx:else>未作答</text>
+          <text class="quiz-status-tag {{quizScoreClass()}}">{{quizStatusText()}}</text>
+        </view>
+      </view>
+      <button class="quiz-btn" bindtap="goQuiz" type="primary" plain>
+        {{courseInfo.quiz_info.has_taken ? '重新测验' : '参加测验'}}
+      </button>
+    </view>
+
+    <!-- 方舟作业链接（方舟学习者填写） -->
+    <view class="homework-section" wx:if="{{courseInfo.is_ark_learning}}">
+      <view class="section-title">📝 方舟作业</view>
+      <view class="homework-tip">请提交你的结课作业（公网可访问的文章或视频链接），由舟长审批：</view>
+      <view class="homework-input-row" wx:if="{{!courseInfo.ark_info.homework_url}}">
+        <input
+          class="homework-input"
+          type="text"
+          placeholder="https://..."
+          value="{{homeworkUrl}}"
+          bindinput="onHomeworkInput"
+          confirm-type="done"
+        />
+        <button
+          class="submit-btn"
+          type="primary"
+          loading="{{hwLoading}}"
+          bindtap="submitHomework"
+        >提交</button>
+      </view>
+      <view class="homework-submitted" wx:else>
+        <text class="check-icon">✓</text>
+        <text>已提交：</text>
+        <text class="homework-link" bindtap="stopPropagation">{{courseInfo.ark_info.homework_url}}</text>
+      </view>
+    </view>
+
+    <!-- 方舟学习提示（无确认结课按钮） -->
+    <view class="ark-tip" wx:if="{{courseInfo.is_ark_learning}}">
+      <text>📌 方舟学习由舟长在方舟详情页统一为大家结课</text>
+    </view>
+
+    <!-- 结课证书（单人学习） -->
+    <view class="certificate-section" wx:if="{{!courseInfo.is_ark_learning}}">
+      <view class="section-title">🏆 结课证书</view>
+      <view class="certificate-placeholder">
+        <view class="cert-content">
+          <view class="cert-title">结课证书</view>
+          <view class="cert-name">{{courseInfo.user_name}}</view>
+          <view class="cert-course">已完成《{{courseInfo.course_title}}》全部课程学习</view>
+          <view class="cert-date">{{currentDate}}</view>
+        </view>
+      </view>
+      <button class="download-btn" type="primary" plain bindtap="downloadCertificate">下载证书</button>
+    </view>
+
+    <!-- 确认结课按钮（单人学习特有） -->
+    <view class="confirm-section" wx:if="{{!courseInfo.is_ark_learning}}">
+      <button
+        class="confirm-btn"
+        type="primary"
+        loading="{{confirmLoading}}"
+        bindtap="confirmFinish"
+      >确认结课</button>
+      <view class="confirm-tip">确认后这门课将从"我的选课"列表中消失</view>
+    </view>
+  </view>
+</view>

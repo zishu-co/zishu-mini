@@ -5,6 +5,18 @@
       {
         "type": "file",
         "value": ".eslintrc.js"
+      },
+      {
+        "type": "folder",
+        "value": "specs"
+      },
+      {
+        "type": "folder",
+        "value": "references"
+      },
+      {
+        "type": "suffix",
+        "value": ".md"
       }
     ]
   },

@@ -1,6 +1,6 @@
 /**
  * 课程 API 服务
- * 对接后端 /api/course/* 接口
+ * 对接后端 /api/learn/* 接口（原 /api/course/* 已迁移）
  */
 
 // ==================== 类型定义 ====================
@@ -60,7 +60,7 @@ function getBaseUrl(): string {
   try {
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
     switch (envVersion) {
-      case 'develop': return 'https://zishu.co';
+      case 'develop': return 'http://127.0.0.1:8008';
       case 'trial': return 'https://zishu.co';
       case 'release': return 'https://zishu.co';
       default: return 'https://zishu.co';
@@ -79,6 +79,7 @@ function request<T = any>(options: {
   method?: string;
   data?: any;
   showLoading?: boolean;
+  contentType?: string;
 }): Promise<T> {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -90,7 +91,7 @@ function request<T = any>(options: {
       method: (options.method || 'GET') as any,
       data: options.data,
       header: {
-        'content-type': 'application/x-www-form-urlencoded',
+        'content-type': options.contentType || 'application/x-www-form-urlencoded',
         'token': token,
       },
       timeout: 80000,
@@ -115,12 +116,12 @@ function request<T = any>(options: {
 
 /** 获取全部课程列表 */
 export function fetchAllCourses(): Promise<Course[]> {
-  return request<Course[]>({ url: '/api/course/fetch_all_courses' });
+  return request<Course[]>({ url: '/api/learn/fetch_all_courses' });
 }
 
 /** 获取当前用户的在读课程 */
 export function fetchCurrentSelections(): Promise<CurrentSelection[]> {
-  return request<CurrentSelection[]>({ url: '/api/course/fetch_current_selections' });
+  return request<CurrentSelection[]>({ url: '/api/learn/fetch_current_selections' });
 }
 
 /** 选课（loading 由调用方控制，不在服务层弹） */
@@ -142,9 +143,10 @@ export function reportLearn(
   reported_hour: string
 ): Promise<any> {
   return request({
-    url: '/api/course/report_learn',
+    url: '/api/learn/report_learn',
     method: 'POST',
     data: { chapter_id, course_id, chapter_title, sele_id, reported_hour },
+    contentType: 'application/json',
     showLoading: true,
   });
 }
@@ -186,5 +188,5 @@ export interface StudentRecord {
 
 /** 获取课程详情（章节 + 同塾信息） */
 export function getCourseDetail(courseId: number): Promise<CourseDetail> {
-  return request<CourseDetail>({ url: '/api/course/get_course/' + courseId, showLoading: true });
+  return request<CourseDetail>({ url: '/api/learn/get_course/' + courseId, showLoading: true });
 }

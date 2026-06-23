@@ -364,7 +364,63 @@ page {
   box-shadow: none !important;
 }
 
+/* ========== Dev 模式登录方式选择器 ========== */
+.login-method-selector {
+  width: 100%;
+  margin-bottom: 40rpx;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.radio-group {
+  display: flex;
+  gap: 24rpx;
+}
+
+.method-option {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24rpx;
+  padding: 32rpx 28rpx;
+  border: 2rpx solid rgba(167, 139, 250, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.1);
+  flex: 1;
+}
+
+.method-option.selected {
+  border-color: #7c3aed;
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 8rpx 24rpx rgba(139, 92, 246, 0.2);
+}
+
+.method-label {
+  font-size: 30rpx;
+  color: #4c1d95;
+  font-weight: 500;
+  margin-left: 16rpx;
+}
+
 /* ========== Dev 模式登录表单样式 ========== */
+.dev-divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 40rpx 0 20rpx;
+}
+
+.dev-divider-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.5), transparent);
+}
+
+.dev-divider-text {
+  padding: 0 24rpx;
+  color: #a78bfa;
+  font-size: 28rpx;
+}
+
 .dev-login-form {
   width: 100%;
   max-width: 600rpx;

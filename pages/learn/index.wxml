@@ -1,3 +1,15 @@
+<wxs module="fmt">
+function dateOnly(s) {
+  if (!s) return '';
+  var d = getDate(s);
+  var y = d.getFullYear();
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+}
+module.exports = { dateOnly: dateOnly };
+</wxs>
+
 <view class="page">
 
   <!-- 顶部 Banner -->
@@ -42,12 +54,13 @@
             <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
           </view>
           <view class="course-meta">
-            <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{item.deadline}}</text>
+            <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
           </view>
         </view>
         <view class="course-actions">
           <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
           <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
+          <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         </view>
       </view>
       <view class="course-card-bottom">

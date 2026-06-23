@@ -1,0 +1,333 @@
+/* pages/ark-detail/index.wxss */
+/* spec: specs/miniprogram/active/004-complete-ark-detail.md */
+
+.page {
+  min-height: 100vh;
+  background: #faf9f7;
+  padding: 24rpx 24rpx 80rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.loading {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* ===== 顶部信息卡 ===== */
+.header-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.ark-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  margin-bottom: 12rpx;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.stage-badge {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.badge-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-waiting {
+  background: rgba(170, 0, 255, 0.12);
+  color: #aa00ff;
+}
+
+.finished-tag {
+  font-size: 22rpx;
+  background: #f5f5f5;
+  color: #999;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* ===== 总进度 ===== */
+.progress-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.progress-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.progress-percent {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #aa00ff;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12rpx;
+  background: #f0f0f0;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #aa00ff 0%, #c6f 100%);
+  border-radius: 6rpx;
+  transition: width 0.3s;
+}
+
+.member-progress-bar {
+  height: 8rpx;
+}
+
+/* ===== 成员卡 ===== */
+.section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+  margin-bottom: 16rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.member-card {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.member-card:last-child {
+  border-bottom: none;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.member-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.captain-tag {
+  font-size: 22rpx;
+  background: rgba(255, 215, 0, 0.15);
+  color: #b8860b;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.gender-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.gender-male {
+  background: #e0f0ff;
+  color: #1e40af;
+}
+
+.gender-female {
+  background: #fff0f5;
+  color: #9d174d;
+}
+
+.member-progress-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.learn-sheet-link {
+  font-size: 24rpx;
+  color: #aa00ff;
+  margin-top: 8rpx;
+  display: inline-block;
+}
+
+/* ===== 操作区 ===== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.action-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  text-align: center;
+  border: none;
+  background: #fff;
+  color: #333;
+  font-weight: normal;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-btn.primary {
+  background: #aa00ff;
+  color: #fff;
+}
+
+.action-btn.danger {
+  background: #fff;
+  color: #fa4126;
+  border: 1rpx solid #fa4126;
+}
+
+.action-btn.ghost {
+  background: #fff;
+  color: #666;
+  border: 1rpx solid #dcdfe6;
+}
+
+/* ===== 三会弹窗 ===== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 24rpx;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 8rpx 16rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  margin-bottom: 16rpx;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #1a1a2e;
+}
+
+.modal-close {
+  font-size: 36rpx;
+  color: #999;
+  padding: 4rpx 12rpx;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 12rpx;
+  background: #faf9f7;
+  border-radius: 12rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.form-input {
+  width: 100%;
+  height: 72rpx;
+  border: 1rpx solid #dcdfe6;
+  border-radius: 8rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.modal-footer .action-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+}
