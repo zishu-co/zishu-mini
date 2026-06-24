@@ -69,33 +69,46 @@ Page<ILearnPageData, ILearnPageData>({
   async loadData() {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
-    if (!token) {
-      this.setData({ loading: false });
-      return;
-    }
 
     try {
-      const [myCourses, allCourses] = await Promise.all([
-        fetchCurrentSelections(),
-        fetchAllCourses(),
-      ]);
-      const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
-      const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
-      const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
-      this.setData({
-        myCourses: safeMyCourses,
-        allCourses: safeAllCourses,
-        selectedIds,
-        loading: false,
-      });
+      if (token) {
+        // 已登录：同时拉取我的选课 + 全部课程
+        const [myCourses, allCourses] = await Promise.all([
+          fetchCurrentSelections(),
+          fetchAllCourses(),
+        ]);
+        const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
+        const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+        const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
+        this.setData({
+          myCourses: safeMyCourses,
+          allCourses: safeAllCourses,
+          selectedIds,
+          loading: false,
+        });
+      } else {
+        // 未登录：只拉取全部课程，让访客也能浏览课程列表
+        const allCourses = await fetchAllCourses();
+        const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+        this.setData({
+          allCourses: safeAllCourses,
+          loading: false,
+        });
+      }
     } catch (e: any) {
       console.error('加载数据失败', e);
       if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
-        wx.removeStorageSync('accessToken');
-        wx.removeStorageSync('refreshToken');
-        this.setData({ hasLogin: false, loading: false });
-        wx.showToast({ title: '请先登录', icon: 'none' });
-        setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
+        // 只有登录态过期（之前有 token）才清空并引导重新登录
+        if (token) {
+          wx.removeStorageSync('accessToken');
+          wx.removeStorageSync('refreshToken');
+          this.setData({ hasLogin: false, loading: false });
+          wx.showToast({ title: '登录已过期，请重新登录', icon: 'none' });
+          setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
+          return;
+        }
+        // 未登录访客 API 401：静默处理，不跳转
+        this.setData({ loading: false });
         return;
       }
       this.setData({ loading: false });

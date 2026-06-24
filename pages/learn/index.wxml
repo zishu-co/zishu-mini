@@ -30,9 +30,9 @@ module.exports = { dateOnly: dateOnly };
     </view>
   </view>
 
-  <!-- 未登录提示 -->
+  <!-- 未登录提示：访客可浏览课程，登录后才能选课学习 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
-    <text>登录后可使用完整学习功能</text>
+    <text class="login-tip-text">登录后开启成长之旅 🚀</text>
     <button class="login-btn" bindtap="goToLogin">去登录</button>
   </view>
 

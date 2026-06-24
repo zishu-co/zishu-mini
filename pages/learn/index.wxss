@@ -57,12 +57,18 @@ page {
   margin: 20rpx 30rpx;
   background: white;
   border-radius: 16rpx;
-  padding: 24rpx;
+  padding: 32rpx 24rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 20rpx;
   color: #666;
   font-size: 30rpx;
+}
+.login-tip-text {
+  text-align: center;
+  font-size: 30rpx;
+  color: #555;
 }
 .login-btn {
   background: #aa00ff;

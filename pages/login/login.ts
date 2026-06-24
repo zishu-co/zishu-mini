@@ -166,6 +166,9 @@ Page<ILoginPageData, ILoginPageData>({
           _appLogin.globalData.hasPhoneNumber = true
           _appLogin.savePhoneNumber(res.data.phone)
           _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
+          // 持久化 token 到本地存储，其他页面通过 storage 判断登录态
+          wx.setStorageSync('accessToken', res.data.atoken)
+          wx.setStorageSync('refreshToken', res.data.rtoken)
           // 更新页面数据
           that.setData({
             phoneNumber: res.data.phone,
