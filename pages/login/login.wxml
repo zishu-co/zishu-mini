@@ -93,7 +93,7 @@
         </view>
       </view>
       
-      <button class="complete-btn {{privacyAgreed ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed}}">完成授权并进入</button>
+      <button class="complete-btn {{privacyAgreed && hasPhoneNumber ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed || !hasPhoneNumber}}">完成授权并进入</button>
     </view>
   </block>
 

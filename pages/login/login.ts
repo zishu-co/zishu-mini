@@ -158,7 +158,13 @@ Page<ILoginPageData, ILoginPageData>({
           'content-type': 'application/json'
         },
         success: (res: any) => {
-          console.log(res.data)
+          console.log('token_miniprogram 返回:', res.statusCode, res.data)
+          // 用户不存在时后端返回 {detail: "用户不存在"}（可能伴随 404）
+          if (res.statusCode === 404 || (res.data && res.data.detail === '用户不存在')) {
+            wx.showToast({ title: '用户不存在，请联系管理员', icon: 'none', duration: 2500 })
+            return
+          }
+          // 用户存在，保存信息
           _appLogin.globalData.phoneNumber = res.data.phone
           _appLogin.globalData.userId = res.data.id
           _appLogin.globalData.accessToken = res.data.atoken
@@ -176,16 +182,20 @@ Page<ILoginPageData, ILoginPageData>({
             userId: res.data.id
           })
 
+          wx.showToast({
+            title: '获取手机号成功',
+            icon: 'success',
+            duration: 2000
+          })
+
           if (1 == res.data.status) {
             console.log(res)
           }
+        },
+        fail: (err) => {
+          console.error('获取手机号接口调用失败', err)
+          wx.showToast({ title: '网络错误，请重试', icon: 'none', duration: 2000 })
         }
-      })
-
-      wx.showToast({
-        title: '获取手机号成功',
-        icon: 'success',
-        duration: 2000
       })
     } else {
       console.error('获取手机号失败', e.detail.errMsg)
@@ -199,6 +209,14 @@ Page<ILoginPageData, ILoginPageData>({
 
   // 完成登录，跳转到首页
   completeLogin() {
+    if (!this.data.hasPhoneNumber) {
+      wx.showToast({
+        title: '请先授权手机号',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
     if (!this.data.privacyAgreed) {
       wx.showToast({
         title: '请先阅读并同意用户协议和隐私政策',
