@@ -136,3 +136,18 @@ export const fetchAllGoals = () => {
 export const fetchShushengs = () => {
   return get('/api/users/fetch_shushengs')
 }
+
+/**
+ * 小程序注册（v2 改造：token_miniprogram 返回"用户不存在"时调用）
+ * POST /api/users/regi_miniprogram
+ * body: { sessionkey, miniProgramToken, name, email, gender }
+ */
+export const regiMiniProgram = (data: {
+  sessionkey: string
+  miniProgramToken: string
+  name: string
+  email: string
+  gender: 'male' | 'female'
+}) => {
+  return post('/api/users/regi_miniprogram', data)
+}

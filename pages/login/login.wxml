@@ -146,4 +146,79 @@
       </view>
     </view>
   </block>
+
+  <!-- ====== v2 改造：注册模式（用户不存在时自动触发） ====== -->
+  <block wx:if="{{mode === 'register'}}">
+    <view class="register-section">
+      <view class="register-title">完善注册信息</view>
+      <view class="register-subtitle">欢迎首次来到自塾，请填写以下信息完成注册</view>
+
+      <!-- 昵称 -->
+      <view class="form-item">
+        <view class="form-label">昵称</view>
+        <input
+          class="form-input {{regNameError ? 'has-error' : ''}}"
+          type="nickname"
+          maxlength="20"
+          placeholder="请输入昵称"
+          value="{{regName}}"
+          bindinput="onRegNameInput"
+        />
+        <view class="form-error" wx:if="{{regNameError}}">{{regNameError}}</view>
+      </view>
+
+      <!-- 邮箱 -->
+      <view class="form-item">
+        <view class="form-label">邮箱</view>
+        <input
+          class="form-input {{regEmailError ? 'has-error' : ''}}"
+          type="text"
+          placeholder="请输入邮箱"
+          value="{{regEmail}}"
+          bindinput="onRegEmailInput"
+        />
+        <view class="form-error" wx:if="{{regEmailError}}">{{regEmailError}}</view>
+      </view>
+
+      <!-- 性别 -->
+      <view class="form-item">
+        <view class="form-label">性别</view>
+        <view class="gender-options">
+          <view class="gender-option {{regGender === 'male' ? 'selected' : ''}}" bindtap="onRegGenderChange" data-value="male">
+            <view class="gender-label">男</view>
+          </view>
+          <view class="gender-option {{regGender === 'female' ? 'selected' : ''}}" bindtap="onRegGenderChange" data-value="female">
+            <view class="gender-label">女</view>
+          </view>
+        </view>
+        <view class="form-error" wx:if="{{regGenderError}}">{{regGenderError}}</view>
+      </view>
+
+      <!-- 隐私政策 -->
+      <view class="privacy-checkbox reg-privacy" bindtap="togglePrivacyAgreement">
+        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
+          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
+        </view>
+        <view class="checkbox-text">
+          我已阅读并同意
+          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
+          和
+          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
+        </view>
+      </view>
+
+      <view class="reg-error-msg" wx:if="{{regErrorMsg}}">{{regErrorMsg}}</view>
+
+      <button
+        class="reg-submit-btn {{canRegister ? 'active' : ''}}"
+        disabled="{{!canRegister || regSubmitting}}"
+        bindtap="submitRegister"
+      >{{regSubmitting ? '注册中...' : '注册并进入'}}</button>
+
+      <view class="reg-hint">
+        <text>已有账号？</text>
+        <text class="link" bindtap="onBackToLogin">返回登录</text>
+      </view>
+    </view>
+  </block>
 </view>
