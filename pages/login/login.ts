@@ -50,7 +50,7 @@ Page<ILoginPageData, ILoginPageData>({
     mode: 'login' as 'login' | 'register',
     regName: '',         // 注册昵称
     regEmail: '',        // 注册邮箱
-    regGender: '' as 'male' | 'female' | '', // 注册性别
+    regGender: '' as '男' | '女' | '', // v2 改造：后端 RegiMiniRequest.gender = Literal["男","女"]
     regNameError: '',    // 昵称校验错误提示
     regEmailError: '',   // 邮箱校验错误提示
     regGenderError: '',  // 性别校验错误提示
@@ -132,10 +132,11 @@ Page<ILoginPageData, ILoginPageData>({
     })
   },
 
-  // 获取用户头像
+  // 获取用户头像（v2 改造：chooseAvatar 后同步设 hasUserInfo，让 completeLogin 通过）
   getAvatar(e: any) {
     this.setData({
-      avatarUrl: e.detail.avatarUrl
+      avatarUrl: e.detail.avatarUrl,
+      hasUserInfo: true,
     })
   },
 
@@ -195,6 +196,16 @@ Page<ILoginPageData, ILoginPageData>({
           // 持久化 token 到本地存储，其他页面通过 storage 判断登录态
           wx.setStorageSync('accessToken', res.data.atoken)
           wx.setStorageSync('refreshToken', res.data.rtoken)
+          // v2 改造：后端返回 username 即"昵称"（用户不需要再授权昵称，直接用后端给的）
+          // 存到 globalData.userInfo.nickName + storage，其他页面（个人中心等）拿这个展示
+          if (res.data.username) {
+            _appLogin.globalData.userInfo = {
+              ...(_appLogin.globalData.userInfo || {}),
+              nickName: res.data.username,
+              userId: res.data.id,
+            }
+            wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
+          }
           // 更新页面数据
           that.setData({
             phoneNumber: res.data.phone,
@@ -412,10 +423,13 @@ Page<ILoginPageData, ILoginPageData>({
     })
   },
 
-  /** 注册昵称输入 */
+  /** 注册昵称输入（v2 改造：按后端 RegiMiniRequest.name 规则 2-5 字） */
   onRegNameInput(e: any) {
     const v = (e.detail.value || '').trim()
-    const err = v.length === 0 ? '请输入昵称' : (v.length > 20 ? '昵称最多 20 字' : '')
+    let err = ''
+    if (v.length === 0) err = '请输入昵称'
+    else if (v.length < 2) err = '昵称至少 2 个字'
+    else if (v.length > 5) err = '昵称最多 5 个字'
     this.setData({ regName: v, regNameError: err })
     this._updateCanRegister()
   },

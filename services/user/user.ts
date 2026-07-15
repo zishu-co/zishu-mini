@@ -147,7 +147,7 @@ export const regiMiniProgram = (data: {
   miniProgramToken: string
   name: string
   email: string
-  gender: 'male' | 'female'
+  gender: '男' | '女'
 }) => {
   return post('/api/users/regi_miniprogram', data)
 }
