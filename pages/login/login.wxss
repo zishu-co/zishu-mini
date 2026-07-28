@@ -527,69 +527,30 @@ page {
   opacity: 0.8;
 }
 
-/* ========== v2 改造：注册模式样式 ========== */
+/* ========== v2 改造：注册模式样式（集成在 auth-item 卡片内） ========== */
 
-.register-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 24rpx;
-  padding: 48rpx 36rpx;
-  margin: 32rpx 40rpx;
-  box-shadow: 0 8rpx 24rpx rgba(124, 58, 237, 0.12);
-}
-
-.register-title {
-  font-size: 38rpx;
-  font-weight: 600;
-  color: #1f2937;
-  text-align: center;
-  margin-bottom: 12rpx;
-}
-
-.register-subtitle {
-  font-size: 26rpx;
-  color: #6b7280;
-  text-align: center;
-  margin-bottom: 36rpx;
-}
-
-.form-item {
-  margin-bottom: 28rpx;
-}
-
-.form-label {
-  font-size: 28rpx;
-  color: #374151;
-  margin-bottom: 12rpx;
-  font-weight: 500;
-}
-
-.form-input {
+.reg-input {
   width: 100%;
-  height: 88rpx;
+  height: 80rpx;
   padding: 0 24rpx;
-  border: 2rpx solid #e5e7eb;
-  border-radius: 12rpx;
-  font-size: 30rpx;
-  color: #1f2937;
-  background: #fff;
+  border: 2rpx solid rgba(167, 139, 250, 0.3);
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #4c1d95;
+  background: rgba(167, 139, 250, 0.05);
   box-sizing: border-box;
   transition: border-color 0.2s ease;
 }
 
-.form-input:focus {
+.reg-input:focus {
   border-color: #7c3aed;
 }
 
-.form-input.has-error {
+.reg-input.has-error {
   border-color: #ef4444;
 }
 
-.form-error {
-  font-size: 24rpx;
-  color: #ef4444;
-  margin-top: 8rpx;
-}
-
+/* 性别 radio 水平排布 */
 .gender-options {
   display: flex;
   gap: 20rpx;
@@ -597,13 +558,14 @@ page {
 
 .gender-option {
   flex: 1;
-  height: 88rpx;
-  border: 2rpx solid #e5e7eb;
-  border-radius: 12rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  height: 72rpx;
+  border: 2rpx solid rgba(167, 139, 250, 0.3);
+  border-radius: 12rpx;
+  background: rgba(167, 139, 250, 0.05);
+  padding: 0 20rpx;
   transition: all 0.2s ease;
 }
 
@@ -613,8 +575,9 @@ page {
 }
 
 .gender-label {
-  font-size: 30rpx;
-  color: #374151;
+  font-size: 28rpx;
+  color: #4c1d95;
+  margin-left: 8rpx;
 }
 
 .gender-option.selected .gender-label {
@@ -622,43 +585,19 @@ page {
   font-weight: 500;
 }
 
-.reg-privacy {
-  margin-top: 36rpx;
-  margin-bottom: 24rpx;
-}
-
+/* reg-error-msg 在 footer 中使用时的调整 */
 .reg-error-msg {
   background: rgba(239, 68, 68, 0.08);
   color: #ef4444;
   padding: 16rpx 24rpx;
-  border-radius: 8rpx;
-  font-size: 26rpx;
-  margin-bottom: 20rpx;
-  text-align: center;
-}
-
-.reg-submit-btn {
-  width: 100%;
-  height: 88rpx;
-  background: #e5e7eb;
-  color: #9ca3af;
   border-radius: 12rpx;
-  font-size: 32rpx;
-  font-weight: 500;
-  border: none;
-  transition: all 0.3s ease;
+  font-size: 26rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+  width: 90%;
 }
 
-.reg-submit-btn.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  color: #fff;
-  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.3);
-}
-
-.reg-submit-btn.active:active {
-  transform: scale(0.98);
-}
-
+/* reg-hint 在 footer 中使用时 */
 .reg-hint {
   text-align: center;
   margin-top: 24rpx;
@@ -670,3 +609,5 @@ page {
   color: #7c3aed;
   margin-left: 8rpx;
 }
+
+/* ========== v1 保留：旧注册独立页面样式（已弃用，保留备查） ========== */

@@ -45,6 +45,58 @@
         </view>
       </view>
 
+      <!-- v2 改造：注册模式 — 完善注册信息（显示在手机号卡片下方，保持风格一致） -->
+      <block wx:if="{{mode === 'register'}}">
+        <!-- 昵称 -->
+        <view class="auth-item">
+          <view class="auth-title">昵称</view>
+          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+            <input
+              class="reg-input {{regNameError ? 'has-error' : ''}}"
+              type="nickname"
+              maxlength="5"
+              placeholder="请输入昵称（2-5字）"
+              value="{{regName}}"
+              bindinput="onRegNameInput"
+            />
+            <view class="form-error" wx:if="{{regNameError}}">{{regNameError}}</view>
+          </view>
+        </view>
+
+        <!-- 邮箱 -->
+        <view class="auth-item">
+          <view class="auth-title">邮箱</view>
+          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+            <input
+              class="reg-input {{regEmailError ? 'has-error' : ''}}"
+              type="text"
+              placeholder="请输入邮箱"
+              value="{{regEmail}}"
+              bindinput="onRegEmailInput"
+            />
+            <view class="form-error" wx:if="{{regEmailError}}">{{regEmailError}}</view>
+          </view>
+        </view>
+
+        <!-- 性别 -->
+        <view class="auth-item">
+          <view class="auth-title">性别</view>
+          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+            <radio-group class="gender-options" bindchange="onRegGenderChange">
+              <label class="gender-option {{regGender === '男' ? 'selected' : ''}}">
+                <radio value="男" checked="{{regGender === '男'}}" color="#7c3aed" />
+                <view class="gender-label">男</view>
+              </label>
+              <label class="gender-option {{regGender === '女' ? 'selected' : ''}}">
+                <radio value="女" checked="{{regGender === '女'}}" color="#7c3aed" />
+                <view class="gender-label">女</view>
+              </label>
+            </radio-group>
+            <view class="form-error" wx:if="{{regGenderError}}">{{regGenderError}}</view>
+          </view>
+        </view>
+      </block>
+
       <!-- 头像授权（第 2 步：v2 改造 — 仅用户存在后才显示；昵称由后端 token_miniprogram 返回无需用户授权） -->
       <view class="auth-item" wx:if="{{hasPhoneNumber && mode === 'login'}}">
         <view class="auth-title">头像授权</view>
@@ -77,7 +129,20 @@
         </view>
       </view>
       
-      <button class="complete-btn {{privacyAgreed && hasPhoneNumber && avatarUrl ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed || !hasPhoneNumber || !avatarUrl}}">完成授权并进入</button>
+      <!-- 登录模式按钮 -->
+      <block wx:if="{{mode === 'login'}}">
+        <button class="complete-btn {{privacyAgreed && hasPhoneNumber && avatarUrl ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed || !hasPhoneNumber || !avatarUrl}}">完成授权并进入</button>
+      </block>
+
+      <!-- 注册模式按钮 -->
+      <block wx:if="{{mode === 'register'}}">
+        <view class="reg-error-msg" wx:if="{{regErrorMsg}}">{{regErrorMsg}}</view>
+        <button class="complete-btn {{canRegister ? 'active' : ''}}" disabled="{{!canRegister || regSubmitting}}" bindtap="submitRegister">{{regSubmitting ? '注册中...' : '注册并登录'}}</button>
+        <view class="reg-hint">
+          <text>已有账号？</text>
+          <text class="link" bindtap="onBackToLogin">返回登录</text>
+        </view>
+      </block>
     </view>
   </block>
 
@@ -131,78 +196,5 @@
     </view>
   </block>
 
-  <!-- ====== v2 改造：注册模式（用户不存在时自动触发） ====== -->
-  <block wx:if="{{mode === 'register'}}">
-    <view class="register-section">
-      <view class="register-title">完善注册信息</view>
-      <view class="register-subtitle">欢迎首次来到自塾，请填写以下信息完成注册</view>
 
-      <!-- 昵称 -->
-      <view class="form-item">
-        <view class="form-label">昵称</view>
-        <input
-          class="form-input {{regNameError ? 'has-error' : ''}}"
-          type="nickname"
-          maxlength="5"
-          placeholder="请输入昵称（2-5字）"
-          value="{{regName}}"
-          bindinput="onRegNameInput"
-        />
-        <view class="form-error" wx:if="{{regNameError}}">{{regNameError}}</view>
-      </view>
-
-      <!-- 邮箱 -->
-      <view class="form-item">
-        <view class="form-label">邮箱</view>
-        <input
-          class="form-input {{regEmailError ? 'has-error' : ''}}"
-          type="text"
-          placeholder="请输入邮箱"
-          value="{{regEmail}}"
-          bindinput="onRegEmailInput"
-        />
-        <view class="form-error" wx:if="{{regEmailError}}">{{regEmailError}}</view>
-      </view>
-
-      <!-- 性别 -->
-      <view class="form-item">
-        <view class="form-label">性别</view>
-        <view class="gender-options">
-          <view class="gender-option {{regGender === '男' ? 'selected' : ''}}" bindtap="onRegGenderChange" data-value="男">
-            <view class="gender-label">男</view>
-          </view>
-          <view class="gender-option {{regGender === '女' ? 'selected' : ''}}" bindtap="onRegGenderChange" data-value="女">
-            <view class="gender-label">女</view>
-          </view>
-        </view>
-        <view class="form-error" wx:if="{{regGenderError}}">{{regGenderError}}</view>
-      </view>
-
-      <!-- 隐私政策 -->
-      <view class="privacy-checkbox reg-privacy" bindtap="togglePrivacyAgreement">
-        <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
-          <view class="check-icon" wx:if="{{privacyAgreed}}">✓</view>
-        </view>
-        <view class="checkbox-text">
-          我已阅读并同意
-          <text class="link" catchtap="viewAgreement">《用户服务协议》</text>
-          和
-          <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
-        </view>
-      </view>
-
-      <view class="reg-error-msg" wx:if="{{regErrorMsg}}">{{regErrorMsg}}</view>
-
-      <button
-        class="reg-submit-btn {{canRegister ? 'active' : ''}}"
-        disabled="{{!canRegister || regSubmitting}}"
-        bindtap="submitRegister"
-      >{{regSubmitting ? '注册中...' : '注册并登录'}}</button>
-
-      <view class="reg-hint">
-        <text>已有账号？</text>
-        <text class="link" bindtap="onBackToLogin">返回登录</text>
-      </view>
-    </view>
-  </block>
 </view>

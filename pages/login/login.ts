@@ -94,6 +94,7 @@ Page<ILoginPageData, ILoginPageData>({
         hasPhoneNumber: true
       })
     }
+
   },
 
   // 获取用户信息
@@ -150,92 +151,106 @@ Page<ILoginPageData, ILoginPageData>({
   // 获取手机号
   getPhoneNumber(e: any) {
     const that = this
-    if (e.detail.errMsg === 'getPhoneNumber:ok') {
-      const sessionkey = _appLogin.globalData.sessionkey
-      if (!sessionkey) {
-        wx.showToast({ title: '授权凭证尚未就绪，请稍后再试', icon: 'none', duration: 2000 })
-        console.error('[login] sessionkey(UUID) 为空，可能 /openid 请求尚未返回')
-        return
-      }
-      // 后端 TokenRequest：sessionkey 字段现在传 UUID，后端从 dict 取出真实 session_key 解密
-      const telparam = {
-        sessionkey: sessionkey,
+    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+      console.error('获取手机号失败', e.detail.errMsg)
+      wx.showToast({ title: '获取手机号失败', icon: 'none', duration: 2000 })
+      return
+    }
+
+    const sessionkey = _appLogin.globalData.sessionkey
+    if (!sessionkey) {
+      wx.showToast({ title: '授权凭证尚未就绪，请稍后再试', icon: 'none', duration: 2000 })
+      console.error('[login] sessionkey(UUID) 为空，可能 /openid 请求尚未返回')
+      return
+    }
+
+    console.log('=== getPhoneNumber 请求参数 ===', JSON.stringify({ sessionkey, encryptedData: '***', iv: e.detail.iv }))
+
+    wx.showLoading({ title: '授权中...', mask: true })
+
+    wx.request({
+      url: getBaseUrl() + '/api/users/token_miniprogram',
+      data: {
+        sessionkey,
         encryptedData: e.detail.encryptedData,
         iv: e.detail.iv
-      }
-      console.log(telparam)
-      console.log('加密的手机号信息：', e.detail)
-      wx.request({
-        url: getBaseUrl() + '/api/users/token_miniprogram',
-        data: telparam,
-        method: 'POST',
-        header: {
-          'content-type': 'application/json'
-        },
-        success: (res: any) => {
-          console.log('token_miniprogram 返回:', res.statusCode, res.data)
-          // 用户不存在时后端返回 {detail: "用户不存在"}（可能伴随 404）
-          if (res.statusCode === 404 || (res.data && res.data.detail === '用户不存在')) {
-            // v2 改造：用户不存在时切到注册模式（用户自助注册，无需联系管理员）
-            // 保存 token_miniprogram 返回的 miniProgramToken 到 _pendingRegiData，注册时回传后端
-            that.setData({
-              mode: 'register',
-              errorMsg: '',
-              _pendingRegiData: res.data || null,
-            })
-            return
-          }
-          // 用户存在，保存信息
-          _appLogin.globalData.phoneNumber = res.data.phone
-          _appLogin.globalData.userId = res.data.id
-          _appLogin.globalData.accessToken = res.data.atoken
-          _appLogin.globalData.refreshToken = res.data.rtoken
-          _appLogin.globalData.hasPhoneNumber = true
-          _appLogin.savePhoneNumber(res.data.phone)
-          _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
-          // 持久化 token 到本地存储，其他页面通过 storage 判断登录态
-          wx.setStorageSync('accessToken', res.data.atoken)
-          wx.setStorageSync('refreshToken', res.data.rtoken)
-          // v2 改造：后端返回 username 即"昵称"（用户不需要再授权昵称，直接用后端给的）
-          // 存到 globalData.userInfo.nickName + storage，其他页面（个人中心等）拿这个展示
-          if (res.data.username) {
-            _appLogin.globalData.userInfo = {
-              ...(_appLogin.globalData.userInfo || {}),
-              nickName: res.data.username,
-              userId: res.data.id,
-            }
-            wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
-          }
-          // 更新页面数据
+      },
+      method: 'POST',
+      header: { 'content-type': 'application/json' },
+      success: (res: any) => {
+        wx.hideLoading()
+        console.log('=== token_miniprogram 返回 ===')
+        console.log('HTTP 状态码:', res.statusCode)
+        console.log('响应数据:', JSON.stringify(res.data))
+
+        // 用户不存在时后端返回 {detail: "用户不存在"} 或 {detail: {message: "用户不存在", phone: "xxx"}}
+        const detail = res.data && res.data.detail
+        const isUserNotFound = res.statusCode === 404 || (
+          typeof detail === 'string' && detail === '用户不存在'
+        ) || (
+          typeof detail === 'object' && detail.message === '用户不存在'
+        )
+
+        if (isUserNotFound) {
+          const phone = (typeof detail === 'object' && detail.phone) || ''
+          console.warn('[login] 用户不存在，切换到注册模式, 手机号:', phone)
           that.setData({
-            phoneNumber: res.data.phone,
+            mode: 'register',
+            regErrorMsg: '',
+            phoneNumber: phone,
             hasPhoneNumber: true,
-            userId: res.data.id
+            _pendingRegiData: res.data || null,
           })
-
-          wx.showToast({
-            title: '获取手机号成功',
-            icon: 'success',
-            duration: 2000
-          })
-
-          if (1 == res.data.status) {
-            console.log(res)
-          }
-        },
-        fail: (err) => {
-          console.error('获取手机号接口调用失败', err)
-          wx.showToast({ title: '网络错误，请重试', icon: 'none', duration: 2000 })
+          return
         }
-      })
-    } else {
-      console.error('获取手机号失败', e.detail.errMsg)
-      wx.showToast({
-        title: '获取手机号失败',
-        icon: 'none',
-        duration: 2000
-      })
-    }
+
+        // 后端返回成功但缺少关键字段
+        if (!res.data || !res.data.phone) {
+          console.error('[login] 后端返回缺少 phone 字段:', res.data)
+          wx.showToast({
+            title: '获取手机号失败，后端返回数据异常',
+            icon: 'none',
+            duration: 2500
+          })
+          return
+        }
+
+        console.log('[login] 用户已存在，手机号:', res.data.phone, '用户ID:', res.data.id)
+
+        // 用户存在，保存信息
+        _appLogin.globalData.phoneNumber = res.data.phone
+        _appLogin.globalData.userId = res.data.id
+        _appLogin.globalData.accessToken = res.data.atoken
+        _appLogin.globalData.refreshToken = res.data.rtoken
+        _appLogin.globalData.hasPhoneNumber = true
+        _appLogin.savePhoneNumber(res.data.phone)
+        _appLogin.saveUserId(res.data.id)
+        wx.setStorageSync('accessToken', res.data.atoken)
+        wx.setStorageSync('refreshToken', res.data.rtoken)
+
+        if (res.data.username) {
+          _appLogin.globalData.userInfo = {
+            ...(_appLogin.globalData.userInfo || {}),
+            nickName: res.data.username,
+            userId: res.data.id,
+          }
+          wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
+        }
+
+        that.setData({
+          phoneNumber: res.data.phone,
+          hasPhoneNumber: true,
+          userId: res.data.id
+        })
+
+        wx.showToast({ title: '获取手机号成功', icon: 'success', duration: 2000 })
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('[login] token_miniprogram 网络请求失败:', err)
+        wx.showToast({ title: '网络错误，请重试', icon: 'none', duration: 2000 })
+      }
+    })
   },
 
   // 完成登录，跳转到首页
@@ -419,6 +434,8 @@ Page<ILoginPageData, ILoginPageData>({
       regGenderError: '',
       regErrorMsg: '',
       canRegister: false,
+      hasPhoneNumber: false,
+      phoneNumber: '',
       _pendingRegiData: null,
     })
   },
@@ -490,17 +507,17 @@ Page<ILoginPageData, ILoginPageData>({
         this.setData({ regSubmitting: false })
         if (res.statusCode >= 200 && res.statusCode < 300 && res.data && res.data.id) {
           // 注册成功：复用 token_miniprogram 成功路径保存信息
-          _appLogin.globalData.phoneNumber = res.data.phone || pending.phone || ''
+          _appLogin.globalData.phoneNumber = res.data.phone || this.data.phoneNumber || ''
           _appLogin.globalData.userId = res.data.id
           _appLogin.globalData.accessToken = res.data.atoken
           _appLogin.globalData.refreshToken = res.data.rtoken
           _appLogin.globalData.hasPhoneNumber = true
-          _appLogin.savePhoneNumber(res.data.phone || pending.phone || '')
+          _appLogin.savePhoneNumber(res.data.phone || this.data.phoneNumber || '')
           _appLogin.saveUserId(res.data.id)
           wx.setStorageSync('accessToken', res.data.atoken)
           wx.setStorageSync('refreshToken', res.data.rtoken)
           this.setData({
-            phoneNumber: res.data.phone || pending.phone || '',
+            phoneNumber: res.data.phone || this.data.phoneNumber || '',
             hasPhoneNumber: true,
             userId: res.data.id,
             mode: 'login',

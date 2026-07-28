@@ -56,10 +56,8 @@ App<IAppOption>({
           // 立即发起请求，不再用 setTimeout 延迟
           const that = this;
           wx.request({
-            url: getBaseUrl() + '/api/users/openid',
-            data: {
-              code: res.code,
-            },
+            url: getBaseUrl() + '/api/users/openid?code=' + res.code,
+            method: 'GET',
             header: {
               'content-type': 'application/json',
             },
