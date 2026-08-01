@@ -43,6 +43,7 @@ Page<IReportDetailPageData, IReportDetailData>({
       return;
     }
     wx.setNavigationBarTitle({ title: '答题详情' });
+    (this as any)._pperformid = pperformid;
     this.fetchDetail(pperformid, paperid);
   },
 
@@ -147,6 +148,17 @@ Page<IReportDetailPageData, IReportDetailData>({
         console.error('获取正确答案失败', err);
       },
     });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: this.data.papertitle || '答题详情',
+      path: `/pages/report-detail/index?pperformid=${(this as any)._pperformid || ''}`,
+    };
+  },
+
+  onShareTimeline() {
+    return { title: this.data.papertitle || '答题详情' };
   },
 });
 

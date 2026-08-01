@@ -60,8 +60,10 @@ function request<T = any>(options: {
   method?: string
   data?: any
   showLoading?: boolean
+  contentType?: string
 }): Promise<T> {
   const token = getToken()
+  const contentType = options.contentType || 'application/x-www-form-urlencoded'
   return new Promise((resolve, reject) => {
     if (options.showLoading) {
       wx.showLoading({ title: '加载中...', mask: true })
@@ -71,7 +73,7 @@ function request<T = any>(options: {
       method: (options.method || 'GET') as any,
       data: options.data,
       header: {
-        'content-type': 'application/x-www-form-urlencoded',
+        'content-type': contentType,
         'token': token,
       },
       timeout: 80000,
@@ -120,6 +122,7 @@ export function submitHomework(
     method: 'PATCH',
     data: { homework_url: homeworkUrl },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -212,6 +215,7 @@ export function arkJoin(arkId: number): Promise<{ code: number; message?: string
     method: 'POST',
     data: { ark_id: arkId },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -222,6 +226,7 @@ export function arkCreate(courseId: number): Promise<{ code: number; message?: s
     method: 'POST',
     data: { course_id: courseId },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -292,6 +297,7 @@ export function arkSetCaptain(
     method: 'POST',
     data,
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -302,6 +308,7 @@ export function arkSaveMeetings(arkId: number, m: ArkMeetings): Promise<{ code: 
     method: 'POST',
     data: { ark_id: arkId, ...m },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -319,6 +326,7 @@ export function arkClose(arkId: number): Promise<{ code: number; message?: strin
     method: 'POST',
     data: { ark_id: arkId },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 
@@ -329,6 +337,7 @@ export function arkLeave(arkId: number): Promise<{ code: number; message?: strin
     method: 'POST',
     data: { ark_id: arkId },
     showLoading: true,
+    contentType: 'application/json',
   })
 }
 

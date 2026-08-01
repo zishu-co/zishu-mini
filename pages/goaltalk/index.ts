@@ -98,6 +98,14 @@ Page({
     return ''
   },
 
+  onShareAppMessage() {
+    return { title: '自塾·目标面谈', path: '/pages/goaltalk/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·目标面谈' };
+  },
+
   getStatusText(item: any): string {
     if (item.confirmer) return '已确认'
     if (item.planed_time) {

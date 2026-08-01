@@ -161,4 +161,17 @@ Page<IPageData, IPageData>({
 
   // 阻止作业链接点击穿透
   stopPropagation() {},
+
+  onShareAppMessage() {
+    const title = this.data.courseInfo?.course_title || '课程结课';
+    return {
+      title,
+      path: `/pages/finish-course/index?course_id=${this.courseId}`,
+    };
+  },
+
+  onShareTimeline() {
+    const title = this.data.courseInfo?.course_title || '课程结课';
+    return { title, query: `course_id=${this.courseId}` };
+  },
 });

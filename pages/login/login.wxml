@@ -29,7 +29,24 @@
   <!-- ====== 微信授权登录 ====== -->
   <block wx:if="{{!isDev || loginMethod === 'wechat'}}">
     <view class="auth-section">
-      <!-- 手机号授权（第 1 步：v2 改造 — 先判断用户是否存在） -->
+      <!-- 头像授权（始终最先获取） -->
+      <view class="auth-item">
+        <view class="auth-title">头像授权</view>
+        <view class="auth-content" wx:if="{{avatarUrl}}">
+          <view class="user-info">
+            <image class="avatar" src="{{avatarUrl}}"></image>
+            <view class="nickname">{{nickName || '已获取头像'}}</view>
+          </view>
+          <view class="auth-status success">已完成</view>
+        </view>
+        <view class="auth-content" wx:else>
+          <view class="auth-desc">用于展示您的个人形象</view>
+          <button class="pop_avatar" wx:if="{{!avatarUrl}}" open-type="chooseAvatar" bindchooseavatar="getAvatar">获取头像</button>
+          <view class="auth-status">待授权</view>
+        </view>
+      </view>
+
+      <!-- 手机号授权（先判断用户是否存在） -->
       <view class="auth-item">
         <view class="auth-title">手机号授权</view>
         <view class="auth-content" wx:if="{{hasPhoneNumber}}">
@@ -47,17 +64,24 @@
 
       <!-- v2 改造：注册模式 — 完善注册信息（显示在手机号卡片下方，保持风格一致） -->
       <block wx:if="{{mode === 'register'}}">
-        <!-- 昵称 -->
+        <!-- 名字 -->
         <view class="auth-item">
-          <view class="auth-title">昵称</view>
-          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+          <view class="auth-title">名字</view>
+          <view class="auth-content" wx:if="{{regName && !regNameError && !editName}}" bindtap="onEditName">
+            <view class="user-info">
+              <view class="phone-info">{{regName}}</view>
+            </view>
+            <view class="auth-status success">已完成</view>
+          </view>
+          <view class="auth-content" wx:else style="flex-direction:column;align-items:stretch;">
             <input
               class="reg-input {{regNameError ? 'has-error' : ''}}"
-              type="nickname"
+              type="text"
               maxlength="5"
-              placeholder="请输入昵称（2-5字）"
+              placeholder="请输入您的名字（2-5字）"
               value="{{regName}}"
               bindinput="onRegNameInput"
+              bindblur="onNameBlur"
             />
             <view class="form-error" wx:if="{{regNameError}}">{{regNameError}}</view>
           </view>
@@ -66,13 +90,20 @@
         <!-- 邮箱 -->
         <view class="auth-item">
           <view class="auth-title">邮箱</view>
-          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+          <view class="auth-content" wx:if="{{regEmail && !regEmailError && !editEmail}}" bindtap="onEditEmail">
+            <view class="user-info">
+              <view class="phone-info">{{regEmail}}</view>
+            </view>
+            <view class="auth-status success">已完成</view>
+          </view>
+          <view class="auth-content" wx:else style="flex-direction:column;align-items:stretch;">
             <input
               class="reg-input {{regEmailError ? 'has-error' : ''}}"
               type="text"
               placeholder="请输入邮箱"
               value="{{regEmail}}"
               bindinput="onRegEmailInput"
+              bindblur="onEmailBlur"
             />
             <view class="form-error" wx:if="{{regEmailError}}">{{regEmailError}}</view>
           </view>
@@ -81,7 +112,13 @@
         <!-- 性别 -->
         <view class="auth-item">
           <view class="auth-title">性别</view>
-          <view class="auth-content" style="flex-direction:column;align-items:stretch;">
+          <view class="auth-content" wx:if="{{regGender && !regGenderError && !editGender}}" bindtap="onEditGender">
+            <view class="user-info">
+              <view class="phone-info">{{regGender}}</view>
+            </view>
+            <view class="auth-status success">已完成</view>
+          </view>
+          <view class="auth-content" wx:else style="flex-direction:column;align-items:stretch;">
             <radio-group class="gender-options" bindchange="onRegGenderChange">
               <label class="gender-option {{regGender === '男' ? 'selected' : ''}}">
                 <radio value="男" checked="{{regGender === '男'}}" color="#7c3aed" />
@@ -97,22 +134,6 @@
         </view>
       </block>
 
-      <!-- 头像授权（第 2 步：v2 改造 — 仅用户存在后才显示；昵称由后端 token_miniprogram 返回无需用户授权） -->
-      <view class="auth-item" wx:if="{{hasPhoneNumber && mode === 'login'}}">
-        <view class="auth-title">头像授权</view>
-        <view class="auth-content" wx:if="{{avatarUrl}}">
-          <view class="user-info">
-            <image class="avatar" src="{{avatarUrl}}"></image>
-            <view class="nickname">已获取头像</view>
-          </view>
-          <view class="auth-status success">已完成</view>
-        </view>
-        <view class="auth-content" wx:else>
-          <view class="auth-desc">用于展示您的个人形象（昵称已自动填充）</view>
-          <button class="pop_avatar" wx:if="{{!avatarUrl}}" open-type="chooseAvatar" bindchooseavatar="getAvatar">获取头像</button>
-          <view class="auth-status">待授权</view>
-        </view>
-      </view>
     </view>
 
     <view class="footer">

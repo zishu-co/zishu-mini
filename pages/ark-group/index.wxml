@@ -27,7 +27,7 @@
             <text class="joined-tip" wx:if="{{isMyArk(ark)}}">已加入 ✓</text>
             <!-- 我未加入 + 还能进 -->
             <button
-              wx:elif="{{canJoin(ark)}}"
+              wx:elif="{{ark._canJoin}}"
               class="action-btn primary"
               size="mini"
               loading="{{joiningArkId === ark.ark_id}}"

@@ -48,4 +48,12 @@ Page({
       url: '/pages/test/test?testid=' + testid,
     });
   },
+
+  onShareAppMessage() {
+    return { title: '自塾·试卷列表', path: '/pages/exam/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·试卷列表' };
+  },
 });

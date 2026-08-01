@@ -81,6 +81,14 @@ Page<IReportPageData, IReportData>({
     }
     wx.navigateTo({ url });
   },
+
+  onShareAppMessage() {
+    return { title: '自塾·考试成绩', path: '/pages/report/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·考试成绩' };
+  },
 });
 
 interface IReportPageData {

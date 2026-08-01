@@ -83,4 +83,15 @@ Page<IPageData, IPageData>({
     if (s === 'learning') return 'status-learning';
     return 'status-not-started';
   },
+
+  onShareAppMessage() {
+    return {
+      title: '自塾·学习单',
+      path: `/pages/learn-sheet/index?userId=${this.data.userId}`,
+    };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·学习单' };
+  },
 });

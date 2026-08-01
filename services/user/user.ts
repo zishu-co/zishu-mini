@@ -26,10 +26,13 @@ export const getProfile = (params: { userid: number }) => {
 /**
  * 提交个人资料
  * POST /api/users/submit_profile
- * body: { info: JSON.stringify({ name, gender, region, desc }) }
+ * body: { info: JSON.stringify({ name, gender, region, desc, goal }) }
+ * 注意：后端要求 application/json，不能用默认的 x-www-form-urlencoded
  */
 export const submitProfile = (data: { info: string }) => {
-  return post('/api/users/submit_profile', data)
+  return post('/api/users/submit_profile', data, {
+    header: { 'content-type': 'application/json' },
+  })
 }
 
 /**

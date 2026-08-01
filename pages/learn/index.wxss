@@ -221,6 +221,10 @@ page {
 .select-btn.selected {
   background: #ff6b6b;
 }
+.select-btn.disabled {
+  background: #c0c0c0;
+  color: #888;
+}
 
 /* 通用操作按钮 */
 .action-btn {

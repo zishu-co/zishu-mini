@@ -89,4 +89,12 @@ Page<IArticlePageData, IArticlePageData>({
   goToLogin() {
     wx.navigateTo({ url: '/pages/login/login' })
   },
+
+  onShareAppMessage() {
+    return { title: '自塾·我的文章', path: '/pages/article/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·我的文章' };
+  },
 })

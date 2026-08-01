@@ -50,9 +50,11 @@ Page<IPageData, IPageData>({
 
   loadUserInfo() {
     const userInfo = app.globalData?.userInfo || wx.getStorageSync('userInfo') || {};
+    const gender = userInfo.gender || null;
+    console.log('[ark-group] loadUserInfo userId:', userInfo.userId, 'gender:', gender, 'userInfo keys:', Object.keys(userInfo));
     this.setData({
       currentUserId: userInfo.userId || 0,
-      currentGender: userInfo.gender || null,
+      currentGender: gender,
     });
   },
 
@@ -61,7 +63,16 @@ Page<IPageData, IPageData>({
     try {
       const list = await arkListByTeacher(this.data.courseId);
       const safeList = Array.isArray(list) ? list : [];
-      this.setData({ arkList: safeList });
+      // 预计算每个方舟的可加入性，避免 WXML 方法调用求值不确定性
+      const processedList = safeList.map(ark => {
+        const result = this.calcCanJoin(ark);
+        console.log('[ark-group] ark:', ark.teacher_name, 'ark_id:', ark.ark_id,
+          'male:', ark.male_count, 'female:', ark.female_count,
+          'closed:', ark.closed, 'finished:', ark.finished,
+          'canJoin:', result);
+        return { ...ark, _canJoin: result };
+      });
+      this.setData({ arkList: processedList });
     } catch (e) {
       console.error('[ark-group] loadData error:', e);
       wx.showToast({ title: '加载失败', icon: 'none' });
@@ -83,13 +94,21 @@ Page<IPageData, IPageData>({
     }
   },
 
-  /** 是否能加入该方舟（按性别） */
-  canJoin(ark: TeacherArkItem): boolean {
-    if (!ark.ark_id || ark.closed || ark.finished) return false;
+  /** 判断是否可加入（纯函数，供 loadData 预计算和 WXML 使用） */
+  calcCanJoin(ark: TeacherArkItem): boolean {
+    if (!ark.ark_id) return false;
+    if (typeof ark.closed === 'number' ? ark.closed !== 0 : !!ark.closed) return false;
+    if (typeof ark.finished === 'number' ? ark.finished !== 0 : !!ark.finished) return false;
     const g = this.data.currentGender;
     if (g === '男') return ark.male_count < 2;
     if (g === '女') return ark.female_count < 2;
-    return false;
+    // 性别未知时，按总人数判断（最多 4 人）
+    return (ark.male_count + ark.female_count) < 4;
+  },
+
+  /** 模板中调用，直接从预计算字段读取 */
+  canJoin(ark: TeacherArkItem): boolean {
+    return !!(ark as any)._canJoin;
   },
 
   /** 是否已加入该方舟 */

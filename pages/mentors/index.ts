@@ -35,4 +35,12 @@ Page({
     this.data.listData.forEach((item: any) => { if (item.shusheng_id) ids.add(item.shusheng_id) })
     return ids.size
   },
+
+  onShareAppMessage() {
+    return { title: '自塾·师生关系', path: '/pages/mentors/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·师生关系' };
+  },
 })

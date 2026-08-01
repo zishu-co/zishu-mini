@@ -85,7 +85,7 @@ Page<IMyPageData, IMyPageData>({
     }
   },
 
-  /** 拉取我的方舟（按阶段分组，按时间倒序合并） */
+  /** 拉取我的方舟（只显示用户已加入的，role 不为 'none'） */
   async fetchArks() {
     this.setData({ arkLoading: true })
     try {
@@ -98,15 +98,16 @@ Page<IMyPageData, IMyPageData>({
           ...(res.finished || []),
           ...(res.closed || []),
         ]
-        all.sort((a, b) => (b.create_time || '').localeCompare(a.create_time || ''))
+        // 只保留用户已加入的方舟（role 不为 'none'）
+        const joined = all.filter((ark: ArkItem) => ark.role && ark.role !== 'none')
+        joined.sort((a, b) => (b.create_time || '').localeCompare(a.create_time || ''))
         this.setData({
-          arkList: all,
-          arkCount: all.length,
+          arkList: joined,
+          arkCount: joined.length,
         })
       }
     } catch (e) {
       console.error('[my] fetchArks error:', e)
-      // 失败不阻塞页面，只是不显示方舟
     } finally {
       this.setData({ arkLoading: false })
     }

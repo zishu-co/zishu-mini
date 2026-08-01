@@ -14,7 +14,7 @@
   padding: 80rpx 0;
   text-align: center;
   color: #999;
-  font-size: 28rpx;
+  font-size: 56rpx;
 }
 
 .teacher-list {
@@ -51,13 +51,13 @@
 
 .teacher-name {
   font-weight: 600;
-  font-size: 32rpx;
+  font-size: 64rpx;
   color: #1a1a2e;
   white-space: nowrap;
 }
 
 .ark-badge {
-  font-size: 22rpx;
+  font-size: 44rpx;
   font-weight: 600;
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
@@ -82,7 +82,7 @@
 }
 
 .action-btn {
-  font-size: 24rpx;
+  font-size: 48rpx;
   padding: 0 20rpx;
   height: 56rpx;
   line-height: 56rpx;
@@ -100,7 +100,7 @@
 }
 
 .joined-tip {
-  font-size: 24rpx;
+  font-size: 48rpx;
   color: #67c23a;
   font-weight: 600;
 }
@@ -109,12 +109,12 @@
 .full-tip,
 .no-ark-tip,
 .no-ark-hint {
-  font-size: 24rpx;
+  font-size: 48rpx;
   color: #999;
 }
 
 .detail-link {
-  font-size: 24rpx;
+  font-size: 48rpx;
   color: #aa00ff;
   margin-left: 4rpx;
 }
@@ -129,7 +129,7 @@
 }
 
 .member-count-tag {
-  font-size: 22rpx;
+  font-size: 44rpx;
   font-weight: 600;
   padding: 4rpx 12rpx;
   border-radius: 12rpx;
@@ -148,7 +148,7 @@
 .member-chip {
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
-  font-size: 24rpx;
+  font-size: 48rpx;
   font-weight: 500;
 }
 
@@ -163,7 +163,7 @@
 }
 
 .no-member {
-  font-size: 24rpx;
+  font-size: 48rpx;
   color: #9a9ab0;
 }
 
@@ -171,5 +171,5 @@
   text-align: center;
   padding: 80rpx 0;
   color: #9a9ab0;
-  font-size: 28rpx;
+  font-size: 56rpx;
 }

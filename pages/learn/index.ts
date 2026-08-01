@@ -80,9 +80,20 @@ Page<ILearnPageData, ILearnPageData>({
         const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
         const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
         const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
+        // 预计算每门课的按钮状态，避免 WXML 嵌套三元表达式
+        const processedAll = safeAllCourses.map((c: any) => {
+          const isSelected = selectedIds.includes(c.id);
+          const isFull = !isSelected && selectedIds.length >= 3;
+          return {
+            ...c,
+            _btnClass: isSelected ? 'selected' : (isFull ? 'disabled' : ''),
+            _btnText: isSelected ? '退选' : (isFull ? '禁选' : '选课'),
+            _isSelected: isSelected,
+          };
+        });
         this.setData({
           myCourses: safeMyCourses,
-          allCourses: safeAllCourses,
+          allCourses: processedAll,
           selectedIds,
           loading: false,
         });
@@ -90,8 +101,14 @@ Page<ILearnPageData, ILearnPageData>({
         // 未登录：只拉取全部课程，让访客也能浏览课程列表
         const allCourses = await fetchAllCourses();
         const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+        const processedAll = safeAllCourses.map((c: any) => ({
+          ...c,
+          _btnClass: '',
+          _btnText: '选课',
+          _isSelected: false,
+        }));
         this.setData({
-          allCourses: safeAllCourses,
+          allCourses: processedAll,
           loading: false,
         });
       }
@@ -115,8 +132,9 @@ Page<ILearnPageData, ILearnPageData>({
     }
   },
 
-  async onSelectCourse(e: any) {
+  onSelectCourse(e: any) {
     const courseId = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title || '该课程';
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     const userId = app.globalData.userInfo?.userId;
 
@@ -128,31 +146,45 @@ Page<ILearnPageData, ILearnPageData>({
 
     const isSelected = this.data.selectedIds.includes(courseId);
     if (isSelected) {
-      try {
-        wx.showLoading({ title: '退选处理中...', mask: true });
-        await quitCourse(userId, courseId, '主动退选');
-        wx.hideLoading();
-        wx.showToast({ title: '已退选', icon: 'success' });
-        this.loadData();
-      } catch (e) {
-        wx.hideLoading();
-        wx.showToast({ title: '退选失败', icon: 'none' });
-      }
+      wx.showModal({
+        title: '确认退选',
+        content: `确定要退选「${title}」吗？`,
+        success: async (res) => {
+          if (!res.confirm) return;
+          try {
+            wx.showLoading({ title: '退选处理中...', mask: true });
+            await quitCourse(userId, courseId, '主动退选');
+            wx.hideLoading();
+            wx.showToast({ title: '已退选', icon: 'success' });
+            this.loadData();
+          } catch (e) {
+            wx.hideLoading();
+            wx.showToast({ title: '退选失败', icon: 'none' });
+          }
+        },
+      });
     } else {
       if (this.data.selectedIds.length >= 3) {
         wx.showToast({ title: '最多选3门课', icon: 'none' });
         return;
       }
-      try {
-        wx.showLoading({ title: '选课中...', mask: true });
-        await selectCourse(userId, courseId);
-        wx.hideLoading();
-        wx.showToast({ title: '选课成功', icon: 'success' });
-        this.loadData();
-      } catch (e) {
-        wx.hideLoading();
-        wx.showToast({ title: '选课失败', icon: 'none' });
-      }
+      wx.showModal({
+        title: '确认选课',
+        content: `确定要选择「${title}」吗？`,
+        success: async (res) => {
+          if (!res.confirm) return;
+          try {
+            wx.showLoading({ title: '选课中...', mask: true });
+            await selectCourse(userId, courseId);
+            wx.hideLoading();
+            wx.showToast({ title: '选课成功', icon: 'success' });
+            this.loadData();
+          } catch (e) {
+            wx.hideLoading();
+            wx.showToast({ title: '选课失败', icon: 'none' });
+          }
+        },
+      });
     }
   },
 
@@ -279,6 +311,13 @@ Page<ILearnPageData, ILearnPageData>({
       wx.showToast({ title: '暂无学习链接', icon: 'none' });
       return;
     }
+    // 微信公众号文章直接在小程序内打开
+    if (url.startsWith('https://mp.weixin.qq.com/s/')) {
+      wx.navigateTo({
+        url: '/pages/event/webview/index?url=' + encodeURIComponent(url),
+      });
+      return;
+    }
     wx.setClipboardData({
       data: url,
       success: () => {
@@ -321,5 +360,13 @@ Page<ILearnPageData, ILearnPageData>({
 
   goToLogin() {
     wx.navigateTo({ url: '/pages/login/login' });
+  },
+
+  onShareAppMessage() {
+    return { title: '自塾·学习', path: '/pages/learn/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·学习' };
   },
 });

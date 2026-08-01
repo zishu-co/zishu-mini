@@ -33,6 +33,14 @@ Page({
     }).length
   },
 
+  onShareAppMessage() {
+    return { title: '自塾·学习监督', path: '/pages/supervise/index' };
+  },
+
+  onShareTimeline() {
+    return { title: '自塾·学习监督' };
+  },
+
   getDeadlineClass(deadline: string): string {
     if (!deadline) return ''
     const deadlineDate = new Date(deadline)

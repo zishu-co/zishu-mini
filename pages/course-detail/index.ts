@@ -185,6 +185,13 @@ Page<IPageData, IPageData>({
       wx.showToast({ title: '暂无链接', icon: 'none' });
       return;
     }
+    // 微信公众号文章直接在小程序内打开
+    if (url.startsWith('https://mp.weixin.qq.com/s/')) {
+      wx.navigateTo({
+        url: '/pages/event/webview/index?url=' + encodeURIComponent(url),
+      });
+      return;
+    }
     wx.setClipboardData({
       data: url,
       success: () => {
@@ -201,5 +208,18 @@ Page<IPageData, IPageData>({
   /** 编辑课程（仅塾主可见） */
   onEditCourse() {
     wx.showToast({ title: '编辑功能开发中', icon: 'none' });
+  },
+
+  onShareAppMessage() {
+    const title = this.data.courseDetail?.course?.title || '课程详情';
+    return {
+      title,
+      path: `/pages/course-detail/index?id=${this.courseId}&title=${encodeURIComponent(title)}`,
+    };
+  },
+
+  onShareTimeline() {
+    const title = this.data.courseDetail?.course?.title || '课程详情';
+    return { title, query: `id=${this.courseId}` };
   },
 });

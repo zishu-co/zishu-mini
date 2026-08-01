@@ -69,7 +69,7 @@ Page({
     const userId = userInfo.userId || 0
 
     const formData = {
-      info: JSON.stringify({ name, gender, region, desc }),
+      info: JSON.stringify({ name, gender, region, desc, goal: userInfo.goal || '' }),
     }
 
     wx.showLoading({ title: '保存中...', mask: true })
@@ -82,6 +82,8 @@ Page({
           const storedUserInfo = wx.getStorageSync('userInfo') || {}
           storedUserInfo.name = name
           storedUserInfo.nickName = name
+          storedUserInfo.gender = gender
+          storedUserInfo.desc = desc
           wx.setStorageSync('userInfo', storedUserInfo)
 
           wx.showToast({ title: '保存成功', icon: 'success' })

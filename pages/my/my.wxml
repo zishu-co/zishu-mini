@@ -90,7 +90,7 @@
     <!-- 空状态 -->
     <view class="ark-empty" wx:else>
       <text class="ark-empty__icon">🛶</text>
-      <text class="ark-empty__text">暂未加入任何方舟</text>
+      <text class="ark-empty__text">您还没有加入任何方舟</text>
       <text class="ark-empty__tip">在"学习"页选课后可创建或加入方舟</text>
     </view>
   </view>

@@ -76,7 +76,7 @@ module.exports = { dateOnly: dateOnly };
       <text class="section-title">全部课程</text>
       <text class="section-tip">最多选3门课</text>
     </view>
-    <view class="course-item {{selectedIds.includes(item.id) ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
+    <view class="course-item {{item._isSelected ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
       <view class="course-item-left" data-id="{{item.id}}" data-title="{{item.title}}" bindtap="onCourseItemTap">
         <view class="course-item-name">{{item.title}}</view>
         <view class="course-item-meta">
@@ -86,12 +86,12 @@ module.exports = { dateOnly: dateOnly };
       </view>
       <view class="course-item-right">
         <view
-          class="select-btn {{selectedIds.includes(item.id) ? 'selected' : ''}}"
+          class="select-btn {{item._btnClass}}"
           data-id="{{item.id}}"
           data-title="{{item.title}}"
           bindtap="onSelectCourse"
         >
-          {{selectedIds.includes(item.id) ? '退选' : '选课'}}
+          {{item._btnText}}
         </view>
       </view>
     </view>

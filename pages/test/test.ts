@@ -55,6 +55,10 @@ Page<ITestPageData, ITestData>({
     return { title: this.data.papertitle };
   },
 
+  onShareTimeline() {
+    return { title: this.data.papertitle };
+  },
+
   onLoad(options: any) {
     const testid = options.testid;
     if (!testid) {

@@ -48,17 +48,23 @@ Page<ILoginPageData, ILoginPageData>({
     // ========== v2 改造：注册模式字段 ==========
     // mode: 'login' = 微信授权登录；'register' = 新用户注册模式
     mode: 'login' as 'login' | 'register',
-    regName: '',         // 注册昵称
+    regName: '',         // 注册名字
     regEmail: '',        // 注册邮箱
     regGender: '' as '男' | '女' | '', // v2 改造：后端 RegiMiniRequest.gender = Literal["男","女"]
-    regNameError: '',    // 昵称校验错误提示
+    regNameError: '',    // 名字校验错误提示
     regEmailError: '',   // 邮箱校验错误提示
     regGenderError: '',  // 性别校验错误提示
+    editName: false,     // 名字是否处于编辑状态
+    editEmail: false,    // 邮箱是否处于编辑状态
+    editGender: false,   // 性别是否处于编辑状态
     canRegister: false,  // 注册按钮是否可点
     regSubmitting: false,// 注册请求进行中
     regErrorMsg: '',     // 注册接口错误提示
     // _pendingRegiData: token_miniprogram 404 时保存的 miniProgramToken，供注册时使用
     _pendingRegiData: null as any,
+    // _encryptedData / _iv: getPhoneNumber 时保存的微信加密数据，注册时传给后端解密手机号
+    _encryptedData: '',
+    _iv: '',
   },
 
   onLoad() {
@@ -166,6 +172,12 @@ Page<ILoginPageData, ILoginPageData>({
 
     console.log('=== getPhoneNumber 请求参数 ===', JSON.stringify({ sessionkey, encryptedData: '***', iv: e.detail.iv }))
 
+    // v2：保存加密数据，注册时需要用到
+    that.setData({
+      _encryptedData: e.detail.encryptedData,
+      _iv: e.detail.iv,
+    })
+
     wx.showLoading({ title: '授权中...', mask: true })
 
     wx.request({
@@ -240,7 +252,8 @@ Page<ILoginPageData, ILoginPageData>({
         that.setData({
           phoneNumber: res.data.phone,
           hasPhoneNumber: true,
-          userId: res.data.id
+          userId: res.data.id,
+          nickName: res.data.username || '',
         })
 
         wx.showToast({ title: '获取手机号成功', icon: 'success', duration: 2000 })
@@ -432,21 +445,26 @@ Page<ILoginPageData, ILoginPageData>({
       regNameError: '',
       regEmailError: '',
       regGenderError: '',
+      editName: false,
+      editEmail: false,
+      editGender: false,
       regErrorMsg: '',
       canRegister: false,
       hasPhoneNumber: false,
       phoneNumber: '',
       _pendingRegiData: null,
+      _encryptedData: '',
+      _iv: '',
     })
   },
 
-  /** 注册昵称输入（v2 改造：按后端 RegiMiniRequest.name 规则 2-5 字） */
+  /** 注册名字输入（2-5 字） */
   onRegNameInput(e: any) {
     const v = (e.detail.value || '').trim()
     let err = ''
-    if (v.length === 0) err = '请输入昵称'
-    else if (v.length < 2) err = '昵称至少 2 个字'
-    else if (v.length > 5) err = '昵称最多 5 个字'
+    if (v.length === 0) err = '请输入名字'
+    else if (v.length < 2) err = '名字至少 2 个字'
+    else if (v.length > 5) err = '名字最多 5 个字'
     this.setData({ regName: v, regNameError: err })
     this._updateCanRegister()
   },
@@ -464,6 +482,48 @@ Page<ILoginPageData, ILoginPageData>({
     const v = e.detail.value || ''
     const err = !v ? '请选择性别' : ''
     this.setData({ regGender: v, regGenderError: err })
+    if (!err) this.setData({ editGender: false })
+    this._updateCanRegister()
+  },
+
+  /** 点击已完成项 → 进入编辑模式 */
+  onEditName() {
+    this.setData({ editName: true, regNameError: '' })
+  },
+  onEditEmail() {
+    this.setData({ editEmail: true, regEmailError: '' })
+  },
+  onEditGender() {
+    this.setData({ editGender: true, regGenderError: '' })
+  },
+
+  /** 名字失焦 → 校验通过则退出编辑模式 */
+  onNameBlur(e: any) {
+    const v = (e.detail.value || '').trim()
+    let err = ''
+    if (v.length === 0) err = '请输入名字'
+    else if (v.length < 2) err = '名字至少 2 个字'
+    else if (v.length > 5) err = '名字最多 5 个字'
+    this.setData({ regName: v, regNameError: err })
+    if (!err) this.setData({ editName: false })
+    this._updateCanRegister()
+  },
+
+  /** 邮箱失焦 → 校验通过则退出编辑模式 */
+  onEmailBlur(e: any) {
+    const v = (e.detail.value || '').trim()
+    const err = v.length === 0 ? '请输入邮箱' : (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '邮箱格式不正确' : '')
+    this.setData({ regEmail: v, regEmailError: err })
+    if (!err) this.setData({ editEmail: false })
+    this._updateCanRegister()
+  },
+
+  /** 性别变更 → 校验通过则退出编辑模式 */
+  onGenderBlur(e: any) {
+    const v = e.detail.value || ''
+    const err = !v ? '请选择性别' : ''
+    this.setData({ regGender: v, regGenderError: err })
+    if (!err) this.setData({ editGender: false })
     this._updateCanRegister()
   },
 
@@ -487,10 +547,14 @@ Page<ILoginPageData, ILoginPageData>({
       wx.showToast({ title: '授权凭证失效，请返回重试', icon: 'none' })
       return
     }
-    const pending: any = this.data._pendingRegiData || {}
+    if (!this.data._encryptedData || !this.data._iv) {
+      wx.showToast({ title: '手机号加密数据缺失，请返回重新授权', icon: 'none' })
+      return
+    }
     const body = {
       sessionkey: _appLogin.globalData.sessionkey,
-      miniProgramToken: pending.miniProgramToken || pending.token || '',
+      encryptedData: this.data._encryptedData,
+      iv: this.data._iv,
       name: this.data.regName,
       email: this.data.regEmail,
       gender: this.data.regGender,
@@ -506,29 +570,36 @@ Page<ILoginPageData, ILoginPageData>({
         wx.hideLoading()
         this.setData({ regSubmitting: false })
         if (res.statusCode >= 200 && res.statusCode < 300 && res.data && res.data.id) {
-          // 注册成功：复用 token_miniprogram 成功路径保存信息
+          // 注册成功：直接保存信息并跳转首页，无需再走登录流程
           _appLogin.globalData.phoneNumber = res.data.phone || this.data.phoneNumber || ''
           _appLogin.globalData.userId = res.data.id
           _appLogin.globalData.accessToken = res.data.atoken
           _appLogin.globalData.refreshToken = res.data.rtoken
           _appLogin.globalData.hasPhoneNumber = true
+          _appLogin.globalData.hasUserInfo = true
+          // 保存注册用户信息
+          _appLogin.globalData.userInfo = {
+            avatarUrl: this.data.avatarUrl || '',
+            nickName: res.data.username || this.data.regName || '',
+            userId: res.data.id,
+          }
           _appLogin.savePhoneNumber(res.data.phone || this.data.phoneNumber || '')
           _appLogin.saveUserId(res.data.id)
           wx.setStorageSync('accessToken', res.data.atoken)
           wx.setStorageSync('refreshToken', res.data.rtoken)
+          wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
+          // 清除游客标记
+          wx.removeStorageSync('guestMode')
           this.setData({
             phoneNumber: res.data.phone || this.data.phoneNumber || '',
             hasPhoneNumber: true,
             userId: res.data.id,
-            mode: 'login',
           })
-          wx.showToast({ title: '注册成功', icon: 'success' })
+          wx.showToast({ title: '注册成功', icon: 'success', duration: 1500 })
+          // 注册成功后直接跳转首页
           setTimeout(() => {
-            // 有头像昵称则跳首页；否则留在登录页让用户继续授权
-            if (this.data.hasUserInfo) {
-              wx.switchTab({ url: '/pages/aim/index' })
-            }
-          }, 800)
+            wx.switchTab({ url: '/pages/aim/index' })
+          }, 1200)
         } else {
           this.setData({ regErrorMsg: (res.data && (res.data.detail || res.data.message)) || '注册失败，请重试' })
         }
