@@ -45,6 +45,7 @@ module.exports = { dateOnly: dateOnly };
   <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
     <view class="section-header">
       <text class="section-title">我的选课</text>
+      <view class="section-btn" bindtap="onGotoLearnSheet">学习单</view>
     </view>
     <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
       <view class="course-card-top">

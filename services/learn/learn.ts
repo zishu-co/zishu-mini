@@ -347,6 +347,7 @@ export function arkLeave(arkId: number): Promise<{ code: number; message?: strin
 export interface CampCourse {
   course_id: number
   course_title: string
+  chapter_title?: string | null
   create_time: string | null
   current_serial: number | null
   deadline: string | null

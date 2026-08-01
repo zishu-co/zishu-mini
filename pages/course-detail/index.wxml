@@ -20,17 +20,23 @@
       <view class="header-top">
         <view class="course-title">{{courseDetail.course.title}}</view>
         <view class="header-actions" wx:if="{{hasLogin}}">
+          <!-- 已选此课 → 退选 -->
           <view
             class="action-btn quit-btn"
-            wx:if="{{selectedIds.includes(courseDetail.course.id)}}"
+            wx:if="{{isSelected}}"
             bindtap="onQuitCourse"
           >退选</view>
+          <!-- 未选此课但已满3门 → 禁选 -->
+          <view
+            class="action-btn disabled-btn"
+            wx:elif="{{currentSelectionsCount >= 3}}"
+          >禁选</view>
+          <!-- 其他 → 选课 -->
           <view
             class="action-btn select-btn"
-            wx:elif="{{currentSelectionsCount < 3}}"
+            wx:else
             bindtap="onSelectCourse"
           >选课</view>
-          <view class="action-btn disabled-btn" wx:else>禁选</view>
         </view>
       </view>
       <view class="course-meta-row">

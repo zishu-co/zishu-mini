@@ -5,11 +5,13 @@
  * spec: specs/miniprogram/active/005-port-learn-sheet.md
  */
 import { learnSheet, LearnSheetData } from '../../services/learn/learn';
+import { fetchCurrentSelections } from '../../services/course/course';
 
 interface IPageData {
   userId: number;
   loading: boolean;
   data: Partial<LearnSheetData>;
+  selMap: Record<number, any>;
 }
 
 Page<IPageData, IPageData>({
@@ -17,6 +19,7 @@ Page<IPageData, IPageData>({
     userId: 0,
     loading: true,
     data: {},
+    selMap: {},
   },
 
   onLoad(options: any) {
@@ -32,8 +35,42 @@ Page<IPageData, IPageData>({
   async loadData() {
     this.setData({ loading: true });
     try {
-      const res: any = await learnSheet(this.data.userId);
-      this.setData({ data: res });
+      // 并行请求：学习单数据 + 选课数据（含 chapter_title / deadline）
+      const [res, selections]: [any, any[]] = await Promise.all([
+        learnSheet(this.data.userId).catch(() => null),
+        fetchCurrentSelections().catch(() => []),
+      ]) as any;
+
+      // 构建 course_id -> 选课详情的映射
+      const selMap: Record<number, any> = {};
+      if (Array.isArray(selections)) {
+        selections.forEach((s: any) => {
+          if (s.course_id) selMap[s.course_id] = s;
+        });
+      }
+
+      // 用选课数据补全 other_learning 和 other_learned
+      const enrich = (list: any[]) =>
+        (list || []).map((c: any) => {
+          const sel = selMap[c.course_id];
+          return {
+            ...c,
+            chapter_title: c.chapter_title || sel?.chapter_title || null,
+            deadline: c.deadline || sel?.deadline || null,
+            current_serial: c.current_serial || sel?.current_serial || null,
+          };
+        });
+
+      const enriched = res
+        ? {
+            ...res,
+            other_learning: enrich(res.other_learning),
+            other_learned: enrich(res.other_learned),
+          }
+        : null;
+
+      this.setData({ data: enriched, selMap });
+
       // 设置导航栏标题为用户名
       const userName = res?.camps?.[0]?.user_name || '';
       if (userName) {

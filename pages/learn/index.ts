@@ -350,6 +350,15 @@ Page<ILearnPageData, ILearnPageData>({
     wx.navigateTo({ url });
   },
 
+  onGotoLearnSheet() {
+    const userId = app.globalData.userId;
+    if (!userId) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
+  },
+
   onGotoExam() {
     wx.navigateTo({ url: '/pages/exam/index' });
   },

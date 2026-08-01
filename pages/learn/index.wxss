@@ -108,6 +108,13 @@ page {
   font-size: 26rpx;
   color: #999;
 }
+.section-btn {
+  font-size: 26rpx;
+  color: #aa00ff;
+  border: 1rpx solid #aa00ff;
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
+}
 
 /* 课程卡片 */
 .course-card {

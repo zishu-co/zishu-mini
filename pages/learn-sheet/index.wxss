@@ -14,7 +14,7 @@
   padding: 80rpx 0;
   text-align: center;
   color: #999;
-  font-size: 28rpx;
+  font-size: 42rpx;
 }
 
 .section {
@@ -25,7 +25,7 @@
 }
 
 .section-title {
-  font-size: 30rpx;
+  font-size: 45rpx;
   font-weight: bold;
   color: #1a1a2e;
   margin-bottom: 16rpx;
@@ -39,7 +39,7 @@
 }
 
 .camp-name {
-  font-size: 32rpx;
+  font-size: 48rpx;
   font-weight: bold;
   color: #aa00ff;
   margin-bottom: 8rpx;
@@ -47,7 +47,7 @@
 
 .camp-meta,
 .camp-must {
-  font-size: 24rpx;
+  font-size: 36rpx;
   color: #999;
   margin-bottom: 4rpx;
 }
@@ -82,7 +82,7 @@
 }
 
 .course-name {
-  font-size: 30rpx;
+  font-size: 45rpx;
   font-weight: 600;
   color: #1a1a2e;
   margin-bottom: 8rpx;
@@ -93,11 +93,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12rpx;
-  font-size: 24rpx;
+  font-size: 36rpx;
 }
 
 .status-tag {
-  font-size: 22rpx;
+  font-size: 33rpx;
   padding: 4rpx 12rpx;
   border-radius: 20rpx;
   font-weight: 600;
@@ -118,8 +118,13 @@
   color: #999;
 }
 
+.chapter-name {
+  font-size: 39rpx;
+  color: #555;
+}
+
 .deadline {
-  font-size: 24rpx;
+  font-size: 36rpx;
   color: #999;
 }
 
@@ -127,5 +132,5 @@
   padding: 80rpx 0;
   text-align: center;
   color: #9a9ab0;
-  font-size: 28rpx;
+  font-size: 42rpx;
 }

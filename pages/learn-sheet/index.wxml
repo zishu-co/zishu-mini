@@ -1,5 +1,22 @@
 <!-- pages/learn-sheet/index.wxml -->
 <!-- spec: specs/miniprogram/active/005-port-learn-sheet.md -->
+<wxs module="fmt">
+function dateOnly(s) {
+  if (!s) return '';
+  var d = getDate(s);
+  var y = d.getFullYear();
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+}
+function chapterLabel(c) {
+  if (!c || !c.current_serial) return '';
+  if (c.chapter_title) return '第' + c.current_serial + '章：' + c.chapter_title;
+  return '第' + c.current_serial + '章';
+}
+module.exports = { dateOnly: dateOnly, chapterLabel: chapterLabel };
+</wxs>
+
 <view class="page">
   <view class="loading" wx:if="{{loading}}">
     <text>加载中...</text>
@@ -37,9 +54,9 @@
       </view>
     </view>
 
-    <!-- 其他在学 -->
+    <!-- 当前在学 -->
     <view class="section" wx:if="{{data.other_learning && data.other_learning.length > 0}}">
-      <view class="section-title">📖 其他在学</view>
+      <view class="section-title">📖 当前在学</view>
       <view
         class="course-item standalone"
         wx:for="{{data.other_learning}}"
@@ -50,8 +67,8 @@
       >
         <view class="course-name">{{c.course_title}}</view>
         <view class="course-meta">
-          <text class="status-tag {{statusClass(c)}}">{{statusText(c)}}</text>
-          <text class="deadline" wx:if="{{c.deadline}}">截止：{{formatDate(c.deadline)}}</text>
+          <text class="chapter-name" wx:if="{{c.current_serial}}">{{fmt.chapterLabel(c)}}</text>
+          <text class="deadline" wx:if="{{c.deadline}}">截止：{{fmt.dateOnly(c.deadline)}}</text>
         </view>
       </view>
     </view>

@@ -60,43 +60,48 @@ Page<IPageData, IPageData>({
 
   async loadData() {
     this.setData({ loading: true });
+
+    // 先拉我已加入的方舟，确保判断 isMyArk 时 myArkId 已就绪
+    let myArkId: number | null = null;
+    try {
+      const my: any = await arkMy();
+      if (my && my.ark_id) {
+        myArkId = my.ark_id;
+      }
+    } catch (e) {
+      // 404 = 不在任何方舟中，正常情况
+    }
+
     try {
       const list = await arkListByTeacher(this.data.courseId);
       const safeList = Array.isArray(list) ? list : [];
-      // 预计算每个方舟的可加入性，避免 WXML 方法调用求值不确定性
+      // 预计算每个方舟的状态字段，避免 WXML 方法调用求值不确定性
       const processedList = safeList.map(ark => {
-        const result = this.calcCanJoin(ark);
+        const canJoin = this.calcCanJoin(ark, myArkId);
         console.log('[ark-group] ark:', ark.teacher_name, 'ark_id:', ark.ark_id,
           'male:', ark.male_count, 'female:', ark.female_count,
           'closed:', ark.closed, 'finished:', ark.finished,
-          'canJoin:', result);
-        return { ...ark, _canJoin: result };
+          'canJoin:', canJoin, 'isMyArk:', !!ark.ark_id && ark.ark_id === myArkId);
+        return {
+          ...ark,
+          _canJoin: canJoin,
+          _isMyArk: !!ark.ark_id && ark.ark_id === myArkId,
+        };
       });
-      this.setData({ arkList: processedList });
+      this.setData({ arkList: processedList, myArkId });
     } catch (e) {
       console.error('[ark-group] loadData error:', e);
       wx.showToast({ title: '加载失败', icon: 'none' });
     } finally {
       this.setData({ loading: false });
     }
-
-    // 拉我已加入的方舟
-    try {
-      const my: any = await arkMy();
-      if (my && my.ark_id) {
-        this.setData({ myArkId: my.ark_id });
-      } else {
-        this.setData({ myArkId: null });
-      }
-    } catch (e) {
-      // 404 = 不在任何方舟中，正常情况
-      this.setData({ myArkId: null });
-    }
   },
 
-  /** 判断是否可加入（纯函数，供 loadData 预计算和 WXML 使用） */
-  calcCanJoin(ark: TeacherArkItem): boolean {
+  /** 判断是否可加入（已加入的方舟不可再加入） */
+  calcCanJoin(ark: TeacherArkItem, myArkId: number | null = null): boolean {
     if (!ark.ark_id) return false;
+    // 已在其中，不可再加入
+    if (myArkId != null && ark.ark_id === myArkId) return false;
     if (typeof ark.closed === 'number' ? ark.closed !== 0 : !!ark.closed) return false;
     if (typeof ark.finished === 'number' ? ark.finished !== 0 : !!ark.finished) return false;
     const g = this.data.currentGender;

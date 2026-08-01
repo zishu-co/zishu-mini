@@ -16,6 +16,7 @@ type IPageData = {
   courseDetail: CourseDetail | null;
   currentUserId: number;
   // 选课状态
+  isSelected: boolean;
   selectedIds: number[];
   currentSelectionsCount: number;
   hasLogin: boolean;
@@ -26,6 +27,7 @@ Page<IPageData, IPageData>({
     loading: true,
     courseDetail: null,
     currentUserId: 0,
+    isSelected: false,
     selectedIds: [],
     currentSelectionsCount: 0,
     hasLogin: false,
@@ -78,18 +80,23 @@ Page<IPageData, IPageData>({
   loadSelections() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
     if (!token) {
-      this.setData({ hasLogin: false, selectedIds: [], currentSelectionsCount: 0 });
+      this.setData({ hasLogin: false, isSelected: false, selectedIds: [], currentSelectionsCount: 0 });
       return Promise.resolve();
     }
     this.setData({ hasLogin: true });
     return fetchCurrentSelections()
       .then((list) => {
         const safeList = Array.isArray(list) ? list : [];
-        const ids = safeList.map((c: any) => c.course_id);
-        this.setData({ selectedIds: ids, currentSelectionsCount: safeList.length });
+        const ids: number[] = safeList.map((c: any) => c.course_id);
+        const selected = ids.indexOf(this.courseId) >= 0;
+        this.setData({
+          selectedIds: ids,
+          currentSelectionsCount: safeList.length,
+          isSelected: selected,
+        });
       })
       .catch(() => {
-        this.setData({ selectedIds: [], currentSelectionsCount: 0 });
+        this.setData({ isSelected: false, selectedIds: [], currentSelectionsCount: 0 });
       });
   },
 

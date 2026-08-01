@@ -24,7 +24,7 @@
           <!-- 有方舟 -->
           <block wx:if="{{ark.ark_id}}">
             <!-- 我已加入 -->
-            <text class="joined-tip" wx:if="{{isMyArk(ark)}}">已加入 ✓</text>
+            <text class="joined-tip" wx:if="{{ark._isMyArk}}">已加入 ✓</text>
             <!-- 我未加入 + 还能进 -->
             <button
               wx:elif="{{ark._canJoin}}"
