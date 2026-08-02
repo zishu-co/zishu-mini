@@ -1,6 +1,5 @@
 {
   "navigationBarTitleText": "目标",
-  "navigationStyle": "custom",
   "usingComponents": {
     "top3-recommendation": "./components/top3-recommendation/index",
     "goal-card": "./components/goal-card/index"

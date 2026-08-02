@@ -1,7 +1,4 @@
 <view class="page">
-  <!-- 顶部背景 -->
-  <view class="top-bg"></view>
-
   <!-- 用户卡片 -->
   <view class="user-card">
     <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">

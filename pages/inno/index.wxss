@@ -23,7 +23,7 @@ page {
 
 .home-page-header {
   background: linear-gradient(#fff, #f5f5f5);
-  padding: 0 24rpx 0;
+  padding: 0 16rpx 0;
 }
 
 .search-wrap {
@@ -67,7 +67,7 @@ page {
 .t-tabs .t-tabs-nav {
   background-color: transparent;
   line-height: 80rpx;
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #333;
 }
 
@@ -76,19 +76,19 @@ page {
 }
 
 .tabs-external__item {
-  font-size: 28rpx;
+  font-size: 32rpx;
   color: #666;
 }
 
 .tabs-external__active {
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: bold;
   color: #aa00ff !important;
 }
 
 
 .project-list {
-  padding: 24rpx 24rpx 0;
+  padding: 16rpx 16rpx 0;
 }
 
 .empty-state {
@@ -104,7 +104,7 @@ page {
 }
 
 .empty-text {
-  font-size: 28rpx;
+  font-size: 36rpx;
   color: #999;
 }
 
@@ -112,8 +112,8 @@ page {
 .project-card {
   background-color: #ffffff;
   border-radius: 16rpx;
-  padding: 28rpx;
-  margin-bottom: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
   position: relative;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
@@ -126,7 +126,7 @@ page {
 }
 
 .card-serial {
-  font-size: 26rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: #aa00ff;
   background-color: #f3e8ff;
@@ -135,7 +135,7 @@ page {
 }
 
 .card-status {
-  font-size: 24rpx;
+  font-size: 30rpx;
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
 }
@@ -156,7 +156,7 @@ page {
 }
 
 .card-title {
-  font-size: 32rpx;
+  font-size: 42rpx;
   font-weight: bold;
   color: #1a1a2e;
   line-height: 1.5;
@@ -164,7 +164,7 @@ page {
 }
 
 .card-desc {
-  font-size: 26rpx;
+  font-size: 36rpx;
   color: #666;
   line-height: 1.5;
   margin-bottom: 16rpx;
@@ -188,12 +188,12 @@ page {
 }
 
 .footer-icon {
-  font-size: 26rpx;
+  font-size: 32rpx;
   margin-right: 6rpx;
 }
 
 .footer-text {
-  font-size: 26rpx;
+  font-size: 32rpx;
   color: #666;
   line-height: 1;
 }
@@ -218,7 +218,7 @@ page {
   bottom: 28rpx;
   background: linear-gradient(135deg, #c6f, #aa00ff);
   color: #fff;
-  font-size: 26rpx;
+  font-size: 30rpx;
   font-weight: bold;
   padding: 12rpx 32rpx;
   border-radius: 32rpx;

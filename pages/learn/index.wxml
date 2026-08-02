@@ -12,14 +12,12 @@ module.exports = { dateOnly: dateOnly };
 
 <view class="page">
 
-  <!-- 顶部 Banner -->
-  <view class="banner">
-    <view class="banner-title">学习中心</view>
-    <view class="banner-sub">学本领 上自塾</view>
-  </view>
-
-  <!-- 快捷入口 -->
+  <!-- 快速入口 -->
   <view class="quick-btns">
+    <view class="quick-btn" bindtap="onGotoLearnSheet">
+      <text class="quick-icon">📋</text>
+      <text class="quick-text">学习单</text>
+    </view>
     <view class="quick-btn primary" bindtap="onGotoExam">
       <text class="quick-icon">📝</text>
       <text class="quick-text">考试</text>
@@ -45,26 +43,21 @@ module.exports = { dateOnly: dateOnly };
   <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
     <view class="section-header">
       <text class="section-title">我的选课</text>
-      <view class="section-btn" bindtap="onGotoLearnSheet">学习单</view>
     </view>
     <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
-      <view class="course-card-top">
-        <view class="course-info">
-          <view class="course-name">{{item.course_title}}</view>
-          <view class="course-meta">
-            <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
-          </view>
-          <view class="course-meta">
-            <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
-          </view>
+      <view class="course-info">
+        <view class="course-name">{{item.course_title}}</view>
+        <view class="course-meta">
+          <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
         </view>
-        <view class="course-actions">
-          <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
-          <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
-          <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
+        <view class="course-meta">
+          <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
         </view>
       </view>
-      <view class="course-card-bottom">
+      <view class="course-actions">
+        <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
+        <text class="action-btn outline" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
+        <text class="action-btn ark" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">去学习</view>
         <view
           class="action-btn primary"

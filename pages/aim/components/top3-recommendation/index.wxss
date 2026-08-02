@@ -1,8 +1,8 @@
 .recommendation-card {
   background: #fff;
   border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
@@ -11,14 +11,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .card-title {
   display: flex;
   align-items: center;
   gap: 12rpx;
-  font-size: 32rpx;
+  font-size: 42rpx;
   font-weight: 600;
   color: #333;
 }
@@ -43,7 +43,7 @@
 }
 
 .loading-text {
-  font-size: 26rpx;
+  font-size: 36rpx;
   color: #909399;
 }
 
@@ -61,13 +61,13 @@
 }
 
 .empty-text {
-  font-size: 30rpx;
+  font-size: 42rpx;
   color: #333;
   margin-bottom: 8rpx;
 }
 
 .empty-subtext {
-  font-size: 26rpx;
+  font-size: 36rpx;
   color: #909399;
 }
 
@@ -75,13 +75,13 @@
 .recommendation-list {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 20rpx;
 }
 
 .recommendation-item {
   display: flex;
-  gap: 20rpx;
-  padding: 24rpx;
+  gap: 16rpx;
+  padding: 20rpx;
   background: #f8f9fa;
   border-radius: 12rpx;
   position: relative;
@@ -105,12 +105,12 @@
   background: #a0f;
   color: #fff;
   border-radius: 50%;
-  font-size: 24rpx;
+  font-size: 32rpx;
   font-weight: 600;
 }
 
 .type-icon {
-  font-size: 28rpx;
+  font-size: 36rpx;
 }
 
 .course-icon { color: #a0f; }
@@ -134,7 +134,7 @@
 }
 
 .item-title {
-  font-size: 30rpx;
+  font-size: 40rpx;
   font-weight: 600;
   color: #333;
   line-height: 1.4;
@@ -143,7 +143,7 @@
 
 /* 紧急度标签 */
 .urgency-tag {
-  font-size: 22rpx;
+  font-size: 30rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
   margin-left: 12rpx;
@@ -172,7 +172,7 @@
 
 .item-description {
   display: block;
-  font-size: 26rpx;
+  font-size: 36rpx;
   color: #666;
   line-height: 1.5;
   margin-bottom: 12rpx;
@@ -194,7 +194,7 @@
   display: flex;
   align-items: center;
   gap: 6rpx;
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #909399;
 }
 
@@ -211,7 +211,7 @@
 }
 
 .reason-tag {
-  font-size: 22rpx;
+  font-size: 30rpx;
   padding: 4rpx 12rpx;
   background: #f0e6ff;
   color: #a0f;
@@ -231,7 +231,7 @@
   margin-top: 20rpx;
   padding-top: 16rpx;
   border-top: 1px solid #eee;
-  font-size: 24rpx;
+  font-size: 32rpx;
   color: #909399;
   text-align: center;
 }

@@ -1,12 +1,6 @@
 <!-- pages/event/index.wxml -->
 <view class="page">
 
-  <!-- 顶部 Banner -->
-  <view class="banner">
-    <view class="banner-title">活动</view>
-    <view class="banner-sub">一起·发现更大的世界</view>
-  </view>
-
   <!-- Tab 切换 -->
   <view class="tabs">
     <view
