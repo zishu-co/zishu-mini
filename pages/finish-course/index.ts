@@ -18,6 +18,7 @@ interface IPageData {
   courseInfo: Partial<FinishCourseInfo> & { homework_url?: string };
   homeworkUrl: string;
   currentDate: string;
+  isFinished: boolean;
 }
 
 Page<IPageData, IPageData>({
@@ -36,6 +37,7 @@ Page<IPageData, IPageData>({
     },
     homeworkUrl: '',
     currentDate: '',
+    isFinished: false,
   },
 
   courseId: 0,
@@ -140,10 +142,11 @@ Page<IPageData, IPageData>({
     try {
       const res = await confirmFinishCourse(this.courseId);
       if (res && res.code === '200') {
+        this.setData({ isFinished: true });
         wx.showToast({ title: '结课成功！', icon: 'success' });
         setTimeout(() => {
           wx.redirectTo({ url: '/pages/learn/index' });
-        }, 1200);
+        }, 2000);
       } else {
         wx.showToast({ title: res?.message || '结课失败，请重试', icon: 'none' });
       }

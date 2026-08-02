@@ -286,15 +286,26 @@ Page<ILearnPageData, ILearnPageData>({
     }
 
     try {
-      await reportLearn(
+      const res: any = await reportLearn(
         reportCourse.chapter_id,
         reportCourse.course_id,
         reportCourse.chapter_title,
         reportCourse.sele_id,
         reportHour,
       );
-      wx.showToast({ title: '申报成功', icon: 'success' });
       this.setData({ showReportModal: false, reportHour: '' });
+
+      // 后端返回 is_last_lesson → 到最后一课，跳转结课页
+      if (res && res.is_last_lesson) {
+        wx.showToast({ title: '已完成全部课程', icon: 'success' });
+        setTimeout(() => {
+          wx.navigateTo({
+            url: `/pages/finish-course/index?course_id=${reportCourse.course_id}`,
+          });
+        }, 800);
+      } else {
+        wx.showToast({ title: '申报成功', icon: 'success' });
+      }
       this.loadData();
     } catch (e: any) {
       wx.showToast({ title: e?.message || '申报失败', icon: 'none' });
@@ -303,6 +314,13 @@ Page<ILearnPageData, ILearnPageData>({
 
   onCloseReportModal() {
     this.setData({ showReportModal: false });
+  },
+
+  /** 点击"结课"按钮 → 跳转结课页面 */
+  onFinishCourse(e: any) {
+    const courseId = e.currentTarget.dataset.courseid;
+    if (!courseId) return;
+    wx.navigateTo({ url: `/pages/finish-course/index?course_id=${courseId}` });
   },
 
   onGoToChapter(e: any) {

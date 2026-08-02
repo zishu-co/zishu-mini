@@ -93,8 +93,17 @@
         type="primary"
         loading="{{confirmLoading}}"
         bindtap="confirmFinish"
+        wx:if="{{!isFinished}}"
       >确认结课</button>
-      <view class="confirm-tip">确认后这门课将从"我的选课"列表中消失</view>
+      <view class="finished-label" wx:else>
+        <view class="finished-ribbon">
+          <text class="finished-star">⭐</text>
+          <text class="finished-text">已 结 课</text>
+          <text class="finished-star">⭐</text>
+        </view>
+        <text class="finished-badge">🎉 恭喜完成全部课程 🎉</text>
+      </view>
+      <view class="confirm-tip" wx:if="{{!isFinished}}">确认后这门课将从"我的选课"列表中消失</view>
     </view>
   </view>
 </view>

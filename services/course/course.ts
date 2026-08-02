@@ -33,6 +33,7 @@ export interface CurrentSelection {
   chapter_title: string;
   chapter_id: number;
   current_serial: number;
+  total_chapters: number;
   deadline: string;
   url: string;
   shushi_id?: number;

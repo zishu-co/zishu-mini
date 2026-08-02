@@ -248,6 +248,10 @@ page {
   background: #f5f5f5;
   color: #555;
 }
+.action-btn.finish {
+  background: linear-gradient(135deg, #67c23a, #85ce61);
+  color: white;
+}
 
 /* 截止日期颜色 */
 .deadline-orange { color: #f59e0b; font-weight: 500; }
