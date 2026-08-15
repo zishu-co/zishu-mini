@@ -61,13 +61,23 @@ Page<IPageData, IPageData>({
           };
         });
 
-      const enriched = res
+      let enriched = res
         ? {
             ...res,
             other_learning: enrich(res.other_learning),
             other_learned: enrich(res.other_learned),
           }
         : null;
+
+      // 过滤掉没有 course_list 数据的 camp
+      if (enriched?.camps) {
+        enriched = {
+          ...enriched,
+          camps: enriched.camps.filter(
+            (c: any) => c.course_list && c.course_list.length > 0
+          ),
+        };
+      }
 
       this.setData({ data: enriched, selMap });
 

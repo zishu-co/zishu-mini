@@ -4,6 +4,7 @@
  * spec: specs/port/archive/006-port-event-list.md
  *      specs/port/archive/007-port-event-participants.md
  */
+import base from '../base'
 
 // ==================== 类型定义 ====================
 
@@ -51,24 +52,12 @@ export interface JoinEventResult {
 
 // ==================== 工具函数 ====================
 
-function getBaseUrl(): string {
-  try {
-    const { envVersion } = wx.getAccountInfoSync().miniProgram
-    switch (envVersion) {
-      case 'develop': return 'http://127.0.0.1:8008';
-      case 'trial': return 'https://zishu.co'
-      case 'release': return 'https://zishu.co'
-      default: return 'https://zishu.co'
-    }
-  } catch (e) {
-    return 'https://zishu.co'
-  }
-}
-
-function getToken(): string {
-  return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
-}
-
+/**
+ * 统一请求封装
+ * 复用 services/base.ts 的双 Token 无感刷新机制：
+ * - accessToken 过期（后端返回 401 + detail.code 5000）时，自动用 refreshToken 刷新并重试原请求
+ * - 刷新失败（refreshToken 也失效）时，自动清除登录态并跳转登录页
+ */
 function request<T = any>(options: {
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -76,37 +65,7 @@ function request<T = any>(options: {
   showLoading?: boolean
   loadingText?: string
 }): Promise<T> {
-  return new Promise((resolve, reject) => {
-    if (options.showLoading) {
-      wx.showLoading({ title: options.loadingText || '加载中...', mask: true })
-    }
-    wx.request({
-      url: getBaseUrl() + options.url,
-      method: (options.method || 'GET') as any,
-      data: options.data,
-      header: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'token': getToken(),
-      },
-      timeout: 30000,
-      success: (res: any) => {
-        if (options.showLoading) wx.hideLoading()
-        if (res.statusCode === 401) {
-          reject({ statusCode: 401, errMsg: 'Unauthorized' })
-          return
-        }
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          reject(new Error(`HTTP ${res.statusCode}`))
-          return
-        }
-        resolve(res.data as T)
-      },
-      fail: (err) => {
-        if (options.showLoading) wx.hideLoading()
-        reject(new Error(err.errMsg || '网络请求失败'))
-      },
-    })
-  })
+  return base.requestWithRefresh(options) as Promise<T>
 }
 
 // ==================== 公开 API ====================

@@ -161,30 +161,22 @@
   font-size: 60rpx;
   font-weight: 600;
   color: #1a1a2e;
-}
-
-.captain-tag {
-  font-size: 44rpx;
-  background: rgba(255, 215, 0, 0.15);
-  color: #b8860b;
-  padding: 4rpx 12rpx;
+  padding: 4rpx 16rpx;
   border-radius: 20rpx;
 }
 
-.gender-tag {
-  font-size: 44rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 12rpx;
-}
-
-.gender-male {
+.member-name.gender-male {
   background: #e0f0ff;
   color: #1e40af;
 }
 
-.gender-female {
+.member-name.gender-female {
   background: #fff0f5;
   color: #9d174d;
+}
+
+.captain-star {
+  font-size: 44rpx;
 }
 
 .member-progress-text {

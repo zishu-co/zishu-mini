@@ -149,15 +149,16 @@
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
   font-size: 48rpx;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
-.gender-male {
+.member-chip.gender-male {
   background: #e0f0ff;
   color: #1e40af;
 }
 
-.gender-female {
+.member-chip.gender-female {
   background: #fff0f5;
   color: #9d174d;
 }

@@ -91,6 +91,13 @@ Page<ILearnPageData, ILearnPageData>({
             _isSelected: isSelected,
           };
         });
+        // 按在学人数降序，相同则按学完人数降序
+        processedAll.sort((a: any, b: any) => {
+          const inStudyA = a.current_selections_num || 0;
+          const inStudyB = b.current_selections_num || 0;
+          if (inStudyA !== inStudyB) return inStudyB - inStudyA;
+          return (b.finish_selections_num || 0) - (a.finish_selections_num || 0);
+        });
         this.setData({
           myCourses: safeMyCourses,
           allCourses: processedAll,
@@ -107,6 +114,13 @@ Page<ILearnPageData, ILearnPageData>({
           _btnText: '选课',
           _isSelected: false,
         }));
+        // 按在学人数降序，相同则按学完人数降序
+        processedAll.sort((a: any, b: any) => {
+          const inStudyA = a.current_selections_num || 0;
+          const inStudyB = b.current_selections_num || 0;
+          if (inStudyA !== inStudyB) return inStudyB - inStudyA;
+          return (b.finish_selections_num || 0) - (a.finish_selections_num || 0);
+        });
         this.setData({
           allCourses: processedAll,
           loading: false,

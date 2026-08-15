@@ -40,6 +40,18 @@ App<IAppOption>({
       this.globalData.userId = userId;
     }
 
+    // 注册隐私授权监听（兼容基础库 2.32.3+），确保新用户点击 chooseAvatar/getPhoneNumber 等 open-type 按钮时能弹出授权弹窗
+    if (wx.onNeedPrivacyAuthorization) {
+      wx.onNeedPrivacyAuthorization((resolve: any) => {
+        console.log('[privacy] 触发隐私授权流程, event:', resolve);
+        if (typeof resolve === 'function') {
+          resolve({ event: 'agree' });
+        } else if (resolve && resolve.resolve) {
+          resolve.resolve({ event: 'agree' });
+        }
+      });
+    }
+
     // 检查登录状态
     this.checkLoginStatus();
   },

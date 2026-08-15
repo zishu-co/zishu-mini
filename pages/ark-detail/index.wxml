@@ -10,13 +10,13 @@
     <!-- 顶部信息卡 -->
     <view class="header-card">
       <view class="ark-name">{{ark.arkname || '方舟详情'}}</view>
-      <view class="status-row">
-        <text class="stage-badge {{stageClass(ark.stage)}}">{{ark.stage || '筹建中'}}</text>
-        <text class="finished-tag" wx:if="{{ark.finished}}">已结束</text>
+      <view class="status-row" wx:if="{{ark.stage && ark.stage !== '已成舟'}}">
+        <text class="stage-badge {{stageClass(ark.stage)}}">{{ark.stage}}</text>
       </view>
+      <text class="finished-tag" wx:if="{{ark.finished}}">已结束</text>
       <view class="meta-row">
         <text class="teacher-text" wx:if="{{ark.teacher_name}}">塾师：{{ark.teacher_name}}</text>
-        <text class="captain-text" wx:if="{{ark.captain_id}}">舟长：#{{ark.captain_id}}</text>
+        <text class="captain-text" wx:if="{{captainName}}">舟长：{{captainName}}</text>
       </view>
     </view>
 
@@ -42,9 +42,8 @@
       >
         <view class="member-row">
           <view class="member-info">
-            <text class="member-name">{{m.username}}</text>
-            <text class="captain-tag" wx:if="{{m.is_captain}}">⭐ 舟长</text>
-            <text class="gender-tag {{genderClass(m.gender)}}" wx:if="{{m.gender}}">{{m.gender}}</text>
+            <text class="member-name {{genderClass(m.gender)}}">{{m.username}}</text>
+            <text class="captain-star" wx:if="{{m.is_captain}}">⭐</text>
           </view>
           <view class="member-progress">
             <text class="member-progress-text">{{m.current_serial}}/{{m.total_chapters}} ({{m.progress_percent}}%)</text>

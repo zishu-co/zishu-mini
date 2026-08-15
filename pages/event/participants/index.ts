@@ -9,6 +9,16 @@ import {
   ParticipantItem,
 } from '../../../services/event/event';
 
+/**
+ * 时间格式化：把 "2024-01-01T12:30:00.123456" / "2024-01-01 12:30:00" 截取为 "YYYY-MM-DD HH:MM"
+ */
+function formatTime(input?: string | null): string {
+  if (!input) return '';
+  const m = String(input).match(/(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
+  if (m) return `${m[1]} ${m[2]}`;
+  return String(input);
+}
+
 interface IParticipantsPageData {
   eventId: number;
   eventInfo: EventItem | null;
@@ -53,8 +63,14 @@ Page<IParticipantsPageData, IParticipantsPageData>({
         fetchParticipants(this.data.eventId).catch(() => []),
       ]);
       this.setData({
-        eventInfo: event,
-        participants: Array.isArray(participants) ? participants : [],
+        eventInfo: event ? { ...event, start_time: formatTime(event.start_time) } : null,
+        participants: Array.isArray(participants)
+          ? participants.map((p: ParticipantItem) => ({
+              ...p,
+              join_time: formatTime(p.join_time),
+              sign_in_time: formatTime(p.sign_in_time),
+            }))
+          : [],
         loading: false,
       });
     } catch (e) {
@@ -85,10 +101,5 @@ Page<IParticipantsPageData, IParticipantsPageData>({
     wx.navigateTo({
       url: `/pages/event/webview/index?url=${encodeURIComponent(url)}`,
     });
-  },
-
-  /** 返回活动列表 */
-  onGoBack() {
-    wx.navigateBack();
   },
 });

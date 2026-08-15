@@ -377,17 +377,19 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
           return;
         }
 
-        // 401 未授权
-        if (statusCode === 401) {
-          if (options.showLoading) wx.hideLoading();
-          handleUnauthorized(options, resolve, reject);
-          return;
-        }
-
-        // 5000 业务错误码（Token 过期）
+        // 5000 业务错误码（Token 过期）：优先判断，触发无感刷新并重试
+        // 注意：后端对过期 token 返回 HTTP 401 + detail.code 5000，
+        // 因此必须先于 401 分支判断，否则永远不会走到刷新逻辑
         if (responseData.detail?.code === 5000 && !options.url.includes('/refresh')) {
           if (options.showLoading) wx.hideLoading();
           handleTokenExpired(options, resolve, reject);
+          return;
+        }
+
+        // 401 未授权（非 token 过期场景：如未登录、无权限等）
+        if (statusCode === 401) {
+          if (options.showLoading) wx.hideLoading();
+          handleUnauthorized(options, resolve, reject);
           return;
         }
 

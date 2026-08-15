@@ -21,6 +21,7 @@ interface IPageData {
   arkId: number;
   loading: boolean;
   ark: Partial<ArkDetail>;
+  captainName: string;
   courseTitle: string;
   currentUserId: number;
   isCaptain: boolean;
@@ -42,6 +43,7 @@ Page<IPageData, IPageData>({
     arkId: 0,
     loading: true,
     ark: {},
+    captainName: '',
     courseTitle: '',
     currentUserId: 0,
     isCaptain: false,
@@ -83,7 +85,10 @@ Page<IPageData, IPageData>({
       const isCaptain = ark.captain_id === myUserId && ark.stage === '已成舟';
       const isTeacher = ark.teacher_id === myUserId;
       const isMember = !!ark.members?.find((m: ArkDetailMember) => m.user_id === myUserId);
-      this.setData({ ark, isCaptain, isTeacher, isMember });
+      // 从成员列表中找出舟长的名字
+      const captain = ark.members?.find((m: ArkDetailMember) => m.is_captain);
+      const captainName = captain?.username || '';
+      this.setData({ ark, captainName, isCaptain, isTeacher, isMember });
     } catch (e) {
       console.error('[ark-detail] loadData error:', e);
       wx.showToast({ title: '加载失败', icon: 'none' });

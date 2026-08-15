@@ -119,7 +119,7 @@ Page<IEventPageData, IEventPageData>({
     const res = await wx.showModal({
       title: '报名确认',
       content: '请先确认您已在「活动行」或「粗门」平台完成报名，再点击确认加入',
-      confirmText: '已报名，确认加入',
+      confirmText: '确认加入',
       cancelText: '取消',
     });
     if (!res.confirm) return;

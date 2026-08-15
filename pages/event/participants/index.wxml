@@ -35,7 +35,6 @@
           <text>{{eventInfo.desc}}</text>
         </view>
         <view class="info-actions">
-          <button class="btn-secondary" bindtap="onGoBack">返回活动列表</button>
           <button
             class="btn-primary"
             wx:if="{{eventInfo.url}}"
@@ -67,17 +66,6 @@
         <text class="row-value">{{item.join_time}}</text>
       </view>
       <view class="participant-row">
-        <text class="row-label">💰 支付</text>
-        <view class="row-value">
-          <view class="tag {{item.is_payed ? 'tag-success' : 'tag-default'}}">
-            <text>{{item.is_payed ? '已支付' : '未支付'}}</text>
-          </view>
-          <text class="amount" wx:if="{{item.payed_amount > 0}}">¥{{item.payed_amount}}</text>
-          <text class="amount" wx:if="{{item.payed_amount > 0 && item.payment_method}}"> · {{item.payment_method}}</text>
-        </view>
-      </view>
-      <view class="participant-row">
-        <text class="row-label">✓ 签到</text>
         <view class="row-value">
           <view class="tag {{item.is_signed_in ? 'tag-success' : 'tag-info'}}">
             <text>{{item.is_signed_in ? '已签到' : '未签到'}}</text>
