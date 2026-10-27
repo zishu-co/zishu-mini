@@ -69,6 +69,21 @@ Page<IMyPageData, any>({
     }
   },
 
+  onPullDownRefresh() {
+    this.init()
+    setTimeout(() => {
+      wx.stopPullDownRefresh()
+    }, 400)
+  },
+
+  onShareAppMessage() {
+    const nickName = this.data.userInfo?.nickName || '自塾学友'
+    return {
+      title: `${nickName} 邀请你加入自塾 AI 英语共学，结伴闯关不孤单！`,
+      path: '/pages/all/index',
+    }
+  },
+
   init() {
     const globalData = _appMy.globalData || {}
     const storedUserInfo = wx.getStorageSync('userInfo') || {}

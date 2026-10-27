@@ -50,6 +50,19 @@ Page({
     this.fetchData()
   },
 
+  onPullDownRefresh() {
+    this.fetchData().finally(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: `我在自塾已达到「${this.data.levelTitle}」，快来开启 AI 英语共学！`,
+      path: '/pages/all/index',
+    }
+  },
+
   applyTabFilter(list: any[], tab: string) {
     if (tab === 'income') {
       return list.filter((item: any) => !item._isNeg)
@@ -72,7 +85,7 @@ Page({
 
     wx.showLoading({ title: '加载中...', mask: true })
 
-    fetchShuzhi(userId)
+    return fetchShuzhi(userId)
       .then((res: any) => {
         wx.hideLoading()
         if (Array.isArray(res)) {

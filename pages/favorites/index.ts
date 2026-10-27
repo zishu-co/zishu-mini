@@ -16,6 +16,19 @@ Page({
     this.fetchFolders()
   },
 
+  onPullDownRefresh() {
+    this.fetchFolders().finally(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '自塾精选知识库 · 我的收藏夹',
+      path: '/pages/all/index',
+    }
+  },
+
   computeTotalItems(folders: any[]) {
     return (folders || []).reduce((acc: number, f: any) => acc + (Number(f.item_num) || 0), 0)
   },
@@ -77,7 +90,7 @@ Page({
   fetchFolders() {
     wx.showLoading({ title: '加载中...', mask: true })
 
-    fetchFolder()
+    return fetchFolder()
       .then((res: any) => {
         wx.hideLoading()
         const folders = Array.isArray(res) ? res : []

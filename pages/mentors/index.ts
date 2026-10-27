@@ -9,12 +9,20 @@ Page({
     listData: [] as any[],
     filteredList: [] as any[],
     searchKeyword: '',
+    statusFilter: 'all',
+    currentUserId: 0,
     shushiCount: 0,
     shushengCount: 0,
     loading: true,
   },
 
   onLoad() {
+    const uid =
+      Number(wx.getStorageSync('userId')) ||
+      Number(wx.getStorageSync('userInfo')?.userId) ||
+      Number(wx.getStorageSync('userInfo')?.id) ||
+      0
+    this.setData({ currentUserId: uid })
     this.fetchData()
   },
 
@@ -22,10 +30,23 @@ Page({
     this.fetchData().finally(() => wx.stopPullDownRefresh())
   },
 
-  applySearch(list: any[], keyword: string) {
+  onShareAppMessage() {
+    return {
+      title: '自塾师生共学广场 · 寻访领航塾师与共修同路人',
+      path: '/pages/mentors/index',
+    }
+  },
+
+  applySearch(list: any[], keyword: string, statusFilter?: string) {
     const kw = (keyword || '').trim().toLowerCase()
-    if (!kw) return list
+    const sf = statusFilter || this.data.statusFilter || 'all'
+    const uid = this.data.currentUserId
     return (list || []).filter((item: any) => {
+      if (sf === 'active' && !item._isActive) return false
+      if (sf === 'mine' && uid > 0 && Number(item.shushi_id) !== uid && Number(item.shusheng_id) !== uid) {
+        return false
+      }
+      if (!kw) return true
       const shushi = String(item.shushi_name || '').toLowerCase()
       const shusheng = String(item.shusheng_name || '').toLowerCase()
       const course = String(item.course_title || '').toLowerCase()
@@ -39,13 +60,20 @@ Page({
 
   onSearchInput(e: any) {
     const searchKeyword = e.detail.value || ''
-    const filteredList = this.applySearch(this.data.listData, searchKeyword)
+    const filteredList = this.applySearch(this.data.listData, searchKeyword, this.data.statusFilter)
     this.setData({ searchKeyword, filteredList })
+  },
+
+  onSelectStatus(e: any) {
+    const statusFilter = e.currentTarget.dataset.status || 'all'
+    const filteredList = this.applySearch(this.data.listData, this.data.searchKeyword, statusFilter)
+    this.setData({ statusFilter, filteredList })
   },
 
   clearSearch() {
     this.setData({
       searchKeyword: '',
+      statusFilter: 'all',
       filteredList: this.data.listData,
     })
   },
@@ -63,10 +91,10 @@ Page({
           return {
             ...item,
             _startDate: item.start_time ? String(item.start_time).slice(0, 10) : '',
-            _isActive: item.status === '活跃' || item.status === '新选' || item.status === '改课',
+            _isActive: item.status === '活跃' || item.status === '新选' || item.status === '改课' || !item.status,
           }
         })
-        const filteredList = this.applySearch(listData, this.data.searchKeyword)
+        const filteredList = this.applySearch(listData, this.data.searchKeyword, this.data.statusFilter)
         this.setData({
           listData,
           filteredList,
@@ -90,6 +118,12 @@ Page({
     const courseId = e.currentTarget.dataset.courseid
     if (!courseId) return
     wx.navigateTo({ url: `/pages/course-detail/index?id=${courseId}` })
+  },
+
+  onGoLearnSheet(e: any) {
+    const userId = e.currentTarget.dataset.userid
+    if (!userId) return
+    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` })
   },
 
   async onGreetMentor(e: any) {

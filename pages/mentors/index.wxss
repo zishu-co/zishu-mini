@@ -39,6 +39,29 @@
   color: #64748b;
 }
 
+.filter-pills {
+  display: flex;
+  gap: 14rpx;
+  margin: 0 24rpx 18rpx;
+}
+
+.filter-pill {
+  padding: 12rpx 26rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 24rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+}
+
+.filter-pill.active {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24);
+}
+
 .search-bar {
   display: flex;
   align-items: center;
@@ -156,4 +179,44 @@
 .meta-text {
   font-size: 24rpx;
   color: #94a3b8;
+  flex: 1;
+}
+
+.empty-text {
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.reset-btn {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  background: rgba(160, 0, 255, 0.10);
+  color: #7c3aed;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.relation-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-left: auto;
+}
+
+.action-chip {
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.action-chip.secondary {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.action-chip.primary {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
 }

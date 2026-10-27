@@ -22,6 +22,7 @@
 - [x] **Slice 5–6（全塾同路人交友广场 `all` + 目标约谈 `goaltalk` + 师生 `mentors` / 监督 `supervise` / 结项 `followup`）**
 - [x] **Slice 7–8（沉浸式闯关答题 `test` / `exam` + 活动社交圈 `event` / `participants` + 个人中心 `my` / `agent`）**
 - [x] **Slice 9–10（全量页面旗舰级深度美化：`course-detail` 分段步进卡与选塾师弹窗、`ark-group` 4席位可视化舱、`exam` 题库搜索大厅、`report`/`report-detail` 成绩单与错题筛选、`inno`/`inno-detail` 里程碑与吸底认领栏、`shuzhi` 段位进度、`editprofile` 实时预览、`changepass` 密码强度计及全量子页面搜索筛选）**
+- [x] **Slice 11（全量子页面下拉刷新 `.json` 配置补齐、`supervise` 督学四状态看板筛选与鼓励互动、`mentors` 师生伴学筛选与一键请教、以及微信社交转发分享 `onShareAppMessage` 全覆盖）**
 - [x] **零无效 WXML 表达式验证 + 自动化契约与逻辑测试 100% 通过**
 
 ---

@@ -17,6 +17,26 @@
     </view>
   </view>
 
+  <!-- 筛选胶囊 -->
+  <view class="filter-pills">
+    <view
+      class="filter-pill {{statusFilter === 'all' ? 'active' : ''}}"
+      bindtap="onSelectStatus"
+      data-status="all"
+    >全部结对</view>
+    <view
+      class="filter-pill {{statusFilter === 'active' ? 'active' : ''}}"
+      bindtap="onSelectStatus"
+      data-status="active"
+    >🔥 伴学进行中</view>
+    <view
+      wx:if="{{currentUserId > 0}}"
+      class="filter-pill {{statusFilter === 'mine' ? 'active' : ''}}"
+      bindtap="onSelectStatus"
+      data-status="mine"
+    >🌟 与我相关</view>
+  </view>
+
   <!-- 实时关键词搜索 -->
   <view class="search-bar">
     <text class="search-icon">🔍</text>
@@ -27,7 +47,7 @@
       value="{{searchKeyword}}"
       bindinput="onSearchInput"
     />
-    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">重置</text>
   </view>
 
   <!-- 列表 -->
@@ -36,7 +56,10 @@
       <view class="loading-row"><text>加载师生结对关系中...</text></view>
     </view>
     <view wx:elif="{{filteredList.length === 0}}">
-      <view class="empty-row"><text>{{searchKeyword ? '未找到匹配的师生结对关系' : '暂无师生结对关系'}}</text></view>
+      <view class="empty-row">
+        <text class="empty-text">{{searchKeyword || statusFilter !== 'all' ? '未找到匹配的师生结对关系' : '暂无师生结对关系'}}</text>
+        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">查看全部结对</view>
+      </view>
     </view>
     <view wx:else>
       <view class="relation-card" wx:for="{{filteredList}}" wx:key="id">
@@ -48,12 +71,16 @@
             data-name="{{item.shushi_name}}"
             data-course="{{item.course_title}}"
           >
-            <text class="person-role">💎 塾师（点击可约聊）</text>
+            <text class="person-role">💎 领航塾师</text>
             <text class="person-name">{{item.shushi_name}}</text>
           </view>
           <text class="arrow">🤝</text>
-          <view class="person-info">
-            <text class="person-role">🌱 塾生</text>
+          <view
+            class="person-info"
+            bindtap="onGoLearnSheet"
+            data-userid="{{item.shusheng_id}}"
+          >
+            <text class="person-role">🌱 共修塾生</text>
             <text class="person-name">{{item.shusheng_name}}</text>
           </view>
         </view>
@@ -69,6 +96,22 @@
         <view class="relation-meta">
           <text class="status-tag {{item._isActive ? 'active' : ''}}">{{item.status || '结对中'}}</text>
           <text class="meta-text" wx:if="{{item._startDate}}">结对日期：{{item._startDate}}</text>
+          <view class="relation-actions">
+            <text
+              wx:if="{{item.shusheng_id}}"
+              class="action-chip secondary"
+              bindtap="onGoLearnSheet"
+              data-userid="{{item.shusheng_id}}"
+            >📋 学习单</text>
+            <text
+              wx:if="{{item.shushi_id}}"
+              class="action-chip primary"
+              bindtap="onGreetMentor"
+              data-userid="{{item.shushi_id}}"
+              data-name="{{item.shushi_name}}"
+              data-course="{{item.course_title}}"
+            >👋 请教塾师</text>
+          </view>
         </view>
       </view>
     </view>
