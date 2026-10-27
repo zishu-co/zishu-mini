@@ -19,10 +19,19 @@
 
 .stat-card {
   flex: 1;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.90);
   border-radius: 16rpx;
-  padding: 22rpx 14rpx;
+  padding: 20rpx 10rpx;
   text-align: center;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.stat-card-active {
+  background: #ffffff;
+  border-color: #fde047;
+  transform: translateY(-2rpx);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.12);
 }
 
 .stat-num {
@@ -35,6 +44,7 @@
 }
 .stat-num.danger { color: #e94560; }
 .stat-num.warning { color: #f97316; }
+.stat-num.success { color: #16a34a; }
 
 .stat-label {
   font-size: 22rpx;
@@ -162,4 +172,45 @@
   font-size: 24rpx;
   color: #16a34a;
   font-weight: 600;
+}
+
+.empty-text {
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.reset-btn {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  background: rgba(160, 0, 255, 0.10);
+  color: #7c3aed;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.record-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f1f5f9;
+}
+
+.action-pill {
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.action-pill.secondary {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.action-pill.primary {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
 }

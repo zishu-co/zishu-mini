@@ -7,8 +7,10 @@ Page({
     listData: [] as any[],
     filteredList: [] as any[],
     searchKeyword: '',
+    statusFilter: 'all',
     overdueCount: 0,
     nearCount: 0,
+    normalCount: 0,
     loading: true,
   },
 
@@ -20,10 +22,21 @@ Page({
     this.fetchData().finally(() => wx.stopPullDownRefresh())
   },
 
-  applySearch(list: any[], keyword: string) {
+  onShareAppMessage() {
+    return {
+      title: '自塾学习监督看板 · 结伴督学共同进阶',
+      path: '/pages/supervise/index',
+    }
+  },
+
+  applySearch(list: any[], keyword: string, statusFilter?: string) {
     const kw = (keyword || '').trim().toLowerCase()
-    if (!kw) return list
+    const sf = statusFilter || this.data.statusFilter || 'all'
     return (list || []).filter((item: any) => {
+      if (sf === 'overdue' && !item._isOverdue) return false
+      if (sf === 'near' && !item._isNear) return false
+      if (sf === 'normal' && (item._isOverdue || item._isNear)) return false
+      if (!kw) return true
       const user = String(item.user_name || '').toLowerCase()
       const shushi = String(item.shushi_name || '').toLowerCase()
       const course = String(item.course_title || '').toLowerCase()
@@ -39,13 +52,20 @@ Page({
 
   onSearchInput(e: any) {
     const searchKeyword = e.detail.value || ''
-    const filteredList = this.applySearch(this.data.listData, searchKeyword)
+    const filteredList = this.applySearch(this.data.listData, searchKeyword, this.data.statusFilter)
     this.setData({ searchKeyword, filteredList })
+  },
+
+  onSelectStatus(e: any) {
+    const statusFilter = e.currentTarget.dataset.status || 'all'
+    const filteredList = this.applySearch(this.data.listData, this.data.searchKeyword, statusFilter)
+    this.setData({ statusFilter, filteredList })
   },
 
   clearSearch() {
     this.setData({
       searchKeyword: '',
+      statusFilter: 'all',
       filteredList: this.data.listData,
     })
   },
@@ -60,22 +80,30 @@ Page({
       const raw = Array.isArray(res) ? res : []
       let overdueCount = 0
       let nearCount = 0
+      let normalCount = 0
       const listData = raw.map((r: any) => {
         const cls = this.getDeadlineClass(r.deadline)
-        if (cls === 'red' || cls === 'purple') overdueCount += 1
-        if (cls === 'orange' || cls === 'blue') nearCount += 1
+        const isOverdue = cls === 'red' || cls === 'purple'
+        const isNear = cls === 'orange' || cls === 'blue'
+        if (isOverdue) overdueCount += 1
+        else if (isNear) nearCount += 1
+        else normalCount += 1
         return {
           ...r,
           _deadlineClass: cls,
+          _isOverdue: isOverdue,
+          _isNear: isNear,
           _deadlineStr: r.deadline ? String(r.deadline).slice(0, 10) : '-',
+          _statusLabel: isOverdue ? '⚠️ 已逾期' : isNear ? '⏳ 即将到期' : '✅ 正常推进',
         }
       })
-      const filteredList = this.applySearch(listData, this.data.searchKeyword)
+      const filteredList = this.applySearch(listData, this.data.searchKeyword, this.data.statusFilter)
       this.setData({
         listData,
         filteredList,
         overdueCount,
         nearCount,
+        normalCount,
         loading: false,
       })
     } catch (e) {
@@ -84,6 +112,7 @@ Page({
         filteredList: [],
         overdueCount: 0,
         nearCount: 0,
+        normalCount: 0,
         loading: false,
       })
     }
@@ -93,6 +122,12 @@ Page({
     const courseId = e.currentTarget.dataset.courseid
     if (!courseId) return
     wx.navigateTo({ url: `/pages/course-detail/index?id=${courseId}` })
+  },
+
+  onGoLearnSheet(e: any) {
+    const userId = e.currentTarget.dataset.userid
+    if (!userId) return
+    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` })
   },
 
   async onNudgePeer(e: any) {
