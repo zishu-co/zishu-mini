@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fetchFolder, fetchFavor, deleteFavor } from '../../services/user/user'
+import { fetchFolder, fetchFavor, deleteFavor, newFolder } from '../../services/user/user'
 
 Page({
   data: {
@@ -45,6 +45,33 @@ Page({
 
   goToArticles() {
     wx.navigateTo({ url: '/pages/article/index' })
+  },
+
+  onCreateFolder() {
+    wx.showModal({
+      title: '新建收藏夹',
+      editable: true,
+      placeholderText: '请输入收藏夹名称（如：AI好课、精选文章）',
+      confirmText: '创建',
+      success: async (res) => {
+        if (!res.confirm) return
+        const name = String(res.content || '').trim()
+        if (!name) {
+          wx.showToast({ title: '请输入收藏夹名称', icon: 'none' })
+          return
+        }
+        try {
+          wx.showLoading({ title: '创建中...', mask: true })
+          await newFolder(name)
+          wx.hideLoading()
+          wx.showToast({ title: '已新建收藏夹', icon: 'success' })
+          this.fetchFolders()
+        } catch (err) {
+          wx.hideLoading()
+          wx.showToast({ title: '创建失败，请重试', icon: 'none' })
+        }
+      },
+    })
   },
 
   fetchFolders() {

@@ -7,6 +7,7 @@
 
 import { fetchProjectsFromApi, claimProject } from '../../services/inno/inno';
 import { Project } from '../../services/inno/inno';
+import { quickGreetPeer } from '../../services/user/user';
 
 type IInnoProjectView = Project & {
   _statusColor: string;
@@ -153,5 +154,53 @@ Page<IInnoDetailPageData, any>({
   isDeadlinePassed(deadline: string): boolean {
     if (!deadline) return false;
     return new Date(deadline) < new Date();
+  },
+
+  /** 联系项目发布人/执行人/指导塾师开展共创协作 */
+  onContactProjectPeer(e: any) {
+    const roleLabel = e.currentTarget.dataset.role || '项目伙伴';
+    const peerName = e.currentTarget.dataset.name || '';
+    const peerId = Number(e.currentTarget.dataset.userid || 0);
+    const title = this.data.project?.title || '创新项目';
+
+    if (!peerName || peerName === '待认领' || peerName === '—') {
+      wx.showToast({ title: '当前暂无对应成员', icon: 'none' });
+      return;
+    }
+
+    wx.showActionSheet({
+      itemList: [
+        `👋 发起《${title}》15分钟协作约聊`,
+        `🔍 在共学广场查找「${peerName}」`,
+      ],
+      success: async (res) => {
+        if (res.tapIndex === 0) {
+          if (peerId) {
+            try {
+              await quickGreetPeer({
+                target_user_id: peerId,
+                topic: `🚀 创新项目《${title}》协作交流（联系${roleLabel}：${peerName}）`,
+                planed_duration: 15,
+              });
+            } catch (err) {
+              // ignore
+            }
+          }
+          wx.showModal({
+            title: '🤝 已发起项目协作邀约',
+            content: `已向${roleLabel}「${peerName}」发送《${title}》协作沟通请求，可前往目标面谈页跟进时间。`,
+            confirmText: '去目标面谈',
+            cancelText: '知道了',
+            success: (m) => {
+              if (m.confirm) {
+                wx.navigateTo({ url: '/pages/goaltalk/index' });
+              }
+            },
+          });
+        } else if (res.tapIndex === 1) {
+          wx.navigateTo({ url: '/pages/all/index' });
+        }
+      },
+    });
   },
 });

@@ -60,17 +60,45 @@
     <view class="card">
       <view class="card-title-bar">项目信息</view>
       <view class="info-grid">
-        <view class="info-row">
+        <view
+          class="info-row clickable"
+          data-role="发布人"
+          data-name="{{project.publisher}}"
+          data-userid="{{project.publisher_id}}"
+          bindtap="onContactProjectPeer"
+        >
           <text class="info-label">发布人</text>
-          <text class="info-value">{{project.publisher || '—'}}</text>
+          <view class="info-value-with-action">
+            <text class="info-value">{{project.publisher || '—'}}</text>
+            <text wx:if="{{project.publisher}}" class="peer-contact-pill">👋 联系发布人 ›</text>
+          </view>
         </view>
-        <view class="info-row">
+        <view
+          class="info-row {{project.taker ? 'clickable' : ''}}"
+          data-role="执行人"
+          data-name="{{project.taker}}"
+          data-userid="{{project.taker_id}}"
+          bindtap="onContactProjectPeer"
+        >
           <text class="info-label">执行人</text>
-          <text class="info-value">{{project.taker || '待认领'}}</text>
+          <view class="info-value-with-action">
+            <text class="info-value">{{project.taker || '待认领'}}</text>
+            <text wx:if="{{project.taker}}" class="peer-contact-pill">🤝 约TA协作 ›</text>
+          </view>
         </view>
-        <view class="info-row" wx:if="{{project.shushi}}">
+        <view
+          class="info-row clickable"
+          wx:if="{{project.shushi}}"
+          data-role="指导塾师"
+          data-name="{{project.shushi}}"
+          data-userid="{{project.shushi_id}}"
+          bindtap="onContactProjectPeer"
+        >
           <text class="info-label">塾师</text>
-          <text class="info-value">{{project.shushi}}</text>
+          <view class="info-value-with-action">
+            <text class="info-value">{{project.shushi}}</text>
+            <text class="peer-contact-pill">🎓 请教塾师 ›</text>
+          </view>
         </view>
         <view class="info-row">
           <text class="info-label">赏金</text>
@@ -137,9 +165,12 @@
       <button
         wx:else
         class="btn-done in-progress"
-        disabled
+        data-role="执行人"
+        data-name="{{project.taker}}"
+        data-userid="{{project.taker_id}}"
+        bindtap="onContactProjectPeer"
       >
-        进行中 · {{project.taker}}
+        🤝 进行中 · 联系 {{project.taker}} 协作
       </button>
     </view>
 

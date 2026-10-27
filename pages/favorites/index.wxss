@@ -135,14 +135,43 @@
   border: none;
 }
 
+.folder-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 0 24rpx;
+}
+
 .folder-tabs {
+  flex: 1;
+  min-width: 0;
   display: flex;
   white-space: nowrap;
   background: #fff;
-  margin: 0 24rpx;
   border-radius: 18rpx;
   padding: 0 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.04);
+}
+
+.empty-folder-hint {
+  height: 84rpx;
+  align-items: center;
+  color: #94a3b8;
+  font-size: 26rpx;
+  padding: 0 24rpx;
+}
+
+.new-folder-btn {
+  flex-shrink: 0;
+  height: 84rpx;
+  line-height: 84rpx;
+  padding: 0 26rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 700;
+  box-shadow: 0 4rpx 14rpx rgba(124, 58, 237, 0.22);
 }
 
 .folder-tab {

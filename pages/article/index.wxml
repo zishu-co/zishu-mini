@@ -11,6 +11,32 @@
     <button class="login-btn" bindtap="goToLogin">去登录</button>
   </view>
 
+  <!-- 顶部筛选与搜索栏 -->
+  <view class="article-toolbar" wx:if="{{hasLogin}}">
+    <view class="article-tabs">
+      <view
+        class="article-tab {{articleTab === 'all' ? 'active' : ''}}"
+        data-tab="all"
+        bindtap="onTabChange"
+      >🌟 全塾精选 ({{allArticles.length}})</view>
+      <view
+        class="article-tab {{articleTab === 'mine' ? 'active' : ''}}"
+        data-tab="mine"
+        bindtap="onTabChange"
+      >📝 我的创作</view>
+    </view>
+    <view class="article-search-bar">
+      <text class="article-search-icon">🔍</text>
+      <input
+        class="article-search-input"
+        placeholder="搜索文章标题、作者或正文关键词..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <text wx:if="{{searchKeyword}}" class="article-search-clear" bindtap="onClearSearch">✕</text>
+    </view>
+  </view>
+
   <!-- 加载状态 -->
   <view class="loading" wx:if="{{loading && hasLogin}}">
     <text>加载中...</text>
@@ -70,6 +96,11 @@
           <text user-select="true">{{currentArticle.content || '暂无正文内容'}}</text>
         </view>
       </scroll-view>
+
+      <view class="reader-footer" wx:if="{{currentArticle}}">
+        <view class="reader-action-btn secondary" bindtap="onGreetAuthor">👋 约作者交流</view>
+        <view class="reader-action-btn primary" bindtap="onFavorArticle">⭐ 收藏文章</view>
+      </view>
     </view>
   </view>
 

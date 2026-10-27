@@ -240,6 +240,25 @@ page {
   color: #333;
 }
 
+.info-value-with-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.peer-contact-pill {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border: 1rpx solid rgba(124, 58, 237, 0.25);
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+
 .info-value.bonus {
   color: #fa4126;
   font-weight: bold;

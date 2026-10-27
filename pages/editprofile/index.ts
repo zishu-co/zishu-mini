@@ -17,11 +17,21 @@ function computeProfileMeta(form: any) {
   }
 }
 
+const SOCIAL_TAG_PRESETS = [
+  '#寻找2男2女方舟搭子',
+  '#考研考公冲刺',
+  '#AI与编程开发',
+  '#英语听说突破',
+  '#创业与产品实战',
+  '#早起打卡监督',
+]
+
 Page({
   data: {
     gender: '',
     avatarInitial: '塾',
     completenessPercent: 20,
+    socialTagPresets: SOCIAL_TAG_PRESETS,
     form: {
       name: '',
       gender: '',
@@ -97,6 +107,19 @@ Page({
 
   onDescInput(e: any) {
     this.updatePreviewMeta({ ...this.data.form, desc: e.detail.value })
+  },
+
+  onToggleSocialTag(e: any) {
+    const tag = e.currentTarget.dataset.tag
+    if (!tag) return
+    const currentDesc = String(this.data.form.desc || '').trim()
+    let nextDesc = currentDesc
+    if (currentDesc.includes(tag)) {
+      nextDesc = currentDesc.replace(tag, '').replace(/\s{2,}/g, ' ').trim()
+    } else {
+      nextDesc = currentDesc ? `${currentDesc} ${tag}` : tag
+    }
+    this.updatePreviewMeta({ ...this.data.form, desc: nextDesc.slice(0, 500) })
   },
 
   submitForm() {

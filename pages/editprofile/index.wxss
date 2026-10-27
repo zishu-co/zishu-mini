@@ -170,6 +170,37 @@
   font-weight: 600;
 }
 
+.social-tag-presets {
+  margin-bottom: 24rpx;
+}
+
+.social-tag-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 14rpx;
+}
+
+.social-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.social-tag-chip {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  background: #f5f3ff;
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  color: #7c3aed;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.social-tag-chip:active {
+  background: #ede9fe;
+}
+
 .form-textarea {
   width: 100%;
   box-sizing: border-box;

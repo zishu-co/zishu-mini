@@ -17,19 +17,25 @@
     </view>
   </view>
 
-  <!-- 文件夹 Tab -->
-  <scroll-view class="folder-tabs" scroll-x wx:if="{{folders.length > 0}}">
-    <view
-      class="folder-tab {{activeIndex === index ? 'active' : ''}}"
-      wx:for="{{folders}}"
-      wx:key="folderid"
-      bindtap="switchFolder"
-      data-index="{{index}}"
-    >
-      <text>{{item.folder_title}}</text>
-      <text class="tab-count">{{item.item_num}}</text>
+  <!-- 文件夹 Tab + 新建收藏夹 -->
+  <view class="folder-tabs-row">
+    <scroll-view class="folder-tabs" scroll-x wx:if="{{folders.length > 0}}">
+      <view
+        class="folder-tab {{activeIndex === index ? 'active' : ''}}"
+        wx:for="{{folders}}"
+        wx:key="folderid"
+        bindtap="switchFolder"
+        data-index="{{index}}"
+      >
+        <text>{{item.folder_title}}</text>
+        <text class="tab-count">{{item.item_num}}</text>
+      </view>
+    </scroll-view>
+    <view class="folder-tabs empty-folder-hint" wx:else>
+      <text>暂未创建收藏夹</text>
     </view>
-  </scroll-view>
+    <view class="new-folder-btn" bindtap="onCreateFolder">＋ 新建</view>
+  </view>
 
   <!-- 实时关键词搜索 -->
   <view class="search-bar">

@@ -6,8 +6,9 @@
  */
 
 const app = getApp()
-import { getBaseUrl } from '../../services/base'
+import base, { getBaseUrl } from '../../services/base'
 import { fetchArticleDetail } from '../../services/article/article'
+import { fetchFolder, newFolder, quickGreetPeer } from '../../services/user/user'
 
 interface IArticleItem {
   articleid: number
@@ -22,6 +23,7 @@ interface IArticleItem {
 interface IReaderArticle {
   articleid: number
   title: string
+  author_id?: number
   author_name: string
   bumen?: string
   create_time?: string
@@ -31,7 +33,11 @@ interface IReaderArticle {
 interface IArticlePageData {
   hasLogin: boolean
   loading: boolean
+  allArticles: IArticleItem[]
   articles: IArticleItem[]
+  articleTab: 'all' | 'mine'
+  searchKeyword: string
+  currentUserId: number
   showReaderModal: boolean
   readerLoading: boolean
   currentArticle: IReaderArticle | null
@@ -56,7 +62,11 @@ Page<IArticlePageData, any>({
   data: {
     hasLogin: false,
     loading: false,
+    allArticles: [],
     articles: [],
+    articleTab: 'all',
+    searchKeyword: '',
+    currentUserId: 0,
     showReaderModal: false,
     readerLoading: false,
     currentArticle: null,
@@ -118,22 +128,23 @@ Page<IArticlePageData, any>({
       success: (res: any) => {
         if (res.data && Array.isArray(res.data)) {
           const storedUserInfo = wx.getStorageSync('userInfo')
-          const userId =
+          const userId = Number(
             wx.getStorageSync('userId') ||
-            storedUserInfo?.userId ||
-            storedUserInfo?.id ||
-            app.globalData?.userInfo?.userId ||
-            app.globalData?.userInfo?.id ||
-            0
+              storedUserInfo?.userId ||
+              storedUserInfo?.id ||
+              app.globalData?.userInfo?.userId ||
+              app.globalData?.userInfo?.id ||
+              0
+          )
           const allFormatted: IArticleItem[] = res.data.map((a: any) => ({
             ...a,
             _preview: stripHtmlTags(a.fulltext || ''),
           }))
-          const filtered = userId
-            ? allFormatted.filter((a: any) => Number(a.author_id) === Number(userId))
-            : allFormatted
-          const articles = filtered.length > 0 ? filtered : allFormatted
-          this.setData({ articles })
+          this.setData({
+            allArticles: allFormatted,
+            currentUserId: userId,
+          })
+          this.applyArticleFilter(this.data.articleTab, this.data.searchKeyword, allFormatted, userId)
 
           if (this.data.pendingArticleId > 0) {
             const targetId = this.data.pendingArticleId
@@ -141,7 +152,7 @@ Page<IArticlePageData, any>({
             this.openArticleReader(targetId)
           }
         } else {
-          this.setData({ articles: [] })
+          this.setData({ allArticles: [], articles: [] })
         }
       },
       fail: () => {
@@ -210,7 +221,7 @@ Page<IArticlePageData, any>({
   },
 
   openArticleReader(articleid: number) {
-    const fallbackItem = this.data.articles.find(
+    const fallbackItem = (this.data.allArticles.length ? this.data.allArticles : this.data.articles).find(
       (item: IArticleItem) => Number(item.articleid) === Number(articleid)
     )
     this.setData({
@@ -220,6 +231,7 @@ Page<IArticlePageData, any>({
         ? {
             articleid: fallbackItem.articleid,
             title: fallbackItem.title,
+            author_id: fallbackItem.author_id,
             author_name: fallbackItem.author_name,
             create_time: fallbackItem.create_time || '',
             content: fallbackItem._preview || stripHtmlTags(fallbackItem.fulltext || ''),
@@ -229,10 +241,96 @@ Page<IArticlePageData, any>({
 
     this.fetchArticleFulltext(Number(articleid)).then((article) => {
       this.setData({
-        currentArticle: article,
+        currentArticle: {
+          ...article,
+          author_id: article.author_id || fallbackItem?.author_id,
+        },
         readerLoading: false,
       })
     })
+  },
+
+  applyArticleFilter(
+    tab: 'all' | 'mine',
+    keyword: string,
+    sourceList = this.data.allArticles,
+    uid = this.data.currentUserId
+  ) {
+    const kw = (keyword || '').trim().toLowerCase()
+    const articles = (sourceList || []).filter((a: IArticleItem) => {
+      if (tab === 'mine' && uid && Number(a.author_id) !== Number(uid)) {
+        return false
+      }
+      if (!kw) return true
+      const title = String(a.title || '').toLowerCase()
+      const author = String(a.author_name || '').toLowerCase()
+      const preview = String(a._preview || '').toLowerCase()
+      return title.includes(kw) || author.includes(kw) || preview.includes(kw)
+    })
+    this.setData({
+      articleTab: tab,
+      searchKeyword: keyword,
+      articles,
+    })
+  },
+
+  onTabChange(e: any) {
+    const tab = (e.currentTarget.dataset.tab || 'all') as 'all' | 'mine'
+    if (tab === this.data.articleTab) return
+    this.applyArticleFilter(tab, this.data.searchKeyword)
+  },
+
+  onSearchInput(e: any) {
+    const kw = e.detail.value || ''
+    this.applyArticleFilter(this.data.articleTab, kw)
+  },
+
+  onClearSearch() {
+    this.applyArticleFilter(this.data.articleTab, '')
+  },
+
+  async onFavorArticle() {
+    const cur = this.data.currentArticle
+    if (!cur || !cur.articleid) return
+    try {
+      let folders: any[] = (await fetchFolder().catch(() => [])) || []
+      if (!Array.isArray(folders) || folders.length === 0) {
+        const created: any = await newFolder('精选专栏')
+        folders = [{ folderid: created?.newfid || 1, folder_title: '精选专栏', selected: true }]
+      } else {
+        folders = folders.map((f: any, idx: number) => ({
+          ...f,
+          selected: idx === 0,
+        }))
+      }
+      await base.post('/api/users/add_favor', {
+        target_id: cur.articleid,
+        target_type: '文章',
+        folderlist: JSON.stringify(folders),
+      })
+      wx.showToast({ title: `⭐ 已收藏至「${folders[0].folder_title || '收藏夹'}」`, icon: 'none' })
+    } catch (err) {
+      wx.showToast({ title: '收藏失败，请稍后重试', icon: 'none' })
+    }
+  },
+
+  async onGreetAuthor() {
+    const cur = this.data.currentArticle
+    if (!cur) return
+    const authorName = cur.author_name || '专栏作者'
+    const authorId = Number(cur.author_id || 0)
+    if (authorId) {
+      try {
+        await quickGreetPeer({
+          target_user_id: authorId,
+          topic: `📖 拜读专栏《${cur.title}》· 15分钟共学交流`,
+          planed_duration: 15,
+        })
+      } catch (err) {
+        // ignore
+      }
+    }
+    wx.showToast({ title: `👋 已向作者 ${authorName} 发送交流邀约`, icon: 'none' })
   },
 
   onViewArticle(e: any) {

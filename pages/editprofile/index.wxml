@@ -75,8 +75,21 @@
       />
     </view>
 
-    <!-- 知识资产 -->
-    <view class="section-title" style="margin-top: 48rpx;">知识资产</view>
+    <!-- 知识资产与交友标签 -->
+    <view class="section-title" style="margin-top: 48rpx;">共学交友标签 & 知识资产</view>
+
+    <view class="social-tag-presets">
+      <text class="social-tag-hint">点击快捷添加共学兴趣标签（将在同路人广场展示）：</text>
+      <view class="social-tag-list">
+        <view
+          class="social-tag-chip"
+          wx:for="{{socialTagPresets}}"
+          wx:key="*this"
+          data-tag="{{item}}"
+          bindtap="onToggleSocialTag"
+        >{{item}}</view>
+      </view>
+    </view>
 
     <view class="form-item">
       <textarea
