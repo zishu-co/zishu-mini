@@ -95,12 +95,16 @@
     </view>
     <view wx:else>
       <view class="member-card" wx:for="{{members}}" wx:key="id">
-        <view class="member-avatar {{item._genderClass}}">
+        <view
+          class="member-avatar {{item._genderClass}}"
+          data-item="{{item}}"
+          bindtap="onOpenPeerProfile"
+        >
           <text class="avatar-text">{{item._avatarChar}}</text>
           <text class="avatar-badge">{{item._levelBadge}}</text>
         </view>
         <view class="member-info">
-          <view class="member-top">
+          <view class="member-top" data-item="{{item}}" bindtap="onOpenPeerProfile">
             <text class="member-name">{{item.username}}</text>
             <view class="level-pill level-{{item._levelNum}}">
               <text>{{item._levelBadge}} {{item._levelTitle}}</text>
@@ -125,6 +129,11 @@
 
           <!-- 互动按钮栏 -->
           <view class="member-actions">
+            <view
+              class="peer-btn ghost"
+              bindtap="onOpenPeerProfile"
+              data-item="{{item}}"
+            >👤 社交名片</view>
             <view
               class="peer-btn ghost"
               bindtap="onViewLearnSheet"
@@ -175,6 +184,63 @@
       <view class="greet-btn confirm" bindtap="onSendGreet">
         {{greetingSubmitting ? '发送中...' : '🚀 发送共学邀请'}}
       </view>
+    </view>
+  </view>
+
+  <!-- 101-profile.md: 同路人社交名片弹窗 -->
+  <view class="greet-mask" wx:if="{{showProfileModal}}" bindtap="onClosePeerProfile"></view>
+  <view class="greet-modal profile-modal" wx:if="{{showProfileModal && profilePeer}}">
+    <view class="profile-head">
+      <view class="member-avatar {{profilePeer._genderClass}}">
+        <text class="avatar-text">{{profilePeer._avatarChar}}</text>
+        <text class="avatar-badge">{{profilePeer._levelBadge}}</text>
+      </view>
+      <view class="profile-head-main">
+        <view class="profile-name-row">
+          <text class="greet-title">{{profilePeer.username}}</text>
+          <view class="level-pill level-{{profilePeer._levelNum}}">
+            <text>{{profilePeer._levelBadge}} {{profilePeer._levelTitle}}</text>
+          </view>
+        </view>
+        <text class="greet-sub">
+          {{profilePeer._genderLabel || '同频搭子'}} · 📍 {{profilePeer.location || '同城/线上'}}
+        </text>
+      </view>
+      <text class="greet-close" bindtap="onClosePeerProfile">✕</text>
+    </view>
+
+    <view class="profile-stats-grid">
+      <view class="profile-stat-box">
+        <text class="profile-stat-val">💎 {{profilePeer._shuzhiStr}}</text>
+        <text class="profile-stat-lbl">当前塾值</text>
+      </view>
+      <view class="profile-stat-box">
+        <text class="profile-stat-val">📚 {{profilePeer._learnHourStr}}h</text>
+        <text class="profile-stat-lbl">累计共学</text>
+      </view>
+      <view class="profile-stat-box">
+        <text class="profile-stat-val">🔥 {{profilePeer._hours7dStr || '0'}}h</text>
+        <text class="profile-stat-lbl">7日冲刺</text>
+      </view>
+    </view>
+
+    <view class="profile-goal-box">
+      <text class="profile-section-title">🎯 当前冲刺目标</text>
+      <text class="profile-goal-text">
+        {{profileGoal ? profileGoal.content : (profilePeer.goal || profilePeer.desc || '正在寻找 2男2女诺亚方舟共学搭子，欢迎随时破冰约聊！')}}
+      </text>
+      <view wx:if="{{profileGoal && profileGoal.process !== undefined}}" class="profile-goal-progress">
+        <text>当前进度：{{profileGoal.process || 0}}%</text>
+      </view>
+    </view>
+
+    <view class="greet-footer">
+      <view
+        class="greet-btn cancel"
+        data-userid="{{profilePeer.id}}"
+        bindtap="onViewLearnSheet"
+      >📖 查看学习单</view>
+      <view class="greet-btn confirm" bindtap="onGreetFromProfile">👋 15分钟破冰约学</view>
     </view>
   </view>
 </view>

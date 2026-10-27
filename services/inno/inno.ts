@@ -256,5 +256,50 @@ export function joinInnoGroup(data: {
   });
 }
 
+/** 102-attend.md: 获取我的小组周报出席记录 GET /api/inno/fetch_myattend */
+export function fetchMyAttend(): Promise<any[]> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/fetch_myattend',
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        resolve(Array.isArray(res.data) ? res.data : []);
+      },
+      fail: () => resolve([]),
+    });
+  });
+}
+
+/** 102-attend.md: 保存小组周报考勤汇报 POST /api/inno/save_attend_report */
+export function saveAttendReport(data: {
+  attend_id?: number;
+  group_id: number;
+  member_id?: number;
+  object: string;
+  contrib: string;
+  demand: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/save_attend_report',
+      method: 'POST',
+      data: {
+        attend_id: Number(data.attend_id || 0),
+        group_id: Number(data.group_id || 0),
+        member_id: Number(data.member_id || 0),
+        object: data.object || '',
+        contrib: data.contrib || '',
+        demand: data.demand || '',
+      },
+      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
 export const fetchInno = fetchInnoFromApi;
 export { fetchProjectsFromApi, claimProject };

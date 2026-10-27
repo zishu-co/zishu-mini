@@ -260,12 +260,17 @@
           class="fb-tab {{feedbackTab === 'submit' ? 'active' : ''}}"
           data-tab="submit"
           bindtap="onSwitchFeedbackTab"
-        >📝 提交建议/Bug</view>
+        >📝 提交建议</view>
         <view
           class="fb-tab {{feedbackTab === 'mine' ? 'active' : ''}}"
           data-tab="mine"
           bindtap="onSwitchFeedbackTab"
-        >📋 我的反馈 ({{myFeedbacks.length}})</view>
+        >📋 我的 ({{myFeedbacks.length}})</view>
+        <view
+          class="fb-tab {{feedbackTab === 'public' ? 'active' : ''}}"
+          data-tab="public"
+          bindtap="onSwitchFeedbackTab"
+        >🏆 共创墙 ({{publicFeedbacks.length}})</view>
       </view>
 
       <block wx:if="{{feedbackTab === 'submit'}}">
@@ -309,7 +314,7 @@
         </view>
       </block>
 
-      <block wx:else>
+      <block wx:elif="{{feedbackTab === 'mine'}}">
         <view class="fb-list">
           <view class="fb-empty" wx:if="{{myFeedbacks.length === 0}}">
             暂无历史反馈记录，快提交第一条共创建议赢取塾值吧！
@@ -323,6 +328,26 @@
             <view class="fb-item-meta">
               <text>{{item._dateStr}}</text>
               <text wx:if="{{item.shuzhi_reward > 0}}" class="fb-reward">💰 +{{item.shuzhi_reward}} 塾值</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 100-public.md: 公开共创荣誉墙 -->
+      <block wx:else>
+        <view class="fb-list">
+          <view class="fb-empty" wx:if="{{publicFeedbacks.length === 0}}">
+            暂无公开采纳的共创建议，快来成为第一位上榜的共创官！
+          </view>
+          <view class="fb-item" wx:for="{{publicFeedbacks}}" wx:key="id">
+            <view class="fb-item-top">
+              <text class="fb-item-title">🏆 {{item.title}}</text>
+              <text class="fb-reward" wx:if="{{item.shuzhi_reward > 0}}">💎 +{{item.shuzhi_reward}} 塾值</text>
+            </view>
+            <view class="fb-item-content">{{item.content}}</view>
+            <view class="fb-item-meta">
+              <text>共创人：{{item.username || '自塾学友'}}</text>
+              <text>{{item._dateStr}}</text>
             </view>
           </view>
         </view>

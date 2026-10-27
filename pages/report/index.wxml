@@ -4,9 +4,11 @@
     <view class="hero-head">
       <view>
         <text class="hero-title">学习汇报</text>
-        <text class="hero-sub">每一次测评都是成长的刻度</text>
+        <text class="hero-sub">每一次测评与学时申报都是成长的刻度</text>
       </view>
-      <view class="hero-tag" bindtap="goToExam">🏆 去题库闯关 ›</view>
+      <view class="hero-tag" bindtap="{{reportMode === 'hours' ? 'goToLearn' : 'goToExam'}}">
+        {{reportMode === 'hours' ? '📚 去申报学时 ›' : '🏆 去题库闯关 ›'}}
+      </view>
     </view>
 
     <view class="stats-grid">
@@ -19,12 +21,27 @@
         <text class="stat-lbl">平均得分</text>
       </view>
       <view class="stat-box">
-        <text class="stat-val">{{passRate}}%</text>
-        <text class="stat-lbl">通关率</text>
+        <text class="stat-val">{{totalGrantedHours}}h</text>
+        <text class="stat-lbl">获批学时</text>
       </view>
     </view>
   </view>
 
+  <!-- 顶部分栏切换: 107-fetch-trans.md vs 115-report.md -->
+  <view class="mode-switch-bar">
+    <view
+      class="mode-switch-btn {{reportMode === 'exam' ? 'active' : ''}}"
+      data-mode="exam"
+      bindtap="onSwitchReportMode"
+    >🎯 闯关测评成绩 ({{records.length}})</view>
+    <view
+      class="mode-switch-btn {{reportMode === 'hours' ? 'active' : ''}}"
+      data-mode="hours"
+      bindtap="onSwitchReportMode"
+    >⏱️ 学时汇报详单 ({{hourReports.length}})</view>
+  </view>
+
+  <block wx:if="{{reportMode === 'exam'}}">
   <!-- 筛选标签栏 -->
   <view class="filter-tabs">
     <view
@@ -122,6 +139,34 @@
     <text class="empty-desc">快去完成一场闯关测评，检验你的学习成果吧</text>
     <button class="cta-btn" bindtap="goToExam">⚡ 去闯关答题</button>
   </view>
+  </block>
+
+  <!-- 115-report.md: 学时汇报详单视图 -->
+  <block wx:if="{{reportMode === 'hours'}}">
+    <view class="record-list" wx:if="{{!loading && hourReports.length > 0}}">
+      <view
+        class="record-card"
+        wx:for="{{hourReports}}"
+        wx:key="id"
+      >
+        <view class="record-top">
+          <view class="grade-badge grade-a">📚 {{item.target_type || '课程学习'}}</view>
+          <text class="record-score score-excellent">+{{item.time_granted || 0}}h</text>
+        </view>
+        <view class="record-title">{{item.target_title || '学时申报事项'}}</view>
+        <view class="record-footer">
+          <text class="record-meta">获批时间：{{item._grantTimeStr}}</text>
+          <text class="record-action" bindtap="goToLearn">继续共学 ›</text>
+        </view>
+      </view>
+    </view>
+    <view class="empty-card" wx:if="{{!loading && hourReports.length === 0}}">
+      <view class="empty-icon">⏱️</view>
+      <text class="empty-title">暂无学时汇报记录</text>
+      <text class="empty-desc">前往课程学习页完成章节测试并申报学时，即可在此查看详单</text>
+      <button class="cta-btn" bindtap="goToLearn">📚 去选课与申报学时</button>
+    </view>
+  </block>
 
   <view class="safe-bottom"></view>
 </view>

@@ -35,12 +35,13 @@
           <text>{{eventInfo.desc}}</text>
         </view>
         <view class="info-actions">
-          <button class="btn-secondary" bindtap="onGoBack">返回活动列表</button>
+          <button class="btn-secondary" bindtap="onGoBack">返回列表</button>
+          <button class="btn-primary" bindtap="onSelfSignIn">📍 现场签到</button>
           <button
             class="btn-primary"
             wx:if="{{eventInfo.url}}"
             bindtap="onOpenPromo"
-          >查看宣传文案</button>
+          >宣传文案</button>
         </view>
       </view>
     </view>

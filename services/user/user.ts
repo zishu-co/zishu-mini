@@ -258,3 +258,14 @@ export const fetchMyFeedbacks = () => {
     method: 'GET',
   })
 }
+
+/**
+ * 100-public.md: 获取公开共创反馈与奖励墙
+ * GET /api/feedback/public
+ */
+export const fetchPublicFeedbacks = () => {
+  return requestWithRefresh({
+    url: '/api/feedback/public',
+    method: 'GET',
+  })
+}

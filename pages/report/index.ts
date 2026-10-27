@@ -17,8 +17,11 @@ interface IReportData {
 
 Page<IReportPageData, any>({
   data: {
+    reportMode: 'exam',
     records: [],
     filteredRecords: [],
+    hourReports: [],
+    totalGrantedHours: '0.0',
     activeFilter: 'all',
     searchKeyword: '',
     avgScore: '0',
@@ -26,8 +29,17 @@ Page<IReportPageData, any>({
     loading: true,
   },
 
-  onLoad() {
+  onLoad(options?: any) {
     wx.setNavigationBarTitle({ title: '学习汇报' });
+    if (options && (options.mode === 'hours' || options.tab === 'hours')) {
+      this.setData({ reportMode: 'hours' });
+    }
+  },
+
+  onSwitchReportMode(e: any) {
+    const mode = (e.currentTarget.dataset.mode || 'exam') as 'exam' | 'hours';
+    if (mode === this.data.reportMode) return;
+    this.setData({ reportMode: mode });
   },
 
   onShow() {
@@ -142,6 +154,27 @@ Page<IReportPageData, any>({
       return;
     }
 
+    // 115-report.md: 同步拉取用户的学时汇报详单 (/api/users/fetch_reports/{userId})
+    wx.request({
+      url: getBaseUrl() + '/api/users/fetch_reports/' + userId,
+      method: 'GET',
+      header: { Authorization: 'Bearer ' + token, token },
+      success: (res: any) => {
+        if (res.statusCode === 200 && Array.isArray(res.data)) {
+          const hourReports = res.data.map((r: any) => ({
+            ...r,
+            _grantTimeStr: r.grant_time ? String(r.grant_time).slice(0, 16).replace('T', ' ') : '近期',
+            _hoursNum: Number(r.time_granted || 0),
+          }));
+          const sumHours = hourReports.reduce((acc: number, r: any) => acc + r._hoursNum, 0);
+          this.setData({
+            hourReports,
+            totalGrantedHours: sumHours.toFixed(1),
+          });
+        }
+      },
+    });
+
     wx.request({
       url: getBaseUrl() + '/api/ques/fetchtrans/by_id/' + userId,
       method: 'GET',
@@ -218,11 +251,23 @@ Page<IReportPageData, any>({
       },
     });
   },
+
+  goToLearn() {
+    wx.navigateTo({
+      url: '/pages/learn/index',
+      fail: () => {
+        wx.switchTab({ url: '/pages/learn/index' });
+      },
+    });
+  },
 });
 
 interface IReportPageData {
+  reportMode: 'exam' | 'hours';
   records: any[];
   filteredRecords: any[];
+  hourReports: any[];
+  totalGrantedHours: string;
   activeFilter: string;
   avgScore: string;
   passRate: number;

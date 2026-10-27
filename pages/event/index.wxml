@@ -9,8 +9,8 @@
         <view class="banner-sub">一起·发现更大的世界</view>
       </view>
       <view class="banner-counters">
+        <view class="counter-pill launch-btn" bindtap="onOpenCreateModal">＋ 发起共学局</view>
         <view class="counter-pill">🔥 进行中 {{currentEvents.length}} 场</view>
-        <view class="counter-pill subtle">📚 历史沉淀 {{historicalEvents.length}} 场</view>
       </view>
     </view>
 
@@ -36,6 +36,13 @@
       bindtap="onTabChange"
     >
       <text>当前活动 ({{filteredCurrentEvents.length}})</text>
+    </view>
+    <view
+      class="tab {{activeTab === 'mine' ? 'tab-active' : ''}}"
+      data-tab="mine"
+      bindtap="onTabChange"
+    >
+      <text>我的参与 ({{myActivities.length}})</text>
     </view>
     <view
       class="tab {{activeTab === 'historical' ? 'tab-active' : ''}}"
@@ -114,6 +121,50 @@
     </view>
   </block>
 
+  <!-- 103-my-activities.md: 我的参与列表 -->
+  <block wx:if="{{activeTab === 'mine'}}">
+    <view class="empty" wx:if="{{!loading && myActivities.length === 0}}">
+      <text class="empty-text">暂未报名任何共学活动</text>
+      <view class="empty-actions">
+        <button class="retry-btn" data-tab="current" bindtap="onTabChange">去看看当前活动</button>
+      </view>
+    </view>
+
+    <view
+      class="event-card"
+      wx:for="{{myActivities}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onCardTap"
+    >
+      <view class="card-body">
+        <view class="card-title">
+          {{item.participant && item.participant.is_signed_in ? '✅ 已签到' : '🎫 已报名'}} · {{item.title}}
+        </view>
+        <view class="card-meta">
+          <text class="meta-item">🕐 活动时间：{{item._startDateStr || item.start_time}}</text>
+          <text class="meta-item">📍 活动地点：{{item.location || '线上/待定'}}</text>
+          <text class="meta-item">👥 共 {{item.participant_count}} 位搭子参与</text>
+        </view>
+        <view class="card-actions">
+          <button
+            wx:if="{{!item.participant || !item.participant.is_signed_in}}"
+            class="btn-primary"
+            data-id="{{item.id}}"
+            data-pid="{{item.participant ? item.participant.id : 0}}"
+            catchtap="onSignInTap"
+          >📍 现场签到打卡</button>
+          <button
+            wx:else
+            class="btn-primary signed-btn"
+            catchtap="onCardTap"
+            data-id="{{item.id}}"
+          >✨ 已完成签到 · 查看搭子名单</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
   <!-- 历史活动列表 -->
   <block wx:if="{{activeTab === 'historical'}}">
     <view class="empty" wx:if="{{!loading && filteredHistoricalEvents.length === 0}}">
@@ -166,6 +217,63 @@
       </view>
     </view>
   </block>
+
+  <!-- 100-event-form.md: 发起同城共学活动弹窗 -->
+  <view class="event-modal-mask" wx:if="{{showCreateModal}}" bindtap="onCloseCreateModal">
+    <view class="event-modal-card" catchtap="stopEventModalBubble">
+      <view class="event-modal-title">🎉 发起同城/线上共学活动</view>
+      <view class="event-form-field">
+        <text class="event-form-label">活动主题 *</text>
+        <input
+          class="event-form-input"
+          placeholder="例如：周末 AI 编程与英语口语共学局"
+          value="{{createForm.title}}"
+          data-field="title"
+          bindinput="onCreateFormInput"
+        />
+      </view>
+      <view class="event-form-field">
+        <text class="event-form-label">地点 / 会议号 *</text>
+        <input
+          class="event-form-input"
+          placeholder="例如：上海静安共学空间 / 腾讯会议 888-999"
+          value="{{createForm.location}}"
+          data-field="location"
+          bindinput="onCreateFormInput"
+        />
+      </view>
+      <view class="event-form-row">
+        <view class="event-form-field half">
+          <text class="event-form-label">活动日期</text>
+          <picker mode="date" value="{{createForm.startDate}}" bindchange="onCreateDateChange">
+            <view class="event-form-picker">{{createForm.startDate || '选择日期'}}</view>
+          </picker>
+        </view>
+        <view class="event-form-field half">
+          <text class="event-form-label">开始时间</text>
+          <picker mode="time" value="{{createForm.startTime}}" bindchange="onCreateTimeChange">
+            <view class="event-form-picker">{{createForm.startTime || '14:00'}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="event-form-field">
+        <text class="event-form-label">活动亮点与说明</text>
+        <textarea
+          class="event-form-textarea"
+          placeholder="介绍活动流程、适合人群或破冰话题..."
+          value="{{createForm.desc}}"
+          data-field="desc"
+          bindinput="onCreateFormInput"
+        />
+      </view>
+      <view class="event-modal-actions">
+        <view class="event-modal-btn cancel" bindtap="onCloseCreateModal">取消</view>
+        <view class="event-modal-btn confirm" bindtap="onSubmitCreateEvent">
+          {{creatingEvent ? '发布中...' : '立即发布'}}
+        </view>
+      </view>
+    </view>
+  </view>
 
   <!-- 底部安全区 -->
   <view class="safe-bottom" />

@@ -87,6 +87,7 @@ function request<T = any>(options: {
       header: {
         'content-type': 'application/x-www-form-urlencoded',
         'token': getToken(),
+        'Authorization': getToken() ? 'Bearer ' + getToken() : '',
       },
       timeout: 30000,
       success: (res: any) => {
@@ -149,5 +150,45 @@ export function joinEvent(eventId: number): Promise<JoinEventResult> {
     data: { event_id: eventId },
     showLoading: true,
     loadingText: '报名中...',
+  })
+}
+
+/** 103-my-activities.md: 获取我参与的活动列表 */
+export function fetchMyActivities(): Promise<any[]> {
+  return request<any[]>({
+    url: '/api/event/my/activities/',
+  })
+}
+
+/** 100-event-form.md: 发起同城共学活动 */
+export function createCommunityEvent(data: {
+  title: string
+  location: string
+  start_time: string
+  desc?: string
+  url?: string
+  poster?: string
+  related_type?: string
+}): Promise<{ code: string; message: string; event_id?: number }> {
+  return request({
+    url: '/api/event/community_events/',
+    method: 'POST',
+    data,
+    showLoading: true,
+    loadingText: '发布活动中...',
+  })
+}
+
+/** 102-participant-list.md: 活动现场签到打卡 */
+export function selfSignInEvent(params: {
+  event_id?: number
+  participant_id?: number
+}): Promise<{ code: string; message: string; sign_in_time?: string }> {
+  return request({
+    url: '/api/event/participants/self_sign_in/',
+    method: 'POST',
+    data: params,
+    showLoading: true,
+    loadingText: '签到中...',
   })
 }

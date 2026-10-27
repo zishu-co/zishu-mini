@@ -1,8 +1,13 @@
 <view class="page">
   <!-- 顶部 Banner -->
   <view class="banner">
-    <view class="banner-title">专栏文章</view>
-    <view class="banner-sub">记录学习点滴 · 沉淀思考精华</view>
+    <view class="banner-top-row">
+      <view>
+        <view class="banner-title">专栏文章</view>
+        <view class="banner-sub">记录学习点滴 · 沉淀思考精华</view>
+      </view>
+      <view wx:if="{{hasLogin}}" class="banner-write-btn" bindtap="onOpenCreateArticle">＋ 写文章</view>
+    </view>
   </view>
 
   <!-- 未登录提示 -->
@@ -20,12 +25,17 @@
         bindtap="onTabChange"
       >🌟 全塾精选 ({{allArticles.length}})</view>
       <view
+        class="article-tab {{articleTab === 'zhuanlan' ? 'active' : ''}}"
+        data-tab="zhuanlan"
+        bindtap="onTabChange"
+      >📚 专栏合集 ({{zhuanlanList.length}})</view>
+      <view
         class="article-tab {{articleTab === 'mine' ? 'active' : ''}}"
         data-tab="mine"
         bindtap="onTabChange"
       >📝 我的创作</view>
     </view>
-    <view class="article-search-bar">
+    <view class="article-search-bar" wx:if="{{articleTab !== 'zhuanlan'}}">
       <text class="article-search-icon">🔍</text>
       <input
         class="article-search-input"
@@ -38,12 +48,65 @@
   </view>
 
   <!-- 加载状态 -->
-  <view class="loading" wx:if="{{loading && hasLogin}}">
+  <view class="loading" wx:if="{{(loading || zhuanlanLoading) && hasLogin}}">
     <text>加载中...</text>
   </view>
 
+  <!-- 专栏合集视图 (103-list-zhuanlan.md & 101-zhuanlan.md) -->
+  <view class="article-list" wx:if="{{!zhuanlanLoading && hasLogin && articleTab === 'zhuanlan'}}">
+    <block wx:if="{{!activeZhuanlan}}">
+      <view
+        class="article-item zhuanlan-card"
+        wx:for="{{zhuanlanList}}"
+        wx:key="zhuanlanid"
+        data-id="{{item.zhuanlanid}}"
+        data-item="{{item}}"
+        bindtap="onSelectZhuanlan"
+      >
+        <view class="article-header">
+          <text class="article-title">📚 {{item.zhuanlan_title || '未命名专栏'}}</text>
+          <text class="article-arrow">进入专栏 ›</text>
+        </view>
+        <view class="article-meta">
+          <text class="author">主理人：{{item.zhuanlan_author || '自塾主理人'}}</text>
+          <text class="read-badge">专栏编号 #{{item.zhuanlanid}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{zhuanlanList.length === 0}}">
+        <text>暂无专栏合集</text>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="zhuanlan-back-bar" bindtap="onBackToZhuanlanList">
+        <text class="zhuanlan-back-btn">← 返回全部专栏</text>
+        <text class="zhuanlan-active-title">📚 {{activeZhuanlan.zhuanlan_title || '专栏目录'}}</text>
+      </view>
+      <view
+        class="article-item"
+        wx:for="{{zhuanlanArticles}}"
+        wx:key="articleid"
+        bindtap="onViewArticle"
+        data-id="{{item.articleid}}"
+      >
+        <view class="article-header">
+          <text class="article-title">{{item.show_title || item.title}}</text>
+          <text class="article-arrow">›</text>
+        </view>
+        <view class="article-meta">
+          <text class="author">{{item.author_name || '自塾作者'}}</text>
+          <text class="read-badge" wx:if="{{item.zhuanlan_part}}">章节：{{item.zhuanlan_part}}</text>
+          <text class="date" wx:if="{{item.create_time}}">{{item.create_time}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{zhuanlanArticles.length === 0}}">
+        <text>该专栏下暂无文章</text>
+      </view>
+    </block>
+  </view>
+
   <!-- 文章列表 -->
-  <view class="article-list" wx:if="{{!loading && hasLogin}}">
+  <view class="article-list" wx:if="{{!loading && hasLogin && articleTab !== 'zhuanlan'}}">
     <view
       class="article-item"
       wx:for="{{articles}}"
@@ -120,8 +183,59 @@
 
       <view class="reader-footer" wx:if="{{currentArticle}}">
         <view class="reader-action-btn ghost" bindtap="onCopyArticle">📋 复制正文</view>
-        <view class="reader-action-btn secondary" bindtap="onGreetAuthor">👋 约作者交流</view>
+        <view
+          wx:if="{{currentUserId && currentArticle.author_id == currentUserId}}"
+          class="reader-action-btn secondary"
+          bindtap="onOpenEditArticle"
+        >✎ 编辑本文</view>
+        <view
+          wx:else
+          class="reader-action-btn secondary"
+          bindtap="onGreetAuthor"
+        >👋 约作者交流</view>
         <view class="reader-action-btn primary" bindtap="onFavorArticle">⭐ 收藏文章</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 102-edit.md: 写文章 / 编辑文章弹窗 -->
+  <view class="reader-mask" wx:if="{{showEditorModal}}" bindtap="onCloseEditorModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-topbar-left">
+          <view class="reader-badge">{{editorForm.id > 0 ? '✎ 编辑专栏文章' : '✨ 发布专栏文章'}}</view>
+        </view>
+        <view class="reader-close" bindtap="onCloseEditorModal">✕</view>
+      </view>
+      <scroll-view class="reader-scroll" scroll-y="true">
+        <view class="editor-field">
+          <text class="editor-label">文章标题 *</text>
+          <input
+            class="editor-input"
+            placeholder="请输入清晰有吸引力的文章标题"
+            value="{{editorForm.title}}"
+            data-field="title"
+            bindinput="onEditorInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">正文内容 *</text>
+          <textarea
+            class="editor-textarea"
+            placeholder="分享你的共学心得、项目复盘或思考笔记..."
+            maxlength="20000"
+            value="{{editorForm.content}}"
+            data-field="content"
+            bindinput="onEditorInput"
+          />
+        </view>
+      </scroll-view>
+      <view class="reader-footer">
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view
+          class="reader-action-btn primary"
+          bindtap="onSaveArticle"
+        >{{savingArticle ? '保存中...' : (editorForm.id > 0 ? '保存修改' : '立即发布')}}</view>
       </view>
     </view>
   </view>

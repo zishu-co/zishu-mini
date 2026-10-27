@@ -53,6 +53,12 @@ Page({
     selectedTopicIndex: 0,
     customTopic: '',
     greetingSubmitting: false,
+
+    // 101-profile.md: 同路人社交名片 Profile 弹窗
+    showProfileModal: false,
+    profilePeer: null as any,
+    profileGoal: null as any,
+    profileLoading: false,
   },
 
   onLoad() {
@@ -188,9 +194,56 @@ Page({
   },
 
   onViewLearnSheet(e: any) {
-    const userId = e.currentTarget.dataset.userid
+    const userId = e.currentTarget.dataset.userid || this.data.profilePeer?.id
     if (!userId) return
+    this.setData({ showProfileModal: false })
     wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` })
+  },
+
+  // ── 101-profile.md: 同路人社交名片弹窗 ─────────────────────────
+  async onOpenPeerProfile(e: any) {
+    const item = e.currentTarget.dataset.item
+    if (!item || !item.id) return
+    this.setData({
+      showProfileModal: true,
+      profilePeer: item,
+      profileGoal: null,
+      profileLoading: true,
+    })
+    try {
+      const [userRes, goalRes]: any = await Promise.all([
+        get(`/api/users/get_user/${item.id}`).catch(() => null),
+        get(`/api/users/fetch_goal/${item.id}`).catch(() => null),
+      ])
+      const mergedPeer = {
+        ...item,
+        location: userRes?.location || item.location || '同城/线上',
+        shuzhi: userRes?.shuzhi ?? item.shuzhi,
+      }
+      this.setData({
+        profilePeer: mergedPeer,
+        profileGoal: goalRes && goalRes.content ? goalRes : null,
+        profileLoading: false,
+      })
+    } catch (err) {
+      this.setData({ profileLoading: false })
+    }
+  },
+
+  onClosePeerProfile() {
+    this.setData({ showProfileModal: false, profilePeer: null })
+  },
+
+  onGreetFromProfile() {
+    const peer = this.data.profilePeer
+    if (!peer) return
+    this.setData({
+      showProfileModal: false,
+      showGreetModal: true,
+      greetTarget: peer,
+      selectedTopicIndex: 0,
+      customTopic: '',
+    })
   },
 
   onOpenGreetModal(e: any) {

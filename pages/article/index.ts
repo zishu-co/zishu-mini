@@ -39,7 +39,7 @@ interface IArticlePageData {
   loading: boolean
   allArticles: IArticleItem[]
   articles: IArticleItem[]
-  articleTab: 'all' | 'mine'
+  articleTab: 'all' | 'mine' | 'zhuanlan'
   searchKeyword: string
   currentUserId: number
   showReaderModal: boolean
@@ -47,6 +47,19 @@ interface IArticlePageData {
   readerFontSize: 'sm' | 'md' | 'lg'
   currentArticle: IReaderArticle | null
   pendingArticleId: number
+  // 103-list-zhuanlan.md & 101-zhuanlan.md: 专栏合集
+  zhuanlanList: any[]
+  activeZhuanlan: any | null
+  zhuanlanArticles: any[]
+  zhuanlanLoading: boolean
+  // 102-edit.md: 写文章 / 编辑文章
+  showEditorModal: boolean
+  savingArticle: boolean
+  editorForm: {
+    id: number
+    title: string
+    content: string
+  }
 }
 
 function stripHtmlTags(input: string): string {
@@ -77,6 +90,17 @@ Page<IArticlePageData, any>({
     readerFontSize: 'md',
     currentArticle: null,
     pendingArticleId: 0,
+    zhuanlanList: [],
+    activeZhuanlan: null,
+    zhuanlanArticles: [],
+    zhuanlanLoading: false,
+    showEditorModal: false,
+    savingArticle: false,
+    editorForm: {
+      id: 0,
+      title: '',
+      content: '',
+    },
   },
 
   onLoad(options?: any) {
@@ -144,9 +168,55 @@ Page<IArticlePageData, any>({
 
     if (hasLogin) {
       this.fetchArticles(done)
+      this.fetchZhuanlans()
     } else if (done) {
       done()
     }
+  },
+
+  fetchZhuanlans() {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ zhuanlanLoading: true })
+    wx.request({
+      url: `${getBaseUrl()}/api/article/showzhuanlan`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        if (Array.isArray(res.data)) {
+          this.setData({ zhuanlanList: res.data })
+        }
+      },
+      complete: () => {
+        this.setData({ zhuanlanLoading: false })
+      },
+    })
+  },
+
+  onSelectZhuanlan(e: any) {
+    const item = e.currentTarget.dataset.item
+    const zhuanlanid = Number(item?.zhuanlanid || e.currentTarget.dataset.id || 0)
+    if (!zhuanlanid) return
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ zhuanlanLoading: true, activeZhuanlan: item })
+    wx.request({
+      url: `${getBaseUrl()}/api/article/zhuanlan/${zhuanlanid}`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        const zdata = Array.isArray(res.data?.zdata) ? res.data.zdata : []
+        this.setData({
+          zhuanlanArticles: zdata,
+          activeZhuanlan: res.data?.zl || item,
+        })
+      },
+      complete: () => {
+        this.setData({ zhuanlanLoading: false })
+      },
+    })
+  },
+
+  onBackToZhuanlanList() {
+    this.setData({ activeZhuanlan: null, zhuanlanArticles: [] })
   },
 
   fetchArticles(done?: () => void) {
@@ -299,11 +369,21 @@ Page<IArticlePageData, any>({
   },
 
   applyArticleFilter(
-    tab: 'all' | 'mine',
+    tab: 'all' | 'mine' | 'zhuanlan',
     keyword: string,
     sourceList = this.data.allArticles,
     uid = this.data.currentUserId
   ) {
+    if (tab === 'zhuanlan') {
+      this.setData({
+        articleTab: 'zhuanlan',
+        searchKeyword: keyword,
+      })
+      if (!this.data.zhuanlanList.length) {
+        this.fetchZhuanlans()
+      }
+      return
+    }
     const kw = (keyword || '').trim().toLowerCase()
     const articles = (sourceList || []).filter((a: IArticleItem) => {
       if (tab === 'mine' && uid && Number(a.author_id) !== Number(uid)) {
@@ -323,9 +403,103 @@ Page<IArticlePageData, any>({
   },
 
   onTabChange(e: any) {
-    const tab = (e.currentTarget.dataset.tab || 'all') as 'all' | 'mine'
+    const tab = (e.currentTarget.dataset.tab || 'all') as 'all' | 'mine' | 'zhuanlan'
     if (tab === this.data.articleTab) return
     this.applyArticleFilter(tab, this.data.searchKeyword)
+  },
+
+  // ── 102-edit.md: 写文章 / 编辑文章 / 删除文章 ──────────────────
+  onOpenCreateArticle() {
+    if (!this.data.hasLogin) {
+      this.goToLogin()
+      return
+    }
+    this.setData({
+      showEditorModal: true,
+      editorForm: {
+        id: 0,
+        title: '',
+        content: '',
+      },
+    })
+  },
+
+  onOpenEditArticle() {
+    const cur = this.data.currentArticle
+    if (!cur || !cur.articleid) return
+    this.setData({
+      showReaderModal: false,
+      showEditorModal: true,
+      editorForm: {
+        id: Number(cur.articleid),
+        title: cur.title || '',
+        content: cur.content || '',
+      },
+    })
+  },
+
+  onCloseEditorModal() {
+    this.setData({ showEditorModal: false })
+  },
+
+  onEditorInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`editorForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSaveArticle() {
+    const { id, title, content } = this.data.editorForm
+    if (!String(title || '').trim()) {
+      wx.showToast({ title: '请输入文章标题', icon: 'none' })
+      return
+    }
+    if (!String(content || '').trim()) {
+      wx.showToast({ title: '请输入文章正文内容', icon: 'none' })
+      return
+    }
+    this.setData({ savingArticle: true })
+    try {
+      const res: any = await base.post('/api/article/save', {
+        id: Number(id || 0),
+        title: String(title).trim(),
+        content: String(content).trim(),
+      })
+      if (res && (res.result !== undefined || res.code === 200)) {
+        wx.showToast({ title: id > 0 ? '文章更新成功 ✨' : '文章发布成功 🎉', icon: 'success' })
+        this.setData({ showEditorModal: false })
+        this.fetchArticles()
+      } else {
+        wx.showToast({ title: res?.msg || '保存失败', icon: 'none' })
+      }
+    } catch (err) {
+      wx.showToast({ title: '保存失败，请稍后重试', icon: 'none' })
+    } finally {
+      this.setData({ savingArticle: false })
+    }
+  },
+
+  async onDeleteArticle() {
+    const cur = this.data.currentArticle
+    if (!cur || !cur.articleid) return
+    wx.showModal({
+      title: '删除文章',
+      content: `确定删除《${cur.title}》吗？`,
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          await base.post('/api/article/delete', { id: Number(cur.articleid) })
+          wx.showToast({ title: '已删除', icon: 'success' })
+          this.setData({ showReaderModal: false })
+          this.fetchArticles()
+        } catch (err) {
+          wx.showToast({ title: '删除失败', icon: 'none' })
+        }
+      },
+    })
   },
 
   onSearchInput(e: any) {

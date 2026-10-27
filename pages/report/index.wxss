@@ -72,6 +72,32 @@ page {
   color: #64748b;
 }
 
+.mode-switch-bar {
+  display: flex;
+  gap: 16rpx;
+  padding: 0 24rpx 20rpx;
+}
+
+.mode-switch-btn {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 12rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  color: #475569;
+  font-size: 26rpx;
+  font-weight: 700;
+  border: 2rpx solid #e2e8f0;
+  box-shadow: 0 2rpx 10rpx rgba(15, 23, 42, 0.04);
+}
+
+.mode-switch-btn.active {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.25);
+}
+
 .filter-tabs {
   display: flex;
   gap: 12rpx;

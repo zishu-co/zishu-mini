@@ -5,6 +5,7 @@
 import {
   getEvent,
   fetchParticipants,
+  selfSignInEvent,
   EventItem,
   ParticipantItem,
 } from '../../../services/event/event';
@@ -174,6 +175,21 @@ Page<IParticipantsPageData, any>({
       wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
     } else {
       wx.navigateTo({ url: '/pages/learn-sheet/index' });
+    }
+  },
+
+  async onSelfSignIn() {
+    if (!this.data.eventId) return;
+    try {
+      const res = await selfSignInEvent({ event_id: this.data.eventId });
+      if (res && res.code === '200') {
+        wx.showToast({ title: '现场签到成功 🎉', icon: 'success' });
+        this.loadData();
+      } else {
+        wx.showToast({ title: res?.message || '签到失败', icon: 'none' });
+      }
+    } catch (err: any) {
+      wx.showToast({ title: '请先报名该活动后再签到', icon: 'none' });
     }
   },
 

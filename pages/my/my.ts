@@ -8,7 +8,7 @@
 
 import { getUserArkList, ArkItem } from '../../services/learn/learn'
 import { fetchCurrentSelections } from '../../services/course/course'
-import { submitFeedback, fetchMyFeedbacks } from '../../services/user/user'
+import { submitFeedback, fetchMyFeedbacks, fetchPublicFeedbacks } from '../../services/user/user'
 import { getBaseUrl } from '../../services/base'
 
 const _appMy = getApp<any>()
@@ -60,9 +60,10 @@ Page<IMyPageData, any>({
     arkLoading: false,
     arkCount: 0,
     showFeedbackModal: false,
-    feedbackTab: 'submit' as 'submit' | 'mine',
+    feedbackTab: 'submit' as 'submit' | 'mine' | 'public',
     submittingFeedback: false,
     myFeedbacks: [] as any[],
+    publicFeedbacks: [] as any[],
     feedbackForm: {
       type: 'feature' as 'bug' | 'feature' | 'ux' | 'other',
       title: '',
@@ -309,6 +310,7 @@ Page<IMyPageData, any>({
       feedbackTab: 'submit',
     })
     this.loadMyFeedbacks()
+    this.loadPublicFeedbacks()
   },
 
   onCloseFeedbackModal() {
@@ -320,6 +322,22 @@ Page<IMyPageData, any>({
     this.setData({ feedbackTab: tab })
     if (tab === 'mine') {
       this.loadMyFeedbacks()
+    } else if (tab === 'public') {
+      this.loadPublicFeedbacks()
+    }
+  },
+
+  async loadPublicFeedbacks() {
+    try {
+      const res: any = await fetchPublicFeedbacks()
+      const raw = Array.isArray(res?.items) ? res.items : Array.isArray(res) ? res : []
+      const list = raw.map((item: any) => ({
+        ...item,
+        _dateStr: item.create_time ? String(item.create_time).slice(0, 10) : '',
+      }))
+      this.setData({ publicFeedbacks: list })
+    } catch {
+      this.setData({ publicFeedbacks: [] })
     }
   },
 

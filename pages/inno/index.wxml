@@ -213,6 +213,11 @@
           <view class="group-action-btns">
             <view
               class="group-join-btn"
+              catchtap="onOpenAttendModal"
+              data-group="{{item}}"
+            >📅 周报考勤</view>
+            <view
+              class="group-join-btn"
               catchtap="onOpenJoinGroupModal"
               data-group="{{item}}"
             >🤝 申请入组</view>
@@ -337,6 +342,49 @@
         <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitJoinGroup">
           {{submittingJoinGroup ? '提交中...' : '提交入组申请'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 102-attend.md: 小组周报考勤汇报弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showAttendModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">📅 小组周报考勤汇报</view>
+      <view class="inno-modal-sub">{{attendForm.groupname}}</view>
+
+      <view class="inno-field-label">本周目标 (Objective) *</view>
+      <input
+        class="inno-input"
+        value="{{attendForm.object}}"
+        placeholder="本周计划推进的核心目标..."
+        data-field="object"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-field-label">本周贡献与产出 (Contribution) *</view>
+      <textarea
+        class="inno-textarea"
+        value="{{attendForm.contrib}}"
+        placeholder="本周完成的课题进展、代码提交或文档产出..."
+        maxlength="500"
+        data-field="contrib"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-field-label">协作需求与求助 (Demand)</view>
+      <input
+        class="inno-input"
+        value="{{attendForm.demand}}"
+        placeholder="需要塾师或小组成员协助的事项（选填）"
+        data-field="demand"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitAttendReport">
+          {{submittingAttend ? '提交中...' : '保存周报考勤'}}
         </view>
       </view>
     </view>

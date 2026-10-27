@@ -13,6 +13,8 @@ import {
   addInnoProject,
   fetchAllGroupsFromApi,
   joinInnoGroup,
+  fetchMyAttend,
+  saveAttendReport,
   Project,
   TabItem,
 } from '../../services/inno/inno';
@@ -161,6 +163,17 @@ Page<IInnoPageData, any>({
       groupid: 1,
       groupname: '',
       reason: '',
+    },
+    showAttendModal: false,
+    submittingAttend: false,
+    attendForm: {
+      attend_id: 0,
+      group_id: 1,
+      groupname: '',
+      member_id: 0,
+      object: '',
+      contrib: '',
+      demand: '',
     },
   },
 
@@ -431,7 +444,96 @@ Page<IInnoPageData, any>({
     this.setData({
       showPublishModal: false,
       showJoinGroupModal: false,
+      showAttendModal: false,
     });
+  },
+
+  // ── 102-attend.md: 小组周报考勤汇报 ──────────────────────────
+  async onOpenAttendModal(e: any) {
+    const group = e.currentTarget.dataset.group;
+    if (!group) return;
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    if (!token) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+    const groupId = Number(group.id || 1);
+    this.setData({
+      showAttendModal: true,
+      attendForm: {
+        attend_id: 0,
+        group_id: groupId,
+        groupname: group.name || group.badge || '创新共创小组',
+        member_id: 0,
+        object: '',
+        contrib: '',
+        demand: '',
+      },
+    });
+    try {
+      const myGroups = await fetchMyAttend();
+      const matched = (myGroups || []).find(
+        (g: any) => Number(g.id) === groupId || g.groupname === group.name
+      );
+      if (matched) {
+        const userId = Number(wx.getStorageSync('userId') || 0);
+        const myReport = (matched.report_items || []).find(
+          (r: any) => Number(r.user_id) === userId
+        );
+        if (myReport) {
+          this.setData({
+            attendForm: {
+              attend_id: Number(myReport.attend_id || matched.group_attend_id || 0),
+              group_id: Number(matched.id || groupId),
+              groupname: matched.groupname || group.name,
+              member_id: Number(myReport.member_id || 0),
+              object: myReport.object || '',
+              contrib: myReport.contrib || '',
+              demand: myReport.demand || '',
+            },
+          });
+        }
+      }
+    } catch {
+      // ignore fallback
+    }
+  },
+
+  onAttendFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [`attendForm.${field}`]: e.detail.value });
+  },
+
+  async onSubmitAttendReport() {
+    if (this.data.submittingAttend) return;
+    const { attend_id, group_id, member_id, object, contrib, demand } = this.data.attendForm;
+    if (!String(object || '').trim() && !String(contrib || '').trim()) {
+      wx.showToast({ title: '请填写本周目标或贡献产出', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingAttend: true });
+    try {
+      const res = await saveAttendReport({
+        attend_id,
+        group_id,
+        member_id,
+        object: String(object || '').trim(),
+        contrib: String(contrib || '').trim(),
+        demand: String(demand || '').trim(),
+      });
+      if (res && (res.code === 200 || res.attend_id)) {
+        wx.showToast({ title: '📅 周报考勤已提交！', icon: 'success' });
+        this.setData({ showAttendModal: false });
+      } else {
+        wx.showToast({ title: res?.message || '周报已保存', icon: 'none' });
+        this.setData({ showAttendModal: false });
+      }
+    } catch {
+      wx.showToast({ title: '保存失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ submittingAttend: false });
+    }
   },
 
   /** 切换项目 / 小组视图 */
