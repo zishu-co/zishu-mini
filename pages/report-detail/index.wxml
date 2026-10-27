@@ -1,6 +1,10 @@
 <view class="page">
   <view class="header-card">
-    <view class="paper-title">{{papertitle}}</view>
+    <view class="header-top">
+      <view class="paper-title">{{papertitle}}</view>
+      <button class="retake-btn" bindtap="retakePaper">🔄 重新挑战本卷</button>
+    </view>
+
     <view class="score-row">
       <text class="score-label">得分</text>
       <text class="score-value {{test_score >= full_score * 0.6 ? 'pass' : 'fail'}}">
@@ -8,8 +12,33 @@
       </text>
       <text class="score-percent">({{scorePercent}}%)</text>
     </view>
+
+    <view class="accuracy-row">
+      <view class="acc-pill">答对 {{correctCount}} 题</view>
+      <view class="acc-pill wrong">答错 {{wrongCount}} 题</view>
+      <view class="acc-pill">正确率 {{scorePercent}}%</view>
+    </view>
+
     <view class="test-time" wx:if="{{test_time}}">
       <text>考试时间：{{test_time}}</text>
+    </view>
+  </view>
+
+  <!-- 题目筛选切换栏 -->
+  <view class="filter-bar" wx:if="{{!loading && questions.length > 0}}">
+    <view
+      class="filter-tab {{filterMode === 'all' ? 'active' : ''}}"
+      bindtap="switchFilterMode"
+      data-mode="all"
+    >
+      全部题目 ({{questions.length}})
+    </view>
+    <view
+      class="filter-tab {{filterMode === 'wrong' ? 'active' : ''}}"
+      bindtap="switchFilterMode"
+      data-mode="wrong"
+    >
+      仅看错题 ({{wrongCount}})
     </view>
   </view>
 
@@ -17,10 +46,10 @@
     <text>加载中...</text>
   </view>
 
-  <view class="question-list" wx:if="{{!loading && questions.length > 0}}">
-    <view class="question-card {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{questions}}" wx:key="quesid">
+  <view class="question-list" wx:if="{{!loading && filteredQuestions.length > 0}}">
+    <view class="question-card {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{filteredQuestions}}" wx:key="quesid">
       <view class="question-header">
-        <text class="question-num">第{{index + 1}}题</text>
+        <text class="question-num">第{{item._num}}题</text>
         <text class="question-type">{{item.ques_type}}</text>
         <text class="question-result {{item.is_correct ? 'result-correct' : 'result-wrong'}}">
           {{item.is_correct ? '✓ 正确' : '✗ 错误'}}
@@ -84,8 +113,8 @@
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!loading && questions.length == 0}}">
-    <text>暂无答题详情</text>
+  <view class="empty" wx:if="{{!loading && filteredQuestions.length == 0}}">
+    <text>{{filterMode === 'wrong' ? '🎉 恭喜！本卷没有错题' : '暂无答题详情'}}</text>
   </view>
 
   <view class="safe-bottom"></view>

@@ -4,18 +4,19 @@
     <t-loading theme="circular" size="40rpx" text="加载中..." />
   </view>
 
-  <!-- 项目不存在 -->
+  <!-- 项目不存在 / 加载失败 -->
   <view class="empty-state" wx:if="{{!loading && !project}}">
     <text class="empty-icon">📭</text>
-    <text class="empty-text">项目不存在或已被删除</text>
+    <text class="empty-text">项目不存在或加载失败</text>
+    <button class="retry-btn" bindtap="onRetry">重新加载</button>
   </view>
 
   <!-- 项目详情 -->
   <view class="detail-wrap" wx:if="{{!loading && project}}">
 
-    <!-- 基本信息卡片 -->
-    <view class="card">
-      <view class="card-top">
+    <!-- 品牌紫 Hero Header Card -->
+    <view class="hero-card">
+      <view class="hero-top">
         <view class="serial-tag">{{project.task_serial || '—'}}</view>
         <view class="status-tag status-{{project._statusColor}}">
           {{project._statusText}}
@@ -24,6 +25,40 @@
 
       <view class="project-title">{{project.title || '无标题'}}</view>
 
+      <view class="hero-bottom">
+        <view class="bounty-badge">
+          <text class="bounty-text">💰 {{project.bonus || 0}} 塾值</text>
+        </view>
+        <view class="hero-meta" wx:if="{{project.planed_hour}}">
+          <text>⏱️ 建议 {{project.planed_hour}}h</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3-Step 里程碑进度条 -->
+    <view class="milestone-card">
+      <view class="milestone-title">项目里程碑</view>
+      <view class="milestone-steps">
+        <view class="milestone-step active">
+          <view class="step-dot">🚀</view>
+          <view class="step-label">开始：{{project._startDate}}</view>
+        </view>
+        <view class="milestone-line {{project._step2Active ? 'active' : ''}}"></view>
+        <view class="milestone-step {{project._step2Active ? 'active' : ''}}">
+          <view class="step-dot">⏱️</view>
+          <view class="step-label">半程：{{project.half_progress || '进行中'}}</view>
+        </view>
+        <view class="milestone-line {{project._step3Active ? 'active' : ''}}"></view>
+        <view class="milestone-step {{project._step3Active ? 'active' : ''}}">
+          <view class="step-dot">🏁</view>
+          <view class="step-label {{project._isDeadlinePassed ? 'text-red' : ''}}">截止：{{project._deadline}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基本信息卡片 -->
+    <view class="card">
+      <view class="card-title-bar">项目信息</view>
       <view class="info-grid">
         <view class="info-row">
           <text class="info-label">发布人</text>
@@ -78,16 +113,34 @@
       <t-chat-markdown content="{{project.sln_text}}" />
     </view>
 
-    <!-- 操作按钮 -->
-    <view class="action-wrap" wx:if="{{!project.taker && !project.finish_date}}">
-      <button class="btn-claim" disabled="{{claiming}}" bindtap="claimProject">
-        {{claiming ? '认领中...' : '认领该项目'}}
+    <!-- 吸底操作栏 -->
+    <view class="sticky-action-bar">
+      <view class="sticky-bounty">
+        <text class="sticky-bounty-label">项目赏金</text>
+        <text class="sticky-bounty-val">💰 {{project.bonus || 0}} 塾值</text>
+      </view>
+      <button
+        wx:if="{{!project.taker && !project.finish_date}}"
+        class="btn-claim"
+        disabled="{{claiming}}"
+        bindtap="claimProject"
+      >
+        {{claiming ? '认领中...' : '✨ 立即认领项目'}}
       </button>
-    </view>
-
-    <!-- 已完成状态 -->
-    <view class="action-wrap" wx:if="{{project.finish_date}}">
-      <button class="btn-done" disabled>该项目已结项</button>
+      <button
+        wx:elif="{{project.finish_date}}"
+        class="btn-done"
+        disabled
+      >
+        该项目已结项
+      </button>
+      <button
+        wx:else
+        class="btn-done in-progress"
+        disabled
+      >
+        进行中 · {{project.taker}}
+      </button>
     </view>
 
   </view>

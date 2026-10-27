@@ -11,9 +11,12 @@ interface IPageData {
   userId: number;
   isSelf: boolean;
   ownerName: string;
+  activeTab: 'all' | 'camps' | 'learning' | 'learned';
   campCount: number;
   learningCount: number;
   learnedCount: number;
+  completionRate: number;
+  isEmpty: boolean;
   loading: boolean;
   data: Partial<LearnSheetData>;
 }
@@ -23,9 +26,12 @@ Page<IPageData, any>({
     userId: 0,
     isSelf: true,
     ownerName: '同路人',
+    activeTab: 'all',
     campCount: 0,
     learningCount: 0,
     learnedCount: 0,
+    completionRate: 0,
+    isEmpty: false,
     loading: true,
     data: {},
   },
@@ -50,6 +56,17 @@ Page<IPageData, any>({
     this.loadData().finally(() => wx.stopPullDownRefresh());
   },
 
+  onTabChange(e: any) {
+    const tab = e.currentTarget.dataset.tab as 'all' | 'camps' | 'learning' | 'learned';
+    if (tab && tab !== this.data.activeTab) {
+      this.setData({ activeTab: tab });
+    }
+  },
+
+  onGoLearnCenter() {
+    wx.switchTab({ url: '/pages/learn/index' });
+  },
+
   decorateCourse(c: any) {
     return {
       ...c,
@@ -66,6 +83,7 @@ Page<IPageData, any>({
       let campCount = 0;
       let learningCount = 0;
       let learnedCount = 0;
+      let totalCourseCount = 0;
       if (res) {
         if (Array.isArray(res.camps)) {
           campCount = res.camps.length;
@@ -73,6 +91,7 @@ Page<IPageData, any>({
             const list = Array.isArray(camp.course_list)
               ? camp.course_list.map((c: any) => {
                   const dec = this.decorateCourse(c);
+                  totalCourseCount += 1;
                   if (dec._statusClass === 'status-done') learnedCount += 1;
                   else if (dec._statusClass === 'status-learning') learningCount += 1;
                   return dec;
@@ -83,13 +102,21 @@ Page<IPageData, any>({
         }
         if (Array.isArray(res.other_learning)) {
           learningCount += res.other_learning.length;
+          totalCourseCount += res.other_learning.length;
           res.other_learning = res.other_learning.map((c: any) => this.decorateCourse(c));
         }
         if (Array.isArray(res.other_learned)) {
           learnedCount += res.other_learned.length;
+          totalCourseCount += res.other_learned.length;
           res.other_learned = res.other_learned.map((c: any) => this.decorateCourse(c));
         }
       }
+      const denom = totalCourseCount || learningCount + learnedCount;
+      const completionRate = denom > 0 ? Math.round((learnedCount * 100) / denom) : 0;
+      const isEmpty =
+        (!res?.camps || res.camps.length === 0) &&
+        (!res?.other_learning || res.other_learning.length === 0) &&
+        (!res?.other_learned || res.other_learned.length === 0);
       const userName = res?.camps?.[0]?.user_name || '同路人';
       this.setData({
         data: res || {},
@@ -97,6 +124,8 @@ Page<IPageData, any>({
         campCount,
         learningCount,
         learnedCount,
+        completionRate,
+        isEmpty,
       });
       if (userName) {
         wx.setNavigationBarTitle({ title: `${userName} 的学习单` });

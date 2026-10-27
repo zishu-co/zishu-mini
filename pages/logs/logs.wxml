@@ -1,6 +1,15 @@
 <!--logs.wxml-->
-<view class="container log-list">
-  <block wx:for="{{logs}}" wx:key="timeStamp" wx:for-item="log">
-    <text class="log-item">{{index + 1}}. {{log.date}}</text>
-  </block>
+<view class="logs-page">
+  <view class="brand-header">
+    <text class="brand-title">启动与运行日志</text>
+    <text class="brand-sub">记录共 {{logs.length}} 条本地访问轨迹</text>
+  </view>
+  <view class="container log-list">
+    <block wx:for="{{logs}}" wx:key="timeStamp" wx:for-item="log">
+      <view class="log-item zs-card">
+        <text class="log-seq">#{{index + 1}}</text>
+        <text class="log-date">{{log.date}}</text>
+      </view>
+    </block>
+  </view>
 </view>

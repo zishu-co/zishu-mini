@@ -1,11 +1,12 @@
 <!--pages/privacy/index.wxml-->
 <view class="page">
-  <view class="header">
+  <view class="brand-header">
+    <view class="brand-badge">🔒 自塾安全合规承诺</view>
     <text class="title">隐私政策</text>
-    <text class="update-date">更新日期：2024年1月1日</text>
+    <text class="update-date">生效与更新日期：2026年10月</text>
   </view>
 
-  <view class="content">
+  <view class="content zs-card">
     <view class="section">
       <view class="section-title">引言</view>
       <view class="section-content">

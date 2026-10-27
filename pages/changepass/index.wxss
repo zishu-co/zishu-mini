@@ -2,10 +2,43 @@
   min-height: 100vh;
   background: #f6f7fb;
   padding-top: 24rpx;
+  padding-bottom: 48rpx;
+}
+
+.security-banner {
+  margin: 0 24rpx 24rpx;
+  padding: 28rpx;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-radius: 24rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.22);
+}
+
+.security-icon {
+  font-size: 52rpx;
+}
+
+.security-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.security-title {
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.security-sub {
+  font-size: 22rpx;
+  opacity: 0.88;
 }
 
 .form-card {
-  margin: 0 24rpx 32rpx;
+  margin: 0 24rpx 24rpx;
   padding: 36rpx 28rpx;
   background: #fff;
   border-radius: 24rpx;
@@ -24,6 +57,12 @@
   font-weight: 500;
 }
 
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .form-input {
   width: 100%;
   box-sizing: border-box;
@@ -35,9 +74,71 @@
   background: #f8fafc;
 }
 
+.form-input.with-toggle {
+  padding-right: 110rpx;
+}
+
 .form-input:focus {
   border-color: #7c3aed;
   background: #fff;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 24rpx;
+  font-size: 24rpx;
+  color: #7c3aed;
+  font-weight: 600;
+  padding: 8rpx;
+}
+
+.strength-meter {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 14rpx;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 10rpx;
+  background: #f1f5f9;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 999rpx;
+}
+
+.strength-fill.weak {
+  background: #ef4444;
+}
+
+.strength-fill.medium {
+  background: #f59e0b;
+}
+
+.strength-fill.strong {
+  background: #10b981;
+}
+
+.strength-label {
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.strength-label.weak {
+  color: #ef4444;
+}
+
+.strength-label.medium {
+  color: #d97706;
+}
+
+.strength-label.strong {
+  color: #059669;
 }
 
 .error-tip {
@@ -62,4 +163,28 @@
 
 .submit-btn::after {
   border: none;
+}
+
+.tips-card {
+  margin: 0 24rpx;
+  padding: 28rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.04);
+}
+
+.tips-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #7c3aed;
+  margin-bottom: 4rpx;
+}
+
+.tips-item {
+  font-size: 24rpx;
+  color: #64748b;
+  line-height: 1.5;
 }

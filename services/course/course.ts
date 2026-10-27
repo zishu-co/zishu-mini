@@ -28,6 +28,8 @@ export interface Course {
 
 export interface CurrentSelection {
   sele_id: number;
+  user_id?: number;
+  user_name?: string;
   course_title: string;
   course_id: number;
   chapter_title: string;
@@ -37,6 +39,8 @@ export interface CurrentSelection {
   url: string;
   shushi_id?: number;
   shushi_name?: string;
+  is_last_declared?: boolean;
+  total_chapters?: number;
 }
 
 export interface Mentor {
@@ -122,6 +126,21 @@ export function fetchAllCourses(): Promise<Course[]> {
 /** 获取当前用户的在读课程 */
 export function fetchCurrentSelections(): Promise<CurrentSelection[]> {
   return request<CurrentSelection[]>({ url: '/api/learn/fetch_current_selections' });
+}
+
+/** 获取全塾所有在读选课记录（督学看板使用） */
+export function fetchAllSelections(): Promise<CurrentSelection[]> {
+  return request<CurrentSelection[]>({ url: '/api/learn/fetch_selections' });
+}
+
+/** 主持人/管理员快速编辑课程标题与描述 */
+export function quickUpdateCourse(course_id: number, title: string, desc: string): Promise<any> {
+  return request({
+    url: '/api/learn/quick_update_course',
+    method: 'POST',
+    data: { course_id, title, desc },
+    showLoading: true,
+  });
 }
 
 /** 选课（loading 由调用方控制，不在服务层弹） */

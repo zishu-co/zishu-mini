@@ -6,7 +6,10 @@ import { getBaseUrl } from '../../services/base';
 Page({
   data: {
     papers: [] as any[],
+    filteredPapers: [] as any[],
+    searchKeyword: '',
     loading: true,
+    skeletonList: [1, 2, 3, 4],
   },
 
   onLoad() {},
@@ -20,16 +23,51 @@ Page({
     setTimeout(() => wx.stopPullDownRefresh(), 500);
   },
 
+  loadPapers() {
+    this.fetchPapers();
+  },
+
+  filterList(papers: any[], keyword: string) {
+    const kw = (keyword || '').trim().toLowerCase();
+    if (!kw) return papers;
+    return papers.filter((item: any) => {
+      const title = String(item.testpaper_title || '').toLowerCase();
+      const author = String(item.testpaper_author || '').toLowerCase();
+      return title.includes(kw) || author.includes(kw);
+    });
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || '';
+    const filteredPapers = this.filterList(this.data.papers, searchKeyword);
+    this.setData({ searchKeyword, filteredPapers });
+  },
+
+  onClearSearch() {
+    this.setData({
+      searchKeyword: '',
+      filteredPapers: this.data.papers,
+    });
+  },
+
   fetchPapers() {
     this.setData({ loading: true });
     wx.request({
       url: getBaseUrl() + '/api/ques/showtest',
       method: 'GET',
       success: (res: any) => {
-        // showtest 返回数组，admin/审核者可见全部试卷
-        // 普通用户用 fetchpapers（需要筛选 reviewed=5）
+        const raw = Array.isArray(res.data) ? res.data : [];
+        const papers = raw.map((item: any, idx: number) => {
+          const num = idx + 1;
+          return {
+            ...item,
+            _seqBadge: num < 10 ? `0${num}` : `${num}`,
+          };
+        });
+        const filteredPapers = this.filterList(papers, this.data.searchKeyword);
         this.setData({
-          papers: Array.isArray(res.data) ? res.data : [],
+          papers,
+          filteredPapers,
           loading: false,
         });
       },
@@ -42,8 +80,9 @@ Page({
 
   onGoTest(e: any) {
     const testid = e.currentTarget.dataset.testid;
+    if (!testid) return;
     wx.navigateTo({
-      url: '/pages/test/test?testid=' + testid,
+      url: '/pages/test/test?testid=' + testid + '&id=' + testid,
     });
   },
 });

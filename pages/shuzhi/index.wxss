@@ -34,12 +34,62 @@
   line-height: 1.1;
 }
 
-.hero-badge {
-  font-size: 22rpx;
-  font-weight: 600;
-  padding: 8rpx 22rpx;
+.hero-badge,
+.level-badge {
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 10rpx 24rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.level-progress-wrap {
+  margin-bottom: 24rpx;
+}
+
+.level-progress-bar {
+  height: 12rpx;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999rpx;
+  overflow: hidden;
+  margin-bottom: 10rpx;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: #fde047;
+  border-radius: 999rpx;
+}
+
+.level-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  opacity: 0.92;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 14rpx;
+  padding: 0 24rpx 20rpx;
+}
+
+.filter-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 12rpx;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: 18rpx;
+  box-shadow: 0 2rpx 10rpx rgba(15, 23, 42, 0.04);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.24);
 }
 
 .stats-row {

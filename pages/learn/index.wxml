@@ -1,73 +1,39 @@
-<wxs module="fmt">
-function dateOnly(s) {
-  if (!s) return '';
-  if (typeof s === 'string' && s.length >= 10) {
-    return s.substring(0, 10);
-  }
-  var d = getDate(s);
-  var y = d.getFullYear();
-  var m = d.getMonth() + 1;
-  var day = d.getDate();
-  if (isNaN(y)) return s;
-  return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
-}
-
-function deadlineClass(s) {
-  if (!s) return '';
-  var d = getDate(s);
-  var ts = d.getTime();
-  if (isNaN(ts)) {
-    var norm = ('' + s).replace(getRegExp('-', 'g'), '/');
-    ts = getDate(norm).getTime();
-  }
-  if (isNaN(ts)) return 'deadline-red';
-  var now = getDate().getTime();
-  var diffDays = (ts - now) / (1000 * 60 * 60 * 24);
-  if (diffDays < 0 && diffDays > -30) return 'deadline-brand';
-  if (diffDays < -30) return 'deadline-red';
-  if (diffDays <= 1) return 'deadline-orange';
-  if (diffDays <= 3) return 'deadline-blue';
-  return '';
-}
-
-function includes(arr, id) {
-  if (!arr || !arr.length) return false;
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === id) return true;
-  }
-  return false;
-}
-
-module.exports = {
-  dateOnly: dateOnly,
-  deadlineClass: deadlineClass,
-  includes: includes
-};
-</wxs>
-
 <view class="page">
 
   <!-- 顶部 Banner -->
   <view class="banner">
-    <view class="banner-title">学习中心</view>
-    <view class="banner-sub">学本领 上自塾</view>
+    <view class="banner-top">
+      <view>
+        <view class="banner-title">学习中心</view>
+        <view class="banner-sub">学本领 上自塾 · 以终为始闯关共学</view>
+      </view>
+      <view class="banner-stat-pill">已选 {{currentSelections.length}} / 3 门</view>
+    </view>
   </view>
 
   <!-- 快捷入口 -->
   <view class="quick-btns">
     <view class="quick-btn primary" bindtap="onGotoExam">
       <text class="quick-icon">📝</text>
-      <text class="quick-text">考试</text>
+      <text class="quick-text">闯关考试</text>
     </view>
     <view class="quick-btn" bindtap="onGotoReport">
       <text class="quick-icon">📊</text>
-      <text class="quick-text">成绩单</text>
+      <text class="quick-text">成绩单学时</text>
+    </view>
+    <view class="quick-btn" bindtap="onGotoSocialPlaza">
+      <text class="quick-icon">🏫</text>
+      <text class="quick-text">共学广场</text>
+    </view>
+    <view class="quick-btn" bindtap="onGotoSupervise">
+      <text class="quick-icon">👀</text>
+      <text class="quick-text">督学看板</text>
     </view>
   </view>
 
   <!-- 未登录提示 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
-    <text>登录后可使用完整学习功能</text>
+    <text>登录后可使用选课、组方舟与学时申报功能</text>
     <button class="login-btn" bindtap="goToLogin">去登录</button>
   </view>
 
@@ -86,27 +52,37 @@ module.exports = {
   <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
     <view class="section-header">
       <text class="section-title">我的选课</text>
+      <text class="section-tip">在学 {{myCourses.length}} 门</text>
     </view>
     <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
       <view class="course-card-top">
-        <view class="course-info">
+        <view class="course-info" data-id="{{item.course_id}}" data-title="{{item.course_title}}" bindtap="onCourseItemTap">
           <view class="course-name">{{item.course_title}}</view>
-          <view class="course-meta">
+          <view class="course-meta" wx:if="{{item.is_last_declared}}">
+            <text class="chapter-label finish-ready">🎉 已完成全部 {{item.total_chapters || (item.current_serial - 1)}} 章学时申报，可申请结课</text>
+          </view>
+          <view class="course-meta" wx:else>
             <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
           </view>
           <view class="course-meta">
-            <text class="deadline {{item.deadlineClass || fmt.deadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
+            <text class="deadline {{item.deadlineClass}}">截止：{{item.deadlineDateStr}}</text>
           </view>
         </view>
         <view class="course-actions">
-          <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
+          <text class="mentor-tag" wx:if="{{item.shushi_name}}">🎓 {{item.shushi_name}}</text>
           <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
           <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         </view>
       </view>
       <view class="course-card-bottom">
-        <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">去学习</view>
-        <view class="action-btn primary" data-course="{{item}}" bindtap="onReportLearn">申报学时</view>
+        <block wx:if="{{item.is_last_declared}}">
+          <view class="action-btn secondary" data-id="{{item.course_id}}" data-title="{{item.course_title}}" bindtap="onCourseItemTap">📖 课程详情</view>
+          <view class="action-btn finish-btn" data-courseid="{{item.course_id}}" bindtap="onGoFinishCourse">🎓 去结课领证</view>
+        </block>
+        <block wx:else>
+          <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">📖 去学习</view>
+          <view class="action-btn primary" data-course="{{item}}" bindtap="onReportLearn">⏱️ 申报学时</view>
+        </block>
       </view>
     </view>
   </view>
@@ -115,32 +91,71 @@ module.exports = {
   <view class="section" wx:if="{{!loading && !loadError}}">
     <view class="section-header">
       <text class="section-title">全部课程</text>
-      <text class="section-tip">最多选3门课</text>
+      <text class="section-tip">最多同时选修 3 门课</text>
     </view>
-    <view class="course-item {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
+
+    <!-- 搜索框 + 筛选胶囊 -->
+    <view class="course-filter-panel">
+      <view class="course-search-box">
+        <text class="search-icon">🔍</text>
+        <input
+          class="course-search-input"
+          placeholder="搜索课程名称或塾主姓名..."
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+        />
+        <text wx:if="{{searchKeyword}}" class="search-clear" bindtap="onClearSearch">✕</text>
+      </view>
+
+      <view class="course-filter-pills">
+        <view
+          class="filter-pill {{courseFilter === 'all' ? 'active' : ''}}"
+          data-filter="all"
+          bindtap="onFilterChange"
+        >全部 ({{tableData.length}})</view>
+        <view
+          class="filter-pill {{courseFilter === 'hot' ? 'active' : ''}}"
+          data-filter="hot"
+          bindtap="onFilterChange"
+        >🔥 热门共修</view>
+        <view
+          class="filter-pill {{courseFilter === 'selected' ? 'active' : ''}}"
+          data-filter="selected"
+          bindtap="onFilterChange"
+        >我已选 ({{currentSelections.length}})</view>
+        <view
+          class="filter-pill {{courseFilter === 'available' ? 'active' : ''}}"
+          data-filter="available"
+          bindtap="onFilterChange"
+        >可报名 ({{availableCount}})</view>
+      </view>
+    </view>
+
+    <view class="course-item {{item.isSelected ? 'selected' : ''}}" wx:for="{{filteredCourses}}" wx:key="id">
       <view class="course-item-left" data-id="{{item.id}}" data-title="{{item.title}}" bindtap="onCourseItemTap">
         <view class="course-item-name">{{item.title}}</view>
         <view class="course-item-meta">
-          <text>塾主：{{item.director_name}}</text>
-          <text>在学：{{item.current_selections_num}} | 学完：{{item.finish_selections_num}}</text>
+          <text>🎓 塾主：{{item.director_name || '自塾教研组'}}</text>
+          <text>🔥 在学 {{item.current_selections_num || 0}} 人 · 🎓 学完 {{item.finish_selections_num || 0}} 人</text>
         </view>
       </view>
       <view class="course-item-right">
         <view
-          class="select-btn {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? 'selected' : ''}}"
+          class="select-btn {{item.isSelected ? 'selected' : ''}}"
           data-id="{{item.id}}"
           data-title="{{item.title}}"
           bindtap="onSelectCourse"
         >
-          {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? '退选' : '选课'}}
+          {{item.isSelected ? '退选' : '选课'}}
         </view>
       </view>
     </view>
-  </view>
 
-  <!-- 空状态 -->
-  <view class="empty" wx:if="{{!loading && !loadError && allCourses.length == 0}}">
-    <text>暂无课程</text>
+    <!-- 筛选为空状态 -->
+    <view class="empty" wx:if="{{filteredCourses.length === 0}}">
+      <text>{{searchKeyword || courseFilter !== 'all' ? '未找到符合筛选条件的课程' : '暂无课程'}}</text>
+      <view wx:if="{{searchKeyword || courseFilter !== 'all'}}" class="reset-course-filter" bindtap="onResetCourseFilter">重置筛选</view>
+    </view>
   </view>
 
   <!-- 底部安全区 -->

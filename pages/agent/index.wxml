@@ -30,6 +30,15 @@
     </view>
   </scroll-view>
 
+  <!-- AI 制定目标采纳浮条 -->
+  <view wx:if="{{suggestedGoal}}" class="goal-adopt-bar" bindtap="onAdoptGoal">
+    <view class="goal-adopt-left">
+      <text class="goal-adopt-badge">🎯 AI 目标提案</text>
+      <text class="goal-adopt-text">{{suggestedGoal}}</text>
+    </view>
+    <view class="goal-adopt-btn">一键设为目标</view>
+  </view>
+
   <!-- 快捷提示词气泡栏 -->
   <scroll-view class="prompt-chips-bar" scroll-x="true" enable-flex="true">
     <view

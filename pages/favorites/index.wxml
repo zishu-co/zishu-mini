@@ -1,10 +1,20 @@
 <view class="page">
   <view class="summary-banner">
     <view class="summary-left">
-      <text class="summary-title">收藏夹</text>
-      <text class="summary-sub">点击条目直达学习详情，支持快速管理</text>
+      <text class="summary-title">我的收藏夹</text>
+      <text class="summary-sub">沉淀优质课程、精选文章与高分试卷</text>
     </view>
-    <view class="summary-badge">{{items.length}} 项内容</view>
+    <view class="summary-stats">
+      <view class="summary-stat">
+        <text class="summary-stat-val">{{folders.length}}</text>
+        <text class="summary-stat-lbl">收藏夹</text>
+      </view>
+      <view class="summary-stat-divider"></view>
+      <view class="summary-stat">
+        <text class="summary-stat-val">{{totalItemsCount}}</text>
+        <text class="summary-stat-lbl">总收藏</text>
+      </view>
+    </view>
   </view>
 
   <!-- 文件夹 Tab -->
@@ -21,18 +31,36 @@
     </view>
   </scroll-view>
 
+  <!-- 实时关键词搜索 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="在当前收藏夹中搜索标题或类型..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+  </view>
+
   <!-- 收藏内容列表 -->
   <view class="content-area">
     <view wx:if="{{loading}}">
       <view class="loading-row"><text>加载中...</text></view>
     </view>
-    <view wx:elif="{{items.length === 0}}">
-      <view class="empty-row"><text>暂无收藏内容</text></view>
+    <view wx:elif="{{filteredItems.length === 0}}">
+      <view class="empty-card">
+        <view class="empty-icon">⭐</view>
+        <text class="empty-title">{{searchKeyword ? '未找到匹配的收藏内容' : '当前收藏夹暂无内容'}}</text>
+        <text class="empty-sub">在学习过程中遇到好内容，随时收藏到这里</text>
+        <button class="empty-cta-btn" bindtap="goToArticles">去阅读精选文章</button>
+      </view>
     </view>
     <view wx:else>
       <view
         class="favor-item"
-        wx:for="{{items}}"
+        wx:for="{{filteredItems}}"
         wx:key="favorid"
         bindtap="onItemTap"
         bindlongpress="deleteItem"

@@ -354,6 +354,63 @@ Page<IAimPageData, IAimData>({
     this.navigateByActionUrl(item.action_url, item.title);
   },
 
+  async onRecommendationFinishTap(e: any) {
+    const { item, index } = e.detail || {};
+    if (!item) return;
+    if (item.action_id) {
+      try {
+        await http.requestWithRefresh({
+          url: `/api/actions/${item.action_id}/finish`,
+          method: 'POST',
+        });
+      } catch {}
+    }
+    const list = (this.data.recommendations || []).filter((_: any, i: number) => i !== index);
+    this.setData({
+      recommendations: list.length > 0 ? list : fallbackRecommendations.slice(0, 2),
+      lastUpdated: formatTime(),
+    });
+    await this.onUpdateProgress();
+  },
+
+  onRecommendationSkipTap(e: any) {
+    const { item, index } = e.detail || {};
+    if (!item) return;
+    const reasons = ['已完成类似任务', '当前时间不够', '与现阶段目标不匹配', '想换个共学方向'];
+    wx.showActionSheet({
+      itemList: reasons,
+      success: async (res) => {
+        const reason = reasons[res.tapIndex] || '用户主动跳过';
+        if (item.action_id) {
+          try {
+            await http.requestWithRefresh({
+              url: `/api/actions/${item.action_id}/abandon`,
+              method: 'POST',
+              data: { reason },
+            });
+          } catch {}
+        }
+        const remaining = (this.data.recommendations || []).filter((_: any, i: number) => i !== index);
+        const existingIds = new Set(remaining.map((r: any) => r.id));
+        const replacement = fallbackRecommendations.find((r) => !existingIds.has(r.id));
+        if (replacement && remaining.length < 3) {
+          remaining.push(replacement);
+        }
+        this.setData({
+          recommendations: remaining,
+          lastUpdated: formatTime(),
+        });
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: `已记录「${reason}」并为您换新推荐`,
+          icon: 'check-circle',
+          duration: 1500,
+        });
+      },
+    });
+  },
+
   navigateByActionUrl(actionUrl: string, title?: string) {
     const cleanPath = actionUrl.split('?')[0];
     if (TAB_BAR_PAGES.indexOf(cleanPath) !== -1) {

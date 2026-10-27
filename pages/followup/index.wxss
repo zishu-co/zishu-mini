@@ -58,6 +58,33 @@
   font-weight: 700;
 }
 
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 18rpx 24rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.04);
+}
+
+.search-icon {
+  font-size: 28rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1e293b;
+}
+
+.search-clear {
+  font-size: 26rpx;
+  color: #94a3b8;
+  padding: 4rpx 10rpx;
+}
+
 .list-area {
   padding: 0 24rpx 48rpx;
 }

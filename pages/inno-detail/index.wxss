@@ -8,7 +8,7 @@ page {
 .page {
   min-height: 100vh;
   padding: 24rpx;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 24rpx);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 180rpx);
 }
 
 /* ========== 加载 / 空状态 ========== */
@@ -24,7 +24,7 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 200rpx 0;
+  padding: 180rpx 0;
 }
 
 .empty-icon {
@@ -35,19 +35,37 @@ page {
 .empty-text {
   font-size: 28rpx;
   color: #999;
+  margin-bottom: 32rpx;
 }
 
-/* ========== 通用卡片 ========== */
+.retry-btn {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+  padding: 0 48rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 36rpx;
+  border: none;
+  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.25);
+}
+.retry-btn::after {
+  border: none;
+}
 
-.card {
-  background-color: #ffffff;
-  border-radius: 16rpx;
-  padding: 28rpx;
+/* ========== Hero Header Card ========== */
+
+.hero-card {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-radius: 24rpx;
+  padding: 36rpx 32rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  color: #ffffff;
+  box-shadow: 0 12rpx 32rpx rgba(124, 58, 237, 0.24);
 }
 
-.card-top {
+.hero-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -55,41 +73,145 @@ page {
 }
 
 .serial-tag {
-  font-size: 26rpx;
-  font-weight: bold;
-  color: #aa00ff;
-  background-color: #f3e8ff;
-  padding: 6rpx 20rpx;
-  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8rpx);
+  padding: 6rpx 22rpx;
+  border-radius: 24rpx;
 }
 
 .status-tag {
   font-size: 24rpx;
-  padding: 6rpx 20rpx;
-  border-radius: 20rpx;
+  font-weight: 600;
+  padding: 6rpx 22rpx;
+  border-radius: 24rpx;
 }
 
 .status-red {
-  color: #fa4126;
-  background-color: #fff1ed;
+  color: #fff1ed;
+  background-color: rgba(250, 65, 38, 0.85);
 }
 
 .status-green {
-  color: #00b42a;
-  background-color: #e8ffef;
+  color: #e8ffef;
+  background-color: rgba(0, 180, 42, 0.85);
 }
 
 .status-gray {
-  color: #999;
-  background-color: #f5f5f5;
+  color: #f5f5f5;
+  background-color: rgba(0, 0, 0, 0.35);
 }
 
 .project-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #1a1a2e;
-  line-height: 1.5;
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.45;
   margin-bottom: 24rpx;
+}
+
+.hero-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.bounty-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10rpx 24rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.12);
+}
+
+.bounty-text {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.hero-meta {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========== 3-Step 里程碑卡片 ========== */
+
+.milestone-card {
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+
+.milestone-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 24rpx;
+}
+
+.milestone-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.milestone-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  flex: 1;
+  opacity: 0.55;
+}
+
+.milestone-step.active {
+  opacity: 1;
+}
+
+.step-dot {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #f3e8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+}
+
+.step-label {
+  font-size: 22rpx;
+  color: #4b5563;
+  text-align: center;
+  font-weight: 500;
+}
+
+.milestone-line {
+  width: 48rpx;
+  height: 4rpx;
+  background: #e5e7eb;
+  margin-bottom: 32rpx;
+}
+
+.milestone-line.active {
+  background: linear-gradient(90deg, #a0f 0%, #7c3aed 100%);
+}
+
+/* ========== 通用卡片 ========== */
+
+.card {
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
 }
 
 /* ========== 信息网格 ========== */
@@ -184,23 +306,53 @@ page {
   line-height: 1.6;
 }
 
-/* ========== 操作按钮 ========== */
+/* ========== 吸底操作栏 ========== */
 
-.action-wrap {
-  margin-top: 8rpx;
+.sticky-action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16rpx);
+  padding: 20rpx 32rpx calc(env(safe-area-inset-bottom) + 20rpx);
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  z-index: 50;
+}
+
+.sticky-bounty {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sticky-bounty-label {
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.sticky-bounty-val {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #7c3aed;
 }
 
 .btn-claim {
-  width: 100%;
-  height: 88rpx;
-  line-height: 88rpx;
+  flex: 1;
+  height: 84rpx;
+  line-height: 84rpx;
   background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
   color: #fff;
-  font-size: 32rpx;
-  font-weight: bold;
-  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  border-radius: 42rpx;
   border: none;
   text-align: center;
+  margin: 0;
   box-shadow: 0 8rpx 24rpx rgba(124, 58, 237, 0.3);
 }
 
@@ -209,15 +361,22 @@ page {
 }
 
 .btn-done {
-  width: 100%;
-  height: 88rpx;
-  line-height: 88rpx;
-  background-color: #f0f0f0;
-  color: #999;
-  font-size: 32rpx;
-  border-radius: 44rpx;
+  flex: 1;
+  height: 84rpx;
+  line-height: 84rpx;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 42rpx;
   border: none;
   text-align: center;
+  margin: 0;
+}
+
+.btn-done.in-progress {
+  background-color: #f3e8ff;
+  color: #7c3aed;
 }
 
 .btn-done::after {

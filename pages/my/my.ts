@@ -21,6 +21,9 @@ interface IMyPageData {
   };
   isLoggedIn: boolean;
   levelBadge: string;
+  levelScore: number;
+  levelProgressPercent: number;
+  nextLevelHint: string;
   stats: {
     reportCount: number;
     shuzhiCount: number;
@@ -43,6 +46,9 @@ Page<IMyPageData, any>({
     },
     isLoggedIn: false,
     levelBadge: "🌱 LV.1 启航新星",
+    levelScore: 0,
+    levelProgressPercent: 15,
+    nextLevelHint: "距 LV.2 进击塾生还差 20 分",
     stats: {
       reportCount: 0,
       shuzhiCount: 0,
@@ -119,10 +125,29 @@ Page<IMyPageData, any>({
     const { reportCount, shuzhiCount, courseCount } = this.data.stats
     const score = (reportCount || 0) * 5 + (shuzhiCount || 0) * 15 + (courseCount || 0) * 10 + (this.data.arkCount || 0) * 20
     let levelBadge = '🌱 LV.1 启航新星'
-    if (score >= 120) levelBadge = '👑 LV.4 领航塾师'
-    else if (score >= 60) levelBadge = '🔥 LV.3 共学先锋'
-    else if (score >= 20) levelBadge = '⚡ LV.2 进击塾生'
-    this.setData({ levelBadge })
+    let levelProgressPercent = 15
+    let nextLevelHint = `距 LV.2 进击塾生还差 ${Math.max(20 - score, 1)} 分`
+    if (score >= 120) {
+      levelBadge = '👑 LV.4 领航塾师'
+      levelProgressPercent = 100
+      nextLevelHint = '已达成最高共学荣誉段位'
+    } else if (score >= 60) {
+      levelBadge = '🔥 LV.3 共学先锋'
+      levelProgressPercent = Math.min(Math.round(((score - 60) / 60) * 100), 99)
+      nextLevelHint = `距 LV.4 领航塾师还差 ${120 - score} 分`
+    } else if (score >= 20) {
+      levelBadge = '⚡ LV.2 进击塾生'
+      levelProgressPercent = Math.min(Math.round(((score - 20) / 40) * 100), 99)
+      nextLevelHint = `距 LV.3 共学先锋还差 ${60 - score} 分`
+    } else {
+      levelProgressPercent = Math.max(Math.round((score / 20) * 100), 10)
+    }
+    this.setData({
+      levelBadge,
+      levelScore: score,
+      levelProgressPercent,
+      nextLevelHint,
+    })
   },
 
   /** 拉取我的方舟（按阶段分组，按时间倒序合并） */

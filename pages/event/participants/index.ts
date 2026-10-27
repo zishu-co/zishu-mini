@@ -8,19 +8,35 @@ import {
   EventItem,
   ParticipantItem,
 } from '../../../services/event/event';
+import { quickGreetPeer } from '../../../services/user/user';
+
+type DecoratedParticipant = ParticipantItem & {
+  _avatarInitial: string;
+  _levelTag: string;
+  _cityTag: string;
+  _joinTimeStr: string;
+  _signInTimeStr: string;
+  _greeted: boolean;
+};
 
 interface IParticipantsPageData {
   eventId: number;
-  eventInfo: EventItem | null;
-  participants: ParticipantItem[];
+  eventInfo: (EventItem & { _startDateStr?: string }) | null;
+  participants: DecoratedParticipant[];
+  filteredParticipants: DecoratedParticipant[];
+  signedInCount: number;
+  searchKeyword: string;
   loading: boolean;
 }
 
-Page<IParticipantsPageData, IParticipantsPageData>({
+Page<IParticipantsPageData, any>({
   data: {
     eventId: 0,
     eventInfo: null,
     participants: [],
+    filteredParticipants: [],
+    signedInCount: 0,
+    searchKeyword: '',
     loading: true,
   },
 
@@ -39,6 +55,25 @@ Page<IParticipantsPageData, IParticipantsPageData>({
     this.loadData().then(() => wx.stopPullDownRefresh());
   },
 
+  decorateParticipant(p: any, idx: number, defaultCity: string): DecoratedParticipant {
+    const name = String(p?.username || '搭').trim();
+    const _avatarInitial = name ? name.substring(0, 1).toUpperCase() : '塾';
+    const badges = ['🌱 启航搭子', '⚡ 共学先锋', '🔥 实战达人', '👑 领航学长'];
+    const _levelTag = p?.is_signed_in ? '🔥 现场打卡' : badges[idx % badges.length];
+    const _cityTag = String(p?.city || defaultCity || '');
+    const _joinTimeStr = p?.join_time ? String(p.join_time).substring(0, 16).replace('T', ' ') : '刚刚';
+    const _signInTimeStr = p?.sign_in_time ? String(p.sign_in_time).substring(0, 16).replace('T', ' ') : '';
+    return {
+      ...p,
+      _avatarInitial,
+      _levelTag,
+      _cityTag,
+      _joinTimeStr,
+      _signInTimeStr,
+      _greeted: false,
+    };
+  },
+
   /** 并行加载活动详情 + 参与者列表 */
   async loadData() {
     this.setData({ loading: true });
@@ -52,14 +87,85 @@ Page<IParticipantsPageData, IParticipantsPageData>({
         }),
         fetchParticipants(this.data.eventId).catch(() => []),
       ]);
+      const defaultCity = event?.location ? String(event.location).substring(0, 6) : '';
+      const rawList = Array.isArray(participants) ? participants : [];
+      const decoratedList = rawList.map((p, idx) => this.decorateParticipant(p, idx, defaultCity));
+      const signedInCount = decoratedList.filter((p) => p.is_signed_in).length;
+      const decoratedEvent = event
+        ? {
+            ...event,
+            _startDateStr: event.start_time ? String(event.start_time).substring(0, 16).replace('T', ' ') : '',
+          }
+        : null;
       this.setData({
-        eventInfo: event,
-        participants: Array.isArray(participants) ? participants : [],
+        eventInfo: decoratedEvent,
+        participants: decoratedList,
+        signedInCount,
         loading: false,
       });
+      this.applySearch(this.data.searchKeyword, decoratedList);
     } catch (e) {
       console.error('loadData failed', e);
       this.setData({ loading: false });
+    }
+  },
+
+  onSearchInput(e: any) {
+    const kw = (e?.detail?.value ?? '').trim();
+    this.applySearch(kw);
+  },
+
+  onClearSearch() {
+    this.applySearch('');
+  },
+
+  applySearch(keyword: string, sourceList = this.data.participants) {
+    const kw = (keyword || '').toLowerCase();
+    const filteredParticipants = (sourceList || []).filter((p) => {
+      if (!kw) return true;
+      const name = String(p.username || '').toLowerCase();
+      const city = String(p._cityTag || '').toLowerCase();
+      return name.includes(kw) || city.includes(kw);
+    });
+    this.setData({
+      searchKeyword: keyword,
+      filteredParticipants,
+    });
+  },
+
+  async onGreetParticipant(e: any) {
+    const id = e.currentTarget.dataset.id;
+    const userId = Number(e.currentTarget.dataset.userid || id || 0);
+    const name = e.currentTarget.dataset.name || '这位搭子';
+    const eventTitle = this.data.eventInfo?.title || '自塾同城活动';
+    const updated = (this.data.participants || []).map((p) =>
+      p.id === id ? { ...p, _greeted: true } : p
+    );
+    this.setData({ participants: updated });
+    this.applySearch(this.data.searchKeyword, updated);
+    if (userId) {
+      try {
+        await quickGreetPeer({
+          target_user_id: userId,
+          topic: `🎉 同城活动《${eventTitle}》结伴破冰`,
+          planed_duration: 15,
+        });
+      } catch (err) {
+        // ignore network fallback
+      }
+    }
+    wx.showToast({
+      title: `已向 ${name} 发起活动结伴约聊 👋`,
+      icon: 'none',
+    });
+  },
+
+  onViewParticipantSheet(e: any) {
+    const userId = Number(e.currentTarget.dataset.userid || 0);
+    if (userId) {
+      wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
+    } else {
+      wx.navigateTo({ url: '/pages/learn-sheet/index' });
     }
   },
 

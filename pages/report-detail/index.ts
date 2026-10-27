@@ -6,6 +6,7 @@ import { getBaseUrl } from '../../services/base';
 
 interface QuestionItem {
   quesid: number;
+  _num: number;
   ques_title: string;
   ques_type: string;
   item_a: string;
@@ -27,12 +28,17 @@ interface QuestionItem {
 }
 
 interface IReportDetailData {
+  paperid: string;
   papertitle: string;
   test_score: number;
   full_score: number;
+  correctCount: number;
+  wrongCount: number;
   scorePercent: number;
   test_time?: string;
+  filterMode: string;
   questions: QuestionItem[];
+  filteredQuestions: QuestionItem[];
   loading: boolean;
 }
 
@@ -55,6 +61,7 @@ function buildQuestionItems(
         : Boolean(ansStr && userAns === ansStr);
     return {
       quesid: index,
+      _num: index + 1,
       ques_title: q.ques_title || '',
       ques_type: q.ques_type || '选择题',
       item_a: q.item_a || '',
@@ -79,22 +86,30 @@ function buildQuestionItems(
 
 Page<IReportDetailPageData, any>({
   data: {
+    paperid: '',
     papertitle: '',
     test_score: 0,
     full_score: 0,
+    correctCount: 0,
+    wrongCount: 0,
     scorePercent: 0,
     test_time: '',
+    filterMode: 'all',
     questions: [],
+    filteredQuestions: [],
     loading: true,
   },
 
   onLoad(options: any) {
     const pperformid = options?.pperformid;
-    const paperid = options?.paperid;
+    const paperid = options?.paperid || '';
     if (!pperformid) {
       wx.showToast({ title: '参数错误', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
       return;
+    }
+    if (paperid) {
+      this.setData({ paperid: String(paperid) });
     }
     wx.setNavigationBarTitle({ title: '答题报告详情' });
     this.loadReportDetail(pperformid, paperid);
@@ -102,6 +117,36 @@ Page<IReportDetailPageData, any>({
 
   loadReportDetail(pperformid: string, paperid?: string) {
     this.fetchDetail(pperformid, paperid);
+  },
+
+  applyQuestionFilter(questions: QuestionItem[], mode: string) {
+    if (mode === 'wrong') {
+      return questions.filter((q: QuestionItem) => !q.is_correct);
+    }
+    return questions;
+  },
+
+  switchFilterMode(e: any) {
+    const filterMode = e.currentTarget.dataset.mode || 'all';
+    const filteredQuestions = this.applyQuestionFilter(this.data.questions, filterMode);
+    this.setData({
+      filterMode,
+      filteredQuestions,
+    });
+  },
+
+  retakePaper() {
+    const paperid = this.data.paperid;
+    if (!paperid) {
+      wx.navigateTo({
+        url: '/pages/exam/index',
+        fail: () => wx.switchTab({ url: '/pages/exam/index' }),
+      });
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/test/test?id=' + paperid + '&testid=' + paperid,
+    });
   },
 
   fetchDetail(pperformid: string, paperid?: string) {
@@ -122,8 +167,9 @@ Page<IReportDetailPageData, any>({
 
         const qdata = res.data.qdata;
         const correctCount = qdata.filter((q: any) => q.getscore === 1).length;
-        const testScore = correctCount;
         const fullScore = qdata.length;
+        const wrongCount = Math.max(0, fullScore - correctCount);
+        const testScore = correctCount;
         const scorePercent = fullScore > 0 ? Math.ceil((testScore * 100) / fullScore) : 0;
 
         const userAnswers: string[] = qdata.map((q: any) => q.reply || '');
@@ -134,12 +180,17 @@ Page<IReportDetailPageData, any>({
         (this as any)._correctFlags = correctFlags;
         (this as any)._qdata = qdata;
 
-        const resolvedPaperId = Number(paperid || res.data.ginfo?.paperid || res.data.ginfo?.testpaperid || 0);
+        const resolvedPaperId = Number(
+          paperid || res.data.ginfo?.paperid || res.data.ginfo?.testpaperid || 0
+        );
 
         this.setData({
+          paperid: resolvedPaperId > 0 ? String(resolvedPaperId) : String(paperid || ''),
           papertitle: res.data.ginfo?.tptitle || '考试成绩详情',
           test_score: testScore,
           full_score: fullScore,
+          correctCount,
+          wrongCount,
           scorePercent,
           test_time: res.data.ginfo?.test_time || '',
         });
@@ -149,8 +200,13 @@ Page<IReportDetailPageData, any>({
           this.fetchPaperAnswers(String(resolvedPaperId), token);
         } else {
           const fallbackQuestions = buildQuestionItems(qdata, userAnswers, correctFlags, []);
+          const filteredQuestions = this.applyQuestionFilter(
+            fallbackQuestions,
+            this.data.filterMode
+          );
           this.setData({
             questions: fallbackQuestions,
+            filteredQuestions,
             loading: false,
           });
         }
@@ -186,12 +242,27 @@ Page<IReportDetailPageData, any>({
         }
 
         const questions = buildQuestionItems(qdata, userAnswers, correctFlags, answersList);
-        this.setData({ questions });
+        const correctCount = questions.filter((q: QuestionItem) => q.is_correct).length;
+        const wrongCount = Math.max(0, questions.length - correctCount);
+        const filteredQuestions = this.applyQuestionFilter(questions, this.data.filterMode);
+        this.setData({
+          questions,
+          filteredQuestions,
+          correctCount,
+          wrongCount,
+        });
       },
       fail: (err) => {
         console.error('获取正确答案失败，回退使用 qdata', err);
         const fallbackQuestions = buildQuestionItems(qdata, userAnswers, correctFlags, []);
-        this.setData({ questions: fallbackQuestions });
+        const filteredQuestions = this.applyQuestionFilter(
+          fallbackQuestions,
+          this.data.filterMode
+        );
+        this.setData({
+          questions: fallbackQuestions,
+          filteredQuestions,
+        });
       },
       complete: () => {
         this.setData({ loading: false });
@@ -201,11 +272,16 @@ Page<IReportDetailPageData, any>({
 });
 
 interface IReportDetailPageData {
+  paperid: string;
   papertitle: string;
   test_score: number;
   full_score: number;
+  correctCount: number;
+  wrongCount: number;
   scorePercent: number;
   test_time?: string;
+  filterMode: string;
   questions: QuestionItem[];
+  filteredQuestions: QuestionItem[];
   loading: boolean;
 }

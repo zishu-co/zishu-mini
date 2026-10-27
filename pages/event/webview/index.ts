@@ -11,9 +11,16 @@ Page({
     const url = decodeURIComponent(options?.url || '');
     if (!url) {
       wx.showToast({ title: '链接无效', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1000);
       return;
     }
     this.setData({ url });
+  },
+
+  onGoBack() {
+    wx.navigateBack({
+      fail: () => {
+        wx.switchTab({ url: '/pages/event/index' });
+      },
+    });
   },
 });

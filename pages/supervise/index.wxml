@@ -17,16 +17,29 @@
     </view>
   </view>
 
+  <!-- 实时关键词搜索 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索塾生、塾师、课程或章节名称..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+  </view>
+
   <!-- 列表 -->
   <view class="list-area">
     <view wx:if="{{loading}}">
       <view class="loading-row"><text>加载中...</text></view>
     </view>
-    <view wx:elif="{{listData.length === 0}}">
-      <view class="empty-row"><text>暂无学习记录</text></view>
+    <view wx:elif="{{filteredList.length === 0}}">
+      <view class="empty-row"><text>{{searchKeyword ? '未找到匹配的学习监督记录' : '暂无学习记录'}}</text></view>
     </view>
     <view wx:else>
-      <view class="record-card" wx:for="{{listData}}" wx:key="sele_id">
+      <view class="record-card" wx:for="{{filteredList}}" wx:key="sele_id">
         <view class="record-top">
           <view class="persons">
             <view

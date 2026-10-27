@@ -7,12 +7,20 @@ import { getBaseUrl } from '../../services/base';
 
 interface IReportData {
   records: any[];
+  filteredRecords: any[];
+  activeFilter: string;
+  avgScore: string;
+  passRate: number;
   loading: boolean;
 }
 
 Page<IReportPageData, any>({
   data: {
     records: [],
+    filteredRecords: [],
+    activeFilter: 'all',
+    avgScore: '0',
+    passRate: 0,
     loading: true,
   },
 
@@ -28,6 +36,55 @@ Page<IReportPageData, any>({
     this.fetchRecords(() => wx.stopPullDownRefresh());
   },
 
+  decorateRecord(item: any) {
+    const score = Number(item.test_score || 0);
+    const full = Number(item.full_score || 0);
+    const ratio = full > 0 ? score / full : 0;
+    const _percent = Math.min(100, Math.max(0, Math.round(ratio * 100)));
+    let _gradeBadge = '💪 待重刷';
+    let _gradeClass = 'grade-fail';
+    if (ratio >= 0.9) {
+      _gradeBadge = '🏆 学霸 S';
+      _gradeClass = 'grade-s';
+    } else if (ratio >= 0.8) {
+      _gradeBadge = '✨ 优秀 A';
+      _gradeClass = 'grade-a';
+    } else if (ratio >= 0.6) {
+      _gradeBadge = '✅ 及格 B';
+      _gradeClass = 'grade-b';
+    }
+    return {
+      ...item,
+      _percent,
+      _ratio: ratio,
+      _gradeBadge,
+      _gradeClass,
+      _scoreClass: this.getScoreClass(score, full),
+    };
+  },
+
+  applyFilter(records: any[], filter: string) {
+    if (filter === 'excellent') {
+      return records.filter((r: any) => r._ratio >= 0.8);
+    }
+    if (filter === 'pass') {
+      return records.filter((r: any) => r._ratio >= 0.6);
+    }
+    if (filter === 'fail') {
+      return records.filter((r: any) => r._ratio < 0.6);
+    }
+    return records;
+  },
+
+  switchFilter(e: any) {
+    const filter = e.currentTarget.dataset.filter || 'all';
+    const filteredRecords = this.applyFilter(this.data.records, filter);
+    this.setData({
+      activeFilter: filter,
+      filteredRecords,
+    });
+  },
+
   fetchRecords(done?: () => void) {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
@@ -39,11 +96,15 @@ Page<IReportPageData, any>({
       _appReport?.globalData?.userId ||
       _appReport?.globalData?.userInfo?.userId ||
       '';
-    console.log('[report] userId:', userId, 'userInfo:', userInfo, 'token:', token);
 
     if (!token || !userId) {
-      this.setData({ loading: false, records: [] });
-      console.warn('[report] token或userId为空，无法请求');
+      this.setData({
+        loading: false,
+        records: [],
+        filteredRecords: [],
+        avgScore: '0',
+        passRate: 0,
+      });
       wx.showToast({ title: '请先登录', icon: 'none' });
       if (done) done();
       return;
@@ -54,22 +115,42 @@ Page<IReportPageData, any>({
       method: 'GET',
       header: { Authorization: 'Bearer ' + token, token },
       success: (res: any) => {
-        console.log('[report] fetchtrans响应:', res.statusCode, res.data);
         if (res.statusCode === 200 && Array.isArray(res.data)) {
-          const records = res.data.map((item: any) => ({
-            ...item,
-            _scoreClass: this.getScoreClass(
-              Number(item.test_score || 0),
-              Number(item.full_score || 0)
-            ),
-          }));
-          this.setData({ records, loading: false });
+          const records = res.data.map((item: any) => this.decorateRecord(item));
+          const totalCount = records.length;
+          const sumScore = records.reduce(
+            (acc: number, item: any) => acc + Number(item.test_score || 0),
+            0
+          );
+          const passCount = records.filter((item: any) => item._ratio >= 0.6).length;
+          const avgScore = totalCount > 0 ? (sumScore / totalCount).toFixed(1) : '0';
+          const passRate = totalCount > 0 ? Math.round((passCount * 100) / totalCount) : 0;
+          const filteredRecords = this.applyFilter(records, this.data.activeFilter);
+          this.setData({
+            records,
+            filteredRecords,
+            avgScore,
+            passRate,
+            loading: false,
+          });
         } else {
-          this.setData({ loading: false, records: [] });
+          this.setData({
+            loading: false,
+            records: [],
+            filteredRecords: [],
+            avgScore: '0',
+            passRate: 0,
+          });
         }
       },
       fail: () => {
-        this.setData({ loading: false, records: [] });
+        this.setData({
+          loading: false,
+          records: [],
+          filteredRecords: [],
+          avgScore: '0',
+          passRate: 0,
+        });
         wx.showToast({ title: '网络请求失败', icon: 'none' });
       },
       complete: () => {
@@ -96,9 +177,22 @@ Page<IReportPageData, any>({
     }
     wx.navigateTo({ url });
   },
+
+  goToExam() {
+    wx.navigateTo({
+      url: '/pages/exam/index',
+      fail: () => {
+        wx.switchTab({ url: '/pages/exam/index' });
+      },
+    });
+  },
 });
 
 interface IReportPageData {
   records: any[];
+  filteredRecords: any[];
+  activeFilter: string;
+  avgScore: string;
+  passRate: number;
   loading: boolean;
 }

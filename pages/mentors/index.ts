@@ -7,6 +7,8 @@ const { get } = base
 Page({
   data: {
     listData: [] as any[],
+    filteredList: [] as any[],
+    searchKeyword: '',
     shushiCount: 0,
     shushengCount: 0,
     loading: true,
@@ -18,6 +20,34 @@ Page({
 
   onPullDownRefresh() {
     this.fetchData().finally(() => wx.stopPullDownRefresh())
+  },
+
+  applySearch(list: any[], keyword: string) {
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return list
+    return (list || []).filter((item: any) => {
+      const shushi = String(item.shushi_name || '').toLowerCase()
+      const shusheng = String(item.shusheng_name || '').toLowerCase()
+      const course = String(item.course_title || '').toLowerCase()
+      return (
+        shushi.indexOf(kw) !== -1 ||
+        shusheng.indexOf(kw) !== -1 ||
+        course.indexOf(kw) !== -1
+      )
+    })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const filteredList = this.applySearch(this.data.listData, searchKeyword)
+    this.setData({ searchKeyword, filteredList })
+  },
+
+  clearSearch() {
+    this.setData({
+      searchKeyword: '',
+      filteredList: this.data.listData,
+    })
   },
 
   fetchData() {
@@ -36,8 +66,10 @@ Page({
             _isActive: item.status === '活跃' || item.status === '新选' || item.status === '改课',
           }
         })
+        const filteredList = this.applySearch(listData, this.data.searchKeyword)
         this.setData({
           listData,
+          filteredList,
           shushiCount: shushiIds.size,
           shushengCount: shushengIds.size,
           loading: false,
@@ -46,6 +78,7 @@ Page({
       .catch(() => {
         this.setData({
           listData: [],
+          filteredList: [],
           shushiCount: 0,
           shushengCount: 0,
           loading: false,

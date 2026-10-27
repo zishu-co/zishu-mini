@@ -8,17 +8,73 @@
 /* Banner */
 .banner {
   background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
-  padding: 48rpx 32rpx 64rpx;
+  padding: 40rpx 32rpx 36rpx;
   color: #fff;
 }
+.banner-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
 .banner-title {
-  font-size: 48rpx;
-  font-weight: 600;
+  font-size: 46rpx;
+  font-weight: 700;
   margin-bottom: 8rpx;
+  letter-spacing: 2rpx;
 }
 .banner-sub {
   font-size: 26rpx;
-  opacity: 0.85;
+  opacity: 0.9;
+}
+.banner-counters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10rpx;
+}
+.counter-pill {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8rpx);
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+.counter-pill.subtle {
+  background: rgba(0, 0, 0, 0.18);
+  font-weight: 500;
+}
+
+/* Search Bar */
+.event-search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 36rpx;
+  padding: 0 24rpx;
+  height: 72rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+.search-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1a1a2e;
+  height: 72rpx;
+}
+.search-placeholder {
+  color: #9ca3af;
+}
+.search-clear {
+  font-size: 26rpx;
+  color: #9ca3af;
+  padding: 8rpx 12rpx;
 }
 
 /* Tabs */
@@ -66,9 +122,40 @@
 /* Empty */
 .empty {
   text-align: center;
-  padding: 120rpx 0;
+  padding: 120rpx 32rpx;
   color: #999;
   font-size: 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28rpx;
+}
+.empty-text {
+  color: #6b7280;
+  font-size: 28rpx;
+}
+.empty-actions {
+  display: flex;
+  gap: 20rpx;
+}
+.retry-btn {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 0 40rpx;
+  height: 68rpx;
+  line-height: 68rpx;
+  border-radius: 34rpx;
+  border: none;
+  margin: 0;
+}
+.retry-btn.secondary {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+.retry-btn::after {
+  border: none;
 }
 
 /* Event Card */

@@ -5,12 +5,46 @@ Page({
   data: {
     folders: [] as any[],
     items: [] as any[],
+    filteredItems: [] as any[],
+    searchKeyword: '',
+    totalItemsCount: 0,
     activeIndex: 0,
     loading: true,
   },
 
   onLoad() {
     this.fetchFolders()
+  },
+
+  computeTotalItems(folders: any[]) {
+    return (folders || []).reduce((acc: number, f: any) => acc + (Number(f.item_num) || 0), 0)
+  },
+
+  applySearchFilter(items: any[], keyword: string) {
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return items
+    return (items || []).filter((item: any) => {
+      const title = String(item.target_title || '').toLowerCase()
+      const type = String(item.target_type || '').toLowerCase()
+      return title.indexOf(kw) !== -1 || type.indexOf(kw) !== -1
+    })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const filteredItems = this.applySearchFilter(this.data.items, searchKeyword)
+    this.setData({ searchKeyword, filteredItems })
+  },
+
+  clearSearch() {
+    this.setData({
+      searchKeyword: '',
+      filteredItems: this.data.items,
+    })
+  },
+
+  goToArticles() {
+    wx.navigateTo({ url: '/pages/article/index' })
   },
 
   fetchFolders() {
@@ -20,7 +54,8 @@ Page({
       .then((res: any) => {
         wx.hideLoading()
         const folders = Array.isArray(res) ? res : []
-        this.setData({ folders })
+        const totalItemsCount = this.computeTotalItems(folders)
+        this.setData({ folders, totalItemsCount })
         if (folders.length > 0) {
           this.fetchItems(folders[0].folderid)
         } else {
@@ -29,7 +64,7 @@ Page({
       })
       .catch(() => {
         wx.hideLoading()
-        this.setData({ folders: [], loading: false })
+        this.setData({ folders: [], totalItemsCount: 0, loading: false })
       })
   },
 
@@ -55,14 +90,16 @@ Page({
         } else if (Array.isArray(res)) {
           rawItems = res
         }
-        const items = rawItems.map((item: any) => ({
+        const items = rawItems.map((item: any, idx: number) => ({
           ...item,
+          _origIndex: idx,
           _typeIcon: this.typeIcon(item.target_type),
         }))
-        this.setData({ items, loading: false })
+        const filteredItems = this.applySearchFilter(items, this.data.searchKeyword)
+        this.setData({ items, filteredItems, loading: false })
       })
       .catch(() => {
-        this.setData({ items: [], loading: false })
+        this.setData({ items: [], filteredItems: [], loading: false })
       })
   },
 
@@ -79,8 +116,7 @@ Page({
   },
 
   deleteItem(e: any) {
-    const { favorid, index } = e.currentTarget.dataset
-    const items = [...this.data.items]
+    const { favorid } = e.currentTarget.dataset
 
     wx.showModal({
       title: '确认删除',
@@ -90,17 +126,20 @@ Page({
 
         deleteFavor(favorid)
           .then(() => {
-            items.splice(index, 1)
-            this.setData({ items })
+            const items = this.data.items.filter(
+              (it: any) => Number(it.favorid) !== Number(favorid)
+            )
+            const filteredItems = this.applySearchFilter(items, this.data.searchKeyword)
 
             // 更新文件夹计数
             const folders = [...this.data.folders]
             const activeIndex = this.data.activeIndex
             if (folders[activeIndex]) {
               folders[activeIndex].item_num = Math.max(0, (folders[activeIndex].item_num || 1) - 1)
-              this.setData({ folders })
             }
+            const totalItemsCount = this.computeTotalItems(folders)
 
+            this.setData({ items, filteredItems, folders, totalItemsCount })
             wx.showToast({ title: '删除成功', icon: 'success' })
           })
           .catch(() => {

@@ -1,151 +1,333 @@
-<wxs module="fmt">
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  return ('' + dateStr).substring(0, 10);
-}
-module.exports = {
-  formatDate: formatDate
-};
-</wxs>
-
 <view class="page">
 
   <!-- 加载状态 -->
   <view class="loading-wrap" wx:if="{{loading}}">
-    <t-loading theme="circular" size="40rpx" text="加载中..." />
+    <t-loading theme="circular" size="48rpx" text="正在加载课程详情..." />
   </view>
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{!loading && !courseDetail}}">
-    <text class="empty-icon">📭</text>
+    <view class="empty-icon">📭</view>
     <text class="empty-text">课程不存在或已被删除</text>
     <view class="empty-retry" bindtap="loadDetail">重新加载</view>
   </view>
 
-  <!-- 课程详情 -->
+  <!-- 课程详情主体 -->
   <view class="detail-wrap" wx:if="{{!loading && courseDetail}}">
 
-    <!-- ========== 课程头部信息卡片 ========== -->
-    <view class="card course-header-card">
-      <view class="header-top">
-        <view class="course-title">{{courseDetail.course.title}}</view>
-        <view class="header-actions" wx:if="{{hasLogin}}">
-          <view
-            class="action-btn quit-btn"
-            wx:if="{{isSelected}}"
+    <!-- ========== 品牌紫 Hero 头部卡片 ========== -->
+    <view class="hero-card">
+      <view class="hero-glow hero-glow--1"></view>
+      <view class="hero-glow hero-glow--2"></view>
+
+      <view class="hero-top">
+        <view class="hero-title-group">
+          <view class="director-pill-row">
+            <view class="director-pill">👑 塾主：{{courseDetail.course.director_name || '自塾教研'}}</view>
+            <view
+              class="director-edit-pill"
+              wx:if="{{courseDetail.course.director_id === currentUserId}}"
+              bindtap="onEditCourse"
+            >✎ 编辑</view>
+          </view>
+          <view class="course-title">{{courseDetail.course.title}}</view>
+        </view>
+
+        <!-- 选课 / 退选 主操作按钮 -->
+        <view class="hero-action">
+          <button
+            class="enroll-btn enroll-btn--quit"
+            wx:if="{{hasLogin && isSelected}}"
+            disabled="{{submitting}}"
+            loading="{{submitting}}"
             bindtap="onQuitCourse"
-          >退选</view>
-          <view
-            class="action-btn select-btn"
-            wx:elif="{{currentSelectionsCount < 3}}"
+          >退选课程</button>
+          <button
+            class="enroll-btn enroll-btn--select"
+            wx:elif="{{!hasLogin || currentSelectionsCount < 3}}"
+            disabled="{{submitting}}"
+            loading="{{submitting}}"
             bindtap="onSelectCourse"
-          >选课</view>
-          <view class="action-btn disabled-btn" wx:else>禁选</view>
+          >＋ 立即选课</button>
+          <view class="enroll-btn enroll-btn--disabled" wx:else>已满3门</view>
         </view>
       </view>
-      <view class="course-meta-row">
-        <text class="meta-label">塾主：</text>
-        <text class="meta-value">{{courseDetail.course.director_name}}</text>
-        <text
-          class="meta-edit"
-          wx:if="{{courseDetail.course.director_id === currentUserId}}"
-          bindtap="onEditCourse"
-        >编辑课程</text>
-      </view>
-      <view class="course-desc" wx:if="{{courseDetail.course.desc}}">{{courseDetail.course.desc}}</view>
-    </view>
 
-    <!-- ========== 课程章节 ========== -->
-    <view class="card" wx:if="{{courseDetail.chapters.length > 0}}">
-      <view class="section-title-bar">课程章节</view>
-      <view class="data-table">
-        <view class="table-header">
-          <view class="th th-index">序</view>
-          <view class="th th-name">章节名称</view>
-          <view class="th th-name">作者</view>
-          <view class="th th-period">学习周期</view>
+      <!-- 课程简介 -->
+      <view class="course-desc">{{courseDetail.course.desc || '探索自塾精选体系化课程，跟随塾师与同塾伙伴完成深度共学。'}}</view>
+
+      <!-- 三维数据统计栏 -->
+      <view class="stats-bar">
+        <view class="stat-item">
+          <text class="stat-icon">📖</text>
+          <text class="stat-num">{{courseDetail.chapters.length}}</text>
+          <text class="stat-label">章节</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-icon">🔥</text>
+          <text class="stat-num">{{courseDetail.current.length}}</text>
+          <text class="stat-label">在学同塾</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-icon">🎓</text>
+          <text class="stat-num">{{courseDetail.finish.length}}</text>
+          <text class="stat-label">结课校友</text>
+        </view>
+      </view>
+
+      <!-- 快捷功能胶囊区 -->
+      <view class="quick-pills">
+        <view class="quick-pill" bindtap="onGoArkGroup">
+          <text class="quick-pill__icon">🚢</text>
+          <text class="quick-pill__text">诺亚方舟搭子舱</text>
+          <text class="quick-pill__arrow">›</text>
         </view>
         <view
-          class="table-row table-row--link"
+          class="quick-pill quick-pill--quiz"
+          wx:if="{{courseDetail.course.paper_id}}"
+          bindtap="onGoCourseQuiz"
+        >
+          <text class="quick-pill__icon">⚡</text>
+          <text class="quick-pill__text">结课闯关测验</text>
+          <text class="quick-pill__arrow">›</text>
+        </view>
+        <view
+          class="quick-pill"
+          wx:if="{{isSelected}}"
+          bindtap="onOpenMentorModal"
+        >
+          <text class="quick-pill__icon">👨‍🏫</text>
+          <text class="quick-pill__text">选择/更换塾师</text>
+          <text class="quick-pill__arrow">›</text>
+        </view>
+        <view
+          class="quick-pill"
+          wx:if="{{isSelected}}"
+          bindtap="onGoFinishCourse"
+        >
+          <text class="quick-pill__icon">🏆</text>
+          <text class="quick-pill__text">申请结课</text>
+          <text class="quick-pill__arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ========== 分段标签栏 Segmented Tabs ========== -->
+    <view class="seg-tabs">
+      <view
+        class="seg-tab {{activeTab === 'chapters' ? 'seg-tab--active' : ''}}"
+        data-tab="chapters"
+        bindtap="onTabChange"
+      >
+        <text class="seg-tab__label">课程章节</text>
+        <text class="seg-tab__count">{{courseDetail.chapters.length}}</text>
+      </view>
+      <view
+        class="seg-tab {{activeTab === 'current' ? 'seg-tab--active' : ''}}"
+        data-tab="current"
+        bindtap="onTabChange"
+      >
+        <text class="seg-tab__label">在学同塾</text>
+        <text class="seg-tab__count">{{courseDetail.current.length}}</text>
+      </view>
+      <view
+        class="seg-tab {{activeTab === 'finish' ? 'seg-tab--active' : ''}}"
+        data-tab="finish"
+        bindtap="onTabChange"
+      >
+        <text class="seg-tab__label">结课同塾</text>
+        <text class="seg-tab__count">{{courseDetail.finish.length}}</text>
+      </view>
+    </view>
+
+    <!-- ========== Tab 1: 纵向章节阶梯卡片 ========== -->
+    <view class="tab-panel" wx:if="{{activeTab === 'chapters'}}">
+      <view class="stepper-list" wx:if="{{courseDetail.chapters.length > 0}}">
+        <view
+          class="chapter-card"
           wx:for="{{courseDetail.chapters}}"
           wx:key="id"
           data-url="{{item.url}}"
+          data-title="{{item.title}}"
           bindtap="onChapterTap"
         >
-          <view class="td td-index">{{index + 1}}</view>
-          <view class="td td-name td-link">{{item.title}}</view>
-          <view class="td td-name">{{item.author_name || '—'}}</view>
-          <view class="td td-period">{{item.period || '—'}}</view>
+          <view class="chapter-step-badge">{{item._stepNum}}</view>
+          <view class="chapter-main">
+            <view class="chapter-title">{{item.title}}</view>
+            <view class="chapter-tags">
+              <text class="chapter-tag chapter-tag--author">✍️ {{item.author_name || '自塾讲师'}}</text>
+              <text class="chapter-tag chapter-tag--period">⏱ 周期 {{item.period || '1周'}}</text>
+            </view>
+          </view>
+          <view class="chapter-action">
+            <text class="chapter-action__text">{{item.url ? '学习 ›' : '待开放'}}</text>
+          </view>
         </view>
+      </view>
+      <view class="panel-empty" wx:else>
+        <text class="panel-empty__icon">📚</text>
+        <text class="panel-empty__text">该课程暂未发布章节内容</text>
       </view>
     </view>
 
-    <!-- 无章节 -->
-    <view class="card empty-card" wx:if="{{courseDetail.chapters.length === 0}}">
-      <view class="section-title-bar">课程章节</view>
-      <view class="empty-section">暂无章节内容</view>
-    </view>
-
-    <!-- ========== 当前同塾 ========== -->
-    <view class="card" wx:if="{{courseDetail.current.length > 0}}">
-      <view class="section-title-bar">当前同塾</view>
-      <view class="data-table">
-        <view class="table-header">
-          <view class="th th-index">序</view>
-          <view class="th th-name">塾生</view>
-          <view class="th th-name">塾师</view>
-          <view class="th th-serial">课次</view>
-          <view class="th th-date">截止日期</view>
-        </view>
+    <!-- ========== Tab 2: 在学同塾学员卡片 ========== -->
+    <view class="tab-panel" wx:if="{{activeTab === 'current'}}">
+      <view class="cohort-list" wx:if="{{courseDetail.current.length > 0}}">
         <view
-          class="table-row"
+          class="cohort-card"
           wx:for="{{courseDetail.current}}"
           wx:key="user_id"
+          data-userid="{{item.user_id}}"
+          data-username="{{item.user_name}}"
+          bindtap="onClassmateTap"
         >
-          <view class="td td-index">{{index + 1}}</view>
-          <view class="td td-name">{{item.user_name || '—'}}</view>
-          <view class="td td-name">{{item.shushi_name || '—'}}</view>
-          <view class="td td-serial">{{item.current_serial || '—'}}</view>
-          <view class="td td-date {{item.deadlineClass}}">{{item.deadlineText}}</view>
+          <view class="cohort-avatar">{{item._avatarChar}}</view>
+          <view class="cohort-info">
+            <view class="cohort-top-row">
+              <text class="cohort-name">{{item.user_name || '同塾学员'}}</text>
+              <view class="cohort-badges-right">
+                <text class="cohort-serial-pill">📖 第 {{item.current_serial || 1}} 节</text>
+                <text class="cohort-social-pill">👋 约共学 ›</text>
+              </view>
+            </view>
+            <view class="cohort-bottom-row">
+              <text class="cohort-mentor-badge">👨‍🏫 塾师：{{item.shushi_name || '待分配'}}</text>
+              <text class="cohort-deadline-badge {{item.deadlineClass}}">⏳ 截止 {{item.deadlineText}}</text>
+            </view>
+          </view>
         </view>
+      </view>
+      <view class="panel-empty" wx:else>
+        <text class="panel-empty__icon">🌱</text>
+        <text class="panel-empty__text">暂无在读塾生，快来成为第一位共学者吧！</text>
       </view>
     </view>
 
-    <!-- 无当前同塾 -->
-    <view class="card empty-card" wx:if="{{courseDetail.current.length === 0}}">
-      <view class="section-title-bar">当前同塾</view>
-      <view class="empty-section">暂无在读塾生</view>
-    </view>
-
-    <!-- ========== 结课同塾 ========== -->
-    <view class="card" wx:if="{{courseDetail.finish.length > 0}}">
-      <view class="section-title-bar">结课同塾</view>
-      <view class="data-table">
-        <view class="table-header">
-          <view class="th th-index">序</view>
-          <view class="th th-name">塾生</view>
-          <view class="th th-name">塾师</view>
-          <view class="th th-date">结课日期</view>
-        </view>
+    <!-- ========== Tab 3: 结课同塾校友卡片 ========== -->
+    <view class="tab-panel" wx:if="{{activeTab === 'finish'}}">
+      <view class="cohort-list" wx:if="{{courseDetail.finish.length > 0}}">
         <view
-          class="table-row"
+          class="cohort-card cohort-card--finish"
           wx:for="{{courseDetail.finish}}"
           wx:key="user_id"
+          data-userid="{{item.user_id}}"
+          data-username="{{item.user_name}}"
+          bindtap="onClassmateTap"
         >
-          <view class="td td-index">{{index + 1}}</view>
-          <view class="td td-name">{{item.user_name || '—'}}</view>
-          <view class="td td-name">{{item.shushi_name || '—'}}</view>
-          <view class="td td-date">{{item.finishDateText}}</view>
+          <view class="cohort-avatar cohort-avatar--finish">{{item._avatarChar}}</view>
+          <view class="cohort-info">
+            <view class="cohort-top-row">
+              <text class="cohort-name">{{item.user_name || '结课校友'}}</text>
+              <view class="cohort-badges-right">
+                <text class="cohort-serial-pill cohort-serial-pill--done">🎓 已结课</text>
+                <text class="cohort-social-pill">👋 请教 ›</text>
+              </view>
+            </view>
+            <view class="cohort-bottom-row">
+              <text class="cohort-mentor-badge">👨‍🏫 塾师：{{item.shushi_name || '自塾导师'}}</text>
+              <text class="cohort-deadline-badge badge-done">🏅 {{item.finishDateText}} 结课</text>
+            </view>
+          </view>
         </view>
+      </view>
+      <view class="panel-empty" wx:else>
+        <text class="panel-empty__icon">🏆</text>
+        <text class="panel-empty__text">暂无结课记录，坚持学习率先通关！</text>
       </view>
     </view>
 
-    <!-- 无结课同塾 -->
-    <view class="card empty-card" wx:if="{{courseDetail.finish.length === 0}}">
-      <view class="section-title-bar">结课同塾</view>
-      <view class="empty-section">暂无结课记录</view>
+  </view>
+
+  <!-- ========== 选择塾师弹窗 Modal ========== -->
+  <view class="mentor-modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
+  <view class="mentor-modal" wx:if="{{showMentorModal}}">
+    <view class="mentor-modal__header">
+      <view>
+        <view class="mentor-modal__title">选择领航塾师</view>
+        <view class="mentor-modal__sub">塾师将陪伴你的课程学习与方舟共创</view>
+      </view>
+      <view class="mentor-modal__close" bindtap="onCloseMentorModal">✕</view>
     </view>
 
+    <view class="mentor-modal__body">
+      <view
+        class="mentor-item"
+        wx:for="{{mentorList}}"
+        wx:key="shushi_id"
+        data-shushiid="{{item.shushi_id}}"
+        data-shushiname="{{item.shushi_name}}"
+        bindtap="onConfirmMentor"
+      >
+        <view class="mentor-item__avatar">{{item._initial}}</view>
+        <view class="mentor-item__info">
+          <view class="mentor-item__name-row">
+            <text class="mentor-item__name">{{item.shushi_name}}</text>
+            <text class="mentor-item__role" wx:if="{{item._isDirector}}">👑 塾主亲授</text>
+            <text class="mentor-item__role mentor-item__role--mentor" wx:else>✨ 认证塾师</text>
+          </view>
+          <view class="mentor-item__desc">点击选择该塾师并完成选课绑定</view>
+        </view>
+        <view class="mentor-item__cta">选择 ›</view>
+      </view>
+
+      <view class="mentor-empty" wx:if="{{mentorList.length === 0}}">
+        <text>当前暂无可选塾师</text>
+      </view>
+    </view>
+
+    <view class="mentor-modal__footer" wx:if="{{pendingEnrollBeforeMentor}}">
+      <button
+        class="direct-select-btn"
+        disabled="{{submitting}}"
+        loading="{{submitting}}"
+        bindtap="onDirectSelectCourse"
+      >先直接选课，稍后分配塾师</button>
+    </view>
+  </view>
+
+  <!-- ========== 塾主编辑课程弹窗 Modal ========== -->
+  <view class="mentor-modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseEditModal"></view>
+  <view class="mentor-modal" wx:if="{{showEditModal}}">
+    <view class="mentor-modal__header">
+      <view>
+        <view class="mentor-modal__title">编辑课程信息</view>
+        <view class="mentor-modal__sub">塾主可随时更新课程名称与核心简介</view>
+      </view>
+      <view class="mentor-modal__close" bindtap="onCloseEditModal">✕</view>
+    </view>
+
+    <view class="edit-modal__body">
+      <view class="edit-field">
+        <text class="edit-field__label">课程名称</text>
+        <input
+          class="edit-field__input"
+          value="{{editTitle}}"
+          placeholder="请输入课程名称"
+          bindinput="onEditTitleInput"
+        />
+      </view>
+      <view class="edit-field">
+        <text class="edit-field__label">课程简介</text>
+        <textarea
+          class="edit-field__textarea"
+          value="{{editDesc}}"
+          placeholder="请输入课程定位、适合人群与共学目标..."
+          maxlength="500"
+          bindinput="onEditDescInput"
+        />
+      </view>
+    </view>
+
+    <view class="mentor-modal__footer">
+      <button
+        class="edit-save-btn"
+        disabled="{{submittingEdit}}"
+        loading="{{submittingEdit}}"
+        bindtap="onConfirmEditCourse"
+      >保存修改</button>
+    </view>
   </view>
 
 </view>

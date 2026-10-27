@@ -15,16 +15,22 @@ interface IEventPageData {
   activeTab: 'current' | 'historical';
   currentEvents: EventItem[];
   historicalEvents: EventItem[];
+  filteredCurrentEvents: EventItem[];
+  filteredHistoricalEvents: EventItem[];
+  searchKeyword: string;
   loading: boolean;
   hasLogin: boolean;
   joiningId: number;
 }
 
-Page<IEventPageData, IEventPageData>({
+Page<IEventPageData, any>({
   data: {
     activeTab: 'current',
     currentEvents: [],
     historicalEvents: [],
+    filteredCurrentEvents: [],
+    filteredHistoricalEvents: [],
+    searchKeyword: '',
     loading: true,
     hasLogin: false,
     joiningId: 0,
@@ -62,16 +68,48 @@ Page<IEventPageData, IEventPageData>({
         fetchCurrentEvents(),
         fetchHistoricalEvents(),
       ]);
+      const currentEvents = Array.isArray(current) ? current.map((e) => this.decorateEvent(e)) : [];
+      const historicalEvents = Array.isArray(historical) ? historical.map((e) => this.decorateEvent(e)) : [];
       this.setData({
-        currentEvents: Array.isArray(current) ? current.map((e) => this.decorateEvent(e)) : [],
-        historicalEvents: Array.isArray(historical) ? historical.map((e) => this.decorateEvent(e)) : [],
+        currentEvents,
+        historicalEvents,
         loading: false,
       });
+      this.applySearch(this.data.searchKeyword, currentEvents, historicalEvents);
     } catch (e) {
       console.error('loadEvents failed', e);
       this.setData({ loading: false });
       wx.showToast({ title: '加载活动列表失败，请稍后重试', icon: 'none' });
     }
+  },
+
+  onSearchInput(e: any) {
+    const kw = (e?.detail?.value ?? '').trim();
+    this.applySearch(kw);
+  },
+
+  onClearSearch() {
+    this.applySearch('');
+  },
+
+  applySearch(
+    keyword: string,
+    currentList = this.data.currentEvents,
+    historicalList = this.data.historicalEvents
+  ) {
+    const kw = (keyword || '').toLowerCase();
+    const matchFn = (ev: any) => {
+      if (!kw) return true;
+      const title = String(ev?.title || '').toLowerCase();
+      const loc = String(ev?.location || '').toLowerCase();
+      const desc = String(ev?.desc || '').toLowerCase();
+      return title.includes(kw) || loc.includes(kw) || desc.includes(kw);
+    };
+    this.setData({
+      searchKeyword: keyword,
+      filteredCurrentEvents: (currentList || []).filter(matchFn),
+      filteredHistoricalEvents: (historicalList || []).filter(matchFn),
+    });
   },
 
   /** 检查登录态 */

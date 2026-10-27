@@ -2,44 +2,93 @@
 <!-- spec: specs/miniprogram/active/005-port-learn-sheet.md -->
 <view class="page">
   <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
+    <text>正在加载学习单档案...</text>
   </view>
 
   <block wx:else>
-    <!-- 顶部学习单概览与约学栏 -->
+    <!-- 顶部学习单概览 Hero 卡片（含结课完成率 + 约学栏） -->
     <view class="sheet-hero">
+      <view class="sheet-hero__top">
+        <view>
+          <view class="sheet-hero__badge">LEARNING PORTFOLIO</view>
+          <view class="sheet-hero__title">{{ownerName}} 的共学档案</view>
+        </view>
+        <view class="sheet-rate-pill">
+          <text class="sheet-rate-pill__num">{{completionRate}}%</text>
+          <text class="sheet-rate-pill__label">完成率</text>
+        </view>
+      </view>
+
+      <!-- 完成率进度条 -->
+      <view class="sheet-progress-track">
+        <view class="sheet-progress-fill" style="width: {{completionRate}}%;"></view>
+      </view>
+
       <view class="sheet-stats">
         <view class="sheet-stat-item">
           <text class="sheet-stat-num">{{campCount}}</text>
           <text class="sheet-stat-label">训练营</text>
         </view>
+        <view class="sheet-stat-divider"></view>
         <view class="sheet-stat-item">
           <text class="sheet-stat-num">{{learningCount}}</text>
           <text class="sheet-stat-label">在修课程</text>
         </view>
+        <view class="sheet-stat-divider"></view>
         <view class="sheet-stat-item">
           <text class="sheet-stat-num">{{learnedCount}}</text>
           <text class="sheet-stat-label">已修完</text>
         </view>
       </view>
+
       <view class="sheet-buddy-bar" wx:if="{{!isSelf}}">
         <text class="sheet-buddy-tip">💡 发现与 {{ownerName}} 志同道合的课程？</text>
         <button class="sheet-greet-btn" bindtap="onGreetOwner">👋 约TA共学</button>
       </view>
     </view>
 
+    <!-- 分段筛选 Tabs -->
+    <view class="sheet-tabs">
+      <view
+        class="sheet-tab {{activeTab === 'all' ? 'sheet-tab--active' : ''}}"
+        data-tab="all"
+        bindtap="onTabChange"
+      >全部</view>
+      <view
+        class="sheet-tab {{activeTab === 'camps' ? 'sheet-tab--active' : ''}}"
+        data-tab="camps"
+        bindtap="onTabChange"
+      >训练营 ({{campCount}})</view>
+      <view
+        class="sheet-tab {{activeTab === 'learning' ? 'sheet-tab--active' : ''}}"
+        data-tab="learning"
+        bindtap="onTabChange"
+      >在修 ({{learningCount}})</view>
+      <view
+        class="sheet-tab {{activeTab === 'learned' ? 'sheet-tab--active' : ''}}"
+        data-tab="learned"
+        bindtap="onTabChange"
+      >已修完 ({{learnedCount}})</view>
+    </view>
+
     <!-- 训练营 -->
-    <view class="section" wx:if="{{data.camps && data.camps.length > 0}}">
-      <view class="section-title">🏕️ 训练营</view>
+    <view
+      class="section"
+      wx:if="{{(activeTab === 'all' || activeTab === 'camps') && data.camps && data.camps.length > 0}}"
+    >
+      <view class="section-title">🏕️ 训练营共学</view>
       <view
         class="camp-card"
         wx:for="{{data.camps}}"
         wx:key="id"
         wx:for-item="camp"
       >
-        <view class="camp-name">{{camp.camp_name}}</view>
-        <view class="camp-meta" wx:if="{{camp.user_name}}">成员：{{camp.user_name}}</view>
-        <view class="camp-must" wx:if="{{camp.must_course}}">必选：{{camp.must_course}}</view>
+        <view class="camp-header">
+          <view class="camp-name">{{camp.camp_name}}</view>
+          <text class="camp-badge">专项集训</text>
+        </view>
+        <view class="camp-meta" wx:if="{{camp.user_name}}">👤 学员：{{camp.user_name}}</view>
+        <view class="camp-must" wx:if="{{camp.must_course}}">📌 必修核心：{{camp.must_course}}</view>
         <view class="course-list">
           <view
             class="course-item"
@@ -49,19 +98,25 @@
             bindtap="onGoCourse"
             data-id="{{c.course_id}}"
           >
-            <view class="course-name">{{c.course_title}}</view>
-            <view class="course-meta">
-              <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
-              <text class="deadline" wx:if="{{c.deadline}}">截止：{{c._deadlineText}}</text>
+            <view class="course-item__main">
+              <view class="course-name">{{c.course_title}}</view>
+              <view class="course-meta">
+                <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
+                <text class="deadline" wx:if="{{c.deadline}}">⏳ 截止：{{c._deadlineText}}</text>
+              </view>
             </view>
+            <text class="course-item__arrow">›</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 其他在学 -->
-    <view class="section" wx:if="{{data.other_learning && data.other_learning.length > 0}}">
-      <view class="section-title">📖 其他在学</view>
+    <view
+      class="section"
+      wx:if="{{(activeTab === 'all' || activeTab === 'learning') && data.other_learning && data.other_learning.length > 0}}"
+    >
+      <view class="section-title">📖 自主在修课程</view>
       <view
         class="course-item standalone"
         wx:for="{{data.other_learning}}"
@@ -70,17 +125,23 @@
         bindtap="onGoCourse"
         data-id="{{c.course_id}}"
       >
-        <view class="course-name">{{c.course_title}}</view>
-        <view class="course-meta">
-          <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
-          <text class="deadline" wx:if="{{c.deadline}}">截止：{{c._deadlineText}}</text>
+        <view class="course-item__main">
+          <view class="course-name">{{c.course_title}}</view>
+          <view class="course-meta">
+            <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
+            <text class="deadline" wx:if="{{c.deadline}}">⏳ 截止：{{c._deadlineText}}</text>
+          </view>
         </view>
+        <text class="course-item__arrow">›</text>
       </view>
     </view>
 
     <!-- 其他学完 -->
-    <view class="section" wx:if="{{data.other_learned && data.other_learned.length > 0}}">
-      <view class="section-title">✅ 已学完</view>
+    <view
+      class="section"
+      wx:if="{{(activeTab === 'all' || activeTab === 'learned') && data.other_learned && data.other_learned.length > 0}}"
+    >
+      <view class="section-title">🎓 已结课通关</view>
       <view
         class="course-item standalone done"
         wx:for="{{data.other_learned}}"
@@ -89,16 +150,22 @@
         bindtap="onGoCourse"
         data-id="{{c.course_id}}"
       >
-        <view class="course-name">{{c.course_title}}</view>
-        <view class="course-meta">
-          <text class="status-tag status-done">已学完</text>
+        <view class="course-item__main">
+          <view class="course-name">{{c.course_title}}</view>
+          <view class="course-meta">
+            <text class="status-tag status-done">✓ 已学完</text>
+          </view>
         </view>
+        <text class="course-item__arrow">›</text>
       </view>
     </view>
 
-    <!-- 完全空 -->
-    <view class="empty" wx:if="{{(!data.camps || !data.camps.length) && (!data.other_learning || !data.other_learning.length) && (!data.other_learned || !data.other_learned.length)}}">
-      <text>暂无学习记录</text>
+    <!-- 空状态 + 去选课中心 CTA -->
+    <view class="empty-card" wx:if="{{isEmpty}}">
+      <view class="empty-icon">🌱</view>
+      <view class="empty-title">暂无学习记录</view>
+      <view class="empty-sub">立即前往选课中心，开启你的第一门自塾共学课程吧！</view>
+      <button class="empty-cta-btn" bindtap="onGoLearnCenter">去选课中心 ›</button>
     </view>
   </block>
 </view>

@@ -6,6 +6,8 @@ Page({
   data: {
     allData: [] as any[],
     listData: [] as any[],
+    filteredList: [] as any[],
+    searchKeyword: '',
     loading: true,
     showMine: false,
   },
@@ -16,6 +18,45 @@ Page({
 
   onPullDownRefresh() {
     this.fetchData().finally(() => wx.stopPullDownRefresh())
+  },
+
+  applyFilters(allData: any[], showMine: boolean, keyword: string) {
+    let baseList = allData || []
+    if (showMine) {
+      const storedUserInfo = wx.getStorageSync('userInfo') || {}
+      const userId = wx.getStorageSync('userId') || storedUserInfo.userId || storedUserInfo.id
+      const userName = storedUserInfo.name || storedUserInfo.nickName || ''
+      baseList = baseList.filter(
+        (item: any) =>
+          (userId && Number(item.taker_id) === Number(userId)) ||
+          (userName && item.taker === userName)
+      )
+    }
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return baseList
+    return baseList.filter((item: any) => {
+      const title = String(item.title || '').toLowerCase()
+      const serial = String(item.task_serial || '').toLowerCase()
+      const taker = String(item.taker || '').toLowerCase()
+      const shushi = String(item.shushi || '').toLowerCase()
+      return (
+        title.indexOf(kw) !== -1 ||
+        serial.indexOf(kw) !== -1 ||
+        taker.indexOf(kw) !== -1 ||
+        shushi.indexOf(kw) !== -1
+      )
+    })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const listData = this.applyFilters(this.data.allData, this.data.showMine, searchKeyword)
+    this.setData({ searchKeyword, listData, filteredList: listData })
+  },
+
+  clearSearch() {
+    const listData = this.applyFilters(this.data.allData, this.data.showMine, '')
+    this.setData({ searchKeyword: '', listData, filteredList: listData })
   },
 
   fetchData() {
@@ -29,10 +70,11 @@ Page({
           _deadline: item.deadline ? String(item.deadline).slice(0, 10) : '-',
           _finishDate: item.finish_date ? String(item.finish_date).slice(0, 10) : '',
         }))
-        this.setData({ allData, listData: allData, loading: false })
+        const listData = this.applyFilters(allData, this.data.showMine, this.data.searchKeyword)
+        this.setData({ allData, listData, filteredList: listData, loading: false })
       })
       .catch(() => {
-        this.setData({ allData: [], listData: [], loading: false })
+        this.setData({ allData: [], listData: [], filteredList: [], loading: false })
       })
   },
 
@@ -40,19 +82,8 @@ Page({
     const mode = e?.currentTarget?.dataset?.mode
     const showMine =
       mode === 'mine' ? true : mode === 'all' ? false : !this.data.showMine
-    if (showMine) {
-      const storedUserInfo = wx.getStorageSync('userInfo') || {}
-      const userId = wx.getStorageSync('userId') || storedUserInfo.userId || storedUserInfo.id
-      const userName = storedUserInfo.name || storedUserInfo.nickName || ''
-      const filtered = this.data.allData.filter(
-        (item: any) =>
-          (userId && Number(item.taker_id) === Number(userId)) ||
-          (userName && item.taker === userName)
-      )
-      this.setData({ listData: filtered, showMine })
-    } else {
-      this.setData({ listData: this.data.allData, showMine })
-    }
+    const listData = this.applyFilters(this.data.allData, showMine, this.data.searchKeyword)
+    this.setData({ listData, filteredList: listData, showMine })
   },
 
   onProjectTap(e: any) {

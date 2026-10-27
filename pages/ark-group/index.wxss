@@ -1,37 +1,158 @@
 /* pages/ark-group/index.wxss */
-/* spec: specs/miniprogram/active/003-complete-ark-group.md */
+/* 诺亚方舟搭子舱旗舰版样式 */
+
+page {
+  background: #f6f4fa;
+  color: #1a1a2e;
+}
 
 .page {
   min-height: 100vh;
-  background: #faf9f7;
-  padding: 24rpx 24rpx 80rpx;
+  padding: 24rpx 28rpx 80rpx;
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 24rpx;
+  box-sizing: border-box;
+}
+
+/* ========== 品牌紫 Hero Banner ========== */
+.ark-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28rpx;
+  padding: 36rpx 32rpx 30rpx;
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 48%, #aa00ff 100%);
+  color: #ffffff;
+  box-shadow: 0 14rpx 36rpx rgba(124, 58, 237, 0.28);
+}
+
+.ark-hero__glow {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.ark-hero__glow--1 {
+  width: 220rpx;
+  height: 220rpx;
+  top: -70rpx;
+  right: -50rpx;
+}
+
+.ark-hero__glow--2 {
+  width: 150rpx;
+  height: 150rpx;
+  bottom: -40rpx;
+  left: -40rpx;
+}
+
+.ark-hero__tag {
+  display: inline-block;
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.16);
+  margin-bottom: 12rpx;
+}
+
+.ark-hero__title {
+  font-size: 38rpx;
+  font-weight: 800;
+  margin-bottom: 10rpx;
+}
+
+.ark-hero__rule {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 26rpx;
+}
+
+.ark-hero__stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1rpx solid rgba(255, 255, 255, 0.22);
+  border-radius: 20rpx;
+  padding: 18rpx 12rpx;
+}
+
+.ark-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.ark-stat__num {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ark-stat__label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ark-stat-divider {
+  width: 2rpx;
+  height: 26rpx;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ========== 筛选胶囊栏 ========== */
+.filter-bar {
+  display: flex;
+  gap: 16rpx;
+}
+
+.filter-pill {
+  flex: 1;
+  height: 68rpx;
+  line-height: 68rpx;
+  text-align: center;
+  border-radius: 34rpx;
+  background: #ffffff;
+  color: #6b6380;
+  font-size: 26rpx;
+  font-weight: 600;
+  border: 1rpx solid rgba(170, 0, 255, 0.12);
+  transition: all 0.2s ease;
+}
+
+.filter-pill--active {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 18rpx rgba(170, 0, 255, 0.26);
+  border-color: transparent;
 }
 
 .loading {
-  padding: 80rpx 0;
+  padding: 100rpx 0;
   text-align: center;
-  color: #999;
+  color: #8b859e;
   font-size: 28rpx;
 }
 
+/* ========== 方舟卡片列表 ========== */
 .teacher-list {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 24rpx;
 }
 
 .teacher-card {
   background: #ffffff;
-  border: 1rpx solid rgba(0, 0, 0, 0.06);
-  border-radius: 16rpx;
-  padding: 24rpx;
+  border: 1rpx solid rgba(170, 0, 255, 0.08);
+  border-radius: 24rpx;
+  padding: 28rpx;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  gap: 22rpx;
+  box-shadow: 0 6rpx 24rpx rgba(26, 26, 46, 0.05);
 }
 
 .teacher-row {
@@ -44,29 +165,61 @@
 .teacher-info {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 18rpx;
   min-width: 0;
   flex: 1;
 }
 
+.teacher-avatar {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6rpx 16rpx rgba(170, 0, 255, 0.2);
+}
+
+.teacher-title-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacher-name-line {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 6rpx;
+}
+
 .teacher-name {
-  font-weight: 600;
+  font-weight: 800;
   font-size: 32rpx;
   color: #1a1a2e;
   white-space: nowrap;
 }
 
-.ark-badge {
+.ark-subname {
   font-size: 22rpx;
-  font-weight: 600;
-  padding: 4rpx 16rpx;
+  color: #8b859e;
+}
+
+.ark-badge {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 14rpx;
   border-radius: 20rpx;
   white-space: nowrap;
 }
 
 .badge-success {
-  background: #d4edda;
-  color: #155724;
+  background: #d1fae5;
+  color: #059669;
 }
 
 .badge-waiting {
@@ -82,94 +235,179 @@
 }
 
 .action-btn {
+  margin: 0;
   font-size: 24rpx;
-  padding: 0 20rpx;
-  height: 56rpx;
-  line-height: 56rpx;
-  border-radius: 8rpx;
+  font-weight: 700;
+  padding: 0 26rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  border-radius: 30rpx;
   border: none;
 }
 
 .action-btn.primary {
-  background: #aa00ff;
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
   color: #fff;
+  box-shadow: 0 6rpx 16rpx rgba(170, 0, 255, 0.25);
 }
 
 .action-btn::after {
   border: none;
 }
 
-.joined-tip {
+.joined-pill {
   font-size: 24rpx;
-  color: #67c23a;
-  font-weight: 600;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1rpx solid #a7f3d0;
+  padding: 8rpx 20rpx;
+  border-radius: 28rpx;
+  font-weight: 700;
 }
 
 .closed-tip,
 .full-tip,
-.no-ark-tip,
-.no-ark-hint {
+.no-ark-tip {
   font-size: 24rpx;
-  color: #999;
+  font-weight: 600;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
 }
 
-.detail-link {
-  font-size: 24rpx;
-  color: #aa00ff;
-  margin-left: 4rpx;
+/* ========== 4 席位可视化船舱网格 ========== */
+.cabin-box {
+  background: #faf8ff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  border: 1rpx solid rgba(170, 0, 255, 0.1);
 }
 
-.members-row {
+.cabin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14rpx;
+}
+
+.seat-slot {
+  border-radius: 16rpx;
+  padding: 16rpx 18rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  box-sizing: border-box;
+}
+
+.seat-slot--occupied.seat-slot--male {
+  background: #eff6ff;
+  border: 2rpx solid #bfdbfe;
+}
+
+.seat-slot--occupied.seat-slot--female {
+  background: #fdf2f8;
+  border: 2rpx solid #fbcfe8;
+}
+
+.seat-slot--empty.seat-slot--male {
+  background: rgba(239, 246, 255, 0.45);
+  border: 2rpx dashed #93c5fd;
+}
+
+.seat-slot--empty.seat-slot--female {
+  background: rgba(253, 242, 248, 0.45);
+  border: 2rpx dashed #f9a8d4;
+}
+
+.seat-top {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  padding-top: 12rpx;
-  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+  justify-content: space-between;
 }
 
-.member-count-tag {
-  font-size: 22rpx;
-  font-weight: 600;
-  padding: 4rpx 12rpx;
+.seat-tag {
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.seat-slot--male .seat-tag {
+  color: #1d4ed8;
+}
+
+.seat-slot--female .seat-tag {
+  color: #be185d;
+}
+
+.seat-captain {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 2rpx 10rpx;
   border-radius: 12rpx;
 }
 
-.member-count-tag.male {
-  background: #e0f0ff;
-  color: #1e40af;
+.seat-user {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.member-count-tag.female {
-  background: #fff0f5;
-  color: #9d174d;
-}
-
-.member-chip {
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
+.seat-empty-text {
   font-size: 24rpx;
-  font-weight: 500;
+  color: #9ca3af;
 }
 
-.gender-male {
-  background: #e0f0ff;
-  color: #1e40af;
+.cabin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(170, 0, 255, 0.1);
 }
 
-.gender-female {
-  background: #fff0f5;
-  color: #9d174d;
+.cabin-footer__hint {
+  font-size: 22rpx;
+  color: #8b859e;
 }
 
-.no-member {
+.cabin-footer__btn {
   font-size: 24rpx;
-  color: #9a9ab0;
+  font-weight: 700;
+  color: #aa00ff;
+}
+
+.no-cabin-bar {
+  padding: 18rpx 20rpx;
+  background: #f9fafb;
+  border-radius: 14rpx;
+  text-align: center;
+}
+
+.no-ark-hint {
+  font-size: 24rpx;
+  color: #9ca3af;
 }
 
 .empty-tip {
-  text-align: center;
-  padding: 80rpx 0;
-  color: #9a9ab0;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 90rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.empty-tip__icon {
+  font-size: 72rpx;
+}
+
+.empty-tip__text {
+  color: #8b859e;
   font-size: 28rpx;
 }

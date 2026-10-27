@@ -1,11 +1,12 @@
 <!--pages/agreement/index.wxml-->
 <view class="page">
-  <view class="header">
+  <view class="brand-header">
+    <view class="brand-badge">📜 自塾平台服务规范</view>
     <text class="title">用户服务协议</text>
-    <text class="update-date">更新日期：2024年1月1日</text>
+    <text class="update-date">生效与更新日期：2026年10月</text>
   </view>
 
-  <view class="content">
+  <view class="content zs-card">
     <view class="section">
       <view class="section-title">一、协议的接受</view>
       <view class="section-content">

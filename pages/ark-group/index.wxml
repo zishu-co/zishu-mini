@@ -1,30 +1,85 @@
 <!-- pages/ark-group/index.wxml -->
 <!-- spec: specs/miniprogram/active/003-complete-ark-group.md -->
 <view class="page">
+  <!-- 品牌紫诺亚方舟搭子舱 Hero Banner -->
+  <view class="ark-hero">
+    <view class="ark-hero__glow ark-hero__glow--1"></view>
+    <view class="ark-hero__glow ark-hero__glow--2"></view>
+    <view class="ark-hero__tag">NOAH'S ARK CO-LEARNING</view>
+    <view class="ark-hero__title">🚢 2男2女诺亚方舟搭子舱</view>
+    <view class="ark-hero__rule">2男 + 2女 = 4人成舟 · 选出舟长 · 召集团队三会</view>
+
+    <view class="ark-hero__stats">
+      <view class="ark-stat">
+        <text class="ark-stat__num">{{arkList.length}}</text>
+        <text class="ark-stat__label">领航塾师</text>
+      </view>
+      <view class="ark-stat-divider"></view>
+      <view class="ark-stat">
+        <text class="ark-stat__num">{{openArkCount}}</text>
+        <text class="ark-stat__label">艘招募中</text>
+      </view>
+      <view class="ark-stat-divider"></view>
+      <view class="ark-stat">
+        <text class="ark-stat__num">{{readyArkCount}}</text>
+        <text class="ark-stat__label">艘已成舟</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选胶囊栏 -->
+  <view class="filter-bar">
+    <view
+      class="filter-pill {{activeFilter === 'all' ? 'filter-pill--active' : ''}}"
+      data-filter="all"
+      bindtap="onFilterChange"
+    >全部 ({{arkList.length}})</view>
+    <view
+      class="filter-pill {{activeFilter === 'open' ? 'filter-pill--active' : ''}}"
+      data-filter="open"
+      bindtap="onFilterChange"
+    >可加入 ({{openArkCount}})</view>
+    <view
+      class="filter-pill {{activeFilter === 'ready' ? 'filter-pill--active' : ''}}"
+      data-filter="ready"
+      bindtap="onFilterChange"
+    >已成舟 ({{readyArkCount}})</view>
+  </view>
+
   <!-- 加载中 -->
   <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
+    <text>正在扫描方舟船舱...</text>
   </view>
 
   <!-- 方舟列表 -->
   <view class="teacher-list" wx:else>
     <view
       class="teacher-card"
-      wx:for="{{arkList}}"
+      wx:for="{{filteredArkList}}"
       wx:key="teacher_id"
       wx:for-item="ark"
     >
-      <!-- 第一行：塾师名 + 状态 + 操作 -->
+      <!-- 第一行：塾师头像 + 塾师名 + 状态徽章 + 主操作 -->
       <view class="teacher-row">
         <view class="teacher-info">
-          <text class="teacher-name">{{ark.teacher_name}} 塾师</text>
-          <text class="ark-badge {{ark._statusClass}}" wx:if="{{ark.ark_id}}">{{ark._statusText}}</text>
+          <view class="teacher-avatar">{{ark._teacherInitial}}</view>
+          <view class="teacher-title-box">
+            <view class="teacher-name-line">
+              <text class="teacher-name">{{ark.teacher_name}} 塾师</text>
+              <text class="ark-badge {{ark._statusClass}}" wx:if="{{ark.ark_id}}">{{ark._statusText}}</text>
+            </view>
+            <view class="ark-subname" wx:if="{{ark.ark_id}}">
+              {{ark.arkname || '诺亚方舟筹建舱'}} · {{ark.male_count || 0}}男 {{ark.female_count || 0}}女
+            </view>
+            <view class="ark-subname" wx:else>暂未创建本课方舟</view>
+          </view>
         </view>
+
         <view class="teacher-actions">
           <!-- 有方舟 -->
           <block wx:if="{{ark.ark_id}}">
             <!-- 我已加入 -->
-            <text class="joined-tip" wx:if="{{ark._isMyArk}}">已加入 ✓</text>
+            <view class="joined-pill" wx:if="{{ark._isMyArk}}">✓ 我的方舟</view>
             <!-- 我未加入 + 还能进 -->
             <button
               wx:elif="{{ark._canJoin}}"
@@ -34,13 +89,11 @@
               loading="{{joiningArkId === ark.ark_id}}"
               data-arkid="{{ark.ark_id}}"
               bindtap="onJoinArk"
-            >加入方舟</button>
+            >＋ 加入方舟</button>
             <!-- 已结束 -->
-            <text class="closed-tip" wx:elif="{{ark.closed || ark.finished}}">方舟已{{ark.finished ? '结束' : '关闭'}}</text>
+            <text class="closed-tip" wx:elif="{{ark.closed || ark.finished}}">已{{ark.finished ? '完航' : '关闭'}}</text>
             <!-- 名额已满 -->
-            <text class="full-tip" wx:else>名额已满</text>
-            <!-- 详情链接 -->
-            <text class="detail-link" bindtap="onGoDetail" data-arkid="{{ark.ark_id}}">详情 ›</text>
+            <text class="full-tip" wx:else>席位已满</text>
           </block>
           <!-- 无方舟 -->
           <block wx:else>
@@ -52,34 +105,47 @@
               loading="{{creating}}"
               data-teacherid="{{ark.teacher_id}}"
               bindtap="onCreateArk"
-            >创建方舟</button>
-            <text class="no-ark-tip" wx:else>该塾师尚未创建方舟</text>
+            >＋ 创建方舟</button>
+            <text class="no-ark-tip" wx:else>待开启</text>
           </block>
         </view>
       </view>
 
-      <!-- 第二行：成员名单 -->
-      <view class="members-row">
-        <block wx:if="{{ark.ark_id}}">
-          <text class="member-count-tag male">{{ark.male_count}} 男</text>
-          <text class="member-count-tag female">{{ark.female_count}} 女</text>
-          <text class="no-member" wx:if="{{ark.members.length === 0}}">暂无成员</text>
-          <block wx:else>
-            <text
-              class="member-chip {{m._genderClass}}"
-              wx:for="{{ark.members}}"
-              wx:key="user_id"
-              wx:for-item="m"
-            >{{m.username}}{{m.is_captain ? ' ⭐' : ''}}</text>
-          </block>
-        </block>
-        <text class="no-ark-hint" wx:else>该塾师暂无方舟</text>
+      <!-- 第二行：可视化 4 席位船舱网格 (2男 + 2女) -->
+      <view class="cabin-box" wx:if="{{ark.ark_id}}">
+        <view class="cabin-grid">
+          <view
+            class="seat-slot seat-slot--{{seat.genderType}} {{seat.occupied ? 'seat-slot--occupied' : 'seat-slot--empty'}}"
+            wx:for="{{ark._seats}}"
+            wx:key="id"
+            wx:for-item="seat"
+          >
+            <view class="seat-top">
+              <text class="seat-tag">{{seat.seatLabel}}</text>
+              <text class="seat-captain" wx:if="{{seat.isCaptain}}">⭐ 舟长</text>
+            </view>
+            <view class="seat-user" wx:if="{{seat.occupied}}">{{seat.username}}</view>
+            <view class="seat-empty-text" wx:else>{{seat.emptyText}}</view>
+          </view>
+        </view>
+
+        <!-- 底部进入船舱栏 -->
+        <view class="cabin-footer" bindtap="onGoDetail" data-arkid="{{ark.ark_id}}">
+          <text class="cabin-footer__hint">查看船员进度与三会排期</text>
+          <text class="cabin-footer__btn">进入船舱 ›</text>
+        </view>
+      </view>
+
+      <!-- 未开启方舟提示 -->
+      <view class="no-cabin-bar" wx:else>
+        <text class="no-ark-hint">该塾师暂未在本课程发起诺亚方舟</text>
       </view>
     </view>
 
     <!-- 空状态 -->
-    <view class="empty-tip" wx:if="{{arkList.length === 0 && !loading}}">
-      <text>当前暂无塾师开设方舟</text>
+    <view class="empty-tip" wx:if="{{filteredArkList.length === 0 && !loading}}">
+      <view class="empty-tip__icon">⛵</view>
+      <text class="empty-tip__text">当前筛选条件下暂无方舟</text>
     </view>
   </view>
 </view>

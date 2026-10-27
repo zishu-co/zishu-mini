@@ -10,18 +10,65 @@ import { fetchInno, fetchProjectsFromApi, claimProject, Project, TabItem } from 
 const _app = getApp<any>();
 
 type DecoratedProject = Project & {
-  statusClass?: 'completed' | 'in-progress' | 'pending';
-  statusText?: '已完成' | '进行中' | '待认领';
-  deadlineColor?: 'overdue' | 'warning' | 'normal';
-  deadlineText?: string;
+  statusClass: 'completed' | 'in-progress' | 'pending';
+  statusText: '已完成' | '进行中' | '待认领';
+  deadlineColor: 'overdue' | 'warning' | 'normal';
+  deadlineText: string;
 };
+
+interface InnoGroupItem {
+  key: string;
+  badge: string;
+  name: string;
+  desc: string;
+  mentor: string;
+  projectCount: number;
+  openCount: number;
+  totalBonus: number;
+}
+
+const DEFAULT_GROUPS_META: Array<{ key: string; badge: string; name: string; desc: string; mentor: string }> = [
+  {
+    key: 'F',
+    badge: 'F · 前端研发组',
+    name: 'Web & 小程序交互创新组',
+    desc: '聚焦 Vue3、微信小程序与 AI 原生交互体验落地，打造流畅的共学产品界面。',
+    mentor: '青桐塾师团',
+  },
+  {
+    key: 'B',
+    badge: 'B · 后端架构组',
+    name: 'FastAPI 与智能体引擎组',
+    desc: '负责高可用 API、PostgreSQL/pgvector 检索与多智能体工作流编排研发。',
+    mentor: '架构导师组',
+  },
+  {
+    key: 'D',
+    badge: 'D · 知识工程组',
+    name: '技术文档与开源沉淀组',
+    desc: '将实战经验转化为结构化工程规范、开源文档与可复用知识库。',
+    mentor: '开源委员会',
+  },
+  {
+    key: 'C',
+    badge: 'C · 课程共创组',
+    name: 'AI 时代精品课程研发组',
+    desc: '设计以终为始的闯关式课程、实战案例与自动化评测题库。',
+    mentor: '教研塾主团',
+  },
+];
 
 type IInnoPageData = {
   imgSrcs: string[];
   tabList: TabItem[];
   projectList: DecoratedProject[];
   filteredList: DecoratedProject[];
+  filteredProjects: DecoratedProject[];
+  groupList: InnoGroupItem[];
+  filteredGroups: InnoGroupItem[];
+  viewMode: 'projects' | 'groups';
   activeTab: string;
+  statusFilter: 'all' | 'pending' | 'in-progress' | 'completed';
   searchKeyword: string;
   claimingId: number;
   pageLoading: boolean;
@@ -34,13 +81,18 @@ type IInnoPageData = {
   swiperImageProps: { mode: string };
 };
 
-Page<IInnoPageData, IInnoPageData>({
+Page<IInnoPageData, any>({
   data: {
     imgSrcs: [],
     tabList: [],
     projectList: [],
     filteredList: [],
+    filteredProjects: [],
+    groupList: [],
+    filteredGroups: [],
+    viewMode: 'projects',
     activeTab: '',
+    statusFilter: 'all',
     searchKeyword: '',
     claimingId: 0,
     pageLoading: false,
@@ -111,6 +163,22 @@ Page<IInnoPageData, IInnoPageData>({
     };
   },
 
+  buildGroups(projects: DecoratedProject[]): InnoGroupItem[] {
+    return DEFAULT_GROUPS_META.map((meta) => {
+      const matched = projects.filter(
+        (p) => p.task_serial && p.task_serial[0].toUpperCase() === meta.key
+      );
+      const openCount = matched.filter((p) => p.statusClass === 'pending').length;
+      const totalBonus = matched.reduce((sum, p) => sum + (Number(p.bonus) || 0), 0);
+      return {
+        ...meta,
+        projectCount: matched.length,
+        openCount,
+        totalBonus,
+      };
+    });
+  },
+
   loadProjects(fresh = false) {
     if (fresh) {
       wx.pageScrollTo({ scrollTop: 0 });
@@ -122,16 +190,49 @@ Page<IInnoPageData, IInnoPageData>({
       .then((list) => {
         const safeList = Array.isArray(list) ? list : [];
         const formattedList = safeList.map((item: any) => this.decorateProject(item));
-        this.setData({ projectList: formattedList });
-        this.filterByTab(this.data.activeTab);
+        const groupList = this.buildGroups(formattedList);
+        this.setData({ projectList: formattedList, groupList });
+        this.applyFilters(this.data.activeTab, this.data.statusFilter, this.data.searchKeyword);
         this.setData({ listLoading: false });
         wx.stopPullDownRefresh();
       })
       .catch(() => {
-        this.setData({ listLoading: false });
+        const groupList = this.buildGroups(this.data.projectList || []);
+        this.setData({ listLoading: false, groupList, filteredGroups: groupList });
         wx.stopPullDownRefresh();
         wx.showToast({ title: '加载项目失败，请稍后重试', icon: 'none' });
       });
+  },
+
+  /** 切换项目 / 小组视图 */
+  onSwitchMode(e: any) {
+    const mode = e.currentTarget.dataset.mode;
+    if (!mode || mode === this.data.viewMode) return;
+    this.setData({ viewMode: mode });
+  },
+
+  /** 点击状态筛选胶囊 */
+  onStatusFilterTap(e: any) {
+    const status = e.currentTarget.dataset.status || 'all';
+    if (status === this.data.statusFilter) return;
+    this.applyFilters(this.data.activeTab, status, this.data.searchKeyword);
+  },
+
+  /** 重置筛选条件 */
+  onResetFilters() {
+    this.setData({
+      searchKeyword: '',
+      statusFilter: 'all',
+      activeTab: '',
+    });
+    this.applyFilters('', 'all', '');
+  },
+
+  /** 点击小组卡片 → 切回该项目分类 */
+  onGroupCardTap(e: any) {
+    const key = e.currentTarget.dataset.key || '';
+    this.setData({ viewMode: 'projects' });
+    this.applyFilters(key, 'all', this.data.searchKeyword);
   },
 
   /** 标签切换 */
@@ -147,43 +248,70 @@ Page<IInnoPageData, IInnoPageData>({
   /** 搜索输入变更 */
   onSearchChange(e: any) {
     const kw = (e?.detail?.value ?? '').trim();
-    this.setData({ searchKeyword: kw });
-    this.filterByTab(this.data.activeTab);
+    this.applyFilters(this.data.activeTab, this.data.statusFilter, kw);
   },
 
   /** 搜索提交 */
   onSearchSubmit(e: any) {
     const kw = (e?.detail?.value ?? this.data.searchKeyword ?? '').trim();
-    this.setData({ searchKeyword: kw });
-    this.filterByTab(this.data.activeTab);
+    this.applyFilters(this.data.activeTab, this.data.statusFilter, kw);
   },
 
   /** 清空搜索 */
   onSearchClear() {
-    this.setData({ searchKeyword: '' });
-    this.filterByTab(this.data.activeTab);
+    this.applyFilters(this.data.activeTab, this.data.statusFilter, '');
   },
 
-  /** 按类型 + 搜索词过滤 */
+  /** 按类型过滤 */
   filterByTab(key: string) {
-    const kw = (this.data.searchKeyword || '').toLowerCase();
-    const filtered = this.data.projectList.filter((p) => {
+    this.applyFilters(key, this.data.statusFilter, this.data.searchKeyword);
+  },
+
+  /** 综合应用分类、状态与关键词过滤 */
+  applyFilters(
+    tabKey: string,
+    statusFilter: 'all' | 'pending' | 'in-progress' | 'completed',
+    keyword: string
+  ) {
+    const kw = (keyword || '').toLowerCase();
+    const filteredProjects = (this.data.projectList || []).filter((p) => {
       const matchTab =
-        !key || (p.task_serial && p.task_serial[0].toUpperCase() === key.toUpperCase());
+        !tabKey || (p.task_serial && p.task_serial[0].toUpperCase() === tabKey.toUpperCase());
       if (!matchTab) return false;
+      if (statusFilter !== 'all' && p.statusClass !== statusFilter) return false;
       if (!kw) return true;
       const title = (p.title || '').toLowerCase();
       const serial = (p.task_serial || '').toLowerCase();
       const desc = (p.desc || '').toLowerCase();
       const taker = (p.taker || '').toLowerCase();
+      const shushi = (p.shushi || '').toLowerCase();
       return (
         title.includes(kw) ||
         serial.includes(kw) ||
         desc.includes(kw) ||
-        taker.includes(kw)
+        taker.includes(kw) ||
+        shushi.includes(kw)
       );
     });
-    this.setData({ filteredList: filtered, activeTab: key });
+
+    const filteredGroups = (this.data.groupList || []).filter((g) => {
+      if (!kw) return true;
+      return (
+        g.name.toLowerCase().includes(kw) ||
+        g.desc.toLowerCase().includes(kw) ||
+        g.badge.toLowerCase().includes(kw) ||
+        g.mentor.toLowerCase().includes(kw)
+      );
+    });
+
+    this.setData({
+      activeTab: tabKey,
+      statusFilter,
+      searchKeyword: keyword,
+      filteredList: filteredProjects,
+      filteredProjects,
+      filteredGroups,
+    });
   },
 
   /** 点击轮播图 */

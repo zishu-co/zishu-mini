@@ -1,48 +1,3 @@
-<wxs module="innoFmt">
-function statusClass(finishDate, halfProgress, taker) {
-  if (finishDate || halfProgress === '已完成') return 'completed';
-  if (taker) return 'in-progress';
-  return 'pending';
-}
-
-function statusText(finishDate, halfProgress, taker) {
-  if (finishDate || halfProgress === '已完成') return '已完成';
-  if (taker) return '进行中';
-  return '待认领';
-}
-
-function deadlineColor(deadline) {
-  if (!deadline) return 'normal';
-  var d = getDate(deadline);
-  var ts = d.getTime();
-  if (isNaN(ts)) {
-    var norm = ('' + deadline).replace(getRegExp('-', 'g'), '/');
-    ts = getDate(norm).getTime();
-  }
-  if (isNaN(ts)) return 'normal';
-  var now = getDate().getTime();
-  var diffDays = (ts - now) / (1000 * 60 * 60 * 24);
-  if (diffDays < 0) return 'overdue';
-  if (diffDays <= 3) return 'warning';
-  return 'normal';
-}
-
-function formatDeadline(deadline) {
-  if (!deadline) return '';
-  if (typeof deadline === 'string' && deadline.length > 10) {
-    return deadline.substring(0, 10);
-  }
-  return deadline;
-}
-
-module.exports = {
-  statusClass: statusClass,
-  statusText: statusText,
-  deadlineColor: deadlineColor,
-  formatDeadline: formatDeadline
-};
-</wxs>
-
 <view class="page">
   <!-- 加载中 -->
   <view class="loading-wrap" wx:if="{{pageLoading}}">
@@ -51,12 +6,32 @@ module.exports = {
 
   <!-- 顶部区域：搜索 + 轮播图 -->
   <view class="home-page-header" wx:if="{{!pageLoading}}">
+    <!-- 顶部品牌标题栏 -->
+    <view class="inno-hero-bar">
+      <view class="inno-hero-left">
+        <text class="inno-hero-title">创新工坊</text>
+        <text class="inno-hero-sub">真实场景项目共创 · 赢取塾值赏金</text>
+      </view>
+      <view class="mode-switch">
+        <view
+          class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
+          data-mode="projects"
+          bindtap="onSwitchMode"
+        >项目 ({{filteredProjects.length}})</view>
+        <view
+          class="mode-pill {{viewMode === 'groups' ? 'active' : ''}}"
+          data-mode="groups"
+          bindtap="onSwitchMode"
+        >小组 ({{filteredGroups.length}})</view>
+      </view>
+    </view>
+
     <!-- 搜索栏 -->
     <view class="search-wrap">
       <t-search
         t-class-input="t-search__input"
         t-class-input-container="t-search__input-container"
-        placeholder="搜索项目名称、编号或执行人"
+        placeholder="{{viewMode === 'projects' ? '搜索项目名称、编号或执行人' : '搜索共创小组、方向或导师'}}"
         value="{{searchKeyword}}"
         bind:change="onSearchChange"
         bind:submit="onSearchSubmit"
@@ -66,8 +41,8 @@ module.exports = {
       </t-search>
     </view>
 
-    <!-- 轮播图（保留） -->
-    <view class="swiper-wrap">
+    <!-- 轮播图 -->
+    <view class="swiper-wrap" wx:if="{{viewMode === 'projects'}}">
       <t-swiper
         wx:if="{{imgSrcs.length > 0}}"
         current="{{current}}"
@@ -82,95 +57,160 @@ module.exports = {
     </view>
   </view>
 
-  <!-- 标签栏（保留改造） -->
-  <view class="tab-bar" wx:if="{{!pageLoading}}">
-    <t-tabs
-      t-class="t-tabs"
-      t-class-active="tabs-external__active"
-      t-class-item="tabs-external__item"
-      defaultValue="{{0}}"
-      space-evenly="{{false}}"
-      bind:change="tabChangeHandle"
-    >
-      <t-tab-panel
-        wx:for="{{tabList}}"
-        wx:for-index="index"
-        wx:key="index"
-        label="{{item.text}}"
-        value="{{index}}"
-      />
-    </t-tabs>
-  </view>
-
-  <!-- 项目列表 -->
-  <view class="project-list" wx:if="{{!pageLoading}}">
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{filteredList.length === 0 && !listLoading}}">
-      <text class="empty-icon">📭</text>
-      <text class="empty-text">暂无项目</text>
+  <!-- 项目视图 -->
+  <block wx:if="{{!pageLoading && viewMode === 'projects'}}">
+    <!-- 领域标签栏 -->
+    <view class="tab-bar">
+      <t-tabs
+        t-class="t-tabs"
+        t-class-active="tabs-external__active"
+        t-class-item="tabs-external__item"
+        defaultValue="{{0}}"
+        space-evenly="{{false}}"
+        bind:change="tabChangeHandle"
+      >
+        <t-tab-panel
+          wx:for="{{tabList}}"
+          wx:for-index="index"
+          wx:key="index"
+          label="{{item.text}}"
+          value="{{index}}"
+        />
+      </t-tabs>
     </view>
 
-    <!-- 项目卡片 -->
-    <view
-      class="project-card"
-      wx:for="{{filteredList}}"
-      wx:key="id"
-      bindtap="goToProjectDetail"
-      data-id="{{item.id}}"
-    >
-      <!-- 卡片头部 -->
-      <view class="card-header">
-        <view class="card-serial">{{item.task_serial || '—'}}</view>
-        <view class="card-status status-{{item.statusClass || innoFmt.statusClass(item.finish_date, item.half_progress, item.taker)}}">
-          {{item.statusText || innoFmt.statusText(item.finish_date, item.half_progress, item.taker)}}
+    <!-- 状态筛选胶囊 -->
+    <view class="status-filter-bar">
+      <view
+        class="status-pill {{statusFilter === 'all' ? 'active' : ''}}"
+        data-status="all"
+        bindtap="onStatusFilterTap"
+      >全部</view>
+      <view
+        class="status-pill {{statusFilter === 'pending' ? 'active' : ''}}"
+        data-status="pending"
+        bindtap="onStatusFilterTap"
+      >🔥 招募中</view>
+      <view
+        class="status-pill {{statusFilter === 'in-progress' ? 'active' : ''}}"
+        data-status="in-progress"
+        bindtap="onStatusFilterTap"
+      >⚡ 进行中</view>
+      <view
+        class="status-pill {{statusFilter === 'completed' ? 'active' : ''}}"
+        data-status="completed"
+        bindtap="onStatusFilterTap"
+      >✅ 已结项</view>
+    </view>
+
+    <!-- 项目列表 -->
+    <view class="project-list">
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{filteredProjects.length === 0 && !listLoading}}">
+        <text class="empty-icon">📭</text>
+        <text class="empty-text">暂无符合筛选条件的项目</text>
+        <view class="reset-filter-btn" bindtap="onResetFilters">重置筛选条件</view>
+      </view>
+
+      <!-- 项目卡片 -->
+      <view
+        class="project-card"
+        wx:for="{{filteredProjects}}"
+        wx:key="id"
+        bindtap="goToProjectDetail"
+        data-id="{{item.id}}"
+      >
+        <!-- 卡片头部 -->
+        <view class="card-header">
+          <view class="card-header-left">
+            <view class="card-serial">{{item.task_serial || '—'}}</view>
+            <view class="bounty-pill" wx:if="{{item.bonus > 0}}">💰 {{item.bonus}} 塾值</view>
+          </view>
+          <view class="card-status status-{{item.statusClass}}">
+            {{item.statusText}}
+          </view>
+        </view>
+
+        <!-- 项目名称 -->
+        <view class="card-title">{{item.title || '无标题'}}</view>
+
+        <!-- 描述 -->
+        <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+
+        <!-- 底部信息行 + 认领按钮 -->
+        <view class="card-footer">
+          <view class="card-footer-meta">
+            <!-- 执行人 -->
+            <view class="footer-item">
+              <text class="footer-icon">👤</text>
+              <text class="footer-text">{{item.taker || '待认领'}}</text>
+            </view>
+            <!-- 塾师 -->
+            <view class="footer-item" wx:if="{{item.shushi}}">
+              <text class="footer-icon">🎓</text>
+              <text class="footer-text">{{item.shushi}}</text>
+            </view>
+            <!-- 截止日期 -->
+            <view class="footer-item" wx:if="{{item.deadlineText}}">
+              <text class="footer-icon">📅</text>
+              <text class="footer-text deadline-{{item.deadlineColor}}">
+                {{item.deadlineText}}
+              </text>
+            </view>
+          </view>
+
+          <!-- 认领按钮（未认领时显示） -->
+          <view
+            class="claim-btn"
+            wx:if="{{item.statusClass === 'pending'}}"
+            catchtap="claimProject"
+            data-id="{{item.id}}"
+            data-index="{{index}}"
+          >
+            {{claimingId === item.id ? '认领中' : '立即认领'}}
+          </view>
         </view>
       </view>
 
-      <!-- 项目名称 -->
-      <view class="card-title">{{item.title || '无标题'}}</view>
+      <!-- 加载更多 -->
+      <view class="list-loading" wx:if="{{listLoading}}">
+        <t-loading theme="circular" size="32rpx" text="加载中..." />
+      </view>
+    </view>
+  </block>
 
-      <!-- 描述 -->
-      <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+  <!-- 共创小组视图 -->
+  <block wx:if="{{!pageLoading && viewMode === 'groups'}}">
+    <view class="project-list">
+      <view class="empty-state" wx:if="{{filteredGroups.length === 0}}">
+        <text class="empty-icon">🤝</text>
+        <text class="empty-text">未找到匹配的共创小组</text>
+        <view class="reset-filter-btn" bindtap="onResetFilters">清空搜索词</view>
+      </view>
 
-      <!-- 底部信息行 + 认领按钮 -->
-      <view class="card-footer">
-        <view class="card-footer-meta">
-          <!-- 执行人 -->
-          <view class="footer-item">
-            <text class="footer-icon">👤</text>
-            <text class="footer-text">{{item.taker || '待认领'}}</text>
-          </view>
-          <!-- 赏金 -->
-          <view class="footer-item" wx:if="{{item.bonus > 0}}">
-            <text class="footer-icon">💰</text>
-            <text class="footer-text bonus">{{item.bonus}}</text>
-          </view>
-          <!-- 截止日期 -->
-          <view class="footer-item" wx:if="{{item.deadlineText || item.deadline}}">
-            <text class="footer-icon">📅</text>
-            <text class="footer-text deadline-{{item.deadlineColor || innoFmt.deadlineColor(item.deadline)}}">
-              {{item.deadlineText || innoFmt.formatDeadline(item.deadline)}}
-            </text>
-          </view>
+      <view
+        class="group-card"
+        wx:for="{{filteredGroups}}"
+        wx:key="key"
+        bindtap="onGroupCardTap"
+        data-key="{{item.key}}"
+      >
+        <view class="group-card-top">
+          <view class="group-badge">{{item.badge}}</view>
+          <view class="group-bounty">累计赏金 💰 {{item.totalBonus}} 塾值</view>
         </view>
-
-        <!-- 认领按钮（未认领时显示） -->
-        <view
-          class="claim-btn"
-          wx:if="{{!item.taker && !item.finish_date && item.half_progress !== '已完成'}}"
-          catchtap="claimProject"
-          data-id="{{item.id}}"
-          data-index="{{index}}"
-        >
-          认领
+        <view class="group-name">{{item.name}}</view>
+        <view class="group-desc">{{item.desc}}</view>
+        <view class="group-footer">
+          <view class="group-stats">
+            <text class="group-stat-item">📋 {{item.projectCount}} 个课题</text>
+            <text class="group-stat-item">🔥 {{item.openCount}} 个招募中</text>
+            <text class="group-stat-item">🎓 领航：{{item.mentor}}</text>
+          </view>
+          <view class="group-enter-btn">查看课题 ›</view>
         </view>
       </view>
     </view>
-
-    <!-- 加载更多 -->
-    <view class="list-loading" wx:if="{{listLoading}}">
-      <t-loading theme="circular" size="32rpx" text="加载中..." />
-    </view>
-  </view>
+  </block>
 
 </view>

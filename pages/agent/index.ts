@@ -7,6 +7,7 @@ import { parseCommand } from '../../services/agent/command-parser';
 import { executeCommand } from '../../services/agent/command-executor';
 import { Recorder } from '../../services/voice/recorder';
 import { Player } from '../../services/voice/player';
+import http from '../../services/base';
 
 interface Message {
   id: string;
@@ -20,6 +21,8 @@ interface Message {
 interface AgentPageData {
   messages: Message[];
   quickPrompts: string[];
+  suggestedGoal: string;
+  adoptingGoal: boolean;
   lastMessageId: string;
   inputText: string;
   isLoading: boolean;
@@ -42,6 +45,8 @@ Page<AgentPageData, any>({
       '📚 推荐热门课程',
       '🏆 去闯关答题',
     ],
+    suggestedGoal: '',
+    adoptingGoal: false,
     lastMessageId: '',
     inputText: '',
     isLoading: false,
@@ -98,20 +103,99 @@ Page<AgentPageData, any>({
     this.setData({ inputText: '', isLoading: true });
     this.addMessage('user', text);
 
-    // 模拟真实思考延迟，确保加载指示器可见
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    const storedUser = wx.getStorageSync('userInfo') || {};
+    const userId = Number(wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0);
 
-    // Mock AI 回复
-    const reply = getMockReply(text);
-    this.addMessage('assistant', reply.content);
+    let replyContent = '';
+    let suggestedGoal = '';
+    let remoteCommand: any = null;
 
-    // 解析并执行 AI 指令
-    const command = parseCommand(text) || reply.command;
+    try {
+      const res: any = await http.post('/api/users/ai_coach_reply', {
+        prompt: text,
+        user_id: userId || undefined,
+      });
+      if (res && res.reply) {
+        replyContent = res.reply;
+        suggestedGoal = res.suggested_goal || '';
+        remoteCommand = res.command || null;
+      }
+    } catch {
+      // 离线或后端未升级时平滑回退本地智能规则
+    }
+
+    if (!replyContent) {
+      await new Promise((resolve) => setTimeout(resolve, 280));
+      const fallback = getMockReply(text);
+      replyContent = fallback.content;
+      remoteCommand = fallback.command;
+      if (text.includes('目标') || text.length >= 8) {
+        suggestedGoal = text.includes('目标')
+          ? '30天内完成1门核心课程并结识3位共学搭子组成方舟通关'
+          : text;
+      }
+    }
+
+    this.addMessage('assistant', replyContent);
+    if (suggestedGoal) {
+      this.setData({ suggestedGoal });
+    }
+
+    const command = parseCommand(text) || remoteCommand;
     if (command) {
       setTimeout(() => {
         executeCommand(command, this);
       }, 650);
     }
+  },
+
+  async onAdoptGoal() {
+    const goalText = (this.data.suggestedGoal || '').trim();
+    if (!goalText || this.data.adoptingGoal) return;
+    this.setData({ adoptingGoal: true });
+    const now = new Date();
+    const dl = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const deadlineStr = `${dl.getFullYear()}-${String(dl.getMonth() + 1).padStart(2, '0')}-${String(dl.getDate()).padStart(2, '0')}`;
+    const startStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const storedUser = wx.getStorageSync('userInfo') || {};
+    const userId = Number(wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0);
+
+    const newGoalObj: any = {
+      id: Date.now(),
+      user_id: userId || 1001,
+      content: goalText,
+      start_time: startStr,
+      deadline: deadlineStr,
+      process: 1,
+      review: '由 AI 伴学教练协同制定，开启共学冲刺！',
+    };
+
+    try {
+      if (userId) {
+        const res: any = await http.requestWithRefresh({
+          url: '/api/users/save_goal',
+          method: 'POST',
+          data: {
+            goal_id: 0,
+            content: goalText,
+            deadline: deadlineStr,
+            process: 1,
+            review: newGoalObj.review,
+            status: 'active',
+          },
+        });
+        if (res && res.goal_id) {
+          newGoalObj.id = res.goal_id;
+        }
+      }
+    } catch {}
+
+    wx.setStorageSync('savedGoal', newGoalObj);
+    this.setData({ adoptingGoal: false, suggestedGoal: '' });
+    wx.showToast({ title: '🎯 已设为当前目标！', icon: 'success' });
+    setTimeout(() => {
+      wx.switchTab({ url: '/pages/aim/index' });
+    }, 900);
   },
 
   // ==================== 语音相关 ====================

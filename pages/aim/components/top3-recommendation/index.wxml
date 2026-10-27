@@ -56,9 +56,13 @@ module.exports = {
 <view class="recommendation-card">
   <!-- 卡片头部 -->
   <view class="card-header">
-    <view class="card-title center">
+    <view class="card-title">
       <t-icon name="aim" size="40rpx" color="#a0f" />
-      <text style="color: #a0f;">今日最值得做</text>
+      <text style="color: #a0f;">今日最值得做 (Top 3)</text>
+    </view>
+    <view class="header-actions">
+      <view class="header-pill" bindtap="showAlgorithmInfo">💡 算法</view>
+      <view class="header-pill refresh" bindtap="onRefresh">{{refreshing ? '刷新中...' : '🔄 换一批'}}</view>
     </view>
   </view>
 
@@ -144,6 +148,20 @@ module.exports = {
           catchtap="onActionTap"
           data-item="{{item}}"
         >{{item.action_text}}</t-button>
+        <view class="micro-action-row">
+          <view
+            class="micro-btn finish"
+            catchtap="onFinishTap"
+            data-item="{{item}}"
+            data-index="{{index}}"
+          >✓ 完成</view>
+          <view
+            class="micro-btn skip"
+            catchtap="onSkipTap"
+            data-item="{{item}}"
+            data-index="{{index}}"
+          >✕ 跳过</view>
+        </view>
       </view>
     </view>
   </view>

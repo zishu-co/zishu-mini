@@ -1,36 +1,54 @@
 <view class="page">
   <!-- 顶部背景 -->
-  <view class="top-bg"></view>
+  <view class="top-bg">
+    <view class="top-bg-header">
+      <text class="top-bg-title">个人中心</text>
+      <text class="top-bg-sub">共学成长档案 · 见证每一次进阶</text>
+    </view>
+  </view>
 
   <!-- 用户卡片 -->
   <view class="user-card">
-    <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
-      <image
-        class="avatar-img"
-        src="{{userInfo.avatarUrl || '/img/logo.png'}}"
-        mode="aspectFill"
-      />
-    </view>
-    <!-- 已登录：显示昵称 + 段位徽章 + 学习单按钮 -->
-    <block wx:if="{{isLoggedIn}}">
-      <view class="user-card__info" bindtap="goToEditProfile">
-        <view class="nickname-row">
-          <text class="nickname">{{userInfo.nickName}}</text>
-          <text class="level-pill">{{levelBadge}}</text>
+    <view class="user-card__top">
+      <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
+        <image
+          class="avatar-img"
+          src="{{userInfo.avatarUrl || '/img/logo.png'}}"
+          mode="aspectFill"
+        />
+      </view>
+      <!-- 已登录：显示昵称 + 段位徽章 + 学习单按钮 -->
+      <block wx:if="{{isLoggedIn}}">
+        <view class="user-card__info" bindtap="goToEditProfile">
+          <view class="nickname-row">
+            <text class="nickname">{{userInfo.nickName}}</text>
+            <text class="level-pill">{{levelBadge}}</text>
+          </view>
+          <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+          <view class="phone" wx:else>点击编辑个人共学名片 ›</view>
         </view>
-        <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
-        <view class="phone" wx:else>点击编辑个人共学名片 ›</view>
+        <button class="sheet-quick-btn" catchtap="goToMyLearnSheet">📋 学习单</button>
+      </block>
+      <!-- 未登录：显示欢迎文案 + 登录按钮 -->
+      <block wx:else>
+        <view class="user-card__info" bindtap="goToLogin">
+          <view class="nickname">欢迎来到自塾</view>
+          <view class="phone">登录解锁共学搭子、方舟与闯关勋章</view>
+        </view>
+        <button class="user-card__login-btn" bindtap="goToLogin">登 录</button>
+      </block>
+    </view>
+
+    <!-- 段位成长进度条（已登录显示） -->
+    <view class="level-progress-box" wx:if="{{isLoggedIn}}">
+      <view class="level-progress-header">
+        <text class="level-score-text">成长积分 {{levelScore}} 分</text>
+        <text class="level-next-hint">{{nextLevelHint}}</text>
       </view>
-      <button class="sheet-quick-btn" catchtap="goToMyLearnSheet">📋 学习单</button>
-    </block>
-    <!-- 未登录：显示欢迎文案 + 登录按钮 -->
-    <block wx:else>
-      <view class="user-card__info" bindtap="goToLogin">
-        <view class="nickname">欢迎来到自塾</view>
-        <view class="phone">登录解锁共学搭子、方舟与闯关勋章</view>
+      <view class="level-track">
+        <view class="level-fill" style="width: {{levelProgressPercent}}%;"></view>
       </view>
-      <button class="user-card__login-btn" bindtap="goToLogin">登 录</button>
-    </block>
+    </view>
   </view>
 
   <!-- 学习数据统计条（已登录时显示） -->
@@ -53,6 +71,30 @@
     <view class="stats-item" bindtap="navigateTo" data-url="/pages/favorites/index">
       <view class="stats-num">{{stats.favCount || 0}}</view>
       <view class="stats-label">收藏</view>
+    </view>
+  </view>
+
+  <!-- 金刚区快捷导航卡片 -->
+  <view class="quick-nav-grid">
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/goaltalk/index">
+      <text class="quick-nav-icon">🎯</text>
+      <text class="quick-nav-title">目标面谈</text>
+      <text class="quick-nav-sub">导师1v1对齐</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/mentors/index">
+      <text class="quick-nav-icon">🤝</text>
+      <text class="quick-nav-title">师生关系</text>
+      <text class="quick-nav-sub">塾师带教记录</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/followup/index">
+      <text class="quick-nav-icon">🚀</text>
+      <text class="quick-nav-title">创新跟进</text>
+      <text class="quick-nav-sub">项目实战进度</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/all/index">
+      <text class="quick-nav-icon">🏫</text>
+      <text class="quick-nav-title">全塾动态</text>
+      <text class="quick-nav-sub">实时共学广场</text>
     </view>
   </view>
 

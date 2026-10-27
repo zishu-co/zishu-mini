@@ -14,6 +14,8 @@ type IInnoProjectView = Project & {
   _startDate: string;
   _deadline: string;
   _isDeadlinePassed: boolean;
+  _step2Active: boolean;
+  _step3Active: boolean;
 };
 
 type IInnoDetailPageData = {
@@ -56,12 +58,22 @@ Page<IInnoDetailPageData, any>({
     this.loadProject().finally(() => wx.stopPullDownRefresh());
   },
 
+  onRetry() {
+    if (this.projectId) {
+      this.loadProject();
+    } else {
+      wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/inno/index' }) });
+    }
+  },
+
   decorateProject(raw: Project): IInnoProjectView {
     const _statusText = this.getStatusText(raw);
     const _statusColor = this.getStatusColor(raw);
     const _startDate = raw.start_date ? String(raw.start_date).substring(0, 10) : '—';
     const _deadline = raw.deadline ? String(raw.deadline).substring(0, 10) : '—';
     const _isDeadlinePassed = this.isDeadlinePassed(raw.deadline);
+    const _step3Active = !!(raw.finish_date || raw.half_progress === '已完成');
+    const _step2Active = _step3Active || !!(raw.taker || raw.half_progress);
     return {
       ...raw,
       _statusColor,
@@ -69,6 +81,8 @@ Page<IInnoDetailPageData, any>({
       _startDate,
       _deadline,
       _isDeadlinePassed,
+      _step2Active,
+      _step3Active,
     };
   },
 

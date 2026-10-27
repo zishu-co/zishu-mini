@@ -1,29 +1,105 @@
 <view class="page">
-  <view class="header">
-    <text class="header-title">学习汇报</text>
-    <text class="header-sub">考试成绩记录</text>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
-  </view>
-
-  <view class="record-list" wx:if="{{!loading && records.length > 0}}">
-    <view class="record-card" wx:for="{{records}}" wx:key="pperformid" data-pperformid="{{item.pperformid}}" data-paperid="{{item.testpaperid}}" bindtap="onViewDetail">
-      <view class="record-top">
-        <text class="record-title">{{item.testpaper_title}}</text>
-        <text class="record-score {{item._scoreClass}}">
-          {{item.test_score}}/{{item.full_score}}
-        </text>
+  <!-- 品牌紫旗舰汇总卡片 -->
+  <view class="hero-card">
+    <view class="hero-head">
+      <view>
+        <text class="hero-title">学习汇报</text>
+        <text class="hero-sub">每一次测评都是成长的刻度</text>
       </view>
-      <view class="record-meta">
-        <text>完成时间：{{item.test_time}}</text>
+      <view class="hero-tag">成绩档案</view>
+    </view>
+
+    <view class="stats-grid">
+      <view class="stat-box">
+        <text class="stat-val">{{records.length}} 次</text>
+        <text class="stat-lbl">累计闯关</text>
+      </view>
+      <view class="stat-box">
+        <text class="stat-val">{{avgScore}} 分</text>
+        <text class="stat-lbl">平均得分</text>
+      </view>
+      <view class="stat-box">
+        <text class="stat-val">{{passRate}}%</text>
+        <text class="stat-lbl">通关率</text>
       </view>
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!loading && records.length == 0}}">
-    <text>暂无考试记录</text>
+  <!-- 筛选标签栏 -->
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{activeFilter === 'all' ? 'active' : ''}}"
+      bindtap="switchFilter"
+      data-filter="all"
+    >
+      全部
+    </view>
+    <view
+      class="filter-tab {{activeFilter === 'excellent' ? 'active' : ''}}"
+      bindtap="switchFilter"
+      data-filter="excellent"
+    >
+      优秀 ≥80%
+    </view>
+    <view
+      class="filter-tab {{activeFilter === 'pass' ? 'active' : ''}}"
+      bindtap="switchFilter"
+      data-filter="pass"
+    >
+      及格 ≥60%
+    </view>
+    <view
+      class="filter-tab {{activeFilter === 'fail' ? 'active' : ''}}"
+      bindtap="switchFilter"
+      data-filter="fail"
+    >
+      待提升 &lt;60%
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>正在加载闯关记录...</text>
+  </view>
+
+  <!-- 成绩单列表 -->
+  <view class="record-list" wx:if="{{!loading && filteredRecords.length > 0}}">
+    <view
+      class="record-card"
+      wx:for="{{filteredRecords}}"
+      wx:key="pperformid"
+      data-pperformid="{{item.pperformid}}"
+      data-paperid="{{item.testpaperid}}"
+      bindtap="onViewDetail"
+    >
+      <view class="record-top">
+        <view class="grade-badge {{item._gradeClass}}">{{item._gradeBadge}}</view>
+        <text class="record-score {{item._scoreClass}}">
+          {{item.test_score}} / {{item.full_score}}
+        </text>
+      </view>
+
+      <view class="record-title">{{item.testpaper_title || '未命名测评卷'}}</view>
+
+      <view class="progress-wrap">
+        <view class="progress-track">
+          <view class="progress-fill {{item._scoreClass}}" style="width: {{item._percent}}%"></view>
+        </view>
+        <text class="progress-pct">{{item._percent}}%</text>
+      </view>
+
+      <view class="record-footer">
+        <text class="record-meta">完成时间：{{item.test_time || '近期'}}</text>
+        <text class="record-action">查看解析 ›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 丰富空状态 -->
+  <view class="empty-card" wx:if="{{!loading && filteredRecords.length === 0}}">
+    <view class="empty-icon">🎯</view>
+    <text class="empty-title">暂无符合条件的考试记录</text>
+    <text class="empty-desc">快去完成一场闯关测评，检验你的学习成果吧</text>
+    <button class="cta-btn" bindtap="goToExam">⚡ 去闯关答题</button>
   </view>
 
   <view class="safe-bottom"></view>

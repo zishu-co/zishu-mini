@@ -6,8 +6,20 @@
         <text class="hero-label">当前可用塾值</text>
         <text class="hero-balance">{{currentBalance}}</text>
       </view>
-      <view class="hero-badge">塾值账户</view>
+      <view class="level-badge">{{levelTitle}}</view>
     </view>
+
+    <!-- 段位成长进度条 -->
+    <view class="level-progress-wrap">
+      <view class="level-progress-bar">
+        <view class="level-progress-fill" style="width: {{levelProgress}}%"></view>
+      </view>
+      <view class="level-progress-meta">
+        <text class="level-hint">{{levelNextHint}}</text>
+        <text class="level-pct">{{levelProgress}}%</text>
+      </view>
+    </view>
+
     <view class="stats-row">
       <view class="stat-card">
         <text class="stat-num">{{listData.length}}</text>
@@ -24,16 +36,41 @@
     </view>
   </view>
 
+  <!-- 明细筛选 Tab -->
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{activeTab === 'all' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="all"
+    >
+      全部明细
+    </view>
+    <view
+      class="filter-tab {{activeTab === 'income' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="income"
+    >
+      获得 +
+    </view>
+    <view
+      class="filter-tab {{activeTab === 'expense' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="expense"
+    >
+      消耗 -
+    </view>
+  </view>
+
   <!-- 列表 -->
   <view class="list-area">
     <view wx:if="{{loading}}">
       <view class="loading-row"><text>加载中...</text></view>
     </view>
-    <view wx:elif="{{listData.length === 0}}">
-      <view class="empty-row"><text>暂无塾值记录</text></view>
+    <view wx:elif="{{filteredList.length === 0}}">
+      <view class="empty-row"><text>暂无符合条件的塾值记录</text></view>
     </view>
     <view wx:else>
-      <view class="record-card" wx:for="{{listData}}" wx:key="index">
+      <view class="record-card" wx:for="{{filteredList}}" wx:key="index">
         <view class="record-top">
           <view class="type-tag">{{item.target_type}}</view>
           <text class="{{item._isNeg ? 'amount-neg' : 'amount-pos'}}">{{item._amountStr}}</text>

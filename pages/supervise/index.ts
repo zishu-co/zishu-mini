@@ -1,10 +1,12 @@
 // @ts-nocheck
-import { fetchCurrentSelections } from '../../services/course/course'
+import { fetchAllSelections, fetchCurrentSelections } from '../../services/course/course'
 import { quickGreetPeer } from '../../services/user/user'
 
 Page({
   data: {
     listData: [] as any[],
+    filteredList: [] as any[],
+    searchKeyword: '',
     overdueCount: 0,
     nearCount: 0,
     loading: true,
@@ -18,10 +20,43 @@ Page({
     this.fetchData().finally(() => wx.stopPullDownRefresh())
   },
 
+  applySearch(list: any[], keyword: string) {
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return list
+    return (list || []).filter((item: any) => {
+      const user = String(item.user_name || '').toLowerCase()
+      const shushi = String(item.shushi_name || '').toLowerCase()
+      const course = String(item.course_title || '').toLowerCase()
+      const chapter = String(item.chapter_title || '').toLowerCase()
+      return (
+        user.indexOf(kw) !== -1 ||
+        shushi.indexOf(kw) !== -1 ||
+        course.indexOf(kw) !== -1 ||
+        chapter.indexOf(kw) !== -1
+      )
+    })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const filteredList = this.applySearch(this.data.listData, searchKeyword)
+    this.setData({ searchKeyword, filteredList })
+  },
+
+  clearSearch() {
+    this.setData({
+      searchKeyword: '',
+      filteredList: this.data.listData,
+    })
+  },
+
   async fetchData() {
     this.setData({ loading: true })
     try {
-      const res = await fetchCurrentSelections()
+      let res = await fetchAllSelections().catch(() => [])
+      if (!Array.isArray(res) || res.length === 0) {
+        res = await fetchCurrentSelections().catch(() => [])
+      }
       const raw = Array.isArray(res) ? res : []
       let overdueCount = 0
       let nearCount = 0
@@ -35,8 +70,10 @@ Page({
           _deadlineStr: r.deadline ? String(r.deadline).slice(0, 10) : '-',
         }
       })
+      const filteredList = this.applySearch(listData, this.data.searchKeyword)
       this.setData({
         listData,
+        filteredList,
         overdueCount,
         nearCount,
         loading: false,
@@ -44,6 +81,7 @@ Page({
     } catch (e) {
       this.setData({
         listData: [],
+        filteredList: [],
         overdueCount: 0,
         nearCount: 0,
         loading: false,

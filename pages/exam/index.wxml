@@ -1,27 +1,75 @@
 <view class="page">
+  <!-- 品牌紫闯关题库大厅 Hero Header -->
   <view class="header">
-    <text class="header-title">🏆 闯关答题中心</text>
-    <text class="header-sub">共 {{papers.length || 0}} 套精选试卷 · 测验巩固所学，解锁学霸勋章</text>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>正在加载闯关题库...</text>
-  </view>
-
-  <view class="paper-list" wx:if="{{!loading}}">
-    <view class="paper-card" wx:for="{{papers}}" wx:key="testpaperid" bindtap="onGoTest" data-testid="{{item.testpaperid}}">
-      <view class="paper-info">
-        <view class="paper-title">⚡ {{item.testpaper_title}}</view>
-        <view class="paper-meta">
-          <text>出题塾师：{{item.testpaper_author || '自塾教研组'}} · 100分制闯关</text>
-        </view>
+    <view class="header-glow header-glow--1"></view>
+    <view class="header-glow header-glow--2"></view>
+    <view class="header-top">
+      <view>
+        <view class="header-badge">CHALLENGE ARENA</view>
+        <text class="header-title">🏆 闯关题库大厅</text>
+        <text class="header-sub">共 {{papers.length || 0}} 套精选试卷 · 测验巩固所学，解锁结课勋章</text>
       </view>
-      <view class="paper-arrow">挑战 ›</view>
+    </view>
+
+    <!-- 实时搜索栏 -->
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索试卷名称或出题塾师..."
+        placeholder-class="search-placeholder"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <view class="search-clear" wx:if="{{searchKeyword}}" catchtap="onClearSearch">✕</view>
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!loading && papers.length == 0}}">
-    <text>暂无闯关试卷</text>
+  <!-- 骨架屏加载态 -->
+  <view class="paper-list" wx:if="{{loading}}">
+    <view class="skeleton-card" wx:for="{{skeletonList}}" wx:key="*this">
+      <view class="skeleton-badge"></view>
+      <view class="skeleton-body">
+        <view class="skeleton-line skeleton-line--title"></view>
+        <view class="skeleton-line skeleton-line--sub"></view>
+      </view>
+      <view class="skeleton-btn"></view>
+    </view>
+  </view>
+
+  <!-- 试卷卡片列表 -->
+  <view class="paper-list" wx:if="{{!loading && filteredPapers.length > 0}}">
+    <view
+      class="paper-card"
+      wx:for="{{filteredPapers}}"
+      wx:key="testpaperid"
+      bindtap="onGoTest"
+      data-testid="{{item.testpaperid}}"
+    >
+      <view class="paper-seq-badge">
+        <text class="paper-seq-bolt">⚡</text>
+        <text class="paper-seq-num">{{item._seqBadge}}</text>
+      </view>
+      <view class="paper-info">
+        <view class="paper-title">{{item.testpaper_title}}</view>
+        <view class="paper-tags">
+          <text class="paper-author-pill">👨‍🏫 出题塾师：{{item.testpaper_author || '自塾教研组'}}</text>
+          <text class="paper-score-tag">💯 100分制</text>
+        </view>
+      </view>
+      <view class="paper-cta">立即挑战 ›</view>
+    </view>
+  </view>
+
+  <!-- 空状态：搜索无结果 或 题库为空 -->
+  <view class="empty-card" wx:if="{{!loading && filteredPapers.length === 0}}">
+    <view class="empty-icon">{{searchKeyword ? '🔎' : '📑'}}</view>
+    <view class="empty-title">{{searchKeyword ? '未找到匹配的试卷' : '暂无闯关试卷'}}</view>
+    <view class="empty-desc">{{searchKeyword ? '试试其他关键词或清空搜索条件' : '题库正在更新中，请稍后下拉刷新'}}</view>
+    <view class="empty-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">清空搜索</view>
+    <view class="empty-btn" wx:else bindtap="loadPapers">重新加载</view>
   </view>
 
   <view class="safe-bottom"></view>

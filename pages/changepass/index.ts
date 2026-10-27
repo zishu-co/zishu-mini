@@ -1,6 +1,42 @@
 // @ts-nocheck
 import { changePass } from '../../services/user/user'
 
+function evaluateStrength(pwd: string) {
+  const s = (pwd || '').trim()
+  if (!s) {
+    return {
+      strengthLevel: '',
+      strengthClass: '',
+      strengthPercent: 0,
+    }
+  }
+  let score = 0
+  if (s.length >= 6) score += 1
+  if (s.length >= 10) score += 1
+  if (/[0-9]/.test(s) && /[a-zA-Z]/.test(s)) score += 1
+  if (/[^a-zA-Z0-9]/.test(s)) score += 1
+
+  if (score >= 3) {
+    return {
+      strengthLevel: '强',
+      strengthClass: 'strong',
+      strengthPercent: 100,
+    }
+  }
+  if (score >= 2) {
+    return {
+      strengthLevel: '中',
+      strengthClass: 'medium',
+      strengthPercent: 66,
+    }
+  }
+  return {
+    strengthLevel: '弱',
+    strengthClass: 'weak',
+    strengthPercent: 33,
+  }
+}
+
 Page({
   data: {
     name: '',
@@ -9,6 +45,12 @@ Page({
     confirmPass: '',
     password: '',
     checkpass: '',
+    showOld: false,
+    showNew: false,
+    showConfirm: false,
+    strengthLevel: '',
+    strengthClass: '',
+    strengthPercent: 0,
     submitting: false,
     errorMsg: '',
   },
@@ -21,6 +63,18 @@ Page({
     }
   },
 
+  toggleShowOld() {
+    this.setData({ showOld: !this.data.showOld })
+  },
+
+  toggleShowNew() {
+    this.setData({ showNew: !this.data.showNew })
+  },
+
+  toggleShowConfirm() {
+    this.setData({ showConfirm: !this.data.showConfirm })
+  },
+
   onNameInput(e: any) {
     this.setData({ name: e.detail.value, errorMsg: '' })
   },
@@ -31,7 +85,13 @@ Page({
 
   onPasswordInput(e: any) {
     const val = e.detail.value
-    this.setData({ newPass: val, password: val, errorMsg: '' })
+    const strength = evaluateStrength(val)
+    this.setData({
+      newPass: val,
+      password: val,
+      ...strength,
+      errorMsg: '',
+    })
   },
 
   onCheckpassInput(e: any) {
@@ -88,6 +148,9 @@ Page({
             confirmPass: '',
             password: '',
             checkpass: '',
+            strengthLevel: '',
+            strengthClass: '',
+            strengthPercent: 0,
             errorMsg: '',
           })
           setTimeout(() => wx.navigateBack(), 1500)

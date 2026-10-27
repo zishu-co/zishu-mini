@@ -2,6 +2,33 @@ page {
   background-color: #f6f7fb;
 }
 
+.logs-page {
+  min-height: 100vh;
+  padding-top: 24rpx;
+}
+
+.brand-header {
+  margin: 0 32rpx 16rpx;
+  padding: 32rpx 28rpx;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-radius: 24rpx;
+  color: #ffffff;
+  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.22);
+}
+
+.brand-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 800;
+  margin-bottom: 6rpx;
+}
+
+.brand-sub {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.88;
+}
+
 .log-list {
   display: flex;
   flex-direction: column;
@@ -10,7 +37,11 @@ page {
   box-sizing: border-box;
 }
 
-.log-item {
+.log-item,
+.zs-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 0 0 16rpx 0;
   padding: 24rpx 28rpx;
   background: #ffffff;
@@ -19,4 +50,13 @@ page {
   color: #334155;
   box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.05);
   border-left: 6rpx solid #7c3aed;
+}
+
+.log-seq {
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.log-date {
+  color: #475569;
 }

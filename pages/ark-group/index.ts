@@ -14,10 +14,24 @@ import {
 
 const app = getApp<any>();
 
+interface SeatSlot {
+  id: string;
+  seatLabel: string;
+  genderType: 'male' | 'female';
+  occupied: boolean;
+  username: string;
+  isCaptain: boolean;
+  emptyText: string;
+}
+
 interface IPageData {
   courseId: number;
   loading: boolean;
+  activeFilter: 'all' | 'open' | 'ready';
   arkList: TeacherArkItem[];
+  filteredArkList: TeacherArkItem[];
+  openArkCount: number;
+  readyArkCount: number;
   myArkId: number | null;
   currentUserId: number;
   currentGender: string | null;
@@ -30,7 +44,11 @@ Page<IPageData, IPageData>({
   data: {
     courseId: 0,
     loading: true,
+    activeFilter: 'all',
     arkList: [],
+    filteredArkList: [],
+    openArkCount: 0,
+    readyArkCount: 0,
     myArkId: null,
     currentUserId: 0,
     currentGender: null,
@@ -39,14 +57,25 @@ Page<IPageData, IPageData>({
     submitting: false,
   },
 
+  hasLoadedOnce: false,
+
   onLoad(options: any) {
-    this.setData({ courseId: parseInt(options.courseId || '0', 10) });
+    this.setData({ courseId: parseInt(options.courseId || options.id || '0', 10) });
     this.loadUserInfo();
     if (this.data.courseId) {
-      this.loadData();
+      this.loadData().then(() => {
+        this.hasLoadedOnce = true;
+      });
     } else {
       wx.showToast({ title: '参数错误', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
+    }
+  },
+
+  onShow() {
+    this.loadUserInfo();
+    if (this.hasLoadedOnce && this.data.courseId) {
+      this.loadData();
     }
   },
 
@@ -60,6 +89,80 @@ Page<IPageData, IPageData>({
       currentUserId: Number(userInfo.userId || userInfo.id || wx.getStorageSync('userId') || 0),
       currentGender: userInfo.gender || null,
     });
+  },
+
+  onFilterChange(e: any) {
+    const filter = e.currentTarget.dataset.filter as 'all' | 'open' | 'ready';
+    if (!filter || filter === this.data.activeFilter) return;
+    const filteredArkList = this.applyFilter(this.data.arkList, filter);
+    this.setData({
+      activeFilter: filter,
+      filteredArkList,
+    });
+  },
+
+  applyFilter(list: any[], filter: 'all' | 'open' | 'ready') {
+    if (filter === 'open') {
+      return list.filter((ark: any) => Boolean(ark.ark_id && !ark.closed && !ark.finished && ark.stage !== '已成舟'));
+    }
+    if (filter === 'ready') {
+      return list.filter((ark: any) => Boolean(ark.ark_id && (ark.stage === '已成舟' || ark.finished)));
+    }
+    return list;
+  },
+
+  buildCabinSeats(members: any[]): SeatSlot[] {
+    const safeMembers = Array.isArray(members) ? members : [];
+    const males = safeMembers.filter((m) => m.gender === '男');
+    const females = safeMembers.filter((m) => m.gender === '女');
+    const others = safeMembers.filter((m) => m.gender !== '男' && m.gender !== '女');
+
+    const pickMale = (idx: number) => males[idx] || others.shift() || null;
+    const pickFemale = (idx: number) => females[idx] || others.shift() || null;
+
+    const m1 = pickMale(0);
+    const m2 = pickMale(1);
+    const f1 = pickFemale(0);
+    const f2 = pickFemale(1);
+
+    return [
+      {
+        id: 'male-1',
+        seatLabel: '♂ 男席 1',
+        genderType: 'male',
+        occupied: Boolean(m1),
+        username: m1?.username || '',
+        isCaptain: Boolean(m1?.is_captain),
+        emptyText: '♂ 虚位以待',
+      },
+      {
+        id: 'male-2',
+        seatLabel: '♂ 男席 2',
+        genderType: 'male',
+        occupied: Boolean(m2),
+        username: m2?.username || '',
+        isCaptain: Boolean(m2?.is_captain),
+        emptyText: '♂ 虚位以待',
+      },
+      {
+        id: 'female-1',
+        seatLabel: '♀ 女席 1',
+        genderType: 'female',
+        occupied: Boolean(f1),
+        username: f1?.username || '',
+        isCaptain: Boolean(f1?.is_captain),
+        emptyText: '♀ 虚位以待',
+      },
+      {
+        id: 'female-2',
+        seatLabel: '♀ 女席 2',
+        genderType: 'female',
+        occupied: Boolean(f2),
+        username: f2?.username || '',
+        isCaptain: Boolean(f2?.is_captain),
+        emptyText: '♀ 虚位以待',
+      },
+    ];
   },
 
   async loadData() {
@@ -80,8 +183,19 @@ Page<IPageData, IPageData>({
     }
 
     const decorated = this.decorateArkList(rawList, myArkId);
+    const openArkCount = decorated.filter(
+      (a: any) => Boolean(a.ark_id && !a.closed && !a.finished && a.stage !== '已成舟')
+    ).length;
+    const readyArkCount = decorated.filter(
+      (a: any) => Boolean(a.ark_id && (a.stage === '已成舟' || a.finished))
+    ).length;
+    const filteredArkList = this.applyFilter(decorated, this.data.activeFilter);
+
     this.setData({
       arkList: decorated,
+      filteredArkList,
+      openArkCount,
+      readyArkCount,
       myArkId,
       loading: false,
     });
@@ -96,9 +210,12 @@ Page<IPageData, IPageData>({
           }))
         : [];
       const isMyArk = !!ark.ark_id && Number(ark.ark_id) === Number(myArkId);
+      const teacherName = (ark.teacher_name || '师').trim();
       return {
         ...ark,
         members,
+        _teacherInitial: teacherName ? teacherName.charAt(0) : '师',
+        _seats: this.buildCabinSeats(members),
         _isMyArk: isMyArk,
         _canJoin: !isMyArk && this.canJoin(ark),
         _statusText: this.statusText(ark),

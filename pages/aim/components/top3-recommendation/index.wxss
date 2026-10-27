@@ -9,7 +9,7 @@
 /* 卡片头部 */
 .card-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 24rpx;
 }
@@ -23,9 +23,24 @@
   color: #333;
 }
 
-.card-title.center {
-  justify-content: center;
-  width: 100%;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.header-pill {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 24rpx;
+  background: #f5f0ff;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.header-pill.refresh {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #fff;
 }
 
 @keyframes rotate {
@@ -223,7 +238,32 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-width: 120rpx;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 140rpx;
+}
+
+.micro-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.micro-btn {
+  font-size: 20rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 10rpx;
+  font-weight: 600;
+}
+
+.micro-btn.finish {
+  background: rgba(22, 163, 74, 0.12);
+  color: #16a34a;
+}
+
+.micro-btn.skip {
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
 }
 
 /* 更新时间 */

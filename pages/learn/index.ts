@@ -17,9 +17,24 @@ import {
 
 const app = getApp();
 
+type DecoratedSelection = CurrentSelection & {
+  deadlineClass: string;
+  deadlineDateStr: string;
+};
+
+type DecoratedCourse = Course & {
+  isSelected: boolean;
+};
+
 interface ILearnPageData {
-  myCourses: (CurrentSelection & { deadlineClass?: string })[];
-  allCourses: (Course & { isSelected?: boolean })[];
+  myCourses: DecoratedSelection[];
+  currentSelections: DecoratedSelection[];
+  allCourses: DecoratedCourse[];
+  tableData: DecoratedCourse[];
+  filteredCourses: DecoratedCourse[];
+  availableCount: number;
+  courseFilter: 'all' | 'selected' | 'available';
+  searchKeyword: string;
   selectedIds: number[];
   loading: boolean;
   loadError: string;
@@ -35,10 +50,16 @@ interface ILearnPageData {
   selectingCourseId: number;
 }
 
-Page<ILearnPageData, ILearnPageData>({
+Page<ILearnPageData, any>({
   data: {
     myCourses: [],
+    currentSelections: [],
     allCourses: [],
+    tableData: [],
+    filteredCourses: [],
+    availableCount: 0,
+    courseFilter: 'all',
+    searchKeyword: '',
     selectedIds: [],
     loading: true,
     loadError: '',
@@ -102,21 +123,27 @@ Page<ILearnPageData, ILearnPageData>({
       const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
       const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
       const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
-      const decoratedMyCourses = safeMyCourses.map((c: CurrentSelection) => ({
+      const decoratedMyCourses: DecoratedSelection[] = safeMyCourses.map((c: CurrentSelection) => ({
         ...c,
         deadlineClass: this.getDeadlineClass(c.deadline),
+        deadlineDateStr: this.formatDateOnly(c.deadline),
       }));
-      const decoratedAllCourses = safeAllCourses.map((c: Course) => ({
+      const decoratedAllCourses: DecoratedCourse[] = safeAllCourses.map((c: Course) => ({
         ...c,
         isSelected: selectedIds.includes(c.id),
       }));
+      const availableCount = decoratedAllCourses.filter((c) => !c.isSelected).length;
       this.setData({
         myCourses: decoratedMyCourses,
+        currentSelections: decoratedMyCourses,
         allCourses: decoratedAllCourses,
+        tableData: decoratedAllCourses,
+        availableCount,
         selectedIds,
         loading: false,
         loadError: '',
       });
+      this.applyCourseFilters(this.data.courseFilter, this.data.searchKeyword, decoratedAllCourses);
     } catch (e: any) {
       console.error('加载数据失败', e);
       if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
@@ -292,21 +319,41 @@ Page<ILearnPageData, ILearnPageData>({
 
     this.setData({ submittingReport: true });
     try {
-      await reportLearn(
+      const res = await reportLearn(
         reportCourse.chapter_id,
         reportCourse.course_id,
         reportCourse.chapter_title,
         reportCourse.sele_id,
         reportHour,
       );
-      wx.showToast({ title: '申报成功', icon: 'success' });
       this.setData({ showReportModal: false, reportHour: '' });
       this.loadData();
+      if (res && res.is_last_lesson) {
+        wx.showModal({
+          title: '🎉 完成全部章节学习',
+          content: '恭喜你已完成本课程所有章节的学时申报！现在去提交结课作业即可解锁荣誉证书。',
+          confirmText: '去结课',
+          cancelText: '稍后',
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              wx.navigateTo({ url: `/pages/finish-course/index?course_id=${reportCourse.course_id}` });
+            }
+          },
+        });
+      } else {
+        wx.showToast({ title: '申报成功', icon: 'success' });
+      }
     } catch (e: any) {
       wx.showToast({ title: e?.message || '申报失败', icon: 'none' });
     } finally {
       this.setData({ submittingReport: false });
     }
+  },
+
+  onGoFinishCourse(e: any) {
+    const courseId = e.currentTarget.dataset.courseid;
+    if (!courseId) return;
+    wx.navigateTo({ url: `/pages/finish-course/index?course_id=${courseId}` });
   },
 
   onCloseReportModal() {
@@ -329,6 +376,65 @@ Page<ILearnPageData, ILearnPageData>({
           confirmText: '知道了'
         });
       }
+    });
+  },
+
+  formatDateOnly(s: string): string {
+    if (!s) return '—';
+    const str = String(s);
+    if (str.length >= 10) return str.substring(0, 10);
+    return str;
+  },
+
+  onSearchInput(e: any) {
+    const kw = (e?.detail?.value ?? '').trim();
+    this.applyCourseFilters(this.data.courseFilter, kw);
+  },
+
+  onClearSearch() {
+    this.applyCourseFilters(this.data.courseFilter, '');
+  },
+
+  onFilterChange(e: any) {
+    const filter = e.currentTarget.dataset.filter || 'all';
+    if (filter === this.data.courseFilter) return;
+    this.applyCourseFilters(filter, this.data.searchKeyword);
+  },
+
+  onResetCourseFilter() {
+    this.applyCourseFilters('all', '');
+  },
+
+  applyCourseFilters(
+    courseFilter: 'all' | 'selected' | 'available' | 'hot',
+    searchKeyword: string,
+    sourceCourses = this.data.allCourses
+  ) {
+    const kw = (searchKeyword || '').toLowerCase();
+    let filteredCourses = (sourceCourses || []).filter((c) => {
+      if (courseFilter === 'selected' && !c.isSelected) return false;
+      if (courseFilter === 'available' && c.isSelected) return false;
+      if (courseFilter === 'hot' && (c.current_selections_num || 0) + (c.finish_selections_num || 0) <= 0) {
+        return false;
+      }
+      if (!kw) return true;
+      const title = String(c.title || '').toLowerCase();
+      const director = String(c.director_name || '').toLowerCase();
+      const desc = String(c.desc || '').toLowerCase();
+      return title.includes(kw) || director.includes(kw) || desc.includes(kw);
+    });
+    if (courseFilter === 'hot') {
+      filteredCourses = [...filteredCourses].sort(
+        (a, b) =>
+          (b.current_selections_num || 0) * 2 +
+          (b.finish_selections_num || 0) -
+          ((a.current_selections_num || 0) * 2 + (a.finish_selections_num || 0))
+      );
+    }
+    this.setData({
+      courseFilter,
+      searchKeyword,
+      filteredCourses,
     });
   },
 
@@ -357,6 +463,14 @@ Page<ILearnPageData, ILearnPageData>({
 
   onGotoReport() {
     wx.navigateTo({ url: '/pages/report/index' });
+  },
+
+  onGotoSocialPlaza() {
+    wx.navigateTo({ url: '/pages/all/index' });
+  },
+
+  onGotoSupervise() {
+    wx.navigateTo({ url: '/pages/supervise/index' });
   },
 
   goToLogin() {

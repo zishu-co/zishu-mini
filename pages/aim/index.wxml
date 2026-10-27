@@ -66,6 +66,8 @@
       bind:refresh="onRefreshRecommendation"
       bind:itemtap="onRecommendationItemTap"
       bind:actiontap="onRecommendationActionTap"
+      bind:finishtap="onRecommendationFinishTap"
+      bind:skiptap="onRecommendationSkipTap"
     />
   </view>
 

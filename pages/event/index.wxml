@@ -3,8 +3,29 @@
 
   <!-- 顶部 Banner -->
   <view class="banner">
-    <view class="banner-title">活动</view>
-    <view class="banner-sub">一起·发现更大的世界</view>
+    <view class="banner-top">
+      <view>
+        <view class="banner-title">共学活动</view>
+        <view class="banner-sub">一起·发现更大的世界</view>
+      </view>
+      <view class="banner-counters">
+        <view class="counter-pill">🔥 进行中 {{currentEvents.length}} 场</view>
+        <view class="counter-pill subtle">📚 历史沉淀 {{historicalEvents.length}} 场</view>
+      </view>
+    </view>
+
+    <!-- 实时搜索栏 -->
+    <view class="event-search-bar">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索活动名称、城市或场地..."
+        placeholder-class="search-placeholder"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <text wx:if="{{searchKeyword}}" class="search-clear" bindtap="onClearSearch">✕</text>
+    </view>
   </view>
 
   <!-- Tab 切换 -->
@@ -14,14 +35,14 @@
       data-tab="current"
       bindtap="onTabChange"
     >
-      <text>当前活动</text>
+      <text>当前活动 ({{filteredCurrentEvents.length}})</text>
     </view>
     <view
       class="tab {{activeTab === 'historical' ? 'tab-active' : ''}}"
       data-tab="historical"
       bindtap="onTabChange"
     >
-      <text>历史活动</text>
+      <text>历史活动 ({{filteredHistoricalEvents.length}})</text>
     </view>
   </view>
 
@@ -32,13 +53,17 @@
 
   <!-- 当前活动列表 -->
   <block wx:if="{{activeTab === 'current'}}">
-    <view class="empty" wx:if="{{!loading && currentEvents.length === 0}}">
-      <text>暂无进行中的活动</text>
+    <view class="empty" wx:if="{{!loading && filteredCurrentEvents.length === 0}}">
+      <text class="empty-text">{{searchKeyword ? '未找到匹配的当前活动' : '暂无进行中的活动'}}</text>
+      <view class="empty-actions">
+        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">清空搜索</button>
+        <button class="retry-btn" bindtap="loadEvents">重新加载</button>
+      </view>
     </view>
 
     <view
       class="event-card"
-      wx:for="{{currentEvents}}"
+      wx:for="{{filteredCurrentEvents}}"
       wx:key="id"
       data-id="{{item.id}}"
       bindtap="onCardTap"
@@ -68,7 +93,7 @@
         <view class="card-title">{{item._heatBadge}} · {{item.title}}</view>
         <view class="card-meta">
           <text class="meta-item">🕐 {{item._startDateStr || item.start_time}}</text>
-          <text class="meta-item">📍 {{item.location}}</text>
+          <text class="meta-item">📍 {{item.location || '线上/待定'}}</text>
           <text class="meta-item">👥 {{item.participant_count}} 位搭子已报名（点卡片看名单）</text>
         </view>
         <view class="card-desc" wx:if="{{item.desc}}">
@@ -91,13 +116,17 @@
 
   <!-- 历史活动列表 -->
   <block wx:if="{{activeTab === 'historical'}}">
-    <view class="empty" wx:if="{{!loading && historicalEvents.length === 0}}">
-      <text>暂无历史活动</text>
+    <view class="empty" wx:if="{{!loading && filteredHistoricalEvents.length === 0}}">
+      <text class="empty-text">{{searchKeyword ? '未找到匹配的历史活动' : '暂无历史活动'}}</text>
+      <view class="empty-actions">
+        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">清空搜索</button>
+        <button class="retry-btn" bindtap="loadEvents">重新加载</button>
+      </view>
     </view>
 
     <view
       class="event-card historical"
-      wx:for="{{historicalEvents}}"
+      wx:for="{{filteredHistoricalEvents}}"
       wx:key="id"
       data-id="{{item.id}}"
       bindtap="onCardTap"
@@ -119,19 +148,21 @@
         <view class="historical-badge">
           <text>已结束</text>
         </view>
+        <view class="poster-overlay">
+          <text>📖 点击海报看回顾</text>
+        </view>
       </view>
 
       <view class="card-body">
         <view class="card-title">{{item.title}}</view>
         <view class="card-meta">
-          <text class="meta-item">🕐 {{item.start_time}}</text>
-          <text class="meta-item">📍 {{item.location}}</text>
-          <text class="meta-item">👥 {{item.participant_count}} 人</text>
+          <text class="meta-item">🕐 {{item._startDateStr || item.start_time}}</text>
+          <text class="meta-item">📍 {{item.location || '线上/待定'}}</text>
+          <text class="meta-item">👥 {{item.participant_count}} 人参与</text>
         </view>
         <view class="card-desc" wx:if="{{item.desc}}">
           <text>{{item.desc}}</text>
         </view>
-        <!-- 历史活动无报名按钮 -->
       </view>
     </view>
   </block>

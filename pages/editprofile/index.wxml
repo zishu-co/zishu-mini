@@ -1,4 +1,31 @@
 <view class="page">
+  <!-- 交互式名片实时预览卡片 -->
+  <view class="preview-card">
+    <view class="preview-top">
+      <view class="preview-avatar">
+        <text class="preview-avatar-text">{{avatarInitial}}</text>
+      </view>
+      <view class="preview-info">
+        <view class="preview-name-row">
+          <text class="preview-name">{{form.name || '自塾学友'}}</text>
+          <text class="preview-gender-pill" wx:if="{{form.gender}}">{{form.gender}}</text>
+          <text class="preview-region-tag" wx:if="{{form.region}}">📍 {{form.region}}</text>
+        </view>
+        <text class="preview-goal">{{form.goal || '设定个人成长目标，开启进阶之旅'}}</text>
+      </view>
+    </view>
+
+    <view class="completeness-row">
+      <view class="completeness-meta">
+        <text>资料完善度</text>
+        <text class="completeness-pct">{{completenessPercent}}%</text>
+      </view>
+      <view class="completeness-track">
+        <view class="completeness-fill" style="width: {{completenessPercent}}%"></view>
+      </view>
+    </view>
+  </view>
+
   <view class="form-card">
     <!-- 基本信息 -->
     <view class="section-title">基本信息</view>
@@ -31,9 +58,20 @@
       <input
         class="form-input"
         type="text"
-        placeholder="请输入居住地"
+        placeholder="请输入居住地（如：上海）"
         value="{{form.region}}"
         bindinput="onRegionInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">个人目标</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="写下一句话近期学习目标..."
+        value="{{form.goal}}"
+        bindinput="onGoalInput"
       />
     </view>
 
@@ -56,7 +94,7 @@
     </view>
 
     <button class="submit-btn" disabled="{{submitting}}" bindtap="submitForm">
-      {{submitting ? '保存中...' : '保存修改'}}
+      {{submitting ? '保存中...' : '保存个人档案'}}
     </button>
   </view>
 </view>

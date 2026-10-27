@@ -17,9 +17,27 @@
     <!-- 祝福语 -->
     <view class="blessing-section">
       <text class="blessing-text">
-        祝贺 {{courseInfo.user_name}} 成功学完《{{courseInfo.course_title}}》！
-        祝愿你在人生路上能好好利用所学知识和技能，为自己创造更好的生活。
+        祝贺 {{courseInfo.user_name || '自塾学友'}} 成功学完《{{courseInfo.course_title}}》！
+        愿你将所学化为笃行，在人生与事业的航程中持续创造价值。
       </text>
+    </view>
+
+    <!-- 结课通关 Step 清单 -->
+    <view class="checklist-bar">
+      <view class="checklist-step done">
+        <view class="checklist-dot">✓</view>
+        <text class="checklist-label">章节学习</text>
+      </view>
+      <view class="checklist-line"></view>
+      <view class="checklist-step {{courseInfo.quiz_info && courseInfo.quiz_info.is_full_score ? 'done' : 'active'}}">
+        <view class="checklist-dot">{{courseInfo.quiz_info && courseInfo.quiz_info.is_full_score ? '✓' : '2'}}</view>
+        <text class="checklist-label">结课测验</text>
+      </view>
+      <view class="checklist-line"></view>
+      <view class="checklist-step {{courseInfo.ark_info && courseInfo.ark_info.homework_url ? 'done' : 'active'}}">
+        <view class="checklist-dot">{{courseInfo.ark_info && courseInfo.ark_info.homework_url ? '✓' : '3'}}</view>
+        <text class="checklist-label">{{courseInfo.is_ark_learning ? '方舟作业' : '荣誉结课'}}</text>
+      </view>
     </view>
 
     <!-- 测验成绩区域（quiz_info 存在时显示） -->
@@ -68,22 +86,23 @@
     </view>
 
     <!-- 方舟学习提示（无确认结课按钮） -->
-    <view class="ark-tip" wx:if="{{courseInfo.is_ark_learning}}">
-      <text>📌 方舟学习由舟长在方舟详情页统一为大家结课</text>
+    <view class="ark-tip" wx:if="{{courseInfo.is_ark_learning}}" bindtap="onGoArkDetail">
+      <text>📌 方舟学习由舟长在方舟详情页统一为大家结课（点击进入方舟舱 ›）</text>
     </view>
 
-    <!-- 结课证书（单人学习） -->
-    <view class="certificate-section" wx:if="{{!courseInfo.is_ark_learning}}">
-      <view class="section-title">🏆 结课证书</view>
-      <view class="certificate-placeholder">
+    <!-- 结课证书（所有学习者均可预览与生成） -->
+    <view class="certificate-section">
+      <view class="section-title">🏆 荣誉结课证书</view>
+      <view class="certificate-placeholder" bindtap="downloadCertificate">
         <view class="cert-content">
-          <view class="cert-title">结课证书</view>
-          <view class="cert-name">{{courseInfo.user_name}}</view>
+          <view class="cert-title">自塾荣誉结课证书</view>
+          <view class="cert-serial">NO. {{certNo}}</view>
+          <view class="cert-name">{{courseInfo.user_name || '自塾学友'}}</view>
           <view class="cert-course">已完成《{{courseInfo.course_title}}》全部课程学习</view>
-          <view class="cert-date">{{currentDate}}</view>
+          <view class="cert-date">{{currentDate}} · 自塾共学委员会</view>
         </view>
       </view>
-      <button class="download-btn" type="primary" plain bindtap="downloadCertificate">下载证书</button>
+      <button class="download-btn" type="primary" plain bindtap="downloadCertificate">🏅 生成与保存荣誉证书</button>
     </view>
 
     <!-- 确认结课按钮（单人学习特有） -->
@@ -97,4 +116,33 @@
       <view class="confirm-tip">确认后这门课将从"我的选课"列表中消失</view>
     </view>
   </view>
+
+  <!-- 荣誉证书预览与生成弹窗 -->
+  <view class="cert-modal-mask" wx:if="{{showCertModal}}" bindtap="onCloseCertModal"></view>
+  <view class="cert-modal" wx:if="{{showCertModal}}">
+    <view class="cert-modal-card">
+      <view class="cert-modal-badge">🏅 ZISHU ACADEMY CERTIFICATE</view>
+      <view class="cert-modal-title">自塾荣誉结课证书</view>
+      <view class="cert-modal-serial">证书编号：{{certNo}}</view>
+      <view class="cert-modal-divider"></view>
+      <view class="cert-modal-recipient">{{courseInfo.user_name || '自塾学友'}}</view>
+      <view class="cert-modal-body">
+        在自塾以终为始共学体系中，圆满完成
+        <text class="cert-modal-course">《{{courseInfo.course_title}}》</text>
+        全部章节修习与闯关挑战，特颁此证，以资嘉勉。
+      </view>
+      <view class="cert-modal-footer">
+        <view class="cert-modal-date">颁发日期：{{currentDate}}</view>
+        <view class="cert-modal-seal">自塾共学\n荣誉认证</view>
+      </view>
+    </view>
+    <view class="cert-modal-actions">
+      <button class="cert-action-btn copy" bindtap="onCopyCertInfo">📋 复制证书喜报</button>
+      <button class="cert-action-btn save" bindtap="onSaveCertPoster">💾 保存证书到相册</button>
+    </view>
+    <view class="cert-modal-close" bindtap="onCloseCertModal">关闭预览</view>
+  </view>
+
+  <!-- 离屏绘制证书 Canvas -->
+  <canvas type="2d" id="certCanvas" class="offscreen-canvas"></canvas>
 </view>

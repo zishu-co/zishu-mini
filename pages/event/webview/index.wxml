@@ -1,2 +1,8 @@
 <!-- pages/event/webview/index.wxml -->
-<web-view src="{{url}}" />
+<web-view wx:if="{{url}}" src="{{url}}" />
+<view wx:else class="empty-webview">
+  <text class="empty-icon">🔗</text>
+  <text class="empty-title">暂无活动文章链接</text>
+  <text class="empty-desc">该活动暂未关联公众号推文或外部详情链接</text>
+  <button class="back-btn" bindtap="onGoBack">返回活动列表</button>
+</view>
