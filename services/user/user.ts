@@ -269,3 +269,47 @@ export const fetchPublicFeedbacks = () => {
     method: 'GET',
   })
 }
+
+/**
+ * 116-shushis.md: 获取某用户的带教塾师列表
+ * GET /api/users/fetch_shushis/{user_id}
+ */
+export const fetchShushis = (userId?: number) => {
+  const uid =
+    userId ||
+    wx.getStorageSync('userId') ||
+    wx.getStorageSync('userInfo')?.userId ||
+    wx.getStorageSync('userInfo')?.id
+  return get(`/api/users/fetch_shushis/${uid || 1}`)
+}
+
+/**
+ * 109-edit-profile.md: 删除个人风采相册图片
+ * POST /api/users/delete_profile
+ */
+export const deleteProfilePhoto = (filename: string) => {
+  return post('/api/users/delete_profile', { filename })
+}
+
+/**
+ * 101-regi.md: 新塾员注册申请
+ * POST /api/users/register
+ */
+export const registerUser = (data: {
+  name: string
+  password: string
+  email: string
+  phone: string
+  gender: string
+  notes?: string
+}) => {
+  return post('/api/users/register', data)
+}
+
+/**
+ * 111-reset-pass.md: 申请重置密码
+ * POST /api/users/reset_pass
+ */
+export const resetPasswordApply = (phone: string) => {
+  return post('/api/users/reset_pass', { phone })
+}

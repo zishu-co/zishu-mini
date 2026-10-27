@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { getProfile, submitProfile } from '../../services/user/user'
+import base, { getBaseUrl } from '../../services/base'
+import { getProfile, submitProfile, deleteProfilePhoto } from '../../services/user/user'
 
 function computeProfileMeta(form: any) {
   const name = (form?.name || '').trim()
@@ -43,6 +44,8 @@ Page({
       goal: '',
       desc: '',
     },
+    profiles: [] as any[],
+    uploadingPhoto: false,
     submitting: false,
     errorMsg: '',
   },
@@ -91,6 +94,14 @@ Page({
           goal: res?.goal || userInfo.goal || '',
           desc: res?.desc || userInfo.desc || '',
         }
+        const rawProfiles = Array.isArray(res?.profiles) ? res.profiles : []
+        const profiles = rawProfiles.map((p: any) => ({
+          ...p,
+          _fullUrl: String(p.url || '').startsWith('http')
+            ? p.url
+            : `${getBaseUrl()}/${String(p.url || '').replace(/^\/+/, '')}`,
+        }))
+        this.setData({ profiles })
         this.updatePreviewMeta(nextForm)
       })
       .catch(() => {
@@ -144,6 +155,56 @@ Page({
       nextDesc = currentDesc ? `${currentDesc} ${tag}` : tag
     }
     this.updatePreviewMeta({ ...this.data.form, desc: nextDesc.slice(0, 500) })
+  },
+
+  // ── 109-edit-profile.md: 个人风采相册上传与删除 (/api/users/save_profile & /api/users/delete_profile) ──
+  onChooseAndUploadPhoto() {
+    if ((this.data.profiles || []).length >= 5) {
+      wx.showToast({ title: '最多可上传 5 张风采照片', icon: 'none' })
+      return
+    }
+    const userInfo = wx.getStorageSync('userInfo') || {}
+    const userId = wx.getStorageSync('userId') || userInfo.userId || userInfo.id || 1
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res: any) => {
+        const tempPath = res?.tempFiles?.[0]?.tempFilePath
+        if (!tempPath) return
+        this.setData({ uploadingPhoto: true })
+        wx.uploadFile({
+          url: `${getBaseUrl()}/api/users/save_profile`,
+          filePath: tempPath,
+          name: 'file',
+          formData: { id: String(userId) },
+          header: { token, Authorization: token ? `Bearer ${token}` : '' },
+          success: () => {
+            wx.showToast({ title: '📸 照片已上传', icon: 'success' })
+            this.fetchProfile()
+          },
+          fail: () => {
+            wx.showToast({ title: '上传失败', icon: 'none' })
+          },
+          complete: () => {
+            this.setData({ uploadingPhoto: false })
+          },
+        })
+      },
+    })
+  },
+
+  async onDeletePhoto(e: any) {
+    const rawName = String(e.currentTarget.dataset.name || '').replace(/^api\//, '')
+    if (!rawName) return
+    try {
+      await deleteProfilePhoto(rawName)
+      wx.showToast({ title: '已移除该照片', icon: 'none' })
+      this.fetchProfile()
+    } catch (err) {
+      wx.showToast({ title: '删除失败', icon: 'none' })
+    }
   },
 
   submitForm() {

@@ -151,6 +151,31 @@ Page<IArticlePageData, any>({
       title: '',
       content: '',
     },
+    showZhuanlanModal: false,
+    savingZhuanlan: false,
+    zhuanlanForm: {
+      zhuanlan_title: '',
+      first_article_id: 0,
+      first_part: '第一篇',
+    },
+    showCreateVideoModal: false,
+    savingVideo: false,
+    videoForm: {
+      album_title: '',
+      video_title: '',
+      video_desc: '',
+      video_length: 15,
+      video_websrc: '',
+      video_fulltext: '',
+    },
+    showCreateMapModal: false,
+    savingMap: false,
+    mapForm: {
+      map_title: '',
+      map_desc: '',
+      root_topic: '',
+      children_topics: '',
+    },
   },
 
   onLoad(options?: any) {
@@ -750,7 +775,223 @@ Page<IArticlePageData, any>({
   },
 
   onCloseEditorModal() {
-    this.setData({ showEditorModal: false })
+    this.setData({
+      showEditorModal: false,
+      showZhuanlanModal: false,
+      showCreateVideoModal: false,
+      showCreateMapModal: false,
+    })
+  },
+
+  // ── 104-edit-zhuanlan.md: 新建/保存专栏合集 ───────────────────
+  onOpenCreateZhuanlanModal() {
+    if (!this.data.hasLogin) {
+      this.goToLogin()
+      return
+    }
+    const firstArt = (this.data.allArticles || [])[0]
+    this.setData({
+      showZhuanlanModal: true,
+      zhuanlanForm: {
+        zhuanlan_title: '',
+        first_article_id: firstArt ? Number(firstArt.articleid) : 0,
+        first_part: '第一篇',
+      },
+    })
+  },
+
+  onZhuanlanFormInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`zhuanlanForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSaveZhuanlan() {
+    if (this.data.savingZhuanlan) return
+    const { zhuanlan_title, first_article_id, first_part } = this.data.zhuanlanForm
+    const cleanTitle = String(zhuanlan_title || '').trim()
+    if (!cleanTitle) {
+      wx.showToast({ title: '请输入专栏合集名称', icon: 'none' })
+      return
+    }
+    this.setData({ savingZhuanlan: true })
+    try {
+      const uid = Number(this.data.currentUserId || wx.getStorageSync('userId') || 1)
+      const firstArt = (this.data.allArticles || []).find(
+        (a: any) => Number(a.articleid) === Number(first_article_id)
+      )
+      const zhuanlanData = firstArt
+        ? [
+            {
+              articleid: Number(firstArt.articleid),
+              show_title: firstArt.title,
+              zhuanlan_part: String(first_part || '第一篇').trim(),
+            },
+          ]
+        : []
+      await base.post('/api/article/savezhuanlan', {
+        zhuanlan_id: 0,
+        zhuanlan_title: cleanTitle,
+        author_id: uid,
+        article_amount: zhuanlanData.length,
+        deleted_data: JSON.stringify([]),
+        zhuanlan_data: JSON.stringify(zhuanlanData),
+      })
+      wx.showToast({ title: '📚 专栏合集已创建！', icon: 'success' })
+      this.setData({ showZhuanlanModal: false })
+      this.fetchZhuanlans()
+    } catch {
+      wx.showToast({ title: '保存专栏失败', icon: 'none' })
+    } finally {
+      this.setData({ savingZhuanlan: false })
+    }
+  },
+
+  // ── 101-edit-album.md & 102-edit-video.md: 发布微课视频与专辑 ──
+  onOpenCreateVideoModal() {
+    if (!this.data.hasLogin) {
+      this.goToLogin()
+      return
+    }
+    this.setData({
+      showCreateVideoModal: true,
+      videoForm: {
+        album_title: this.data.activeAlbum?.album_title || '',
+        video_title: '',
+        video_desc: '',
+        video_length: 15,
+        video_websrc: '',
+        video_fulltext: '',
+      },
+    })
+  },
+
+  onVideoFormInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`videoForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSaveVideoAndAlbum() {
+    if (this.data.savingVideo) return
+    const f = this.data.videoForm
+    const vTitle = String(f.video_title || '').trim()
+    const aTitle = String(f.album_title || '').trim() || vTitle
+    if (!vTitle) {
+      wx.showToast({ title: '请输入微课视频标题', icon: 'none' })
+      return
+    }
+    this.setData({ savingVideo: true })
+    try {
+      const uid = Number(this.data.currentUserId || wx.getStorageSync('userId') || 1)
+      const vRes: any = await base.post('/api/video/savevideo', {
+        action: 'new',
+        video_title: vTitle,
+        video_desc: String(f.video_desc || vTitle).trim(),
+        video_fulltext: String(f.video_fulltext || '').trim(),
+        video_length: Number(f.video_length || 15),
+        upstyle: 'Web',
+        videochange: 'yes',
+        video_websrc: String(f.video_websrc || '').trim(),
+      })
+      const createdVideoId = Number(vRes?.result?.videoid || 0)
+      await base.post('/api/video/save_album', {
+        album_id: Number(this.data.activeAlbum?.album_id || 0),
+        album_title: aTitle,
+        author_id: uid,
+        wholelength: Number(f.video_length || 15),
+        deleted_data: JSON.stringify([]),
+        album_data: JSON.stringify(
+          createdVideoId > 0
+            ? [
+                {
+                  videoid: createdVideoId,
+                  show_title: vTitle,
+                  album_part: '第一节',
+                },
+              ]
+            : []
+        ),
+      })
+      wx.showToast({ title: '🎬 微课与专辑已发布！', icon: 'success' })
+      this.setData({ showCreateVideoModal: false })
+      this.fetchVideoAlbums()
+    } catch {
+      wx.showToast({ title: '发布微课失败', icon: 'none' })
+    } finally {
+      this.setData({ savingVideo: false })
+    }
+  },
+
+  // ── 104-edit-map.md: 新建/保存知识脑图 ─────────────────────────
+  onOpenCreateMapModal() {
+    if (!this.data.hasLogin) {
+      this.goToLogin()
+      return
+    }
+    this.setData({
+      showCreateMapModal: true,
+      mapForm: {
+        map_title: '',
+        map_desc: '',
+        root_topic: '',
+        children_topics: '',
+      },
+    })
+  },
+
+  onMapFormInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`mapForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSaveMindMap() {
+    if (this.data.savingMap) return
+    const f = this.data.mapForm
+    const mapTitle = String(f.map_title || '').trim()
+    const rootTopic = String(f.root_topic || mapTitle).trim()
+    if (!mapTitle) {
+      wx.showToast({ title: '请输入知识脑图名称', icon: 'none' })
+      return
+    }
+    this.setData({ savingMap: true })
+    try {
+      const childNames = String(f.children_topics || '')
+        .split(/[,，\n]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+      const nowId = Date.now()
+      const nodeData = {
+        id: `root-${nowId}`,
+        topic: rootTopic,
+        root: true,
+        children: childNames.map((name, idx) => ({
+          id: `node-${nowId}-${idx + 1}`,
+          topic: name,
+          children: [],
+        })),
+      }
+      await base.post('/api/map/save_map', {
+        map_id: 0,
+        map_title: mapTitle,
+        map_desc: String(f.map_desc || `${mapTitle} 结构化知识脑图`).trim(),
+        data: JSON.stringify({ nodeData }),
+      })
+      wx.showToast({ title: '🗺️ 知识脑图已创建！', icon: 'success' })
+      this.setData({ showCreateMapModal: false })
+      this.fetchMindMaps()
+    } catch {
+      wx.showToast({ title: '创建脑图失败', icon: 'none' })
+    } finally {
+      this.setData({ savingMap: false })
+    }
   },
 
   onEditorInput(e: any) {

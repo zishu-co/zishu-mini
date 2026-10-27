@@ -24,6 +24,13 @@ Page({
       answer: 'A',
       explain: '',
     },
+    // 101-edit-paper.md & 103-all-ques.md: 题库检索与组卷发布
+    showAssemblePaperModal: false,
+    savingPaper: false,
+    paperTitle: '',
+    quesSearchKeyword: '',
+    questionBankList: [] as any[],
+    selectedQuesIds: [] as number[],
   },
 
   onLoad() {},
@@ -106,7 +113,117 @@ Page({
   },
 
   onCloseAddQuesModal() {
-    this.setData({ showAddQuesModal: false });
+    this.setData({
+      showAddQuesModal: false,
+      showAssemblePaperModal: false,
+    });
+  },
+
+  // ── 101-edit-paper.md & 103-all-ques.md: 题库检索与组卷发布 ──
+  async onOpenAssemblePaperModal() {
+    this.setData({
+      showAssemblePaperModal: true,
+      paperTitle: '',
+      quesSearchKeyword: '',
+      selectedQuesIds: [],
+    });
+    await this.loadQuestionBank();
+  },
+
+  async loadQuestionBank(keyword = '') {
+    try {
+      let list: any[] = [];
+      if (String(keyword || '').trim()) {
+        const res: any = await base.post('/api/ques/searchques', {
+          search_data: JSON.stringify([['ques_title', String(keyword).trim()]]),
+        });
+        list = Array.isArray(res) ? res : [];
+      } else {
+        const res: any = await base.get('/api/ques/showques');
+        list = Array.isArray(res) ? res : [];
+      }
+      const selectedSet = new Set(this.data.selectedQuesIds || []);
+      const decorated = list.slice(0, 30).map((q: any) => ({
+        ...q,
+        _selected: selectedSet.has(Number(q.quesid)),
+      }));
+      this.setData({ questionBankList: decorated });
+    } catch {
+      this.setData({ questionBankList: [] });
+    }
+  },
+
+  onPaperTitleInput(e: any) {
+    this.setData({ paperTitle: e.detail.value || '' });
+  },
+
+  onQuesSearchInput(e: any) {
+    const kw = e.detail.value || '';
+    this.setData({ quesSearchKeyword: kw });
+    this.loadQuestionBank(kw);
+  },
+
+  onToggleSelectQues(e: any) {
+    const qid = Number(e.currentTarget.dataset.id);
+    if (!qid) return;
+    const cur = [...(this.data.selectedQuesIds || [])];
+    const idx = cur.indexOf(qid);
+    if (idx >= 0) {
+      cur.splice(idx, 1);
+    } else {
+      cur.push(qid);
+    }
+    const selectedSet = new Set(cur);
+    const updatedBank = (this.data.questionBankList || []).map((q: any) => ({
+      ...q,
+      _selected: selectedSet.has(Number(q.quesid)),
+    }));
+    this.setData({
+      selectedQuesIds: cur,
+      questionBankList: updatedBank,
+    });
+  },
+
+  async onSubmitAssemblePaper() {
+    if (this.data.savingPaper) return;
+    const title = String(this.data.paperTitle || '').trim();
+    const selectedIds = this.data.selectedQuesIds || [];
+    if (!title) {
+      wx.showToast({ title: '请输入新试卷名称', icon: 'none' });
+      return;
+    }
+    if (selectedIds.length === 0) {
+      wx.showToast({ title: '请至少勾选 1 道题目组卷', icon: 'none' });
+      return;
+    }
+    this.setData({ savingPaper: true });
+    try {
+      const uid = Number(wx.getStorageSync('userId') || 1);
+      const eachScore = Math.max(5, Math.floor(100 / selectedIds.length));
+      const paperData = selectedIds.map((qid: number, idx: number) => ({
+        quesid: Number(qid),
+        ques_num: idx,
+        ques_value: eachScore,
+        ques_part: '必答题',
+      }));
+      await base.post('/api/ques/savepaper', {
+        paper_id: 0,
+        paper_title: title,
+        author_id: uid,
+        ques_num: paperData.length,
+        score_sum: eachScore * paperData.length,
+        public: 1,
+        deleted_data: JSON.stringify([]),
+        paper_data: JSON.stringify(paperData),
+      });
+      wx.showToast({ title: '📑 试卷组卷发布成功！', icon: 'success' });
+      this.setData({ showAssemblePaperModal: false });
+      this.fetchPapers();
+    } catch {
+      wx.showToast({ title: '组卷失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ savingPaper: false });
+    }
   },
 
   onSelectQuesType(e: any) {

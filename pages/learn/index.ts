@@ -94,6 +94,18 @@ Page<ILearnPageData, any>({
       commitment: '',
       signature: '',
     },
+    // 103-edit-course.md: 塾主/塾师共创课程与草稿保存
+    showEditCourseModal: false,
+    savingCourse: false,
+    courseForm: {
+      courseid: 0,
+      title: '',
+      desc: '',
+      paper_id: '',
+      chapters: [
+        { id: 0, serial: 1, title: '第1章：导论与核心概念', period: 7, url: '1', paper_id: '' },
+      ] as any[],
+    },
   },
 
   onLoad() {},
@@ -596,5 +608,121 @@ Page<ILearnPageData, any>({
 
   goToLogin() {
     wx.navigateTo({ url: '/pages/login/login' });
+  },
+
+  // ── 103-edit-course.md: 共创课程（草稿加载/保存 + 正式发布课程） ──
+  async onOpenEditCourseModal() {
+    if (!this.data.hasLogin) {
+      this.goToLogin();
+      return;
+    }
+    this.setData({ showEditCourseModal: true });
+    try {
+      const drafts: any = await base.get('/api/learn/load_draft');
+      if (Array.isArray(drafts) && drafts.length > 0) {
+        const myDraft = drafts[drafts.length - 1];
+        if (myDraft && myDraft.course_title) {
+          let parsedChapters = [];
+          try {
+            parsedChapters =
+              typeof myDraft.course_chapters === 'string'
+                ? JSON.parse(myDraft.course_chapters)
+                : myDraft.course_chapters;
+          } catch {}
+          this.setData({
+            courseForm: {
+              courseid: 0,
+              title: myDraft.course_title || '',
+              desc: myDraft.course_desc || '',
+              paper_id: '',
+              chapters:
+                Array.isArray(parsedChapters) && parsedChapters.length > 0
+                  ? parsedChapters
+                  : this.data.courseForm.chapters,
+            },
+          });
+        }
+      }
+    } catch {}
+  },
+
+  onCloseEditCourseModal() {
+    this.setData({ showEditCourseModal: false });
+  },
+
+  onCourseFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [`courseForm.${field}`]: e.detail.value });
+  },
+
+  onChapterFieldInput(e: any) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const field = e.currentTarget.dataset.field;
+    const chapters = [...(this.data.courseForm.chapters || [])];
+    if (!chapters[idx] || !field) return;
+    chapters[idx][field] = field === 'period' ? Number(e.detail.value || 7) : e.detail.value;
+    this.setData({ 'courseForm.chapters': chapters });
+  },
+
+  onAddCourseChapter() {
+    const chapters = [...(this.data.courseForm.chapters || [])];
+    chapters.push({
+      id: 0,
+      serial: chapters.length + 1,
+      title: `第${chapters.length + 1}章：进阶实践`,
+      period: 7,
+      url: '1',
+      paper_id: '',
+    });
+    this.setData({ 'courseForm.chapters': chapters });
+  },
+
+  async onSaveCourseDraft() {
+    const f = this.data.courseForm;
+    if (!String(f.title || '').trim()) {
+      wx.showToast({ title: '请先填写课程名称', icon: 'none' });
+      return;
+    }
+    try {
+      await base.post('/api/learn/save_draft', {
+        title: f.title.trim(),
+        desc: (f.desc || '').trim(),
+        chapters: JSON.stringify(f.chapters || []),
+      });
+      wx.showToast({ title: '💾 课程草稿已保存', icon: 'none' });
+    } catch {
+      wx.showToast({ title: '草稿保存失败', icon: 'none' });
+    }
+  },
+
+  async onSubmitSaveCourse() {
+    if (this.data.savingCourse) return;
+    const f = this.data.courseForm;
+    if (!String(f.title || '').trim()) {
+      wx.showToast({ title: '请填写课程名称', icon: 'none' });
+      return;
+    }
+    if (!Array.isArray(f.chapters) || f.chapters.length === 0) {
+      wx.showToast({ title: '请至少添加 1 个章节', icon: 'none' });
+      return;
+    }
+    this.setData({ savingCourse: true });
+    try {
+      await base.post('/api/learn/save_course', {
+        courseid: Number(f.courseid || 0),
+        title: f.title.trim(),
+        desc: (f.desc || '自塾共创精品课').trim(),
+        paper_id: String(f.paper_id || ''),
+        chapters: JSON.stringify(f.chapters),
+      });
+      wx.showToast({ title: '🎉 课程已成功发布！', icon: 'success' });
+      this.setData({ showEditCourseModal: false });
+      this.loadData();
+    } catch {
+      wx.showToast({ title: '发布失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ savingCourse: false });
+    }
   },
 });

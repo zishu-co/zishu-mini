@@ -12,6 +12,7 @@
       <view class="header-quick-btns">
         <view class="header-quick-pill" bindtap="onRandomPaper">🎲 随机闯关</view>
         <view class="header-quick-pill outline" bindtap="onOpenAddQuesModal">＋ 共创出题</view>
+        <view class="header-quick-pill outline" bindtap="onOpenAssemblePaperModal">📑 题库组卷</view>
         <view class="header-quick-pill outline" bindtap="onGoReports">📊 成绩单</view>
       </view>
     </view>
@@ -192,6 +193,66 @@
         style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
         bindtap="onSubmitNewQues"
       >{{savingQues ? '提交中...' : '立即提交入库'}}</button>
+    </view>
+  </view>
+
+  <!-- 101-edit-paper.md & 103-all-ques.md: 题库检索与组卷发布弹窗 -->
+  <view
+    wx:if="{{showAssemblePaperModal}}"
+    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    bindtap="onCloseAddQuesModal"
+  >
+    <view
+      style="width:100%;max-height:85vh;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;overflow-y:auto;"
+      catchtap=""
+    >
+      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
+        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">📑 题库组卷 · 发布闯关试卷</text>
+        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseAddQuesModal">✕</text>
+      </view>
+
+      <view style="margin-bottom:16rpx;">
+        <text style="font-size:24rpx;font-weight:700;color:#334155;">试卷名称 *</text>
+        <input
+          placeholder="例如：AI 智能体工程核心闯关卷"
+          value="{{paperTitle}}"
+          bindinput="onPaperTitleInput"
+          style="width:100%;height:72rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 18rpx;font-size:26rpx;margin-top:8rpx;box-sizing:border-box;"
+        />
+      </view>
+
+      <view style="margin-bottom:16rpx;">
+        <text style="font-size:24rpx;font-weight:700;color:#334155;">题库检索 (已选 {{selectedQuesIds.length}} 题)</text>
+        <input
+          placeholder="输入题干关键词筛选题目 (103-all-ques)..."
+          value="{{quesSearchKeyword}}"
+          bindinput="onQuesSearchInput"
+          style="width:100%;height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 18rpx;font-size:24rpx;margin-top:8rpx;box-sizing:border-box;"
+        />
+      </view>
+
+      <scroll-view scroll-y="true" style="max-height:360rpx;margin-bottom:20rpx;border:1rpx solid #e2e8f0;border-radius:16rpx;padding:12rpx;box-sizing:border-box;">
+        <view
+          wx:for="{{questionBankList}}"
+          wx:key="quesid"
+          data-id="{{item.quesid}}"
+          bindtap="onToggleSelectQues"
+          style="display:flex;justify-content:space-between;align-items:center;padding:14rpx 12rpx;border-bottom:1rpx dashed #e2e8f0;border-radius:12rpx;{{item._selected ? 'background:rgba(124,58,237,0.08);' : ''}}"
+        >
+          <view style="flex:1;padding-right:16rpx;">
+            <text style="font-size:22rpx;color:#7c3aed;font-weight:700;margin-right:8rpx;">[{{item.ques_type || '题目'}}]</text>
+            <text style="font-size:25rpx;color:#0f172a;">{{item.ques_title}}</text>
+          </view>
+          <text style="font-size:26rpx;font-weight:700;color:{{item._selected ? '#7c3aed' : '#94a3b8'}};">
+            {{item._selected ? '✓ 已选' : '＋ 选择'}}
+          </text>
+        </view>
+      </scroll-view>
+
+      <button
+        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
+        bindtap="onSubmitAssemblePaper"
+      >{{savingPaper ? '组卷发布中...' : '确认组卷并发布'}}</button>
     </view>
   </view>
 

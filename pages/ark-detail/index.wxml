@@ -62,14 +62,24 @@
             bindtap="onGoLearnSheet"
             data-userid="{{m.user_id}}"
           >📖 查看学习单 ›</view>
-          <view
-            class="learn-sheet-link"
-            style="margin-top: 0;"
-            wx:if="{{m.user_id !== currentUserId}}"
-            bindtap="onGreetMember"
-            data-userid="{{m.user_id}}"
-            data-username="{{m.username}}"
-          >👋 约TA共学</view>
+          <view style="display:flex;gap:20rpx;align-items:center;">
+            <view
+              class="learn-sheet-link"
+              style="margin-top: 0; color:#dc2626;"
+              wx:if="{{isTeacher && ark.stage !== '已成舟'}}"
+              bindtap="onKickCrew"
+              data-crewid="{{m.crew_id}}"
+              data-username="{{m.username}}"
+            >移除</view>
+            <view
+              class="learn-sheet-link"
+              style="margin-top: 0;"
+              wx:if="{{m.user_id !== currentUserId}}"
+              bindtap="onGreetMember"
+              data-userid="{{m.user_id}}"
+              data-username="{{m.username}}"
+            >👋 约TA共学</view>
+          </view>
         </view>
       </view>
     </view>
@@ -106,6 +116,12 @@
     <view class="actions">
       <button
         class="action-btn primary"
+        wx:if="{{isMember && !ark.finished && !ark.closed}}"
+        disabled="{{submitting}}"
+        bindtap="onReportArkHour"
+      >⏱️ 打卡推进下一章节</button>
+      <button
+        class="action-btn primary"
         wx:if="{{canSelfSetCaptain}}"
         disabled="{{submitting}}"
         loading="{{submitting}}"
@@ -118,11 +134,23 @@
         bindtap="onOpenMeetings"
       >📅 编辑三会排期</button>
       <button
+        class="action-btn primary"
+        wx:if="{{canFinishAllCrews}}"
+        disabled="{{submitting}}"
+        bindtap="onFinishAllCrews"
+      >🎓 全舱100%统一结课</button>
+      <button
         class="action-btn danger"
         wx:if="{{canCloseArk}}"
         disabled="{{submitting}}"
         bindtap="onCloseArk"
       >🏆 完结方舟</button>
+      <button
+        class="action-btn danger"
+        wx:if="{{canDeleteEmptyArk}}"
+        disabled="{{submitting}}"
+        bindtap="onDeleteEmptyArk"
+      >🗑️ 删除空方舟</button>
       <button
         class="action-btn ghost"
         wx:if="{{canLeaveArk}}"

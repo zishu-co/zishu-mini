@@ -13,7 +13,9 @@
         <text class="inno-hero-sub">真实场景项目共创 · 赢取塾值赏金</text>
       </view>
       <view class="inno-hero-right">
-        <view class="publish-btn" bindtap="onOpenPublishModal">＋ 发布课题</view>
+        <view class="publish-btn" bindtap="onOpenTimeModal" style="background: rgba(15,118,110,0.1); color: #0f766e;">⏱️ 工时清单</view>
+        <view class="publish-btn" wx:if="{{viewMode === 'groups'}}" bindtap="onOpenCreateGroupModal">＋ 创建小组</view>
+        <view class="publish-btn" wx:else bindtap="onOpenPublishModal">＋ 发布课题</view>
         <view class="mode-switch">
           <view
             class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
@@ -213,14 +215,19 @@
           <view class="group-action-btns">
             <view
               class="group-join-btn"
+              catchtap="onOpenGroupDetailModal"
+              data-group="{{item}}"
+            >🏛️ 详情</view>
+            <view
+              class="group-join-btn"
               catchtap="onOpenAttendModal"
               data-group="{{item}}"
-            >📅 周报考勤</view>
+            >📅 周报</view>
             <view
               class="group-join-btn"
               catchtap="onOpenJoinGroupModal"
               data-group="{{item}}"
-            >🤝 申请入组</view>
+            >🤝 入组</view>
             <view class="group-enter-btn">课题 ›</view>
           </view>
         </view>
@@ -386,6 +393,161 @@
         <view class="inno-modal-btn confirm" bindtap="onSubmitAttendReport">
           {{submittingAttend ? '提交中...' : '保存周报考勤'}}
         </view>
+      </view>
+
+      <!-- 107-attend-review.md: 同行互评建议 (Start/Stop/Continue) 与塾主评议 -->
+      <view style="margin-top: 24rpx; padding-top: 20rpx; border-top: 1rpx solid #e2e8f0;">
+        <view class="inno-field-label">💬 同行互评建议 (Start / Stop / Continue)</view>
+        <view class="inno-row-2">
+          <view class="inno-col">
+            <input
+              class="inno-input"
+              value="{{adviceForm.begin}}"
+              placeholder="建议开始做 (Start)..."
+              data-field="begin"
+              bindinput="onAdviceFormInput"
+            />
+          </view>
+          <view class="inno-col">
+            <input
+              class="inno-input"
+              value="{{adviceForm.keepon}}"
+              placeholder="继续保持 (Keep)..."
+              data-field="keepon"
+              bindinput="onAdviceFormInput"
+            />
+          </view>
+        </view>
+        <view style="display: flex; gap: 12rpx; margin-top: 12rpx;">
+          <input
+            class="inno-input"
+            style="flex: 1; margin-bottom: 0;"
+            value="{{adviceForm.feedback}}"
+            placeholder="塾主周报总评（选填）"
+            data-field="feedback"
+            bindinput="onAdviceFormInput"
+          />
+          <view class="group-join-btn" bindtap="onSubmitAttendAdvice">送出互评</view>
+          <view class="group-join-btn" bindtap="onSubmitAttendFeedback">塾主评议</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 101-group.md: 小组详情与成员看板弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showGroupDetailModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view style="display: flex; justify-content: space-between; align-items: center;">
+        <view class="inno-modal-title">🏛️ {{activeGroupDetail.groupname || '共创小组详情'}}</view>
+        <view class="group-join-btn" bindtap="onOpenEditGroupModal">✏️ 编辑小组</view>
+      </view>
+      <view class="inno-modal-sub">{{activeGroupDetail.type}} · 先修要求：{{activeGroupDetail.must_course || '无'}}</view>
+
+      <view class="inno-field-label">小组使命与研究方向</view>
+      <view style="font-size: 25rpx; color: #334155; line-height: 1.6; background: #f8fafc; padding: 16rpx; border-radius: 14rpx;">
+        {{activeGroupDetail.desc || '围绕真实场景课题展开协作共创与同行评议。'}}
+      </view>
+
+      <view class="inno-field-label" style="margin-top: 18rpx;">小组成员 ({{groupDetailMembers.length}})</view>
+      <view wx:if="{{groupDetailMembers.length === 0}}" style="font-size: 24rpx; color: #94a3b8; padding: 12rpx 0;">
+        欢迎第一位正式入组伙伴！
+      </view>
+      <view
+        wx:for="{{groupDetailMembers}}"
+        wx:key="id"
+        style="display: flex; justify-content: space-between; padding: 10rpx 0; border-bottom: 1rpx dashed #e2e8f0; font-size: 24rpx;"
+      >
+        <text style="font-weight: 600; color: #0f172a;">👤 {{item.username}} ({{item.role || '成员'}})</text>
+        <text style="color: #64748b;">入组：{{item.join_time || '近期'}}</text>
+      </view>
+
+      <view class="inno-modal-actions" style="margin-top: 24rpx;">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">关闭</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 105-edit-group.md: 创建/编辑共创小组弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showCreateGroupModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">{{createGroupForm.isEdit ? '✏️ 编辑共创小组' : '🌱 申请创建共创小组'}}</view>
+      <view class="inno-field-label">小组名称 *</view>
+      <input
+        class="inno-input"
+        value="{{createGroupForm.groupname}}"
+        placeholder="例如：AI 多模态智能体组"
+        data-field="groupname"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label">小组类别</view>
+      <input
+        class="inno-input"
+        value="{{createGroupForm.type}}"
+        placeholder="工程组 / 研究组 / 课程组"
+        data-field="type"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label" wx:if="{{createGroupForm.isEdit}}">建议先修课程</view>
+      <input
+        wx:if="{{createGroupForm.isEdit}}"
+        class="inno-input"
+        value="{{createGroupForm.must_course}}"
+        placeholder="例如：Python 基础、FastAPI 实战"
+        data-field="must_course"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label">小组简介与共创目标 *</view>
+      <textarea
+        class="inno-textarea"
+        value="{{createGroupForm.desc}}"
+        placeholder="描述小组的研究课题、协作方式与产出目标..."
+        maxlength="600"
+        data-field="desc"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitCreateOrSaveGroup">
+          {{submittingCreateGroup ? '保存中...' : '确认提交'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 104-project.md: 个人工时清单与打卡明细弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showTimeModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">⏱️ 我的创新工时清单</view>
+      <view class="inno-modal-sub">104-project.md · 累计课题投入与工时结算记录</view>
+
+      <view class="inno-field-label">📋 课题工时汇总 ({{docketsList.length}})</view>
+      <view wx:if="{{docketsList.length === 0}}" style="font-size: 24rpx; color: #94a3b8; padding: 12rpx 0;">
+        暂无已登记的课题工时汇总
+      </view>
+      <view
+        wx:for="{{docketsList}}"
+        wx:key="id"
+        style="display: flex; justify-content: space-between; padding: 10rpx 0; border-bottom: 1rpx dashed #e2e8f0; font-size: 24rpx;"
+      >
+        <text style="color: #0f172a; font-weight: 600;">{{item.task_serial}} · {{item.title}}</text>
+        <text style="color: #0f766e;">{{item.total_hour || 0}}h ({{item.status}})</text>
+      </view>
+
+      <view class="inno-field-label" style="margin-top: 18rpx;">🕒 最近工时打卡明细 ({{timeRecordsList.length}})</view>
+      <view wx:if="{{timeRecordsList.length === 0}}" style="font-size: 24rpx; color: #94a3b8; padding: 12rpx 0;">
+        暂无打卡明细记录
+      </view>
+      <view
+        wx:for="{{timeRecordsList}}"
+        wx:key="id"
+        style="display: flex; justify-content: space-between; padding: 8rpx 0; font-size: 23rpx; color: #475569;"
+      >
+        <text>{{item.task_serial}} {{item.project}}</text>
+        <text>{{item.duration || 0}} 分钟 · {{item.status}}</text>
+      </view>
+
+      <view class="inno-modal-actions" style="margin-top: 24rpx;">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">关闭</view>
       </view>
     </view>
   </view>

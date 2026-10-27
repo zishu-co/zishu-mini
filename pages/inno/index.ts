@@ -15,6 +15,14 @@ import {
   joinInnoGroup,
   fetchMyAttend,
   saveAttendReport,
+  getInnoGroupDetail,
+  createInnoGroup,
+  saveInnoGroup,
+  fetchAllAttend,
+  saveAttendAdvice,
+  saveAttendFeedback,
+  fetchUserDockets,
+  getUserTimeRecords,
   Project,
   TabItem,
 } from '../../services/inno/inno';
@@ -175,6 +183,35 @@ Page<IInnoPageData, any>({
       contrib: '',
       demand: '',
     },
+    attendPeerReports: [] as any[],
+    adviceForm: {
+      receiver_id: 0,
+      begin: '',
+      stop: '',
+      keepon: '',
+      manner: '积极协同',
+      feedback: '',
+    },
+    showGroupDetailModal: false,
+    groupDetailLoading: false,
+    activeGroupDetail: null as any,
+    groupDetailMembers: [] as any[],
+    groupDetailWaitings: [] as any[],
+    showCreateGroupModal: false,
+    submittingCreateGroup: false,
+    createGroupForm: {
+      isEdit: false,
+      groupid: 0,
+      groupname: '',
+      type: '工程组',
+      must_course: '',
+      desc: '',
+      join_us: '',
+    },
+    showTimeModal: false,
+    timeModalLoading: false,
+    docketsList: [] as any[],
+    timeRecordsList: [] as any[],
   },
 
   // 当前标签索引
@@ -445,10 +482,163 @@ Page<IInnoPageData, any>({
       showPublishModal: false,
       showJoinGroupModal: false,
       showAttendModal: false,
+      showGroupDetailModal: false,
+      showCreateGroupModal: false,
+      showTimeModal: false,
     });
   },
 
-  // ── 102-attend.md: 小组周报考勤汇报 ──────────────────────────
+  // ── 101-group.md: 小组详情与成员看板 ─────────────────────────
+  async onOpenGroupDetailModal(e: any) {
+    const group = e.currentTarget.dataset.group;
+    if (!group) return;
+    const groupId = Number(group.id || 1);
+    this.setData({
+      showGroupDetailModal: true,
+      groupDetailLoading: true,
+      activeGroupDetail: {
+        id: groupId,
+        groupname: group.name,
+        type: group.badge || '工程组',
+        desc: group.desc,
+        must_course: '',
+        join_us: '',
+      },
+      groupDetailMembers: [],
+      groupDetailWaitings: [],
+    });
+    try {
+      const res: any = await getInnoGroupDetail(groupId);
+      const g = res?.group || {};
+      this.setData({
+        groupDetailLoading: false,
+        activeGroupDetail: {
+          id: Number(g.id || groupId),
+          groupname: g.groupname || group.name,
+          type: g.type || group.badge || '工程组',
+          desc: g.desc || group.desc,
+          must_course: g.must_course || '无前置必修要求',
+          join_us: g.join_us || '欢迎热爱共创的塾员加入！',
+        },
+        groupDetailMembers: Array.isArray(res?.members) ? res.members : [],
+        groupDetailWaitings: Array.isArray(res?.waitings) ? res.waitings : [],
+      });
+    } catch {
+      this.setData({ groupDetailLoading: false });
+    }
+  },
+
+  // ── 105-edit-group.md: 创建或编辑共创小组 ────────────────────
+  onOpenCreateGroupModal() {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    if (!token) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+    this.setData({
+      showCreateGroupModal: true,
+      createGroupForm: {
+        isEdit: false,
+        groupid: 0,
+        groupname: '',
+        type: '工程组',
+        must_course: '',
+        desc: '',
+        join_us: '',
+      },
+    });
+  },
+
+  onOpenEditGroupModal() {
+    const g = this.data.activeGroupDetail || {};
+    this.setData({
+      showGroupDetailModal: false,
+      showCreateGroupModal: true,
+      createGroupForm: {
+        isEdit: true,
+        groupid: Number(g.id || 1),
+        groupname: g.groupname || '',
+        type: g.type || '工程组',
+        must_course: g.must_course || '',
+        desc: g.desc || '',
+        join_us: g.join_us || '',
+      },
+    });
+  },
+
+  onCreateGroupFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({
+      [`createGroupForm.${field}`]: e.detail.value,
+    });
+  },
+
+  async onSubmitCreateOrSaveGroup() {
+    if (this.data.submittingCreateGroup) return;
+    const f = this.data.createGroupForm;
+    const groupname = String(f.groupname || '').trim();
+    if (!groupname) {
+      wx.showToast({ title: '请输入小组名称', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingCreateGroup: true });
+    try {
+      if (f.isEdit && f.groupid) {
+        await saveInnoGroup({
+          groupid: f.groupid,
+          groupname,
+          type: String(f.type || '工程组').trim(),
+          must_course: String(f.must_course || '').trim(),
+          desc: String(f.desc || '').trim(),
+          join_us: String(f.join_us || '').trim(),
+        });
+        wx.showToast({ title: '✅ 小组信息已更新', icon: 'success' });
+      } else {
+        await createInnoGroup({
+          groupname,
+          type: String(f.type || '工程组').trim(),
+          desc: String(f.desc || '').trim(),
+        });
+        wx.showToast({ title: '🌱 创建申请已提交审核', icon: 'success' });
+      }
+      this.setData({ showCreateGroupModal: false });
+      this.loadProjects(false);
+    } catch {
+      wx.showToast({ title: '保存失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ submittingCreateGroup: false });
+    }
+  },
+
+  // ── 104-project.md: 个人工时清单与打卡明细 ──────────────────
+  async onOpenTimeModal() {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    const userId = Number(wx.getStorageSync('userId') || 0);
+    if (!token || !userId) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+    this.setData({
+      showTimeModal: true,
+      timeModalLoading: true,
+    });
+    try {
+      const [dockets, tmList] = await Promise.all([
+        fetchUserDockets(userId),
+        getUserTimeRecords(userId),
+      ]);
+      this.setData({
+        timeModalLoading: false,
+        docketsList: Array.isArray(dockets) ? dockets : [],
+        timeRecordsList: Array.isArray(tmList) ? tmList : [],
+      });
+    } catch {
+      this.setData({ timeModalLoading: false });
+    }
+  },
+
+  // ── 102-attend.md & 107-attend-review.md: 小组周报考勤与互评 ──
   async onOpenAttendModal(e: any) {
     const group = e.currentTarget.dataset.group;
     if (!group) return;
@@ -469,12 +659,26 @@ Page<IInnoPageData, any>({
         contrib: '',
         demand: '',
       },
+      attendPeerReports: [],
     });
     try {
-      const myGroups = await fetchMyAttend();
+      const [myGroups, allGroups] = await Promise.all([
+        fetchMyAttend(),
+        fetchAllAttend().catch(() => []),
+      ]);
       const matched = (myGroups || []).find(
         (g: any) => Number(g.id) === groupId || g.groupname === group.name
       );
+      const matchedAll = (allGroups || []).find(
+        (g: any) => Number(g.id) === groupId || g.groupname === group.name
+      );
+      const peerItems = matchedAll?.report_items || matched?.report_items || [];
+      if (Array.isArray(peerItems) && peerItems.length > 0) {
+        this.setData({
+          attendPeerReports: peerItems,
+          'adviceForm.receiver_id': Number(peerItems[0]?.user_id || 0),
+        });
+      }
       if (matched) {
         const userId = Number(wx.getStorageSync('userId') || 0);
         const myReport = (matched.report_items || []).find(
@@ -496,6 +700,62 @@ Page<IInnoPageData, any>({
       }
     } catch {
       // ignore fallback
+    }
+  },
+
+  onAdviceFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({
+      [`adviceForm.${field}`]: e.detail.value,
+    });
+  },
+
+  async onSubmitAttendAdvice() {
+    const { attend_id } = this.data.attendForm;
+    const { receiver_id, begin, stop, keepon } = this.data.adviceForm;
+    if (!String(begin || '').trim() && !String(keepon || '').trim()) {
+      wx.showToast({ title: '请至少填写一条建议', icon: 'none' });
+      return;
+    }
+    try {
+      await saveAttendAdvice({
+        attend_id: Number(attend_id || 1),
+        receiver_id: Number(receiver_id || wx.getStorageSync('userId') || 1),
+        begin: String(begin || '').trim(),
+        stop: String(stop || '').trim(),
+        keepon: String(keepon || '').trim(),
+      });
+      wx.showToast({ title: '💬 同行互评建议已提交！', icon: 'success' });
+      this.setData({
+        'adviceForm.begin': '',
+        'adviceForm.stop': '',
+        'adviceForm.keepon': '',
+      });
+    } catch {
+      wx.showToast({ title: '提交互评失败', icon: 'none' });
+    }
+  },
+
+  async onSubmitAttendFeedback() {
+    const { attend_id, group_id, member_id } = this.data.attendForm;
+    const { manner, feedback } = this.data.adviceForm;
+    if (!String(feedback || '').trim()) {
+      wx.showToast({ title: '请填写塾主评议内容', icon: 'none' });
+      return;
+    }
+    try {
+      await saveAttendFeedback({
+        attend_id: Number(attend_id || 1),
+        group_id: Number(group_id || 1),
+        member_id: Number(member_id || 1),
+        manner: String(manner || '积极协同').trim(),
+        feedback: String(feedback || '').trim(),
+      });
+      wx.showToast({ title: '🎓 塾主评议已归档', icon: 'success' });
+      this.setData({ 'adviceForm.feedback': '' });
+    } catch {
+      wx.showToast({ title: '提交评议失败', icon: 'none' });
     }
   },
 

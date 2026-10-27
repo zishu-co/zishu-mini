@@ -332,6 +332,89 @@ export function arkLeave(arkId: number): Promise<{ code: number; message?: strin
   })
 }
 
+/** 方舟船员申报章节学时推进 (POST /api/learn/ark/report_hour) */
+export function arkReportHour(arkId: number): Promise<{ code: number; new_serial?: number; total?: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/report_hour',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
+
+/** 方舟船员提交满分章节测验推进 (POST /api/learn/ark/submit_quiz) */
+export function arkSubmitQuiz(arkId: number, score = 100): Promise<{ code: number; new_serial?: number; total?: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/submit_quiz',
+    method: 'POST',
+    data: { ark_id: arkId, score },
+    showLoading: true,
+  })
+}
+
+/** 获取方舟实时进度 (GET /api/learn/ark/progress/{ark_id}) */
+export function arkGetProgress(arkId: number): Promise<any> {
+  return request({
+    url: `/api/learn/ark/progress/${arkId}`,
+  })
+}
+
+/** 舟长/塾师为全船 100% 成员统一结课 (POST /api/learn/ark/finish-all-crews) */
+export function arkFinishAllCrews(arkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/finish-all-crews',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
+
+/** 塾师移除未成舟成员 (DELETE /api/learn/ark/crew/{crew_id}) */
+export function arkKickCrew(crewId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: `/api/learn/ark/crew/${crewId}`,
+    method: 'DELETE',
+    showLoading: true,
+  })
+}
+
+/** 塾师删除空方舟 (POST /api/learn/ark/delete) */
+export function arkDeleteEmpty(arkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/delete',
+    method: 'POST',
+    data: { ark_id: arkId },
+    showLoading: true,
+  })
+}
+
+/** 成舟前切换方舟 (POST /api/learn/ark/switch) */
+export function arkSwitch(fromArkId: number, toArkId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/switch',
+    method: 'POST',
+    data: { from_ark_id: fromArkId, to_ark_id: toArkId },
+    showLoading: true,
+  })
+}
+
+/** 缴纳方舟共学保证金 (POST /api/learn/ark/pay_deposit) */
+export function arkPayDeposit(courseId: number): Promise<{ code: number; message?: string }> {
+  return request({
+    url: '/api/learn/ark/pay_deposit',
+    method: 'POST',
+    data: { course_id: courseId },
+    showLoading: true,
+  })
+}
+
+/** 获取塾师领航的方舟列表 (GET /api/learn/ark/teacher/list) */
+export function arkTeacherList(): Promise<any[]> {
+  return request({
+    url: '/api/learn/ark/teacher/list',
+  })
+}
+
 // ==================== 学习单 ====================
 
 /** 训练营课程 */

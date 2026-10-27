@@ -5,6 +5,7 @@
 const _appLogin = getApp<any>()
 import { isDevMode, isLoggedIn } from '../../utils/env'
 import { getBaseUrl } from '../../services/base'
+import { registerUser, resetPasswordApply } from '../../services/user/user'
 
 type ILoginPageData = {
   userInfo: any;
@@ -47,6 +48,20 @@ Page<ILoginPageData, ILoginPageData>({
     submitting: false,
     // 隐私政策勾选默认未勾选
     privacyAgreed: false,
+    // 101-regi.md & 111-reset-pass.md: 新塾员注册与忘记密码
+    showRegiModal: false,
+    submittingRegi: false,
+    regiForm: {
+      name: '',
+      phone: '',
+      email: '',
+      password: '',
+      gender: '男',
+      notes: '',
+    },
+    showResetModal: false,
+    resetPhone: '',
+    submittingReset: false,
   },
 
   onShareAppMessage() {
@@ -384,6 +399,118 @@ Page<ILoginPageData, ILoginPageData>({
   enterAsGuest() {
     wx.setStorageSync('guestMode', true)
     wx.switchTab({ url: '/pages/aim/index' })
+  },
+
+  // ── 101-regi.md: 新塾员入塾注册申请 (/api/users/register) ──
+  onOpenRegiModal() {
+    this.setData({
+      showRegiModal: true,
+      regiForm: {
+        name: this.data.nickName || '',
+        phone: this.data.phoneInput || this.data.phoneNumber || '',
+        email: '',
+        password: '',
+        gender: '男',
+        notes: '',
+      },
+    })
+  },
+
+  onCloseRegiModal() {
+    this.setData({ showRegiModal: false })
+  },
+
+  onRegiFieldInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`regiForm.${field}`]: e.detail.value,
+    })
+  },
+
+  onSelectRegiGender(e: any) {
+    const g = e.currentTarget.dataset.gender || '男'
+    this.setData({ 'regiForm.gender': g })
+  },
+
+  async onSubmitRegister() {
+    const f = this.data.regiForm
+    if (!String(f.name || '').trim()) {
+      wx.showToast({ title: '请输入真实姓名/昵称', icon: 'none' })
+      return
+    }
+    if (!/^1[3-9]\d{9}$/.test(String(f.phone || '').trim())) {
+      wx.showToast({ title: '请输入有效的11位手机号', icon: 'none' })
+      return
+    }
+    if (!String(f.password || '').trim() || String(f.password).length < 4) {
+      wx.showToast({ title: '请设置至少4位登录密码', icon: 'none' })
+      return
+    }
+    this.setData({ submittingRegi: true })
+    try {
+      const res: any = await registerUser({
+        name: f.name.trim(),
+        phone: f.phone.trim(),
+        email: (f.email || `${f.phone.trim()}@zishu.co`).trim(),
+        password: f.password.trim(),
+        gender: f.gender || '男',
+        notes: (f.notes || '小程序自主申请入塾').trim(),
+      })
+      if (res && (res.code === 200 || res.code === '200')) {
+        wx.showToast({ title: '🎉 入塾申请已提交！', icon: 'success' })
+        this.setData({
+          showRegiModal: false,
+          phoneInput: f.phone.trim(),
+          pwdInput: f.password.trim(),
+          canDevLogin: true,
+        })
+      } else {
+        wx.showToast({ title: res?.message || '该手机号已注册，请直接登录', icon: 'none' })
+      }
+    } catch (err) {
+      wx.showToast({ title: '提交注册申请失败', icon: 'none' })
+    } finally {
+      this.setData({ submittingRegi: false })
+    }
+  },
+
+  // ── 111-reset-pass.md: 申请重置密码 (/api/users/reset_pass) ──
+  onOpenResetModal() {
+    this.setData({
+      showResetModal: true,
+      resetPhone: this.data.phoneInput || this.data.phoneNumber || '',
+    })
+  },
+
+  onCloseResetModal() {
+    this.setData({ showResetModal: false })
+  },
+
+  onResetPhoneInput(e: any) {
+    this.setData({ resetPhone: e.detail.value })
+  },
+
+  async onSubmitResetPass() {
+    const phone = String(this.data.resetPhone || '').trim()
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
+      wx.showToast({ title: '请输入注册时的11位手机号', icon: 'none' })
+      return
+    }
+    this.setData({ submittingReset: true })
+    try {
+      const res: any = await resetPasswordApply(phone)
+      if (res && Number(res.code) === 200) {
+        wx.showToast({ title: `🔑 已提交重置申请（第${res.times || 1}次）`, icon: 'none' })
+        this.setData({ showResetModal: false })
+      } else {
+        wx.showToast({ title: '未找到该手机号对应的账号', icon: 'none' })
+      }
+    } catch (err) {
+      wx.showToast({ title: '提交申请失败', icon: 'none' })
+    } finally {
+      this.setData({ submittingReset: false })
+    }
   },
 
   // ========== 隐私政策相关方法 ==========

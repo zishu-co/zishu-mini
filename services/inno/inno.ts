@@ -301,5 +301,144 @@ export function saveAttendReport(data: {
   });
 }
 
+/** 101-group.md: 获取共创小组详情与成员列表 GET /api/inno/get_group/{groupid} */
+export function getInnoGroupDetail(groupId: number | string): Promise<any> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/get_group/' + encodeURIComponent(String(groupId)),
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => resolve(res.data || {}),
+      fail: () => resolve({}),
+    });
+  });
+}
+
+/** 105-edit-group.md: 申请创建新共创小组 POST /api/inno/create_group */
+export function createInnoGroup(data: {
+  groupname: string;
+  type: string;
+  desc: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/create_group',
+      method: 'POST',
+      data: { info: JSON.stringify(data) },
+      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 105-edit-group.md: 保存/编辑共创小组信息 POST /api/inno/save_group */
+export function saveInnoGroup(data: {
+  groupid: number | string;
+  groupname: string;
+  type: string;
+  must_course?: string;
+  desc: string;
+  join_us?: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/save_group',
+      method: 'POST',
+      data: { info: JSON.stringify(data) },
+      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 107-attend-review.md: 获取全站各小组周报公开记录 GET /api/inno/fetch_allattend */
+export function fetchAllAttend(): Promise<any[]> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/fetch_allattend',
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => resolve(Array.isArray(res.data) ? res.data : []),
+      fail: () => resolve([]),
+    });
+  });
+}
+
+/** 107-attend-review.md: 提交同行周报互评建议 (Start/Stop/Continue) POST /api/inno/save_advice */
+export function saveAttendAdvice(data: {
+  attend_id: number;
+  receiver_id: number;
+  begin: string;
+  stop: string;
+  keepon: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/save_advice',
+      method: 'POST',
+      data,
+      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 107-attend-review.md: 提交塾主周报评议反馈 POST /api/inno/save_feedback */
+export function saveAttendFeedback(data: {
+  attend_id: number;
+  group_id: number;
+  member_id: number;
+  manner: string;
+  feedback: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/save_feedback',
+      method: 'POST',
+      data,
+      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 104-project.md: 获取用户项目工时汇总清单 GET /api/inno/fetch_dockets/{user_id} */
+export function fetchUserDockets(userId: number | string): Promise<any[]> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/fetch_dockets/' + encodeURIComponent(String(userId)),
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => resolve(Array.isArray(res.data) ? res.data : []),
+      fail: () => resolve([]),
+    });
+  });
+}
+
+/** 104-project.md: 获取用户工时打卡明细 GET /api/inno/get_tm/{user_id} */
+export function getUserTimeRecords(userId: number | string): Promise<any[]> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/get_tm/' + encodeURIComponent(String(userId)),
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => resolve(Array.isArray(res.data) ? res.data : []),
+      fail: () => resolve([]),
+    });
+  });
+}
+
 export const fetchInno = fetchInnoFromApi;
 export { fetchProjectsFromApi, claimProject };

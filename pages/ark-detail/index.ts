@@ -11,6 +11,11 @@ import {
   arkGetMeetings,
   arkClose,
   arkLeave,
+  arkReportHour,
+  arkSubmitQuiz,
+  arkFinishAllCrews,
+  arkKickCrew,
+  arkDeleteEmpty,
   ArkDetail,
   ArkDetailMember,
 } from '../../services/learn/learn';
@@ -63,6 +68,8 @@ Page<IPageData, IPageData>({
     canEditMeetings: false,
     canCloseArk: false,
     canLeaveArk: false,
+    canFinishAllCrews: false,
+    canDeleteEmptyArk: false,
     hasMeetings: false,
     maleCount: 0,
     femaleCount: 0,
@@ -135,6 +142,15 @@ Page<IPageData, IPageData>({
       const canEditMeetings = this.computeCanEditMeetings(ark, isCaptain, isTeacher);
       const canCloseArk = this.computeCanCloseArk(ark, isCaptain, isTeacher);
       const canLeaveArk = this.computeCanLeaveArk(ark, isMember, isCaptain, isTeacher);
+      const canFinishAllCrews = Boolean(
+        (isCaptain || isTeacher) &&
+          !ark.finished &&
+          !ark.closed &&
+          Number(ark.total_progress_percent || 0) >= 100
+      );
+      const canDeleteEmptyArk = Boolean(
+        isTeacher && !ark.finished && !ark.closed && members.length === 0
+      );
       const hasMeetings = Boolean(
         ark.meet_start ||
           ark.meet_mid ||
@@ -154,6 +170,8 @@ Page<IPageData, IPageData>({
         canEditMeetings,
         canCloseArk,
         canLeaveArk,
+        canFinishAllCrews,
+        canDeleteEmptyArk,
         hasMeetings,
         maleCount,
         femaleCount,
@@ -354,6 +372,101 @@ Page<IPageData, IPageData>({
     const userId = e.currentTarget.dataset.userid;
     if (!userId) return;
     wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
+  },
+
+  /** 方舟船员章节学时打卡推进 (POST /api/learn/ark/report_hour) */
+  async onReportArkHour() {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
+    try {
+      const res: any = await arkReportHour(this.data.arkId);
+      if (res?.code === 200) {
+        wx.showToast({
+          title: `🎉 打卡成功！已推进至第 ${res.new_serial}/${res.total} 课`,
+          icon: 'none',
+        });
+        await this.loadData();
+      } else {
+        wx.showToast({ title: res?.message || '推进失败', icon: 'none' });
+      }
+    } catch (err: any) {
+      wx.showToast({ title: err?.message || '打卡失败', icon: 'none' });
+    } finally {
+      this.setData({ submitting: false });
+    }
+  },
+
+  /** 舟长/塾师为全船 100% 成员统一结课 (POST /api/learn/ark/finish-all-crews) */
+  onFinishAllCrews() {
+    if (this.data.submitting) return;
+    wx.showModal({
+      title: '全舱统一结课',
+      content: '确认全舱 4 名船员均已完成 100% 章节学习，并为全员统一办理结课吗？',
+      success: async (res) => {
+        if (!res.confirm) return;
+        this.setData({ submitting: true });
+        try {
+          const r: any = await arkFinishAllCrews(this.data.arkId);
+          if (r?.code === 200) {
+            wx.showToast({ title: r?.message || '🎓 全船已统一结课！', icon: 'none' });
+            await this.loadData();
+          } else {
+            wx.showToast({ title: r?.message || '尚有成员未学完', icon: 'none' });
+          }
+        } finally {
+          this.setData({ submitting: false });
+        }
+      },
+    });
+  },
+
+  /** 塾师移除未成舟成员 (DELETE /api/learn/ark/crew/{crew_id}) */
+  onKickCrew(e: any) {
+    const crewId = Number(e.currentTarget.dataset.crewid || 0);
+    const username = e.currentTarget.dataset.username || '该成员';
+    if (!crewId) return;
+    wx.showModal({
+      title: '调整方舟成员',
+      content: `确认将 ${username} 移出当前筹建中的方舟吗？`,
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          const r: any = await arkKickCrew(crewId);
+          if (r?.code === 200) {
+            wx.showToast({ title: '已移除成员', icon: 'success' });
+            await this.loadData();
+          } else {
+            wx.showToast({ title: r?.message || '移除失败', icon: 'none' });
+          }
+        } catch (err) {
+          wx.showToast({ title: '移除失败', icon: 'none' });
+        }
+      },
+    });
+  },
+
+  /** 塾师删除空方舟 (POST /api/learn/ark/delete) */
+  onDeleteEmptyArk() {
+    wx.showModal({
+      title: '删除空方舟',
+      content: '当前方舟内暂无船员，确认删除该方舟吗？',
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          const r: any = await arkDeleteEmpty(this.data.arkId);
+          if (r?.code === 200) {
+            wx.showToast({ title: '已删除空方舟', icon: 'success' });
+            setTimeout(() => wx.navigateBack(), 800);
+          } else {
+            wx.showToast({ title: r?.message || '删除失败', icon: 'none' });
+          }
+        } catch (err) {
+          wx.showToast({ title: '删除失败', icon: 'none' });
+        }
+      },
+    });
   },
 
   /** 一键向同舟搭子打招呼约学 */

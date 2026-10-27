@@ -6,7 +6,12 @@
         <view class="banner-title">专栏文章</view>
         <view class="banner-sub">记录学习点滴 · 沉淀思考精华</view>
       </view>
-      <view wx:if="{{hasLogin}}" class="banner-write-btn" bindtap="onOpenCreateArticle">＋ 写文章</view>
+      <view wx:if="{{hasLogin}}" style="display: flex; gap: 12rpx; align-items: center;">
+        <view wx:if="{{articleTab === 'zhuanlan'}}" class="banner-write-btn" bindtap="onOpenCreateZhuanlanModal">＋ 新建专栏</view>
+        <view wx:if="{{articleTab === 'video'}}" class="banner-write-btn" bindtap="onOpenCreateVideoModal">＋ 发布微课</view>
+        <view wx:if="{{articleTab === 'map'}}" class="banner-write-btn" bindtap="onOpenCreateMapModal">＋ 新建脑图</view>
+        <view class="banner-write-btn" bindtap="onOpenCreateArticle">＋ 写文章</view>
+      </view>
     </view>
   </view>
 
@@ -427,6 +432,156 @@
       <view class="reader-footer">
         <view class="reader-action-btn ghost" bindtap="onCopyVideoUrl">🔗 复制视频链接</view>
         <view class="reader-action-btn primary" bindtap="onFavorVideo">⭐ 收藏本节微课</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 104-edit-zhuanlan.md: 新建专栏合集弹窗 -->
+  <view class="reader-mask" wx:if="{{showZhuanlanModal}}" bindtap="onCloseEditorModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-topbar-left">
+          <view class="reader-badge">📚 新建专栏合集 (104-edit-zhuanlan)</view>
+        </view>
+        <view class="reader-close" bindtap="onCloseEditorModal">✕</view>
+      </view>
+      <scroll-view class="reader-scroll" scroll-y="true">
+        <view class="editor-field">
+          <text class="editor-label">专栏合集名称 *</text>
+          <input
+            class="editor-input"
+            placeholder="例如：AI 工程化实战手记"
+            value="{{zhuanlanForm.zhuanlan_title}}"
+            data-field="zhuanlan_title"
+            bindinput="onZhuanlanFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">首篇章节标签</text>
+          <input
+            class="editor-input"
+            placeholder="例如：第一篇 / 基础篇"
+            value="{{zhuanlanForm.first_part}}"
+            data-field="first_part"
+            bindinput="onZhuanlanFormInput"
+          />
+        </view>
+      </scroll-view>
+      <view class="reader-footer">
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn primary" bindtap="onSaveZhuanlan">
+          {{savingZhuanlan ? '创建中...' : '创建专栏合集'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 101-edit-album.md & 102-edit-video.md: 发布微课与专辑弹窗 -->
+  <view class="reader-mask" wx:if="{{showCreateVideoModal}}" bindtap="onCloseEditorModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-topbar-left">
+          <view class="reader-badge">🎬 发布微课视频与专辑</view>
+        </view>
+        <view class="reader-close" bindtap="onCloseEditorModal">✕</view>
+      </view>
+      <scroll-view class="reader-scroll" scroll-y="true">
+        <view class="editor-field">
+          <text class="editor-label">微课专辑名称</text>
+          <input
+            class="editor-input"
+            placeholder="例如：FastAPI 核心架构微课"
+            value="{{videoForm.album_title}}"
+            data-field="album_title"
+            bindinput="onVideoFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">微课视频标题 *</text>
+          <input
+            class="editor-input"
+            placeholder="请输入本节微课标题"
+            value="{{videoForm.video_title}}"
+            data-field="video_title"
+            bindinput="onVideoFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">视频地址 (URL)</text>
+          <input
+            class="editor-input"
+            placeholder="https://..."
+            value="{{videoForm.video_websrc}}"
+            data-field="video_websrc"
+            bindinput="onVideoFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">配套文字讲义</text>
+          <textarea
+            class="editor-textarea"
+            placeholder="输入本节微课核心知识点与讲义摘要..."
+            value="{{videoForm.video_fulltext}}"
+            data-field="video_fulltext"
+            bindinput="onVideoFormInput"
+          />
+        </view>
+      </scroll-view>
+      <view class="reader-footer">
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn primary" bindtap="onSaveVideoAndAlbum">
+          {{savingVideo ? '发布中...' : '立即发布微课'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 104-edit-map.md: 新建知识脑图弹窗 -->
+  <view class="reader-mask" wx:if="{{showCreateMapModal}}" bindtap="onCloseEditorModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-topbar-left">
+          <view class="reader-badge">🗺️ 新建结构化知识脑图</view>
+        </view>
+        <view class="reader-close" bindtap="onCloseEditorModal">✕</view>
+      </view>
+      <scroll-view class="reader-scroll" scroll-y="true">
+        <view class="editor-field">
+          <text class="editor-label">脑图标题 *</text>
+          <input
+            class="editor-input"
+            placeholder="例如：大语言模型 Agent 知识体系"
+            value="{{mapForm.map_title}}"
+            data-field="map_title"
+            bindinput="onMapFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">中心根节点主题</text>
+          <input
+            class="editor-input"
+            placeholder="默认与脑图标题一致"
+            value="{{mapForm.root_topic}}"
+            data-field="root_topic"
+            bindinput="onMapFormInput"
+          />
+        </view>
+        <view class="editor-field">
+          <text class="editor-label">核心分支节点（逗号或换行分隔）</text>
+          <textarea
+            class="editor-textarea"
+            placeholder="例如：Prompt 工程, RAG 检索增强, 工具调用, 记忆机制"
+            value="{{mapForm.children_topics}}"
+            data-field="children_topics"
+            bindinput="onMapFormInput"
+          />
+        </view>
+      </scroll-view>
+      <view class="reader-footer">
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn primary" bindtap="onSaveMindMap">
+          {{savingMap ? '生成中...' : '生成并保存脑图'}}
+        </view>
       </view>
     </view>
   </view>

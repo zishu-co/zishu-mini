@@ -33,6 +33,10 @@
       <text class="quick-icon">🏕️</text>
       <text class="quick-text">进阶预备营</text>
     </view>
+    <view class="quick-btn" bindtap="onOpenEditCourseModal">
+      <text class="quick-icon">🛠️</text>
+      <text class="quick-text">共创课程</text>
+    </view>
   </view>
 
   <!-- 未登录提示 -->
@@ -279,6 +283,83 @@
         <view class="action-btn secondary" bindtap="onCloseCampModal">关闭</view>
         <view class="action-btn primary" bindtap="onSubmitJoinCamp">
           {{submittingCamp ? '提交中...' : '🚀 申请加入预备营'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 103-edit-course.md: 塾主/塾师共创课程弹窗 -->
+  <view class="modal-mask" wx:if="{{showEditCourseModal}}" bindtap="onCloseEditCourseModal">
+    <view class="modal-card" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">🛠️ 共创与发布自塾课程 (103-edit-course)</text>
+        <text class="modal-close" bindtap="onCloseEditCourseModal">✕</text>
+      </view>
+      <scroll-view scroll-y="true" style="max-height:62vh;">
+        <view class="input-row">
+          <text class="input-label">课程名称 *</text>
+          <input
+            class="input-field"
+            placeholder="例如：AI 智能体实战与产品创新"
+            value="{{courseForm.title}}"
+            data-field="title"
+            bindinput="onCourseFormInput"
+          />
+        </view>
+        <view class="input-row">
+          <text class="input-label">课程简介 *</text>
+          <textarea
+            class="input-field"
+            style="height:110rpx;padding:12rpx;"
+            placeholder="简述课程核心目标、收获与适用人群..."
+            value="{{courseForm.desc}}"
+            data-field="desc"
+            bindinput="onCourseFormInput"
+          />
+        </view>
+        <view style="display:flex;justify-content:space-between;align-items:center;margin:14rpx 0 10rpx;">
+          <text style="font-size:26rpx;font-weight:700;color:#334155;">课程章节大纲 ({{courseForm.chapters.length}} 章)</text>
+          <text style="font-size:24rpx;font-weight:700;color:#7c3aed;" bindtap="onAddCourseChapter">＋ 新增章节</text>
+        </view>
+        <view
+          wx:for="{{courseForm.chapters}}"
+          wx:key="index"
+          style="background:#f8fafc;border-radius:16rpx;padding:18rpx;margin-bottom:14rpx;border:2rpx solid #e2e8f0;"
+        >
+          <view style="font-size:22rpx;font-weight:700;color:#7c3aed;margin-bottom:8rpx;">第 {{index + 1}} 章</view>
+          <input
+            placeholder="章节标题"
+            value="{{item.title}}"
+            data-index="{{index}}"
+            data-field="title"
+            bindinput="onChapterFieldInput"
+            style="height:64rpx;background:#fff;border:2rpx solid #cbd5e1;border-radius:10rpx;padding:0 14rpx;font-size:24rpx;margin-bottom:10rpx;"
+          />
+          <view style="display:flex;gap:12rpx;">
+            <input
+              type="number"
+              placeholder="建议天数(如7)"
+              value="{{item.period}}"
+              data-index="{{index}}"
+              data-field="period"
+              bindinput="onChapterFieldInput"
+              style="flex:1;height:60rpx;background:#fff;border:2rpx solid #cbd5e1;border-radius:10rpx;padding:0 14rpx;font-size:22rpx;"
+            />
+            <input
+              placeholder="关联文章/视频ID"
+              value="{{item.url}}"
+              data-index="{{index}}"
+              data-field="url"
+              bindinput="onChapterFieldInput"
+              style="flex:1;height:60rpx;background:#fff;border:2rpx solid #cbd5e1;border-radius:10rpx;padding:0 14rpx;font-size:22rpx;"
+            />
+          </view>
+        </view>
+      </scroll-view>
+      <view class="modal-actions" style="margin-top:16rpx;">
+        <view class="action-btn secondary" bindtap="onSaveCourseDraft">💾 存草稿</view>
+        <view class="action-btn primary" bindtap="onSubmitSaveCourse">
+          {{savingCourse ? '发布中...' : '🚀 立即发布课程'}}
         </view>
       </view>
     </view>
