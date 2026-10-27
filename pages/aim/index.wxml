@@ -73,6 +73,18 @@
 
   <!-- 主内容区域：当前目标 -->
   <view class="section-goal">
+    <!-- 100% 满级达成通关庆贺横幅（Spec 003 / GoalCockpit 同步） -->
+    <view class="goal-achieved-banner" wx:if="{{goalProgressPercent >= 100 && currentGoal}}">
+      <view class="achieved-top">
+        <text class="achieved-badge">🏆 阶段目标 100% 圆满达成</text>
+        <text class="achieved-sub">恭喜通关！你可以归档当前荣誉并开启下一段进阶目标</text>
+      </view>
+      <view class="achieved-actions">
+        <view class="achieved-btn ghost" bindtap="onFindGoalBuddy">🎉 去广场分享喜悦</view>
+        <view class="achieved-btn primary" bindtap="onArchiveAndNewGoal">🚀 归档并开启新目标</view>
+      </view>
+    </view>
+
     <goal-card
       goal="{{currentGoal}}"
       loading="{{goalLoading}}"

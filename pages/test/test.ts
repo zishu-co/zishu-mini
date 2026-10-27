@@ -18,6 +18,7 @@ interface QuestionItem {
   _selD?: boolean;
   _selTrue?: boolean;
   _selFalse?: boolean;
+  _isAnswered?: boolean;
   ques_title: string;
   answer: string;
   explain?: string;
@@ -42,6 +43,7 @@ interface ITestData {
   showrst: boolean;
   submitted: boolean;
   submitting: boolean;
+  filterWrongOnly: boolean;
   checkData: QuestionItem[];
   quizitemids: number[];
   paperid: number;
@@ -62,6 +64,7 @@ Page<ITestPageData, ITestData>({
     showrst: false,
     submitted: false,
     submitting: false,
+    filterWrongOnly: false,
     checkData: [],
     quizitemids: [],
     paperid: 0,
@@ -132,6 +135,7 @@ Page<ITestPageData, ITestData>({
           q._selD = false;
           q._selTrue = false;
           q._selFalse = false;
+          q._isAnswered = false;
           q.check = false;
           q.submitted = false;
         }
@@ -149,6 +153,7 @@ Page<ITestPageData, ITestData>({
           correctCount: 0,
           rankBadge: '',
           submitted: false,
+          filterWrongOnly: false,
           showrst: false,
           loading: false,
         });
@@ -165,11 +170,14 @@ Page<ITestPageData, ITestData>({
     const list = this.data.checkData || [];
     let answeredCount = 0;
     for (const q of list) {
+      let hasAns = false;
       if (Array.isArray(q.reply)) {
-        if (q.reply.some((s) => Boolean(s && String(s).trim()))) answeredCount += 1;
+        hasAns = q.reply.some((s) => Boolean(s && String(s).trim()));
       } else if (q.reply && String(q.reply).trim()) {
-        answeredCount += 1;
+        hasAns = true;
       }
+      q._isAnswered = hasAns;
+      if (hasAns) answeredCount += 1;
     }
     const progressPercent = list.length > 0 ? Math.round((answeredCount * 100) / list.length) : 0;
     this.setData({
@@ -177,6 +185,11 @@ Page<ITestPageData, ITestData>({
       answeredCount,
       progressPercent,
     });
+  },
+
+  onToggleWrongOnly(e: any) {
+    const mode = e.currentTarget.dataset.mode;
+    this.setData({ filterWrongOnly: mode === 'wrong' });
   },
 
   checkClick(event: any) {
@@ -341,6 +354,7 @@ interface ITestPageData {
   showrst: boolean;
   submitted: boolean;
   submitting: boolean;
+  filterWrongOnly: boolean;
   checkData: QuestionItem[];
   quizitemids: number[];
   paperid: number;

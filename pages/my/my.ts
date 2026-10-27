@@ -8,6 +8,7 @@
 
 import { getUserArkList, ArkItem } from '../../services/learn/learn'
 import { fetchCurrentSelections } from '../../services/course/course'
+import { submitFeedback, fetchMyFeedbacks } from '../../services/user/user'
 import { getBaseUrl } from '../../services/base'
 
 const _appMy = getApp<any>()
@@ -58,6 +59,16 @@ Page<IMyPageData, any>({
     arkList: [],
     arkLoading: false,
     arkCount: 0,
+    showFeedbackModal: false,
+    feedbackTab: 'submit' as 'submit' | 'mine',
+    submittingFeedback: false,
+    myFeedbacks: [] as any[],
+    feedbackForm: {
+      type: 'feature' as 'bug' | 'feature' | 'ux' | 'other',
+      title: '',
+      content: '',
+      contact: '',
+    },
   },
 
   onLoad() {},
@@ -286,6 +297,100 @@ Page<IMyPageData, any>({
       return
     }
     wx.navigateTo({ url: "/pages/editprofile/index" })
+  },
+
+  onOpenFeedbackModal() {
+    if (!this.data.isLoggedIn) {
+      wx.navigateTo({ url: "/pages/login/login" })
+      return
+    }
+    this.setData({
+      showFeedbackModal: true,
+      feedbackTab: 'submit',
+    })
+    this.loadMyFeedbacks()
+  },
+
+  onCloseFeedbackModal() {
+    this.setData({ showFeedbackModal: false })
+  },
+
+  onSwitchFeedbackTab(e: any) {
+    const tab = e.currentTarget.dataset.tab || 'submit'
+    this.setData({ feedbackTab: tab })
+    if (tab === 'mine') {
+      this.loadMyFeedbacks()
+    }
+  },
+
+  onSelectFeedbackType(e: any) {
+    const type = e.currentTarget.dataset.type || 'feature'
+    this.setData({ 'feedbackForm.type': type })
+  },
+
+  onFeedbackInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({ [`feedbackForm.${field}`]: e.detail.value })
+  },
+
+  async loadMyFeedbacks() {
+    try {
+      const res: any = await fetchMyFeedbacks()
+      const raw = Array.isArray(res?.items) ? res.items : Array.isArray(res) ? res : []
+      const statusMap: Record<string, string> = {
+        pending: '⏳ 待审核',
+        reviewing: '🔍 评估中',
+        accepted: '✨ 已采纳',
+        completed: '🏆 已落地',
+        rejected: '已归档',
+      }
+      const list = raw.map((item: any) => ({
+        ...item,
+        _statusText: statusMap[item.status] || '处理中',
+        _dateStr: item.create_time ? String(item.create_time).slice(0, 10) : '',
+      }))
+      this.setData({ myFeedbacks: list })
+    } catch {
+      this.setData({ myFeedbacks: [] })
+    }
+  },
+
+  async onSubmitFeedback() {
+    if (this.data.submittingFeedback) return
+    const { type, title, content, contact } = this.data.feedbackForm
+    const cleanTitle = String(title || '').trim()
+    const cleanContent = String(content || '').trim()
+    if (!cleanTitle || !cleanContent) {
+      wx.showToast({ title: '请填写反馈标题与详细描述', icon: 'none' })
+      return
+    }
+    this.setData({ submittingFeedback: true })
+    try {
+      const res: any = await submitFeedback({
+        type,
+        title: cleanTitle,
+        content: cleanContent,
+        contact: String(contact || '').trim(),
+      })
+      if (res && (res.code === 200 || res.id)) {
+        wx.showToast({ title: '🎉 感谢共创反馈！采纳后奖励塾值', icon: 'none' })
+        this.setData({
+          'feedbackForm.title': '',
+          'feedbackForm.content': '',
+          feedbackTab: 'mine',
+        })
+        await this.loadMyFeedbacks()
+      } else {
+        wx.showToast({ title: res?.msg || '反馈已提交', icon: 'none' })
+        this.setData({ feedbackTab: 'mine' })
+        await this.loadMyFeedbacks()
+      }
+    } catch {
+      wx.showToast({ title: '提交失败，请稍后重试', icon: 'none' })
+    } finally {
+      this.setData({ submittingFeedback: false })
+    }
   },
 
   navigateTo(e: any) {

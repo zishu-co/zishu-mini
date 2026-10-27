@@ -6,7 +6,7 @@
         <text class="hero-title">学习汇报</text>
         <text class="hero-sub">每一次测评都是成长的刻度</text>
       </view>
-      <view class="hero-tag">成绩档案</view>
+      <view class="hero-tag" bindtap="goToExam">🏆 去题库闯关 ›</view>
     </view>
 
     <view class="stats-grid">
@@ -57,6 +57,19 @@
     </view>
   </view>
 
+  <!-- 实时关键词搜索 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索测评试卷名称..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+  </view>
+
   <view class="loading" wx:if="{{loading}}">
     <text>正在加载闯关记录...</text>
   </view>
@@ -89,7 +102,15 @@
 
       <view class="record-footer">
         <text class="record-meta">完成时间：{{item.test_time || '近期'}}</text>
-        <text class="record-action">查看解析 ›</text>
+        <view class="record-actions">
+          <text
+            wx:if="{{item.testpaperid}}"
+            class="retake-chip"
+            catchtap="onRetakePaper"
+            data-paperid="{{item.testpaperid}}"
+          >🔄 再刷本卷</text>
+          <text class="record-action">查看解析 ›</text>
+        </view>
       </view>
     </view>
   </view>

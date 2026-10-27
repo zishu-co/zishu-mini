@@ -157,6 +157,25 @@ Page<IReportDetailPageData, any>({
     });
   },
 
+  onCopyWrongNotes() {
+    const wrongList = (this.data.questions || []).filter((q: QuestionItem) => !q.is_correct);
+    if (!wrongList.length) {
+      wx.showToast({ title: '🎉 本卷全部答对，无需错题笔记', icon: 'none' });
+      return;
+    }
+    const lines = wrongList.map(
+      (q: QuestionItem) =>
+        `第${q._num}题：${q.ques_title}\n我的答案：${q.user_answer || '未作答'} | 正确答案：${q.answer}${q.explain ? '\n解析：' + q.explain : ''}`
+    );
+    const text = `📝【${this.data.papertitle || '测评错题本'}】\n共 ${wrongList.length} 道错题：\n\n` + lines.join('\n\n');
+    wx.setClipboardData({
+      data: text,
+      success: () => {
+        wx.showToast({ title: '📋 已复制错题复盘笔记', icon: 'none' });
+      },
+    });
+  },
+
   fetchDetail(pperformid: string, paperid?: string) {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';

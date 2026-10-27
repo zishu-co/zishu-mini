@@ -340,15 +340,89 @@ Page<IAimPageData, IAimData>({
       });
   },
 
-  onRefreshRecommendation() {
+  async onRefreshRecommendation() {
+    const goalId = this.data.currentGoal?.id;
+    const userId = this.getUserId();
+    if (userId && goalId) {
+      try {
+        await http.requestWithRefresh({
+          url: '/api/actions/plan',
+          method: 'POST',
+          data: { goal_id: Number(goalId) },
+        });
+      } catch {}
+    }
     this.loadRecommendations(true);
   },
 
   onRecommendationItemTap(e: any) {
-    const { item } = e.detail || {};
-    if (item && item.action_url) {
-      this.navigateByActionUrl(item.action_url, item.title);
+    const { item, index } = e.detail || {};
+    if (!item) return;
+    wx.showActionSheet({
+      itemList: [
+        `🚀 立即前往：${item.title || '执行微行动'}`,
+        '✎ 自定义修改该微行动标题',
+      ],
+      success: (res) => {
+        if (res.tapIndex === 0 && item.action_url) {
+          this.navigateByActionUrl(item.action_url, item.title);
+        } else if (res.tapIndex === 1) {
+          wx.showModal({
+            title: '✎ 自定义微行动标题',
+            editable: true,
+            placeholderText: item.title || '输入更贴合你今日节奏的行动描述',
+            success: async (m: any) => {
+              const newTitle = String(m.content || '').trim();
+              if (!m.confirm || !newTitle) return;
+              if (item.action_id) {
+                try {
+                  await http.requestWithRefresh({
+                    url: `/api/actions/${item.action_id}/title`,
+                    method: 'POST',
+                    data: { title: newTitle },
+                  });
+                } catch {}
+              }
+              const list = [...(this.data.recommendations || [])];
+              if (list[index]) {
+                list[index] = { ...list[index], title: newTitle };
+                this.setData({ recommendations: list });
+              }
+              wx.showToast({ title: '✅ 行动标题已更新', icon: 'none' });
+            },
+          });
+        }
+      },
+    });
+  },
+
+  async onArchiveAndNewGoal() {
+    const goal = this.data.currentGoal;
+    if (!goal || this.data.goalSaving) return;
+    const userId = this.getUserId();
+    this.setData({ goalSaving: true });
+    try {
+      if (userId && goal.id) {
+        await http.requestWithRefresh({
+          url: '/api/users/save_goal',
+          method: 'POST',
+          data: {
+            goal_id: goal.id,
+            content: goal.content,
+            deadline: (goal.deadline || '').substring(0, 10),
+            process: 100,
+            review: goal.review || '阶段目标圆满达成！',
+            action: '完成',
+            status: 'achieved',
+          },
+        });
+      }
+    } catch {} finally {
+      this.setData({ goalSaving: false });
     }
+    wx.removeStorageSync('savedGoal');
+    wx.showToast({ title: '🏆 已归档达成目标！', icon: 'success' });
+    this.onCreateGoal();
   },
 
   onRecommendationActionTap(e: any) {

@@ -132,6 +132,8 @@ Page<ILearnPageData, any>({
       const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
       const decoratedMyCourses: DecoratedSelection[] = safeMyCourses.map((c: CurrentSelection) => ({
         ...c,
+        current_serial: Number(c.current_serial) || 1,
+        total_chapters: Number(c.total_chapters) || (Number(c.current_serial) > 1 ? Number(c.current_serial) - 1 : 1),
         deadlineClass: this.getDeadlineClass(c.deadline),
         deadlineDateStr: this.formatDateOnly(c.deadline),
       }));

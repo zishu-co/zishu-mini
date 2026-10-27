@@ -2,7 +2,10 @@
   <view class="header-card">
     <view class="header-top">
       <view class="paper-title">{{papertitle}}</view>
-      <button class="retake-btn" bindtap="retakePaper">🔄 重新挑战本卷</button>
+      <view class="header-btn-group">
+        <button wx:if="{{wrongCount > 0}}" class="copy-notes-btn" bindtap="onCopyWrongNotes">📋 复制错题</button>
+        <button class="retake-btn" bindtap="retakePaper">🔄 重刷本卷</button>
+      </view>
     </view>
 
     <view class="score-row">
@@ -18,6 +21,15 @@
       <view class="acc-pill wrong">答错 {{wrongCount}} 题</view>
       <view class="acc-pill">正确率 {{scorePercent}}%</view>
     </view>
+
+    <!-- 题号对错矩阵条 -->
+    <scroll-view class="report-dots-bar" scroll-x="true" enable-flex="true" wx:if="{{questions.length > 0}}">
+      <view
+        wx:for="{{questions}}"
+        wx:key="quesid"
+        class="report-dot {{item.is_correct ? 'is-ok' : 'is-err'}}"
+      >{{item._num}}</view>
+    </scroll-view>
 
     <view class="test-time" wx:if="{{test_time}}">
       <text>考试时间：{{test_time}}</text>

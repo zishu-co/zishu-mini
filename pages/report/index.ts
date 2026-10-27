@@ -9,6 +9,7 @@ interface IReportData {
   records: any[];
   filteredRecords: any[];
   activeFilter: string;
+  searchKeyword: string;
   avgScore: string;
   passRate: number;
   loading: boolean;
@@ -19,6 +20,7 @@ Page<IReportPageData, any>({
     records: [],
     filteredRecords: [],
     activeFilter: 'all',
+    searchKeyword: '',
     avgScore: '0',
     passRate: 0,
     loading: true,
@@ -70,25 +72,48 @@ Page<IReportPageData, any>({
     };
   },
 
-  applyFilter(records: any[], filter: string) {
+  applyFilter(records: any[], filter: string, keyword = this.data.searchKeyword) {
+    let list = records || [];
     if (filter === 'excellent') {
-      return records.filter((r: any) => r._ratio >= 0.8);
+      list = list.filter((r: any) => r._ratio >= 0.8);
+    } else if (filter === 'pass') {
+      list = list.filter((r: any) => r._ratio >= 0.6);
+    } else if (filter === 'fail') {
+      list = list.filter((r: any) => r._ratio < 0.6);
     }
-    if (filter === 'pass') {
-      return records.filter((r: any) => r._ratio >= 0.6);
-    }
-    if (filter === 'fail') {
-      return records.filter((r: any) => r._ratio < 0.6);
-    }
-    return records;
+    const kw = (keyword || '').trim().toLowerCase();
+    if (!kw) return list;
+    return list.filter((r: any) => String(r.testpaper_title || '').toLowerCase().indexOf(kw) !== -1);
   },
 
   switchFilter(e: any) {
     const filter = e.currentTarget.dataset.filter || 'all';
-    const filteredRecords = this.applyFilter(this.data.records, filter);
+    const filteredRecords = this.applyFilter(this.data.records, filter, this.data.searchKeyword);
     this.setData({
       activeFilter: filter,
       filteredRecords,
+    });
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || '';
+    const filteredRecords = this.applyFilter(this.data.records, this.data.activeFilter, searchKeyword);
+    this.setData({ searchKeyword, filteredRecords });
+  },
+
+  clearSearch() {
+    const filteredRecords = this.applyFilter(this.data.records, this.data.activeFilter, '');
+    this.setData({ searchKeyword: '', filteredRecords });
+  },
+
+  onRetakePaper(e: any) {
+    const paperid = e.currentTarget.dataset.paperid;
+    if (!paperid) {
+      this.goToExam();
+      return;
+    }
+    wx.navigateTo({
+      url: `/pages/test/test?testid=${paperid}&id=${paperid}`,
     });
   },
 

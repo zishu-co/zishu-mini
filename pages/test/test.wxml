@@ -10,6 +10,15 @@
     <view class="progress-bar-track" wx:if="{{checkData.length > 0}}">
       <view class="progress-bar-fill" style="width: {{progressPercent}}%;"></view>
     </view>
+
+    <!-- 题号答题卡状态矩阵 -->
+    <scroll-view class="sheet-dots-bar" scroll-x="true" enable-flex="true" wx:if="{{checkData.length > 0}}">
+      <view
+        wx:for="{{checkData}}"
+        wx:key="quesid"
+        class="sheet-dot {{submitted ? (item.check ? 'dot-correct' : 'dot-wrong') : (item._isAnswered ? 'dot-answered' : '')}}"
+      >{{index + 1}}</view>
+    </scroll-view>
   </view>
 
   <!-- 成绩结算卡片（仅交卷后显示） -->
@@ -28,9 +37,28 @@
     </view>
   </view>
 
+  <!-- 交卷后错题快筛栏 -->
+  <view class="post-filter-tabs" wx:if="{{submitted && checkData.length > 0}}">
+    <view
+      class="post-filter-tab {{!filterWrongOnly ? 'active' : ''}}"
+      data-mode="all"
+      bindtap="onToggleWrongOnly"
+    >全部题目 ({{checkData.length}})</view>
+    <view
+      class="post-filter-tab {{filterWrongOnly ? 'active' : ''}}"
+      data-mode="wrong"
+      bindtap="onToggleWrongOnly"
+    >🔥 仅看错题</view>
+  </view>
+
   <!-- 题目列表 -->
   <view class="quiz-list">
-    <view class="quizblock" wx:for="{{checkData}}" wx:key="quesid">
+    <view
+      class="quizblock"
+      wx:for="{{checkData}}"
+      wx:key="quesid"
+      wx:if="{{!filterWrongOnly || !item.check}}"
+    >
       <!-- 题目头部：题号 + 题型徽章 -->
       <view class="question-header">
         <text class="question-index">第 {{index + 1}} 题</text>
