@@ -36,6 +36,28 @@
     </view>
   </view>
 
+  <!-- 赚取塾值加速指南卡片 -->
+  <view class="earn-guide-card">
+    <view class="earn-guide-head">
+      <text class="earn-guide-title">⚡ 塾值赚取加速通道</text>
+      <text class="earn-guide-sub">完成共学挑战快速晋升段位</text>
+    </view>
+    <view class="earn-task-grid">
+      <view
+        wx:for="{{earnTasks}}"
+        wx:key="id"
+        class="earn-task-pill"
+        data-url="{{item.url}}"
+        data-istab="{{item.isTab}}"
+        bindtap="onGoEarnTask"
+      >
+        <text class="earn-task-icon">{{item.icon}}</text>
+        <text class="earn-task-name">{{item.title}}</text>
+        <text class="earn-task-bonus">{{item.bonus}} ›</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 明细筛选 Tab -->
   <view class="filter-tabs">
     <view
@@ -59,6 +81,19 @@
     >
       消耗 -
     </view>
+  </view>
+
+  <!-- 关键词搜索栏 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索塾值变动项目、类型或备注..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
   </view>
 
   <!-- 列表 -->

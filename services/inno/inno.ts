@@ -112,5 +112,149 @@ function claimProject(projectId: number): Promise<{ code: string }> {
   });
 }
 
+/** 获取指定类型的下一个课题编号 GET /api/inno/fetch_next_serial/{task_type} */
+export function fetchNextSerial(taskType: string): Promise<string> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/fetch_next_serial/' + encodeURIComponent(taskType || 'F'),
+      method: 'GET',
+      header: { token },
+      success: (res: any) => {
+        resolve(typeof res.data === 'string' ? res.data : `${taskType || 'F'}001`);
+      },
+      fail: () => {
+        resolve(`${taskType || 'F'}001`);
+      },
+    });
+  });
+}
+
+/** 发布新创新项目 POST /api/inno/add_project */
+export function addInnoProject(data: {
+  task_serial: string;
+  title: string;
+  required_courses?: string;
+  bonus: number;
+  desc: string;
+  start_date: string;
+  deadline: string;
+  planed_hour: number;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/add_project',
+      method: 'POST',
+      data,
+      header: { token, 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 更新项目（半程汇报 / 结束汇报 / 编辑） PUT /api/inno/edit_project/{project_id} */
+export function updateInnoProject(
+  projectId: number,
+  params: Record<string, any>
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    const payload: Record<string, any> = {};
+    Object.keys(params || {}).forEach((k) => {
+      payload[`params[${k}]`] = params[k];
+    });
+    wx.request({
+      url: getBaseUrl() + '/api/inno/edit_project/' + projectId,
+      method: 'PUT',
+      data: payload,
+      header: { token, 'content-type': 'application/x-www-form-urlencoded' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 获取单个创新任务详情 GET /api/inno/get_task/{task_id} */
+export function getInnoTaskDetail(taskId: number | string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/get_task/' + encodeURIComponent(String(taskId)),
+      method: 'GET',
+      header: { token },
+      success: (res: any) => resolve(res.data || {}),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 保存/提交创新任务方案与塾师点评 POST /api/inno/save_task */
+export function saveInnoTask(data: {
+  id: number | string;
+  action: 'save_pub' | 'save_sln' | 'submit_sln' | 'save_comment' | 'redo' | 'finish_task';
+  content: string;
+  title?: string;
+  actual_hour?: number;
+  reward?: number;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/save_task',
+      method: 'POST',
+      data: {
+        id: String(data.id),
+        action: data.action,
+        content: data.content || '',
+        title: data.title || '',
+        actual_hour: Number(data.actual_hour || 0),
+        reward: Number(data.reward || 0),
+      },
+      header: { token, 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
+/** 获取全部共创小组列表 GET /api/inno/fetch_allgroup */
+export function fetchAllGroupsFromApi(): Promise<any[]> {
+  return new Promise((resolve) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/fetch_allgroup',
+      method: 'GET',
+      header: { token },
+      success: (res: any) => {
+        resolve(Array.isArray(res.data) ? res.data : []);
+      },
+      fail: () => resolve([]),
+    });
+  });
+}
+
+/** 申请加入创新共创小组 POST /api/inno/join_group */
+export function joinInnoGroup(data: {
+  groupid: number | string;
+  groupname: string;
+  reason: string;
+}): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: getBaseUrl() + '/api/inno/join_group',
+      method: 'POST',
+      data: {
+        info: JSON.stringify(data),
+      },
+      header: { token, 'content-type': 'application/json' },
+      success: (res: any) => resolve(res.data),
+      fail: (err) => reject(err),
+    });
+  });
+}
+
 export const fetchInno = fetchInnoFromApi;
 export { fetchProjectsFromApi, claimProject };

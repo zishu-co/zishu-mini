@@ -7,6 +7,7 @@ Page({
     items: [] as any[],
     filteredItems: [] as any[],
     searchKeyword: '',
+    typeFilter: 'all', // 'all' | '课程' | '文章' | '试卷'
     totalItemsCount: 0,
     activeIndex: 0,
     loading: true,
@@ -33,31 +34,46 @@ Page({
     return (folders || []).reduce((acc: number, f: any) => acc + (Number(f.item_num) || 0), 0)
   },
 
-  applySearchFilter(items: any[], keyword: string) {
+  applySearchFilter(items: any[], keyword: string, typeFilter = this.data.typeFilter) {
+    let baseList = items || []
+    if (typeFilter && typeFilter !== 'all') {
+      baseList = baseList.filter((item: any) => String(item.target_type || '').indexOf(typeFilter) !== -1)
+    }
     const kw = (keyword || '').trim().toLowerCase()
-    if (!kw) return items
-    return (items || []).filter((item: any) => {
+    if (!kw) return baseList
+    return baseList.filter((item: any) => {
       const title = String(item.target_title || '').toLowerCase()
       const type = String(item.target_type || '').toLowerCase()
       return title.indexOf(kw) !== -1 || type.indexOf(kw) !== -1
     })
   },
 
+  onTypeFilterChange(e: any) {
+    const typeFilter = e.currentTarget.dataset.type || 'all'
+    const filteredItems = this.applySearchFilter(this.data.items, this.data.searchKeyword, typeFilter)
+    this.setData({ typeFilter, filteredItems })
+  },
+
   onSearchInput(e: any) {
     const searchKeyword = e.detail.value || ''
-    const filteredItems = this.applySearchFilter(this.data.items, searchKeyword)
+    const filteredItems = this.applySearchFilter(this.data.items, searchKeyword, this.data.typeFilter)
     this.setData({ searchKeyword, filteredItems })
   },
 
   clearSearch() {
+    const filteredItems = this.applySearchFilter(this.data.items, '', this.data.typeFilter)
     this.setData({
       searchKeyword: '',
-      filteredItems: this.data.items,
+      filteredItems,
     })
   },
 
   goToArticles() {
     wx.navigateTo({ url: '/pages/article/index' })
+  },
+
+  goToLearnCenter() {
+    wx.switchTab({ url: '/pages/learn/index' })
   },
 
   onCreateFolder() {

@@ -68,6 +68,94 @@
   opacity: 0.92;
 }
 
+.earn-guide-card {
+  margin: 0 24rpx 22rpx;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.04);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+}
+
+.earn-guide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18rpx;
+}
+
+.earn-guide-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.earn-guide-sub {
+  font-size: 22rpx;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.earn-task-grid {
+  display: flex;
+  gap: 14rpx;
+}
+
+.earn-task-pill {
+  flex: 1;
+  background: #f5f3ff;
+  border-radius: 16rpx;
+  padding: 16rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.14);
+}
+
+.earn-task-icon {
+  font-size: 32rpx;
+}
+
+.earn-task-name {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.earn-task-bonus {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 16rpx 24rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  box-shadow: 0 2rpx 10rpx rgba(15, 23, 42, 0.04);
+}
+
+.search-icon {
+  font-size: 26rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1e293b;
+}
+
+.search-clear {
+  font-size: 24rpx;
+  color: #94a3b8;
+  padding: 4rpx 8rpx;
+}
+
 .filter-tabs {
   display: flex;
   gap: 14rpx;

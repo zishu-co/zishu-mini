@@ -37,6 +37,7 @@ Page({
     listData: [] as any[],
     filteredList: [] as any[],
     activeTab: 'all',
+    searchKeyword: '',
     totalAmount: 0,
     totalAmountStr: '+0',
     currentBalance: 0,
@@ -44,6 +45,11 @@ Page({
     levelProgress: 0,
     levelNextHint: '距离「⚡ 进阶行者」还需 50 塾值',
     loading: true,
+    earnTasks: [
+      { id: 'learn', icon: '📚', title: '修习共学课程', bonus: '+10 塾值', url: '/pages/learn/index', isTab: true },
+      { id: 'inno', icon: '🚀', title: '揭榜创新项目', bonus: '+50 塾值', url: '/pages/inno/index', isTab: true },
+      { id: 'exam', icon: '🏆', title: '闯关满分测评', bonus: '+20 塾值', url: '/pages/exam/index', isTab: false },
+    ],
   },
 
   onLoad() {
@@ -63,20 +69,48 @@ Page({
     }
   },
 
-  applyTabFilter(list: any[], tab: string) {
+  applyTabFilter(list: any[], tab: string, keyword = this.data.searchKeyword) {
+    let baseList = list || []
     if (tab === 'income') {
-      return list.filter((item: any) => !item._isNeg)
+      baseList = baseList.filter((item: any) => !item._isNeg)
+    } else if (tab === 'expense') {
+      baseList = baseList.filter((item: any) => item._isNeg)
     }
-    if (tab === 'expense') {
-      return list.filter((item: any) => item._isNeg)
-    }
-    return list
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return baseList
+    return baseList.filter((item: any) => {
+      const title = String(item.target_title || '').toLowerCase()
+      const type = String(item.target_type || '').toLowerCase()
+      const comment = String(item.comments || '').toLowerCase()
+      return title.indexOf(kw) !== -1 || type.indexOf(kw) !== -1 || comment.indexOf(kw) !== -1
+    })
   },
 
   switchTab(e: any) {
     const activeTab = e.currentTarget.dataset.tab || 'all'
-    const filteredList = this.applyTabFilter(this.data.list, activeTab)
+    const filteredList = this.applyTabFilter(this.data.list, activeTab, this.data.searchKeyword)
     this.setData({ activeTab, filteredList })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const filteredList = this.applyTabFilter(this.data.list, this.data.activeTab, searchKeyword)
+    this.setData({ searchKeyword, filteredList })
+  },
+
+  clearSearch() {
+    const filteredList = this.applyTabFilter(this.data.list, this.data.activeTab, '')
+    this.setData({ searchKeyword: '', filteredList })
+  },
+
+  onGoEarnTask(e: any) {
+    const { url, istab } = e.currentTarget.dataset
+    if (!url) return
+    if (istab) {
+      wx.switchTab({ url })
+    } else {
+      wx.navigateTo({ url })
+    }
   },
 
   fetchData() {

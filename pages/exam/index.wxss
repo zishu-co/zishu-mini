@@ -46,7 +46,58 @@ page {
 .header-top {
   position: relative;
   z-index: 1;
-  margin-bottom: 28rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.header-quick-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.header-quick-pill {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  background: #fde047;
+  color: #4c1d95;
+  font-size: 22rpx;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.12);
+}
+
+.header-quick-pill.outline {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.exam-cat-pills {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 14rpx;
+  margin-top: 20rpx;
+}
+
+.exam-cat-pill {
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.exam-cat-pill.active {
+  background: #ffffff;
+  color: #7c3aed;
+  font-weight: 800;
 }
 
 .header-badge {

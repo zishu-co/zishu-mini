@@ -12,17 +12,20 @@
         <text class="inno-hero-title">创新工坊</text>
         <text class="inno-hero-sub">真实场景项目共创 · 赢取塾值赏金</text>
       </view>
-      <view class="mode-switch">
-        <view
-          class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
-          data-mode="projects"
-          bindtap="onSwitchMode"
-        >项目 ({{filteredProjects.length}})</view>
-        <view
-          class="mode-pill {{viewMode === 'groups' ? 'active' : ''}}"
-          data-mode="groups"
-          bindtap="onSwitchMode"
-        >小组 ({{filteredGroups.length}})</view>
+      <view class="inno-hero-right">
+        <view class="publish-btn" bindtap="onOpenPublishModal">＋ 发布课题</view>
+        <view class="mode-switch">
+          <view
+            class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
+            data-mode="projects"
+            bindtap="onSwitchMode"
+          >项目 ({{filteredProjects.length}})</view>
+          <view
+            class="mode-pill {{viewMode === 'groups' ? 'active' : ''}}"
+            data-mode="groups"
+            bindtap="onSwitchMode"
+          >小组 ({{filteredGroups.length}})</view>
+        </view>
       </view>
     </view>
 
@@ -207,10 +210,136 @@
             <text class="group-stat-item">🔥 {{item.openCount}} 个招募中</text>
             <text class="group-stat-item">🎓 领航：{{item.mentor}}</text>
           </view>
-          <view class="group-enter-btn">查看课题 ›</view>
+          <view class="group-action-btns">
+            <view
+              class="group-join-btn"
+              catchtap="onOpenJoinGroupModal"
+              data-group="{{item}}"
+            >🤝 申请入组</view>
+            <view class="group-enter-btn">课题 ›</view>
+          </view>
         </view>
       </view>
     </view>
   </block>
+
+  <!-- 发布新课题弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showPublishModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">🚀 发布创新共创课题</view>
+      <view class="inno-modal-sub">自动编号：{{publishForm.task_serial}}</view>
+
+      <view class="inno-field-label">课题领域</view>
+      <view class="inno-type-chips">
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'F' ? 'active' : ''}}"
+          data-type="F"
+          bindtap="onSelectPublishType"
+        >F 前端</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'B' ? 'active' : ''}}"
+          data-type="B"
+          bindtap="onSelectPublishType"
+        >B 后端</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'D' ? 'active' : ''}}"
+          data-type="D"
+          bindtap="onSelectPublishType"
+        >D 文档</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'T' ? 'active' : ''}}"
+          data-type="T"
+          bindtap="onSelectPublishType"
+        >T 教程</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'C' ? 'active' : ''}}"
+          data-type="C"
+          bindtap="onSelectPublishType"
+        >C 课程</view>
+      </view>
+
+      <view class="inno-field-label">课题名称</view>
+      <input
+        class="inno-input"
+        value="{{publishForm.title}}"
+        placeholder="输入清晰可交付的课题标题..."
+        data-field="title"
+        bindinput="onPublishFormInput"
+      />
+
+      <view class="inno-row-2">
+        <view class="inno-col">
+          <view class="inno-field-label">悬赏塾值</view>
+          <input
+            class="inno-input"
+            type="digit"
+            value="{{publishForm.bonus}}"
+            data-field="bonus"
+            bindinput="onPublishFormInput"
+          />
+        </view>
+        <view class="inno-col">
+          <view class="inno-field-label">计划工时(h)</view>
+          <input
+            class="inno-input"
+            type="digit"
+            value="{{publishForm.planed_hour}}"
+            data-field="planed_hour"
+            bindinput="onPublishFormInput"
+          />
+        </view>
+      </view>
+
+      <view class="inno-field-label">截止日期（YYYY-MM-DD）</view>
+      <input
+        class="inno-input"
+        value="{{publishForm.deadline}}"
+        placeholder="2026-11-15"
+        data-field="deadline"
+        bindinput="onPublishFormInput"
+      />
+
+      <view class="inno-field-label">课题描述与验收标准</view>
+      <textarea
+        class="inno-textarea"
+        value="{{publishForm.desc}}"
+        placeholder="描述课题背景、交付物要求与参考资料..."
+        maxlength="1000"
+        data-field="desc"
+        bindinput="onPublishFormInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitPublishProject">
+          {{submittingPublish ? '发布中...' : '确认发布'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请加入创新小组弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showJoinGroupModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">🤝 申请加入共创小组</view>
+      <view class="inno-modal-sub">{{joinGroupForm.groupname}}</view>
+
+      <view class="inno-field-label">申请理由与擅长方向</view>
+      <textarea
+        class="inno-textarea"
+        value="{{joinGroupForm.reason}}"
+        placeholder="简单介绍你的已修课程、技术特长与希望参与的课题方向..."
+        maxlength="500"
+        bindinput="onJoinReasonInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitJoinGroup">
+          {{submittingJoinGroup ? '提交中...' : '提交入组申请'}}
+        </view>
+      </view>
+    </view>
+  </view>
 
 </view>

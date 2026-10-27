@@ -338,3 +338,134 @@
   font-size: 23rpx;
   color: #94a3b8;
 }
+
+.talk-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.talk-banner-btn.primary {
+  background: #ffffff;
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.talk-action-btn.finish {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+}
+
+/* 弹窗样式 */
+.gt-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 32rpx;
+}
+
+.gt-modal-card {
+  width: 100%;
+  max-width: 640rpx;
+  background: #ffffff;
+  border-radius: 28rpx;
+  padding: 36rpx 32rpx;
+  box-shadow: 0 20rpx 48rpx rgba(15, 23, 42, 0.2);
+}
+
+.gt-modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12rpx;
+}
+
+.gt-modal-sub {
+  font-size: 25rpx;
+  color: #6d28d9;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.gt-field-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #475569;
+  margin: 18rpx 0 10rpx;
+}
+
+.gt-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  max-height: 180rpx;
+  overflow-y: auto;
+}
+
+.gt-chip {
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 23rpx;
+  font-weight: 600;
+}
+
+.gt-chip.active {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
+}
+
+.gt-input {
+  width: 100%;
+  height: 76rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  font-size: 26rpx;
+  color: #1e293b;
+}
+
+.gt-textarea {
+  width: 100%;
+  min-height: 150rpx;
+  padding: 18rpx 22rpx;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  font-size: 26rpx;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+.gt-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18rpx;
+  margin-top: 28rpx;
+}
+
+.gt-modal-btn {
+  padding: 16rpx 36rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.gt-modal-btn.cancel {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.gt-modal-btn.confirm {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
+}

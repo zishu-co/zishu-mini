@@ -9,6 +9,10 @@
         <text class="header-title">🏆 闯关题库大厅</text>
         <text class="header-sub">共 {{papers.length || 0}} 套精选试卷 · 测验巩固所学，解锁结课勋章</text>
       </view>
+      <view class="header-quick-btns">
+        <view class="header-quick-pill" bindtap="onRandomPaper">🎲 随机闯关</view>
+        <view class="header-quick-pill outline" bindtap="onGoReports">📊 成绩单</view>
+      </view>
     </view>
 
     <!-- 实时搜索栏 -->
@@ -24,6 +28,25 @@
         confirm-type="search"
       />
       <view class="search-clear" wx:if="{{searchKeyword}}" catchtap="onClearSearch">✕</view>
+    </view>
+
+    <!-- 分类筛选胶囊 -->
+    <view class="exam-cat-pills">
+      <view
+        class="exam-cat-pill {{categoryFilter === 'all' ? 'active' : ''}}"
+        data-cat="all"
+        bindtap="onCategoryChange"
+      >全部试卷 ({{papers.length}})</view>
+      <view
+        class="exam-cat-pill {{categoryFilter === 'core' ? 'active' : ''}}"
+        data-cat="core"
+        bindtap="onCategoryChange"
+      >🔥 核心必刷</view>
+      <view
+        class="exam-cat-pill {{categoryFilter === 'mentor' ? 'active' : ''}}"
+        data-cat="mentor"
+        bindtap="onCategoryChange"
+      >👨‍🏫 塾师精编</view>
     </view>
   </view>
 

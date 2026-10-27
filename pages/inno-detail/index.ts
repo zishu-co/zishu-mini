@@ -5,8 +5,14 @@
  * 创新项目详情页
  */
 
-import { fetchProjectsFromApi, claimProject } from '../../services/inno/inno';
-import { Project } from '../../services/inno/inno';
+import {
+  fetchProjectsFromApi,
+  claimProject,
+  getInnoTaskDetail,
+  updateInnoProject,
+  saveInnoTask,
+  Project,
+} from '../../services/inno/inno';
 import { quickGreetPeer } from '../../services/user/user';
 
 type IInnoProjectView = Project & {
@@ -23,7 +29,20 @@ type IInnoDetailPageData = {
   project: IInnoProjectView | null;
   loading: boolean;
   claiming: boolean;
+  submittingTask: boolean;
   currentUserId: number;
+  showHalfModal: boolean;
+  halfProgressText: string;
+  showSlnModal: boolean;
+  slnForm: {
+    content: string;
+    actual_hour: number;
+  };
+  showReviewModal: boolean;
+  reviewForm: {
+    comment: string;
+    reward: number;
+  };
 };
 
 Page<IInnoDetailPageData, any>({
@@ -31,7 +50,20 @@ Page<IInnoDetailPageData, any>({
     project: null,
     loading: false,
     claiming: false,
+    submittingTask: false,
     currentUserId: 0,
+    showHalfModal: false,
+    halfProgressText: '核心方案已完成 50%，进入验证阶段',
+    showSlnModal: false,
+    slnForm: {
+      content: '',
+      actual_hour: 6,
+    },
+    showReviewModal: false,
+    reviewForm: {
+      comment: '',
+      reward: 0,
+    },
   },
 
   projectId: 0,
@@ -97,16 +129,178 @@ Page<IInnoDetailPageData, any>({
 
   loadProject() {
     this.setData({ loading: true });
-    return fetchProjectsFromApi()
-      .then((list) => {
-        const found = (list || []).find((p: Project) => Number(p.id) === Number(this.projectId)) || null;
-        const project = found ? this.decorateProject(found) : null;
+    return Promise.all([
+      getInnoTaskDetail(this.projectId).catch(() => null),
+      fetchProjectsFromApi().catch(() => []),
+    ])
+      .then(([taskDetail, list]) => {
+        const fromList = (list || []).find((p: Project) => Number(p.id) === Number(this.projectId)) || null;
+        const mergedRaw =
+          taskDetail && taskDetail.id
+            ? { ...(fromList || {}), ...taskDetail }
+            : fromList;
+        const project = mergedRaw ? this.decorateProject(mergedRaw) : null;
         this.setData({ project, loading: false });
       })
       .catch(() => {
         this.setData({ loading: false });
         wx.showToast({ title: '加载项目详情失败', icon: 'none' });
       });
+  },
+
+  onOpenHalfModal() {
+    const cur = this.data.project?.half_progress || '核心方案已完成 50%，进入联调验证阶段';
+    this.setData({
+      showHalfModal: true,
+      halfProgressText: cur,
+    });
+  },
+
+  onSelectHalfPreset(e: any) {
+    const text = e.currentTarget.dataset.text || '';
+    if (text) {
+      this.setData({ halfProgressText: text });
+    }
+  },
+
+  onHalfInput(e: any) {
+    this.setData({ halfProgressText: e.detail.value });
+  },
+
+  async onSubmitHalfReport() {
+    if (this.data.submittingTask || !this.projectId) return;
+    const half_progress = String(this.data.halfProgressText || '').trim();
+    if (!half_progress) {
+      wx.showToast({ title: '请填写半程进度说明', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingTask: true });
+    try {
+      await updateInnoProject(this.projectId, {
+        action: 'half_report',
+        half_progress,
+      });
+      wx.showToast({ title: '📊 半程进度已更新！', icon: 'success' });
+      this.setData({ showHalfModal: false });
+      await this.loadProject();
+    } catch {
+      wx.showToast({ title: '汇报提交失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingTask: false });
+    }
+  },
+
+  onOpenSlnModal() {
+    const p = this.data.project;
+    this.setData({
+      showSlnModal: true,
+      slnForm: {
+        content: p?.sln_text || '',
+        actual_hour: Number(p?.actual_hour || p?.planed_hour || 6),
+      },
+    });
+  },
+
+  onSlnInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({
+      [`slnForm.${field}`]: e.detail.value,
+    });
+  },
+
+  async onSubmitSolution(e: any) {
+    if (this.data.submittingTask || !this.projectId) return;
+    const mode = e.currentTarget.dataset.mode || 'submit_sln';
+    const content = String(this.data.slnForm.content || '').trim();
+    const actual_hour = Math.max(0.5, Number(this.data.slnForm.actual_hour) || 1);
+    if (!content) {
+      wx.showToast({ title: '请填写解决方案内容', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingTask: true });
+    try {
+      const res: any = await saveInnoTask({
+        id: this.projectId,
+        action: mode === 'save_sln' ? 'save_sln' : 'submit_sln',
+        content,
+        title: this.data.project?.title || '',
+        actual_hour,
+      });
+      wx.showToast({
+        title: mode === 'save_sln' ? '💾 方案草稿已暂存' : '🚀 解决方案已正式提交！',
+        icon: 'none',
+      });
+      this.setData({ showSlnModal: false });
+      await this.loadProject();
+    } catch {
+      wx.showToast({ title: '保存方案失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingTask: false });
+    }
+  },
+
+  onOpenReviewModal() {
+    const p = this.data.project;
+    this.setData({
+      showReviewModal: true,
+      reviewForm: {
+        comment: p?.comment || '方案架构清晰、落地扎实，同意结项验收！',
+        reward: Number((p as any)?.reward || 0),
+      },
+    });
+  },
+
+  onReviewInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({
+      [`reviewForm.${field}`]: e.detail.value,
+    });
+  },
+
+  async onSubmitReview(e: any) {
+    if (this.data.submittingTask || !this.projectId) return;
+    const action = e.currentTarget.dataset.action || 'save_comment';
+    const comment = String(this.data.reviewForm.comment || '').trim();
+    const reward = Math.max(0, Number(this.data.reviewForm.reward) || 0);
+    if (!comment) {
+      wx.showToast({ title: '请填写点评或验收意见', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingTask: true });
+    try {
+      await saveInnoTask({
+        id: this.projectId,
+        action,
+        content: comment,
+        title: this.data.project?.title || '',
+        reward,
+      });
+      const toastMap: Record<string, string> = {
+        save_comment: '💬 塾师点评已保存',
+        redo: '🔄 已退回要求返工迭代',
+        finish_task: '🏆 结项验收通过！塾值已结算',
+      };
+      wx.showToast({
+        title: toastMap[action] || '操作成功',
+        icon: 'none',
+      });
+      this.setData({ showReviewModal: false });
+      await this.loadProject();
+    } catch {
+      wx.showToast({ title: '操作失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ submittingTask: false });
+    }
+  },
+
+  onCloseTaskModals() {
+    this.setData({
+      showHalfModal: false,
+      showSlnModal: false,
+      showReviewModal: false,
+    });
   },
 
   /** 认领项目 */

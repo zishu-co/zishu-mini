@@ -8,6 +8,7 @@ Page({
     papers: [] as any[],
     filteredPapers: [] as any[],
     searchKeyword: '',
+    categoryFilter: 'all', // 'all' | 'core' | 'mentor'
     loading: true,
     skeletonList: [1, 2, 3, 4],
   },
@@ -34,27 +35,58 @@ Page({
     this.fetchPapers();
   },
 
-  filterList(papers: any[], keyword: string) {
+  filterList(papers: any[], keyword: string, category = this.data.categoryFilter) {
+    let list = papers || [];
+    if (category === 'core') {
+      list = list.filter((item: any, idx: number) => idx < 5 || String(item.testpaper_title || '').includes('核心'));
+    } else if (category === 'mentor') {
+      list = list.filter((item: any) => Boolean(item.testpaper_author));
+    }
     const kw = (keyword || '').trim().toLowerCase();
-    if (!kw) return papers;
-    return papers.filter((item: any) => {
+    if (!kw) return list;
+    return list.filter((item: any) => {
       const title = String(item.testpaper_title || '').toLowerCase();
       const author = String(item.testpaper_author || '').toLowerCase();
       return title.includes(kw) || author.includes(kw);
     });
   },
 
+  onCategoryChange(e: any) {
+    const categoryFilter = e.currentTarget.dataset.cat || 'all';
+    const filteredPapers = this.filterList(this.data.papers, this.data.searchKeyword, categoryFilter);
+    this.setData({ categoryFilter, filteredPapers });
+  },
+
   onSearchInput(e: any) {
     const searchKeyword = e.detail.value || '';
-    const filteredPapers = this.filterList(this.data.papers, searchKeyword);
+    const filteredPapers = this.filterList(this.data.papers, searchKeyword, this.data.categoryFilter);
     this.setData({ searchKeyword, filteredPapers });
   },
 
   onClearSearch() {
+    const filteredPapers = this.filterList(this.data.papers, '', this.data.categoryFilter);
     this.setData({
       searchKeyword: '',
-      filteredPapers: this.data.papers,
+      filteredPapers,
     });
+  },
+
+  onGoReports() {
+    wx.navigateTo({ url: '/pages/report/index' });
+  },
+
+  onRandomPaper() {
+    const list = this.data.filteredPapers.length ? this.data.filteredPapers : this.data.papers;
+    if (!list.length) {
+      wx.showToast({ title: '暂无可挑战试卷', icon: 'none' });
+      return;
+    }
+    const picked = list[Math.floor(Math.random() * list.length)];
+    if (picked?.testpaperid) {
+      wx.navigateTo({
+        url: '/pages/test/test?testid=' + picked.testpaperid + '&id=' + picked.testpaperid,
+      });
+    }
   },
 
   fetchPapers() {

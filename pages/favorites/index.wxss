@@ -90,6 +90,42 @@
   padding: 4rpx 10rpx;
 }
 
+.type-filter-bar {
+  display: flex;
+  gap: 14rpx;
+  padding: 18rpx 24rpx 0;
+}
+
+.type-filter-pill {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  border: 1rpx solid #e2e8f0;
+  color: #64748b;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.type-filter-pill.active {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.2);
+}
+
+.empty-cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.empty-cta-btn.ghost {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 2rpx solid rgba(124, 58, 237, 0.24);
+  box-shadow: none;
+}
+
 .empty-card {
   padding: 72rpx 40rpx;
   background: #ffffff;

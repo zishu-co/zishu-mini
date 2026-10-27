@@ -130,15 +130,32 @@
     </view>
 
     <!-- 任务详情（Markdown 渲染）-->
-    <view class="card" wx:if="{{project.task_text}}">
-      <view class="card-title-bar">任务详情</view>
-      <t-chat-markdown content="{{project.task_text}}" />
+    <view class="card" wx:if="{{project.task_text || project.desc}}">
+      <view class="card-title-bar">📋 课题需求与描述</view>
+      <t-chat-markdown content="{{project.task_text || project.desc}}" />
     </view>
 
     <!-- 解决方案（Markdown 渲染）-->
     <view class="card" wx:if="{{project.sln_text}}">
-      <view class="card-title-bar">解决方案</view>
+      <view class="card-title-bar">💡 提交的解决方案（实际耗时 {{project.actual_hour || project.planed_hour || 0}}h）</view>
       <t-chat-markdown content="{{project.sln_text}}" />
+    </view>
+
+    <!-- 塾师/发布人点评 -->
+    <view class="card" wx:if="{{project.comment}}">
+      <view class="card-title-bar">🎓 塾师与发布人评审意见</view>
+      <t-chat-markdown content="{{project.comment}}" />
+    </view>
+
+    <!-- 实战共创工作台（支持半程汇报、提交方案、导师验收） -->
+    <view class="card workbench-card" wx:if="{{!project.finish_date}}">
+      <view class="card-title-bar">🛠️ 创新实战共创工作台</view>
+      <view class="workbench-sub">推进课题里程碑：填写半程进度、提交解决方案，或由发布人/塾师评审结项</view>
+      <view class="workbench-actions">
+        <view class="wb-btn ghost" bindtap="onOpenHalfModal">📊 半程进度汇报</view>
+        <view class="wb-btn primary" bindtap="onOpenSlnModal">📝 提交/更新方案</view>
+        <view class="wb-btn accent" bindtap="onOpenReviewModal">🎓 评审/结项验收</view>
+      </view>
     </view>
 
     <!-- 吸底操作栏 -->
@@ -160,20 +177,132 @@
         class="btn-done"
         disabled
       >
-        该项目已结项
+        🏆 该项目已结项验收
       </button>
       <button
         wx:else
-        class="btn-done in-progress"
-        data-role="执行人"
-        data-name="{{project.taker}}"
-        data-userid="{{project.taker_id}}"
-        bindtap="onContactProjectPeer"
+        class="btn-claim"
+        bindtap="onOpenSlnModal"
       >
-        🤝 进行中 · 联系 {{project.taker}} 协作
+        📝 提交解决方案 / 推进进度
       </button>
     </view>
 
+  </view>
+
+  <!-- 半程进度汇报弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showHalfModal}}" bindtap="onCloseTaskModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">📊 半程进度汇报</view>
+      <view class="inno-preset-row">
+        <view
+          class="inno-preset-chip"
+          data-text="核心方案已完成 50%，进入联调验证阶段"
+          bindtap="onSelectHalfPreset"
+        >⚡ 已完成50%</view>
+        <view
+          class="inno-preset-chip"
+          data-text="已完成技术调研与原型设计，正开发核心模块"
+          bindtap="onSelectHalfPreset"
+        >📐 原型已完成</view>
+        <view
+          class="inno-preset-chip"
+          data-text="代码/文档初稿已就绪，正在自测打磨"
+          bindtap="onSelectHalfPreset"
+        >🧪 初稿自测中</view>
+      </view>
+      <textarea
+        class="inno-textarea"
+        value="{{halfProgressText}}"
+        placeholder="输入当前课题半程进展..."
+        maxlength="300"
+        bindinput="onHalfInput"
+      />
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitHalfReport">
+          {{submittingTask ? '提交中...' : '保存进度'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交/暂存解决方案弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showSlnModal}}" bindtap="onCloseTaskModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">📝 课题解决方案申报</view>
+      <view class="inno-field-label">实际投入工时（小时）</view>
+      <input
+        class="inno-input"
+        type="digit"
+        value="{{slnForm.actual_hour}}"
+        data-field="actual_hour"
+        bindinput="onSlnInput"
+      />
+      <view class="inno-field-label">解决方案内容 / 成果链接（支持 Markdown）</view>
+      <textarea
+        class="inno-textarea"
+        value="{{slnForm.content}}"
+        placeholder="填写实现思路、PR/文档链接、关键交付成果说明..."
+        maxlength="4000"
+        data-field="content"
+        bindinput="onSlnInput"
+      />
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">取消</view>
+        <view
+          class="inno-modal-btn ghost"
+          data-mode="save_sln"
+          bindtap="onSubmitSolution"
+        >暂存草稿</view>
+        <view
+          class="inno-modal-btn confirm"
+          data-mode="submit_sln"
+          bindtap="onSubmitSolution"
+        >{{submittingTask ? '提交中...' : '正式提交'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 塾师点评 / 结项验收弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showReviewModal}}" bindtap="onCloseTaskModals">
+    <view class="inno-modal-card" catchtap="true">
+      <view class="inno-modal-title">🎓 课题评审与结项验收</view>
+      <view class="inno-field-label">额外红包激励（塾值，可选）</view>
+      <input
+        class="inno-input"
+        type="digit"
+        value="{{reviewForm.reward}}"
+        data-field="reward"
+        bindinput="onReviewInput"
+      />
+      <view class="inno-field-label">评审意见 / 返工建议</view>
+      <textarea
+        class="inno-textarea"
+        value="{{reviewForm.comment}}"
+        placeholder="填写对方案的评审意见、亮点总结或返工修改建议..."
+        maxlength="2000"
+        data-field="comment"
+        bindinput="onReviewInput"
+      />
+      <view class="inno-modal-actions">
+        <view
+          class="inno-modal-btn ghost"
+          data-action="save_comment"
+          bindtap="onSubmitReview"
+        >仅存点评</view>
+        <view
+          class="inno-modal-btn warn"
+          data-action="redo"
+          bindtap="onSubmitReview"
+        >要求返工</view>
+        <view
+          class="inno-modal-btn confirm"
+          data-action="finish_task"
+          bindtap="onSubmitReview"
+        >{{submittingTask ? '验收中...' : '🏆 结项验收'}}</view>
+      </view>
+    </view>
   </view>
 </view>
 

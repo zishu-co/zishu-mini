@@ -50,6 +50,30 @@
     <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
   </view>
 
+  <!-- 内容类型筛选胶囊 -->
+  <view class="type-filter-bar">
+    <view
+      class="type-filter-pill {{typeFilter === 'all' ? 'active' : ''}}"
+      data-type="all"
+      bindtap="onTypeFilterChange"
+    >全部 ({{items.length}})</view>
+    <view
+      class="type-filter-pill {{typeFilter === '课程' ? 'active' : ''}}"
+      data-type="课程"
+      bindtap="onTypeFilterChange"
+    >📚 课程</view>
+    <view
+      class="type-filter-pill {{typeFilter === '文章' ? 'active' : ''}}"
+      data-type="文章"
+      bindtap="onTypeFilterChange"
+    >📄 文章</view>
+    <view
+      class="type-filter-pill {{typeFilter === '试卷' ? 'active' : ''}}"
+      data-type="试卷"
+      bindtap="onTypeFilterChange"
+    >📝 试卷</view>
+  </view>
+
   <!-- 收藏内容列表 -->
   <view class="content-area">
     <view wx:if="{{loading}}">
@@ -58,9 +82,12 @@
     <view wx:elif="{{filteredItems.length === 0}}">
       <view class="empty-card">
         <view class="empty-icon">⭐</view>
-        <text class="empty-title">{{searchKeyword ? '未找到匹配的收藏内容' : '当前收藏夹暂无内容'}}</text>
-        <text class="empty-sub">在学习过程中遇到好内容，随时收藏到这里</text>
-        <button class="empty-cta-btn" bindtap="goToArticles">去阅读精选文章</button>
+        <text class="empty-title">{{searchKeyword || typeFilter !== 'all' ? '未找到匹配的收藏内容' : '当前收藏夹暂无内容'}}</text>
+        <text class="empty-sub">在学习过程中遇到好课、好文或真题，随时收藏到这里</text>
+        <view class="empty-cta-row">
+          <button class="empty-cta-btn ghost" bindtap="goToLearnCenter">📚 去选课中心</button>
+          <button class="empty-cta-btn" bindtap="goToArticles">📄 去读精选文章</button>
+        </view>
       </view>
     </view>
     <view wx:else>
