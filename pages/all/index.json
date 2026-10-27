@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "全塾动态", "usingComponents": {} }
+{
+  "navigationBarTitleText": "全塾动态",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {}
+}

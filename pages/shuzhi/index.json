@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "塾值明细", "usingComponents": {} }
+{
+  "navigationBarTitleText": "塾值明细",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {}
+}

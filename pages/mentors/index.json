@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "师生关系", "usingComponents": {} }
+{
+  "navigationBarTitleText": "师生关系",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {}
+}
