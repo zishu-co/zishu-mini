@@ -22,6 +22,7 @@ type ILoginPageData = {
   phoneInput: string;
   pwdInput: string;
   canDevLogin: boolean;
+  submitting: boolean;
   // 隐私政策勾选
   privacyAgreed: boolean;
 };
@@ -43,6 +44,7 @@ Page<ILoginPageData, ILoginPageData>({
     phoneInput: '',
     pwdInput: '',
     canDevLogin: false,
+    submitting: false,
     // 隐私政策勾选默认未勾选
     privacyAgreed: false,
   },
@@ -65,18 +67,25 @@ Page<ILoginPageData, ILoginPageData>({
       })
     }
 
-    // 检查是否已有用户信息
-    if (_appLogin.globalData.userInfo) {
+    // 检查是否已有用户信息（兼容 globalData 与本地缓存，避免 completeLogin 覆盖为 null）
+    const cachedUserInfo = _appLogin.globalData.userInfo || wx.getStorageSync('userInfo')
+    if (cachedUserInfo) {
+      const avatarUrl = cachedUserInfo.avatarUrl || null
+      const nickName = cachedUserInfo.nickName || null
       this.setData({
-        userInfo: _appLogin.globalData.userInfo,
-        hasUserInfo: true
+        userInfo: cachedUserInfo,
+        avatarUrl,
+        nickName,
+        userId: cachedUserInfo.userId || _appLogin.globalData.userId || wx.getStorageSync('userId') || null,
+        hasUserInfo: Boolean((nickName && String(nickName).trim().length > 0) || avatarUrl)
       })
     }
 
     // 检查是否已有手机号
-    if (_appLogin.globalData.phoneNumber) {
+    const cachedPhone = _appLogin.globalData.phoneNumber || wx.getStorageSync('phoneNumber')
+    if (cachedPhone) {
       this.setData({
-        phoneNumber: _appLogin.globalData.phoneNumber,
+        phoneNumber: cachedPhone,
         hasPhoneNumber: true
       })
     }
@@ -98,6 +107,8 @@ Page<ILoginPageData, ILoginPageData>({
         // 更新页面数据
         this.setData({
           userInfo: res.userInfo,
+          avatarUrl: res.userInfo.avatarUrl || this.data.avatarUrl,
+          nickName: res.userInfo.nickName || this.data.nickName,
           hasUserInfo: true
         })
 
@@ -120,15 +131,19 @@ Page<ILoginPageData, ILoginPageData>({
 
   // 获取用户头像
   getAvatar(e: any) {
+    const avatarUrl = e.detail.avatarUrl
     this.setData({
-      avatarUrl: e.detail.avatarUrl
+      avatarUrl,
+      hasUserInfo: Boolean((this.data.nickName && this.data.nickName.trim().length > 0) || avatarUrl)
     })
   },
 
   getName(e: any) {
+    const rawName = e.detail.value || ''
+    const trimmed = rawName.trim()
     this.setData({
-      nickName: e.detail.value,
-      hasUserInfo: true
+      nickName: rawName,
+      hasUserInfo: trimmed.length > 0
     })
   },
 
@@ -159,30 +174,43 @@ Page<ILoginPageData, ILoginPageData>({
         },
         success: (res: any) => {
           console.log(res.data)
-          _appLogin.globalData.phoneNumber = res.data.phone
-          _appLogin.globalData.userId = res.data.id
-          _appLogin.globalData.accessToken = res.data.atoken
-          _appLogin.globalData.refreshToken = res.data.rtoken
-          _appLogin.globalData.hasPhoneNumber = true
-          _appLogin.savePhoneNumber(res.data.phone)
-          _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
-          // 更新页面数据
-          that.setData({
-            phoneNumber: res.data.phone,
-            hasPhoneNumber: true,
-            userId: res.data.id
-          })
+          if (res.statusCode === 200 && res.data && (res.data.atoken || res.data.phone)) {
+            _appLogin.globalData.phoneNumber = res.data.phone
+            _appLogin.globalData.userId = res.data.id
+            _appLogin.globalData.accessToken = res.data.atoken
+            _appLogin.globalData.refreshToken = res.data.rtoken
+            _appLogin.globalData.hasPhoneNumber = true
+            _appLogin.savePhoneNumber(res.data.phone)
+            _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
+            wx.setStorageSync('userId', res.data.id)
+            // 更新页面数据
+            that.setData({
+              phoneNumber: res.data.phone,
+              hasPhoneNumber: true,
+              userId: res.data.id
+            })
 
-          if (1 == res.data.status) {
-            console.log(res)
+            wx.showToast({
+              title: '获取手机号成功',
+              icon: 'success',
+              duration: 2000
+            })
+          } else {
+            wx.showToast({
+              title: res.data?.detail || res.data?.message || '获取手机号失败',
+              icon: 'none',
+              duration: 2000
+            })
           }
+        },
+        fail: (err: any) => {
+          console.error('[login] token_miniprogram 请求失败', err)
+          wx.showToast({
+            title: '网络异常，获取手机号失败',
+            icon: 'none',
+            duration: 2000
+          })
         }
-      })
-
-      wx.showToast({
-        title: '获取手机号成功',
-        icon: 'success',
-        duration: 2000
       })
     } else {
       console.error('获取手机号失败', e.detail.errMsg)
@@ -205,13 +233,27 @@ Page<ILoginPageData, ILoginPageData>({
       return
     }
     if (this.data.hasUserInfo && this.data.hasPhoneNumber) {
+      const prevInfo = _appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+      const resolvedUserId = this.data.userId || _appLogin.globalData.userId || prevInfo.userId || wx.getStorageSync('userId')
       // 确保全局状态已更新
       _appLogin.globalData.hasUserInfo = true
       _appLogin.globalData.hasPhoneNumber = true
-      _appLogin.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName, userId: _appLogin.globalData.userId}
+      _appLogin.globalData.userInfo = {
+        ...prevInfo,
+        avatarUrl: this.data.avatarUrl || prevInfo.avatarUrl || '',
+        nickName: (this.data.nickName && this.data.nickName.trim()) || prevInfo.nickName || '',
+        userId: resolvedUserId
+      }
       wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
-      wx.setStorageSync('accessToken', _appLogin.globalData.accessToken)
-      wx.setStorageSync('refreshToken', _appLogin.globalData.refreshToken)
+      if (resolvedUserId) {
+        wx.setStorageSync('userId', resolvedUserId)
+      }
+      if (_appLogin.globalData.accessToken) {
+        wx.setStorageSync('accessToken', _appLogin.globalData.accessToken)
+      }
+      if (_appLogin.globalData.refreshToken) {
+        wx.setStorageSync('refreshToken', _appLogin.globalData.refreshToken)
+      }
 
       // 跳转到首页
       wx.switchTab({
@@ -219,7 +261,7 @@ Page<ILoginPageData, ILoginPageData>({
       })
     } else {
       wx.showToast({
-        title: '请先完成授权',
+        title: '请先完成昵称与手机号授权',
         icon: 'none',
         duration: 2000
       })
@@ -259,7 +301,7 @@ Page<ILoginPageData, ILoginPageData>({
 
   /** 手机号+密码登录（Dev 模式） */
   loginByPassword() {
-    if (!this.data.canDevLogin) return
+    if (!this.data.canDevLogin || this.data.submitting) return
     if (!this.data.privacyAgreed) {
       wx.showToast({
         title: '请先阅读并同意用户协议和隐私政策',
@@ -270,7 +312,7 @@ Page<ILoginPageData, ILoginPageData>({
     }
 
     const { phoneInput: phone, pwdInput: password } = this.data
-
+    this.setData({ submitting: true })
     wx.showLoading({ title: '登录中...', mask: true })
 
     // 调用后端密码登录接口
@@ -283,19 +325,27 @@ Page<ILoginPageData, ILoginPageData>({
       data: { phone, password },
       success: (res: any) => {
         wx.hideLoading()
+        this.setData({ submitting: false })
         const data = res.data
-        if (data && data.id > 0) {
+        if (res.statusCode === 200 && data && data.id > 0) {
           // 登录成功，保存 token 和用户信息
-          const userInfo = {
+          const userInfo: any = {
             userId: data.id,
             nickName: data.username || data.nickName || `用户${phone.slice(-4)}`,
-            avatarUrl: ''
+            avatarUrl: data.avatarUrl || ''
+          }
+          if (data.gender) {
+            userInfo.gender = data.gender
           }
 
           wx.setStorageSync('userInfo', userInfo)
+          wx.setStorageSync('userId', data.id)
           wx.setStorageSync('accessToken', data.atoken)
           wx.setStorageSync('refreshToken', data.rtoken)
           wx.setStorageSync('phoneNumber', data.phone || phone)
+          if (typeof _appLogin.saveUserId === 'function') {
+            _appLogin.saveUserId(data.id)
+          }
           // 清除游客标记
           wx.removeStorageSync('guestMode')
 
@@ -312,11 +362,12 @@ Page<ILoginPageData, ILoginPageData>({
             wx.switchTab({ url: '/pages/aim/index' })
           }, 1000)
         } else {
-          wx.showToast({ title: data.message || '用户名或密码错误', icon: 'none' })
+          wx.showToast({ title: data?.detail || data?.message || '用户名或密码错误', icon: 'none' })
         }
       },
       fail: () => {
         wx.hideLoading()
+        this.setData({ submitting: false })
         wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })

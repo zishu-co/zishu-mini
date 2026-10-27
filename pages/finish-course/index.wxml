@@ -25,17 +25,17 @@
     <!-- 测验成绩区域（quiz_info 存在时显示） -->
     <view class="quiz-section" wx:if="{{courseInfo.quiz_info}}">
       <view class="section-title">📋 结课测验</view>
-      <view class="quiz-score-box {{quizScoreClass()}}">
+      <view class="quiz-score-box {{quizScoreClass}}">
         <view class="quiz-score-inner">
           <text class="quiz-label">当前成绩</text>
           <text class="quiz-score" wx:if="{{courseInfo.quiz_info.has_taken}}">
             {{courseInfo.quiz_info.current_score}} / {{courseInfo.quiz_info.full_score}}
           </text>
           <text class="quiz-score no-attempt" wx:else>未作答</text>
-          <text class="quiz-status-tag {{quizScoreClass()}}">{{quizStatusText()}}</text>
+          <text class="quiz-status-tag {{quizScoreClass}}">{{quizStatusText}}</text>
         </view>
       </view>
-      <button class="quiz-btn" bindtap="goQuiz" type="primary" plain>
+      <button class="quiz-btn" bindtap="goQuiz">
         {{courseInfo.quiz_info.has_taken ? '重新测验' : '参加测验'}}
       </button>
     </view>
@@ -44,7 +44,7 @@
     <view class="homework-section" wx:if="{{courseInfo.is_ark_learning}}">
       <view class="section-title">📝 方舟作业</view>
       <view class="homework-tip">请提交你的结课作业（公网可访问的文章或视频链接），由舟长审批：</view>
-      <view class="homework-input-row" wx:if="{{!courseInfo.ark_info.homework_url}}">
+      <view class="homework-input-row" wx:if="{{courseInfo.ark_info && !courseInfo.ark_info.homework_url}}">
         <input
           class="homework-input"
           type="text"
@@ -55,12 +55,12 @@
         />
         <button
           class="submit-btn"
-          type="primary"
           loading="{{hwLoading}}"
+          disabled="{{hwLoading}}"
           bindtap="submitHomework"
         >提交</button>
       </view>
-      <view class="homework-submitted" wx:else>
+      <view class="homework-submitted" wx:elif="{{courseInfo.ark_info && courseInfo.ark_info.homework_url}}">
         <text class="check-icon">✓</text>
         <text>已提交：</text>
         <text class="homework-link" bindtap="stopPropagation">{{courseInfo.ark_info.homework_url}}</text>
@@ -90,8 +90,8 @@
     <view class="confirm-section" wx:if="{{!courseInfo.is_ark_learning}}">
       <button
         class="confirm-btn"
-        type="primary"
         loading="{{confirmLoading}}"
+        disabled="{{confirmLoading || submitting}}"
         bindtap="confirmFinish"
       >确认结课</button>
       <view class="confirm-tip">确认后这门课将从"我的选课"列表中消失</view>

@@ -1,13 +1,165 @@
 .aim-page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 24rpx;
-  padding-top: calc(env(safe-area-inset-top) + 44px + 24rpx);
-  padding-top: calc(constant(safe-area-inset-top) + 44px + 24rpx);
-  /* 底部安全区域 - 防止被自定义 tabBar 遮挡 */
-  /* 使用 max 确保至少有 160rpx 的底部间距（约 60px tabBar + 额外空间） */
-  padding-bottom: max(env(safe-area-inset-bottom) + 120rpx, 160rpx);
+  background: #f6f4fb;
+  padding: 0 24rpx;
+  padding-bottom: max(env(safe-area-inset-bottom) + 180rpx, 200rpx);
   box-sizing: border-box;
+}
+
+/* 顶部自定义导航头 */
+.aim-header {
+  margin: 0 -24rpx 24rpx;
+  padding: calc(env(safe-area-inset-top) + 36rpx) 32rpx 36rpx;
+  background: linear-gradient(135deg, #aa00ff 0%, #6d28d9 100%);
+  color: #ffffff;
+  border-radius: 0 0 40rpx 40rpx;
+  box-shadow: 0 12rpx 32rpx rgba(124, 58, 237, 0.24);
+}
+
+.aim-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.aim-header-title {
+  font-size: 42rpx;
+  font-weight: 800;
+  margin-bottom: 8rpx;
+  letter-spacing: 2rpx;
+}
+
+.aim-header-sub {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+.streak-pill {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1rpx solid rgba(255, 255, 255, 0.32);
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  backdrop-filter: blur(8px);
+}
+
+.streak-fire {
+  font-size: 28rpx;
+}
+
+.streak-num {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 能量充能卡片 */
+.energy-dock {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1rpx solid rgba(255, 255, 255, 0.24);
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+}
+
+.energy-dock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.energy-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #7c3aed;
+  background: #ffffff;
+  padding: 4rpx 18rpx;
+  border-radius: 999rpx;
+}
+
+.energy-pct {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.energy-progress-track {
+  height: 14rpx;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 999rpx;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.energy-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fde047 0%, #34d399 100%);
+  border-radius: 999rpx;
+  transition: width 0.35s ease;
+}
+
+.energy-tip {
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* 交友与伴学快捷入口 */
+.social-quick-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.quick-pill {
+  background: #ffffff;
+  border-radius: 22rpx;
+  padding: 20rpx 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.06);
+  border: 1rpx solid rgba(160, 0, 255, 0.1);
+}
+
+.quick-pill:active {
+  transform: scale(0.97);
+  background: #faf5ff;
+}
+
+.quick-pill-icon {
+  font-size: 38rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quick-pill-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick-pill-title {
+  font-size: 25rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+.quick-pill-sub {
+  font-size: 20rpx;
+  color: #64748b;
+  white-space: nowrap;
+  margin-top: 2rpx;
 }
 
 /* 额外的底部占位元素，确保内容不被遮挡 */
@@ -25,7 +177,7 @@
   margin-bottom: 24rpx;
 }
 
-/* 覆盖 TDesign 按钮样式 - 简化版本 */
+/* 覆盖 TDesign 按钮样式 */
 .aim-page .t-button {
   --td-button-primary-color: #a0f;
   --td-button-primary-color-hover: #90e;
@@ -47,7 +199,6 @@
 .aim-page .t-button--outline {
   --td-button-default-border-color: #a0f;
   --td-button-default-text-color: #a0f;
-  
   border-color: var(--td-button-default-border-color) !important;
 }
 
@@ -80,4 +231,118 @@
   padding: 8rpx 20rpx;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 24rpx;
+}
+
+/* 目标编辑/创建弹窗 */
+.goal-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.goal-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 640rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  z-index: 201;
+  overflow: hidden;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.16);
+}
+
+.goal-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.goal-modal-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.goal-modal-close {
+  font-size: 32rpx;
+  color: #999;
+  padding: 4rpx 12rpx;
+}
+
+.goal-modal-body {
+  padding: 24rpx 32rpx 32rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #1a1a2e;
+  background: #f9fafb;
+  box-sizing: border-box;
+}
+
+.picker-display {
+  color: #333;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 160rpx;
+  padding: 16rpx 20rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #1a1a2e;
+  background: #f9fafb;
+  box-sizing: border-box;
+}
+
+.form-textarea.short {
+  height: 120rpx;
+}
+
+.goal-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}
+
+.modal-btn {
+  padding: 16rpx 36rpx;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.modal-btn.cancel {
+  background: #f3f4f6;
+  color: #666;
+}
+
+.modal-btn.confirm {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
 }

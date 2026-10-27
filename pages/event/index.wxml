@@ -59,17 +59,17 @@
           <text>暂无封面</text>
         </view>
         <view class="poster-overlay">
-          <text>点击查看详情</text>
+          <text>📖 点击海报看详情</text>
         </view>
       </view>
 
       <!-- 卡片信息 -->
       <view class="card-body">
-        <view class="card-title">{{item.title}}</view>
+        <view class="card-title">{{item._heatBadge}} · {{item.title}}</view>
         <view class="card-meta">
-          <text class="meta-item">🕐 {{item.start_time}}</text>
+          <text class="meta-item">🕐 {{item._startDateStr || item.start_time}}</text>
           <text class="meta-item">📍 {{item.location}}</text>
-          <text class="meta-item">👥 {{item.participant_count}} 人</text>
+          <text class="meta-item">👥 {{item.participant_count}} 位搭子已报名（点卡片看名单）</text>
         </view>
         <view class="card-desc" wx:if="{{item.desc}}">
           <text>{{item.desc}}</text>
@@ -80,8 +80,10 @@
             class="btn-primary"
             data-id="{{item.id}}"
             data-title="{{item.title}}"
+            loading="{{joiningId === item.id}}"
+            disabled="{{joiningId === item.id}}"
             catchtap="onJoinTap"
-          >报名参加</button>
+          >{{joiningId === item.id ? '报名中...' : '✨ 报名结伴参加'}}</button>
         </view>
       </view>
     </view>

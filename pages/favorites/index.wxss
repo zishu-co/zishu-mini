@@ -1,40 +1,75 @@
-.page { min-height: 100vh; background: #faf9f7; }
-
-.header {
-  padding: 32rpx;
-  background: #c6f;
+.page {
+  min-height: 100vh;
+  background: #f6f7fb;
 }
-.title { font-size: 36rpx; color: #fff; font-weight: bold; }
+
+.summary-banner {
+  margin: 24rpx 24rpx 16rpx;
+  padding: 32rpx 28rpx;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-radius: 24rpx;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.2);
+}
+
+.summary-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.summary-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.summary-sub {
+  font-size: 22rpx;
+  opacity: 0.86;
+}
+
+.summary-badge {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.2);
+}
 
 .folder-tabs {
   display: flex;
   white-space: nowrap;
   background: #fff;
-  border-bottom: 1rpx solid rgba(0,0,0,0.06);
+  margin: 0 24rpx;
+  border-radius: 18rpx;
   padding: 0 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(15, 23, 42, 0.04);
 }
 
 .folder-tab {
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  padding: 24rpx 20rpx;
+  padding: 24rpx 22rpx;
   font-size: 28rpx;
-  color: #9a9ab0;
+  color: #64748b;
   border-bottom: 4rpx solid transparent;
   flex-shrink: 0;
 }
 
 .folder-tab.active {
-  color: #8800cc;
-  border-bottom-color: #8800cc;
+  color: #7c3aed;
+  border-bottom-color: #7c3aed;
   font-weight: 600;
 }
 
 .tab-count {
-  background: rgba(160,0,255,0.10);
-  color: #8800cc;
-  padding: 2rpx 12rpx;
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+  padding: 2rpx 14rpx;
   border-radius: 100rpx;
   font-size: 22rpx;
   font-weight: 600;
@@ -56,16 +91,16 @@
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 24rpx;
+  padding: 26rpx 24rpx;
   background: #fff;
-  border-radius: 12rpx;
-  margin-bottom: 12rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  border-radius: 18rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
+  border: 1rpx solid rgba(124, 58, 237, 0.06);
 }
 
 .favor-icon {
-  font-size: 36rpx;
+  font-size: 40rpx;
   flex-shrink: 0;
 }
 
@@ -78,24 +113,34 @@
   display: block;
   font-size: 28rpx;
   color: #1a1a2e;
-  font-weight: 500;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 4rpx;
+  margin-bottom: 6rpx;
 }
 
 .favor-type {
   display: inline-block;
   font-size: 22rpx;
-  color: #9a9ab0;
-  background: rgba(160,0,255,0.08);
-  padding: 2rpx 12rpx;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 2rpx 14rpx;
   border-radius: 100rpx;
+}
+
+.favor-delete-btn {
+  font-size: 24rpx;
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1rpx solid #fecaca;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
 }
 
 .favor-arrow {
   font-size: 36rpx;
-  color: #ccc;
+  color: #a78bfa;
   flex-shrink: 0;
 }

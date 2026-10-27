@@ -1,6 +1,11 @@
 <view class="page">
-  <view class="header">
-    <text class="title">目标面谈</text>
+  <!-- 顶部破冰约谈横幅 -->
+  <view class="talk-banner">
+    <view class="talk-banner-left">
+      <text class="talk-banner-title">💬 目标约谈 · 1v1 共学室</text>
+      <text class="talk-banner-sub">与领航塾师或同频搭子深度复盘目标、碰撞灵感</text>
+    </view>
+    <view class="talk-banner-btn" bindtap="onGoSocialPlaza">+ 找搭子约聊</view>
   </view>
 
   <!-- Tab 切换 -->
@@ -20,34 +25,59 @@
   <!-- Tab 0: 预定面谈 -->
   <view class="tab-content" wx:if="{{activeTab === 0}}">
     <view wx:if="{{loading}}">
-      <view class="loading-row"><text>加载中...</text></view>
+      <view class="loading-row"><text>正在同步约谈日程...</text></view>
     </view>
     <view wx:elif="{{scheduledData.length === 0}}">
-      <view class="empty-row"><text>暂无预定面谈</text></view>
+      <view class="empty-row">
+        <text class="empty-title">暂无预定面谈</text>
+        <text class="empty-desc">快去同路人广场向心仪的塾师或搭子发起 15 分钟破冰约聊吧</text>
+        <view class="empty-cta" bindtap="onGoSocialPlaza">👋 去广场发起约聊</view>
+      </view>
     </view>
     <view wx:else>
       <view class="talk-card" wx:for="{{scheduledData}}" wx:key="id" bindtap="viewDetail" data-item="{{item}}" data-type="scheduled">
         <view class="talk-top">
-          <view class="person-badge {{item.shusheng_id ? 'person' : 'group'}}">
-            <text>{{item.shusheng_name || '群发'}}</text>
+          <view class="talk-person-wrap">
+            <view class="person-badge {{item.shusheng_id ? 'person' : 'group'}}">
+              <text>🤝 {{item._partnerName}}</text>
+            </view>
+            <text class="role-chip">{{item._roleTag}}</text>
           </view>
-          <view class="status-badge {{getStatusClass(item)}}">
-            <text>{{getStatusText(item)}}</text>
+          <view class="status-badge {{item._statusClass}}">
+            <text>{{item._statusText}}</text>
           </view>
         </view>
         <view class="talk-info">
-          <view class="info-row" wx:if="{{item.planed_time}}">
-            <text class="info-label">预定时间</text>
-            <text class="info-value">{{item.planed_time}}</text>
+          <view class="info-row">
+            <text class="info-label">🕐 预定时间</text>
+            <text class="info-value">{{item._planedTimeStr}}</text>
           </view>
           <view class="info-row">
-            <text class="info-label">计划时长</text>
-            <text class="info-value">{{item.planed_duration || 10}} 分钟</text>
+            <text class="info-label">⏱️ 计划时长</text>
+            <text class="info-value">{{item.planed_duration || 15}} 分钟</text>
           </view>
-          <view class="info-row" wx:if="{{item.confirmed_time}}">
-            <text class="info-label">确认时间</text>
-            <text class="info-value success">{{item.confirmed_time}}</text>
+          <view class="info-row" wx:if="{{item.access_info}}">
+            <text class="info-label">📌 主题/入口</text>
+            <text class="info-value topic">{{item.access_info}}</text>
           </view>
+          <view class="info-row" wx:if="{{item._confirmedTimeStr}}">
+            <text class="info-label">✅ 确认时间</text>
+            <text class="info-value success">{{item._confirmedTimeStr}}</text>
+          </view>
+        </view>
+        <view class="talk-actions" wx:if="{{item._canConfirm || item.access_info}}">
+          <view
+            class="talk-action-btn ghost"
+            wx:if="{{item.access_info}}"
+            catchtap="onCopyAccess"
+            data-info="{{item.access_info}}"
+          >复制入口/主题</view>
+          <view
+            class="talk-action-btn primary"
+            wx:if="{{item._canConfirm}}"
+            catchtap="onConfirmTalk"
+            data-item="{{item}}"
+          >{{confirmingId === item.id ? '确认中...' : '✓ 确认赴约'}}</view>
         </view>
       </view>
     </view>
@@ -59,17 +89,20 @@
       <view class="loading-row"><text>加载中...</text></view>
     </view>
     <view wx:elif="{{goalsData.length === 0}}">
-      <view class="empty-row"><text>暂无目标记录</text></view>
+      <view class="empty-row"><text>暂无关联塾生目标记录</text></view>
     </view>
     <view wx:else>
       <view class="goal-card" wx:for="{{goalsData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="目标内容">
         <view class="goal-top">
-          <text class="goal-student">{{item.shusheng_name}}</text>
-          <text class="goal-progress">{{item.process || '进行中'}}</text>
+          <text class="goal-student">🎯 {{item.shusheng_name}}</text>
+          <text class="goal-progress">{{item._progressText}}</text>
+        </view>
+        <view class="goal-body-preview" wx:if="{{item._shortContent}}">
+          <text>{{item._shortContent}}</text>
         </view>
         <view class="goal-dates">
-          <text wx:if="{{item.start_time}}">开始: {{item.start_time.slice(0,10)}}</text>
-          <text wx:if="{{item.deadline}}">截止: {{item.deadline.slice(0,10)}}</text>
+          <text wx:if="{{item._startDate}}">开始: {{item._startDate}}</text>
+          <text wx:if="{{item._deadline}}">截止: {{item._deadline}}</text>
         </view>
       </view>
     </view>
@@ -81,16 +114,19 @@
       <view class="loading-row"><text>加载中...</text></view>
     </view>
     <view wx:elif="{{historyData.length === 0}}">
-      <view class="empty-row"><text>暂无历史面谈</text></view>
+      <view class="empty-row"><text>暂无历史面谈记录</text></view>
     </view>
     <view wx:else>
-      <view class="history-card" wx:for="{{historyData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="面谈内容">
+      <view class="history-card" wx:for="{{historyData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="面谈纪要">
         <view class="history-top">
-          <text class="history-student">{{item.shusheng_name || '未知'}}</text>
-          <text class="history-duration">{{item.actual_duration || 0}}分钟</text>
+          <text class="history-student">🤝 {{item._partnerName}}</text>
+          <text class="history-duration">⏱️ {{item.actual_duration || 15}} 分钟</text>
         </view>
-        <view class="history-time" wx:if="{{item.finish_time}}">
-          {{item.finish_time}}
+        <view class="goal-body-preview" wx:if="{{item._summary}}">
+          <text>{{item._summary}}</text>
+        </view>
+        <view class="history-time" wx:if="{{item._finishTimeStr}}">
+          完成于 {{item._finishTimeStr}}
         </view>
       </view>
     </view>

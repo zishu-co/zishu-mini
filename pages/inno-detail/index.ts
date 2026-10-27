@@ -8,34 +8,47 @@
 import { fetchProjectsFromApi, claimProject } from '../../services/inno/inno';
 import { Project } from '../../services/inno/inno';
 
+type IInnoProjectView = Project & {
+  _statusColor: string;
+  _statusText: string;
+  _startDate: string;
+  _deadline: string;
+  _isDeadlinePassed: boolean;
+};
+
 type IInnoDetailPageData = {
-  project: Project | null;
+  project: IInnoProjectView | null;
   loading: boolean;
+  claiming: boolean;
   currentUserId: number;
 };
 
-Page<IInnoDetailPageData, IInnoDetailPageData>({
+Page<IInnoDetailPageData, any>({
   data: {
     project: null,
     loading: false,
+    claiming: false,
     currentUserId: 0,
   },
 
   projectId: 0,
 
   onLoad(options: any) {
-    this.projectId = parseInt(options.id || '0', 10);
+    this.projectId = parseInt(options?.id || '0', 10);
     const _appInno = getApp<any>();
-    const userInfo = _appInno.globalData.userInfo || {};
-    this.setData({ currentUserId: userInfo.userId || 0 });
+    const storedUserInfo = wx.getStorageSync('userInfo') || {};
+    const userInfo = _appInno?.globalData?.userInfo || storedUserInfo || {};
+    const currentUserId =
+      Number(wx.getStorageSync('userId') || userInfo.userId || userInfo.id || storedUserInfo.userId || storedUserInfo.id || 0);
+    this.setData({ currentUserId });
     if (this.projectId) {
       this.loadProject();
     }
   },
 
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().init();
+    if (this.projectId && !this.data.project && !this.data.loading) {
+      this.loadProject();
     }
   },
 
@@ -43,21 +56,41 @@ Page<IInnoDetailPageData, IInnoDetailPageData>({
     this.loadProject().finally(() => wx.stopPullDownRefresh());
   },
 
+  decorateProject(raw: Project): IInnoProjectView {
+    const _statusText = this.getStatusText(raw);
+    const _statusColor = this.getStatusColor(raw);
+    const _startDate = raw.start_date ? String(raw.start_date).substring(0, 10) : '—';
+    const _deadline = raw.deadline ? String(raw.deadline).substring(0, 10) : '—';
+    const _isDeadlinePassed = this.isDeadlinePassed(raw.deadline);
+    return {
+      ...raw,
+      _statusColor,
+      _statusText,
+      _startDate,
+      _deadline,
+      _isDeadlinePassed,
+    };
+  },
+
   loadProject() {
     this.setData({ loading: true });
     return fetchProjectsFromApi()
       .then((list) => {
-        const project = list.find((p: Project) => p.id === this.projectId) || null;
+        const found = (list || []).find((p: Project) => Number(p.id) === Number(this.projectId)) || null;
+        const project = found ? this.decorateProject(found) : null;
         this.setData({ project, loading: false });
       })
       .catch(() => {
         this.setData({ loading: false });
+        wx.showToast({ title: '加载项目详情失败', icon: 'none' });
       });
   },
 
   /** 认领项目 */
   claimProject() {
-    const token = wx.getStorageSync('refreshToken');
+    if (this.data.claiming) return;
+
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
     if (!token) {
       wx.navigateTo({ url: '/pages/login/login' });
       return;
@@ -68,6 +101,7 @@ Page<IInnoDetailPageData, IInnoDetailPageData>({
       content: '确定要认领该项目吗？',
       success: (res) => {
         if (res.confirm) {
+          this.setData({ claiming: true });
           wx.showLoading({ title: '提交中...', mask: true });
           claimProject(this.projectId)
             .then(() => {
@@ -77,7 +111,10 @@ Page<IInnoDetailPageData, IInnoDetailPageData>({
             })
             .catch(() => {
               wx.hideLoading();
-              wx.showToast({ title: '认领失败', icon: 'none' });
+              wx.showToast({ title: '认领失败，请稍后重试', icon: 'none' });
+            })
+            .finally(() => {
+              this.setData({ claiming: false });
             });
         }
       },

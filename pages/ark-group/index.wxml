@@ -18,18 +18,19 @@
       <view class="teacher-row">
         <view class="teacher-info">
           <text class="teacher-name">{{ark.teacher_name}} 塾师</text>
-          <text class="ark-badge {{statusClass(ark)}}" wx:if="{{ark.ark_id}}">{{statusText(ark)}}</text>
+          <text class="ark-badge {{ark._statusClass}}" wx:if="{{ark.ark_id}}">{{ark._statusText}}</text>
         </view>
         <view class="teacher-actions">
           <!-- 有方舟 -->
           <block wx:if="{{ark.ark_id}}">
             <!-- 我已加入 -->
-            <text class="joined-tip" wx:if="{{isMyArk(ark)}}">已加入 ✓</text>
+            <text class="joined-tip" wx:if="{{ark._isMyArk}}">已加入 ✓</text>
             <!-- 我未加入 + 还能进 -->
             <button
-              wx:elif="{{canJoin(ark)}}"
+              wx:elif="{{ark._canJoin}}"
               class="action-btn primary"
               size="mini"
+              disabled="{{submitting}}"
               loading="{{joiningArkId === ark.ark_id}}"
               data-arkid="{{ark.ark_id}}"
               bindtap="onJoinArk"
@@ -47,6 +48,7 @@
               wx:if="{{ark.teacher_id === currentUserId}}"
               class="action-btn primary"
               size="mini"
+              disabled="{{submitting}}"
               loading="{{creating}}"
               data-teacherid="{{ark.teacher_id}}"
               bindtap="onCreateArk"
@@ -64,7 +66,7 @@
           <text class="no-member" wx:if="{{ark.members.length === 0}}">暂无成员</text>
           <block wx:else>
             <text
-              class="member-chip {{genderClass(m.gender)}}"
+              class="member-chip {{m._genderClass}}"
               wx:for="{{ark.members}}"
               wx:key="user_id"
               wx:for-item="m"

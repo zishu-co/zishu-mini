@@ -1,7 +1,18 @@
 <view class="agent-page">
   <!-- 消息列表 -->
-  <scroll-view class="message-list" scroll-y="true" scroll-top="{{scrollTop}}">
-    <view wx:for="{{messages}}" wx:key="id" class="message-item {{item.role}}">
+  <scroll-view
+    class="message-list"
+    scroll-y="true"
+    scroll-with-animation="true"
+    scroll-top="{{scrollTop}}"
+    scroll-into-view="{{lastMessageId}}"
+  >
+    <view
+      wx:for="{{messages}}"
+      wx:key="id"
+      id="{{item.id}}"
+      class="message-item {{item.role}}"
+    >
       <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">🤖</view>
       <view wx:else class="avatar user-avatar">👤</view>
       <view class="message-bubble {{item.role}}">
@@ -16,6 +27,19 @@
       <view class="message-bubble assistant loading-bubble">
         <text class="loading-dots">●●●</text>
       </view>
+    </view>
+  </scroll-view>
+
+  <!-- 快捷提示词气泡栏 -->
+  <scroll-view class="prompt-chips-bar" scroll-x="true" enable-flex="true">
+    <view
+      class="prompt-chip"
+      wx:for="{{quickPrompts}}"
+      wx:key="*this"
+      data-prompt="{{item}}"
+      bindtap="onQuickPrompt"
+    >
+      <text>{{item}}</text>
     </view>
   </scroll-view>
 

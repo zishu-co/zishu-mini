@@ -1,4 +1,6 @@
 {
+  "navigationBarTitleText": "学习中心",
+  "enablePullDownRefresh": true,
   "component": true,
   "styleIsolation": "apply-shared"
 }

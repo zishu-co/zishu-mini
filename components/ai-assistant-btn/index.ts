@@ -4,12 +4,10 @@
 
 Component({
   properties: {
-    // 是否显示角标（表示有未读消息）
     badge: {
       type: Boolean,
       value: false,
     },
-    // 是否显示红点
     dot: {
       type: Boolean,
       value: false,
@@ -17,17 +15,20 @@ Component({
   },
 
   data: {
-    // 按钮动画状态
     isPressed: false,
   },
 
-  lifetimes: {
-    attached() {
-      // 可扩展：从全局状态读取未读数
-    },
-  },
-
   methods: {
+    onTouchStart() {
+      this.setData({ isPressed: true });
+    },
+
+    onTouchEnd() {
+      if (this.data.isPressed) {
+        this.setData({ isPressed: false });
+      }
+    },
+
     onTap() {
       wx.navigateTo({
         url: '/pages/agent/index',
@@ -35,11 +36,10 @@ Component({
     },
 
     onLongPress() {
-      // 长按提示（可选）
       wx.showToast({
-        title: 'AI 助理',
+        title: '自塾 AI 助学助理',
         icon: 'none',
-        duration: 1000,
+        duration: 1200,
       });
     },
   },

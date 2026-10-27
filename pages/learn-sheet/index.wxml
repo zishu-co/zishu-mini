@@ -6,6 +6,28 @@
   </view>
 
   <block wx:else>
+    <!-- 顶部学习单概览与约学栏 -->
+    <view class="sheet-hero">
+      <view class="sheet-stats">
+        <view class="sheet-stat-item">
+          <text class="sheet-stat-num">{{campCount}}</text>
+          <text class="sheet-stat-label">训练营</text>
+        </view>
+        <view class="sheet-stat-item">
+          <text class="sheet-stat-num">{{learningCount}}</text>
+          <text class="sheet-stat-label">在修课程</text>
+        </view>
+        <view class="sheet-stat-item">
+          <text class="sheet-stat-num">{{learnedCount}}</text>
+          <text class="sheet-stat-label">已修完</text>
+        </view>
+      </view>
+      <view class="sheet-buddy-bar" wx:if="{{!isSelf}}">
+        <text class="sheet-buddy-tip">💡 发现与 {{ownerName}} 志同道合的课程？</text>
+        <button class="sheet-greet-btn" bindtap="onGreetOwner">👋 约TA共学</button>
+      </view>
+    </view>
+
     <!-- 训练营 -->
     <view class="section" wx:if="{{data.camps && data.camps.length > 0}}">
       <view class="section-title">🏕️ 训练营</view>
@@ -29,8 +51,8 @@
           >
             <view class="course-name">{{c.course_title}}</view>
             <view class="course-meta">
-              <text class="status-tag {{statusClass(c)}}">{{statusText(c)}}</text>
-              <text class="deadline" wx:if="{{c.deadline}}">截止：{{formatDate(c.deadline)}}</text>
+              <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
+              <text class="deadline" wx:if="{{c.deadline}}">截止：{{c._deadlineText}}</text>
             </view>
           </view>
         </view>
@@ -50,8 +72,8 @@
       >
         <view class="course-name">{{c.course_title}}</view>
         <view class="course-meta">
-          <text class="status-tag {{statusClass(c)}}">{{statusText(c)}}</text>
-          <text class="deadline" wx:if="{{c.deadline}}">截止：{{formatDate(c.deadline)}}</text>
+          <text class="status-tag {{c._statusClass}}">{{c._statusText}}</text>
+          <text class="deadline" wx:if="{{c.deadline}}">截止：{{c._deadlineText}}</text>
         </view>
       </view>
     </view>

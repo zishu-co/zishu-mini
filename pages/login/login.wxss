@@ -80,7 +80,7 @@ page {
 .welcome-title {
   font-size: 52rpx;
   font-weight: bold;
-  background: linear-gradient(135deg, #7c3aed, #a855f7, #c084fc);
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 55%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -137,7 +137,7 @@ page {
   left: 0;
   width: 8rpx;
   height: 100%;
-  background: linear-gradient(to bottom, #a855f7, #7c3aed);
+  background: linear-gradient(to bottom, #aa00ff, #7c3aed);
   border-radius: 4rpx 0 0 4rpx;
 }
 
@@ -172,7 +172,7 @@ page {
 }
 
 .auth-btn {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
   color: #fff;
   font-size: 28rpx;
   padding: 0 36rpx;
@@ -181,18 +181,22 @@ page {
   border-radius: 36rpx;
   margin: 0;
   font-weight: 500;
-  box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6rpx 20rpx rgba(170, 0, 255, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-btn::after {
+  border: none;
 }
 
 .auth-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 3rpx 10rpx rgba(139, 92, 246, 0.25);
+  box-shadow: 0 3rpx 10rpx rgba(170, 0, 255, 0.22);
 }
 
 /* 获取头像按钮特殊样式 */
 .pop_avatar {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
   color: #fff;
   font-size: 28rpx;
   padding: 0 36rpx;
@@ -200,7 +204,7 @@ page {
   line-height: 72rpx;
   border-radius: 36rpx;
   font-weight: 500;
-  box-shadow: 0 6rpx 20rpx rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6rpx 20rpx rgba(170, 0, 255, 0.3);
 }
 
 .pop_avatar::after {
@@ -281,17 +285,21 @@ page {
   width: 90%;
   height: 96rpx;
   line-height: 96rpx;
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6d28d9 100%);
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 60%, #6d28d9 100%);
   color: #fff;
   font-size: 34rpx;
   font-weight: 600;
   border-radius: 48rpx;
   margin-bottom: 36rpx;
-  box-shadow: 0 12rpx 32rpx rgba(139, 92, 246, 0.4);
+  box-shadow: 0 12rpx 32rpx rgba(170, 0, 255, 0.35);
   letter-spacing: 4rpx;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+.complete-btn::after {
+  border: none;
 }
 
 .complete-btn::before {
@@ -371,6 +379,7 @@ page {
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
+.login-method-selector radio-group,
 .radio-group {
   display: flex;
   gap: 24rpx;
@@ -379,9 +388,10 @@ page {
 .method-option {
   display: flex;
   align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 24rpx;
-  padding: 32rpx 28rpx;
+  padding: 28rpx 24rpx;
   border: 2rpx solid rgba(167, 139, 250, 0.3);
   transition: all 0.3s ease;
   box-shadow: 0 4rpx 16rpx rgba(139, 92, 246, 0.1);
@@ -389,16 +399,16 @@ page {
 }
 
 .method-option.selected {
-  border-color: #7c3aed;
-  background: rgba(139, 92, 246, 0.08);
-  box-shadow: 0 8rpx 24rpx rgba(139, 92, 246, 0.2);
+  border-color: #aa00ff;
+  background: rgba(170, 0, 255, 0.08);
+  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.18);
 }
 
 .method-label {
-  font-size: 30rpx;
+  font-size: 28rpx;
   color: #4c1d95;
-  font-weight: 500;
-  margin-left: 16rpx;
+  font-weight: 600;
+  margin-left: 12rpx;
 }
 
 /* ========== Dev 模式登录表单样式 ========== */
@@ -467,9 +477,13 @@ page {
   transition: all 0.3s ease;
 }
 
+.dev-login-btn::after {
+  border: none;
+}
+
 .dev-login-btn.active {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-  box-shadow: 0 12rpx 32rpx rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  box-shadow: 0 12rpx 32rpx rgba(170, 0, 255, 0.38);
 }
 
 .dev-login-btn.active:active {

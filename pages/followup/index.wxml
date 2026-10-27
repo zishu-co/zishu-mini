@@ -1,13 +1,26 @@
 <view class="page">
-  <view class="header">
-    <text class="title">创新结项</text>
-  </view>
-
-  <!-- 筛选按钮 -->
-  <view class="filter-row">
-    <button class="filter-btn {{showMine ? '' : 'active'}}" bindtap="toggleFilter">
-      {{showMine ? '显示全部' : '显示我的'}}
-    </button>
+  <!-- 顶部统计与筛选栏 -->
+  <view class="top-bar">
+    <view class="top-summary">
+      <text class="summary-count">{{listData.length}}</text>
+      <text class="summary-label">个结项项目</text>
+    </view>
+    <view class="filter-row">
+      <button
+        class="filter-btn {{!showMine ? 'active' : ''}}"
+        bindtap="toggleFilter"
+        data-mode="all"
+      >
+        全部项目
+      </button>
+      <button
+        class="filter-btn {{showMine ? 'active' : ''}}"
+        bindtap="toggleFilter"
+        data-mode="mine"
+      >
+        我的结项
+      </button>
+    </view>
   </view>
 
   <!-- 列表 -->
@@ -19,10 +32,17 @@
       <view class="empty-row"><text>暂无结项记录</text></view>
     </view>
     <view wx:else>
-      <view class="project-card" wx:for="{{listData}}" wx:key="id">
+      <view
+        class="project-card"
+        wx:for="{{listData}}"
+        wx:key="id"
+        bindtap="onProjectTap"
+        data-id="{{item.id}}"
+      >
         <view class="project-top">
           <text class="project-serial">{{item.task_serial}}</text>
           <text class="project-title">{{item.title}}</text>
+          <text class="project-arrow">›</text>
         </view>
         <view class="project-persons">
           <view class="person-item">
@@ -37,11 +57,11 @@
         <view class="project-meta">
           <view class="meta-item">
             <text class="meta-label">开始</text>
-            <text class="meta-value">{{item.start_date ? item.start_date.slice(0,10) : '-'}}</text>
+            <text class="meta-value">{{item._startDate}}</text>
           </view>
           <view class="meta-item">
             <text class="meta-label">截止</text>
-            <text class="meta-value deadline">{{item.deadline ? item.deadline.slice(0,10) : '-'}}</text>
+            <text class="meta-value deadline">{{item._deadline}}</text>
           </view>
           <view class="meta-item">
             <text class="meta-label">计划</text>
@@ -52,9 +72,9 @@
             <text class="meta-value accent">{{item.actual_hour}}h</text>
           </view>
         </view>
-        <view class="project-progress" wx:if="{{item.half_progress}}">
-          <text class="progress-label">半程进度</text>
-          <text class="progress-value">{{item.half_progress}}</text>
+        <view class="project-progress" wx:if="{{item.half_progress || item._finishDate}}">
+          <text class="progress-label" wx:if="{{item.half_progress}}">半程进度：{{item.half_progress}}</text>
+          <text class="progress-value" wx:if="{{item._finishDate}}">✓ 结项于 {{item._finishDate}}</text>
         </view>
       </view>
     </view>

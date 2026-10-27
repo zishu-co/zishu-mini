@@ -5,7 +5,7 @@ page {
 }
 
 .header {
-  background: linear-gradient(135deg, #c6a0ff, #aa00ff);
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
   padding: 40rpx 30rpx 50rpx;
   color: white;
 }

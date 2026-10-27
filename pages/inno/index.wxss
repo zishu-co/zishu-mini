@@ -178,8 +178,18 @@ page {
 .card-footer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.card-footer-meta {
+  display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 20rpx;
+  flex: 1;
+  min-width: 0;
 }
 
 .footer-item {
@@ -203,26 +213,32 @@ page {
   font-weight: bold;
 }
 
-.footer-text.deadline-red {
+.footer-text.deadline-red,
+.footer-text.deadline-overdue {
   color: #fa4126;
+  font-weight: 500;
 }
 
+.footer-text.deadline-warning {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.footer-text.deadline-normal,
 .footer-text.deadline- {
   color: #666;
 }
 
 
 .claim-btn {
-  position: absolute;
-  right: 28rpx;
-  bottom: 28rpx;
-  background: linear-gradient(135deg, #c6f, #aa00ff);
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
   color: #fff;
   font-size: 26rpx;
   font-weight: bold;
   padding: 12rpx 32rpx;
   border-radius: 32rpx;
-  box-shadow: 0 4rpx 12rpx rgba(170, 0, 255, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(170, 0, 255, 0.25);
 }
 
 

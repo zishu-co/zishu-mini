@@ -9,15 +9,20 @@ var formatDate = function(dateStr) {
   return dateStr;
 };
 
-var formatProgress = function(process) {
-  if (process === undefined || process === null) {
+var getProgressPercent = function(process) {
+  if (process === undefined || process === null || isNaN(process)) {
     return 0;
   }
-  // 后端进度值乘以10转换为百分比
-  return process * 10;
+  var num = Number(process);
+  if (num < 0) return 0;
+  if (num <= 10) {
+    return Math.min(Math.round(num * 10), 100);
+  }
+  return Math.min(Math.round(num), 100);
 };
 
 module.exports = {
   formatDate: formatDate,
-  formatProgress: formatProgress
+  formatProgress: getProgressPercent,
+  getProgressPercent: getProgressPercent
 };

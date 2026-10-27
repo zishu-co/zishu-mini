@@ -6,30 +6,37 @@ Component({
     list: TabMenu,
   },
 
+  lifetimes: {
+    attached() {
+      this.init();
+    },
+  },
+
   methods: {
     onChange(event: any) {
-      this.setData({ active: event.detail.value });
+      const nextIndex = Number(event.detail.value);
+      if (isNaN(nextIndex) || !this.data.list[nextIndex]) return;
+      if (nextIndex === this.data.active) return;
+
+      this.setData({ active: nextIndex });
+      const rawUrl = this.data.list[nextIndex].url;
       wx.switchTab({
-        url: this.data.list[event.detail.value].url.startsWith('/')
-          ? this.data.list[event.detail.value].url
-          : `/${this.data.list[event.detail.value].url}`,
+        url: rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`,
       });
     },
 
     init() {
-      const page = getCurrentPages().pop();
+      const pages = getCurrentPages();
+      const page = pages.length ? pages[pages.length - 1] : null;
       const route = page ? page.route : '';
-      
-      // 在 tabBar 列表中查找当前页面
-      const active = this.data.list.findIndex(
-        (item: any) => {
-          const itemUrl = item.url.startsWith('/') ? item.url.substr(1) : item.url;
-          return itemUrl === route || itemUrl === `${route}/index`;
-        }
-      );
-      
-      // 如果找到匹配项则设置，否则保持当前状态
-      if (active !== -1) {
+      if (!route) return;
+
+      const active = this.data.list.findIndex((item: any) => {
+        const itemUrl = item.url.startsWith('/') ? item.url.slice(1) : item.url;
+        return itemUrl === route || itemUrl === `${route}/index`;
+      });
+
+      if (active !== -1 && active !== this.data.active) {
         this.setData({ active });
       }
     },

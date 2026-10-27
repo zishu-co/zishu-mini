@@ -1,15 +1,57 @@
-.page { min-height: 100vh; background: #faf9f7; }
-
-.header {
-  padding: 32rpx;
-  background: #c6f;
+.page {
+  min-height: 100vh;
+  background: #f6f4fb;
+  padding-top: 20rpx;
+  padding-bottom: 60rpx;
 }
-.title { font-size: 36rpx; color: #fff; font-weight: bold; }
+
+.talk-banner {
+  margin: 0 24rpx 20rpx;
+  padding: 28rpx 26rpx;
+  background: linear-gradient(135deg, #aa00ff 0%, #6d28d9 100%);
+  border-radius: 24rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.22);
+}
+
+.talk-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.talk-banner-title {
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.talk-banner-sub {
+  font-size: 22rpx;
+  opacity: 0.9;
+}
+
+.talk-banner-btn {
+  background: #ffffff;
+  color: #7c3aed;
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
 .tab-bar {
   display: flex;
   background: #fff;
-  border-bottom: 1rpx solid rgba(0,0,0,0.06);
+  margin: 0 24rpx;
+  border-radius: 20rpx;
+  padding: 6rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
 }
 
 .tab-item {
@@ -18,25 +60,31 @@
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  padding: 24rpx 0;
+  padding: 20rpx 0;
   font-size: 28rpx;
-  color: #9a9ab0;
-  border-bottom: 4rpx solid transparent;
+  color: #64748b;
+  border-radius: 14rpx;
 }
 
 .tab-item.active {
-  color: #8800cc;
-  border-bottom-color: #8800cc;
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #fff;
   font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.25);
 }
 
 .tab-badge {
-  background: #c6f;
+  background: rgba(255, 255, 255, 0.25);
   color: #fff;
   padding: 2rpx 12rpx;
   border-radius: 100rpx;
   font-size: 22rpx;
   font-weight: 600;
+}
+
+.tab-item:not(.active) .tab-badge {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
 }
 
 .tab-content {
@@ -46,19 +94,46 @@
 .loading-row,
 .empty-row {
   text-align: center;
-  padding: 80rpx 0;
-  color: #9a9ab0;
+  padding: 80rpx 32rpx;
+  color: #94a3b8;
   font-size: 28rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #334155;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #94a3b8;
+  margin-bottom: 12rpx;
+}
+
+.empty-cta {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 700;
+  padding: 16rpx 36rpx;
+  border-radius: 999rpx;
 }
 
 /* 预定面谈卡片 */
 .talk-card {
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  border-radius: 22rpx;
+  padding: 26rpx;
+  margin-bottom: 18rpx;
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.05);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 
 .talk-top {
@@ -68,135 +143,198 @@
   margin-bottom: 16rpx;
 }
 
+.talk-person-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .person-badge {
   padding: 6rpx 20rpx;
   border-radius: 100rpx;
   font-size: 26rpx;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .person-badge.person {
-  background: rgba(160,0,255,0.10);
-  color: #8800cc;
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
 }
 
 .person-badge.group {
-  background: rgba(249,115,22,0.10);
+  background: rgba(249, 115, 22, 0.1);
   color: #f97316;
+}
+
+.role-chip {
+  font-size: 21rpx;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
 }
 
 .status-badge {
   padding: 4rpx 16rpx;
   border-radius: 100rpx;
   font-size: 22rpx;
+  font-weight: 600;
 }
 
 .status-badge.pending {
-  background: rgba(59,130,246,0.10);
+  background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
 }
 
 .status-badge.confirmed {
-  background: rgba(34,197,94,0.10);
-  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
 }
 
 .status-badge.overdue {
-  background: rgba(233,69,96,0.10);
+  background: rgba(233, 69, 96, 0.1);
   color: #e94560;
 }
 
 .talk-info {
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 10rpx;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
+  gap: 16rpx;
 }
 
 .info-label {
   font-size: 24rpx;
-  color: #9a9ab0;
+  color: #94a3b8;
+  flex-shrink: 0;
 }
 
 .info-value {
   font-size: 24rpx;
   color: #1a1a2e;
   font-weight: 500;
+  text-align: right;
+}
+
+.info-value.topic {
+  color: #6d28d9;
 }
 
 .info-value.success {
-  color: #22c55e;
+  color: #16a34a;
+}
+
+.talk-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14rpx;
+  margin-top: 18rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #f1f5f9;
+}
+
+.talk-action-btn {
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 23rpx;
+  font-weight: 600;
+}
+
+.talk-action-btn.ghost {
+  background: #f8fafc;
+  color: #475569;
+  border: 1rpx solid #e2e8f0;
+}
+
+.talk-action-btn.primary {
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  color: #ffffff;
 }
 
 /* 目标卡片 */
 .goal-card {
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 12rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  border-radius: 20rpx;
+  padding: 26rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
+  border: 1rpx solid rgba(124, 58, 237, 0.06);
 }
 
 .goal-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 10rpx;
 }
 
 .goal-student {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #8800cc;
+  font-weight: 700;
+  color: #7c3aed;
 }
 
 .goal-progress {
-  font-size: 24rpx;
-  color: #9a9ab0;
+  font-size: 23rpx;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
+
+.goal-body-preview {
+  font-size: 25rpx;
+  color: #334155;
+  background: #faf5ff;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  margin-bottom: 10rpx;
+  line-height: 1.5;
 }
 
 .goal-dates {
   display: flex;
   gap: 16rpx;
-  font-size: 24rpx;
-  color: #9a9ab0;
+  font-size: 23rpx;
+  color: #64748b;
 }
 
 /* 历史卡片 */
 .history-card {
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 12rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  border-radius: 20rpx;
+  padding: 26rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
+  border: 1rpx solid rgba(124, 58, 237, 0.06);
 }
 
 .history-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 10rpx;
 }
 
 .history-student {
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #1a1a2e;
 }
 
 .history-duration {
-  font-size: 26rpx;
-  color: #22c55e;
+  font-size: 25rpx;
+  color: #16a34a;
   font-weight: 600;
 }
 
 .history-time {
-  font-size: 24rpx;
-  color: #9a9ab0;
+  font-size: 23rpx;
+  color: #94a3b8;
 }

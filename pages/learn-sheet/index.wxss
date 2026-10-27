@@ -17,6 +17,65 @@
   font-size: 28rpx;
 }
 
+.sheet-hero {
+  background: linear-gradient(135deg, #6200ea 0%, #aa00ff 100%);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.2);
+}
+
+.sheet-stats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.sheet-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.sheet-stat-num {
+  font-size: 40rpx;
+  font-weight: 800;
+}
+
+.sheet-stat-label {
+  font-size: 22rpx;
+  opacity: 0.85;
+}
+
+.sheet-buddy-bar {
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sheet-buddy-tip {
+  font-size: 24rpx;
+  opacity: 0.95;
+}
+
+.sheet-greet-btn {
+  margin: 0;
+  padding: 0 24rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  color: #7c4dff;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+.sheet-greet-btn::after {
+  border: none;
+}
+
 .section {
   background: #fff;
   border-radius: 16rpx;

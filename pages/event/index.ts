@@ -17,6 +17,7 @@ interface IEventPageData {
   historicalEvents: EventItem[];
   loading: boolean;
   hasLogin: boolean;
+  joiningId: number;
 }
 
 Page<IEventPageData, IEventPageData>({
@@ -26,10 +27,11 @@ Page<IEventPageData, IEventPageData>({
     historicalEvents: [],
     loading: true,
     hasLogin: false,
+    joiningId: 0,
   },
 
   onShow() {
-    if (typeof this.getTabBar === 'function') {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
     this.checkLogin();
@@ -43,22 +45,32 @@ Page<IEventPageData, IEventPageData>({
     this.loadEvents().then(() => wx.stopPullDownRefresh());
   },
 
+  decorateEvent(ev: any) {
+    const count = Number(ev?.participant_count || 0);
+    return {
+      ...ev,
+      _heatBadge: count >= 10 ? '🔥 热门同城局' : '✨ 搭子召集中',
+      _startDateStr: ev?.start_time ? String(ev.start_time).slice(0, 16).replace('T', ' ') : '待定',
+    };
+  },
+
   /** 加载活动列表（同时拉当前 + 历史） */
   async loadEvents() {
     this.setData({ loading: true });
     try {
       const [current, historical] = await Promise.all([
-        fetchCurrentEvents().catch(() => []),
-        fetchHistoricalEvents().catch(() => []),
+        fetchCurrentEvents(),
+        fetchHistoricalEvents(),
       ]);
       this.setData({
-        currentEvents: Array.isArray(current) ? current : [],
-        historicalEvents: Array.isArray(historical) ? historical : [],
+        currentEvents: Array.isArray(current) ? current.map((e) => this.decorateEvent(e)) : [],
+        historicalEvents: Array.isArray(historical) ? historical.map((e) => this.decorateEvent(e)) : [],
         loading: false,
       });
     } catch (e) {
       console.error('loadEvents failed', e);
       this.setData({ loading: false });
+      wx.showToast({ title: '加载活动列表失败，请稍后重试', icon: 'none' });
     }
   },
 
@@ -115,7 +127,7 @@ Page<IEventPageData, IEventPageData>({
     }
     const id = e.currentTarget.dataset.id;
     const title = e.currentTarget.dataset.title;
-    if (!id) return;
+    if (!id || this.data.joiningId === id) return;
     const res = await wx.showModal({
       title: '报名确认',
       content: '请先确认您已在「活动行」或「粗门」平台完成报名，再点击确认加入',
@@ -123,6 +135,7 @@ Page<IEventPageData, IEventPageData>({
       cancelText: '取消',
     });
     if (!res.confirm) return;
+    this.setData({ joiningId: id });
     try {
       const result = await joinEvent(id);
       if (result && result.code === '200') {
@@ -135,6 +148,8 @@ Page<IEventPageData, IEventPageData>({
     } catch (err: any) {
       console.error('joinEvent failed', err);
       wx.showToast({ title: err?.message || '报名失败', icon: 'none' });
+    } finally {
+      this.setData({ joiningId: 0 });
     }
   },
 });

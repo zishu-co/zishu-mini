@@ -1,4 +1,55 @@
 <view class="aim-page">
+  <!-- 顶部自定义导航头 + 成长能量舱 -->
+  <view class="aim-header">
+    <view class="aim-header-top">
+      <view>
+        <view class="aim-header-title">目标驾驶舱</view>
+        <view class="aim-header-sub">以终为始 · 结伴同行 · 每日精进</view>
+      </view>
+      <view class="streak-pill">
+        <text class="streak-fire">🔥</text>
+        <text class="streak-num">坚持 {{streakDays}} 天</text>
+      </view>
+    </view>
+
+    <!-- 趣味能量进度卡片 -->
+    <view class="energy-dock">
+      <view class="energy-dock-row">
+        <view class="energy-badge">{{energyBadge}}</view>
+        <text class="energy-pct">能量充能 {{goalProgressPercent}}%</text>
+      </view>
+      <view class="energy-progress-track">
+        <view class="energy-progress-fill" style="width: {{goalProgressPercent}}%;"></view>
+      </view>
+      <view class="energy-tip">{{energyLevelText}}</view>
+    </view>
+  </view>
+
+  <!-- 交友 & 伴学快捷矩阵 -->
+  <view class="social-quick-bar">
+    <view class="quick-pill" bindtap="onFindGoalBuddy">
+      <view class="quick-pill-icon">🤝</view>
+      <view class="quick-pill-info">
+        <text class="quick-pill-title">找共学搭子</text>
+        <text class="quick-pill-sub">邂逅同频伙伴</text>
+      </view>
+    </view>
+    <view class="quick-pill" bindtap="onQuickGoaltalk">
+      <view class="quick-pill-icon">💬</view>
+      <view class="quick-pill-info">
+        <text class="quick-pill-title">目标约谈</text>
+        <text class="quick-pill-sub">塾师 1v1 赋能</text>
+      </view>
+    </view>
+    <view class="quick-pill" bindtap="onOpenAiCoach">
+      <view class="quick-pill-icon">🧙‍♂️</view>
+      <view class="quick-pill-info">
+        <text class="quick-pill-title">AI 伴学</text>
+        <text class="quick-pill-sub">智能语音助教</text>
+      </view>
+    </view>
+  </view>
+
   <!-- Dev 模式游客提示条 -->
   <view class="dev-banner" wx:if="{{showDevBanner}}">
     <text class="dev-banner-text">🔧 Dev 模式 · 游客身份（数据为模拟）</text>
@@ -27,6 +78,59 @@
       bind:create="onCreateGoal"
       bind:updateProgress="onUpdateProgress"
     />
+  </view>
+
+  <!-- 目标创建 / 编辑弹窗 -->
+  <view class="goal-modal-mask" wx:if="{{showGoalModal}}" bindtap="onCloseGoalModal"></view>
+  <view class="goal-modal" wx:if="{{showGoalModal}}">
+    <view class="goal-modal-header">
+      <text class="goal-modal-title">{{isEditingGoal ? '编辑目标' : '创建新目标'}}</text>
+      <text class="goal-modal-close" bindtap="onCloseGoalModal">✕</text>
+    </view>
+    <view class="goal-modal-body">
+      <view class="form-item">
+        <text class="form-label">目标内容</text>
+        <textarea
+          class="form-textarea"
+          placeholder="请输入您的阶段性目标与关键结果（例如：备考雅思7.5 / 攻克系统架构师）..."
+          value="{{goalForm.content}}"
+          maxlength="500"
+          bindinput="onGoalContentInput"
+        />
+      </view>
+      <view class="form-item">
+        <text class="form-label">截止日期（YYYY-MM-DD）</text>
+        <picker mode="date" value="{{goalForm.deadline}}" bindchange="onGoalDeadlineChange">
+          <view class="form-input picker-display">
+            {{goalForm.deadline || '点击选择截止日期'}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">当前进度（0 - 10，每格代表 10%）</text>
+        <input
+          class="form-input"
+          type="number"
+          placeholder="0 - 10"
+          value="{{goalForm.process}}"
+          bindinput="onGoalProcessInput"
+        />
+      </view>
+      <view class="form-item">
+        <text class="form-label">复盘与共学寄语（选填）</text>
+        <textarea
+          class="form-textarea short"
+          placeholder="记录当前进展、下周计划或想对共学搭子说的话..."
+          value="{{goalForm.review}}"
+          maxlength="500"
+          bindinput="onGoalReviewInput"
+        />
+      </view>
+      <view class="goal-modal-actions">
+        <view class="modal-btn cancel" bindtap="onCloseGoalModal">取消</view>
+        <view class="modal-btn confirm" bindtap="onConfirmGoalModal">{{goalSaving ? '保存中...' : '保存目标'}}</view>
+      </view>
+    </view>
   </view>
 </view>
 

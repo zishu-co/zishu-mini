@@ -35,10 +35,10 @@
   ],
   "tabBar": {
     "custom": true,
-    "color": "#666666",
+    "color": "#64748b",
     "selectedColor": "#aa00ff",
     "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/learn/index",
@@ -63,8 +63,9 @@
     ]
   },
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#c6f",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#faf9f7",
+    "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTitleText": "学本领 上自塾",
     "navigationBarTextStyle": "black"
   },

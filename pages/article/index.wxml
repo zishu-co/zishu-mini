@@ -1,13 +1,13 @@
 <view class="page">
   <!-- 顶部 Banner -->
   <view class="banner">
-    <view class="banner-title">我的文章</view>
-    <view class="banner-sub">记录学习点滴</view>
+    <view class="banner-title">专栏文章</view>
+    <view class="banner-sub">记录学习点滴 · 沉淀思考精华</view>
   </view>
 
   <!-- 未登录提示 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
-    <text>登录后可查看和管理您的文章</text>
+    <text class="login-tip-text">登录后可查看和阅读专栏文章</text>
     <button class="login-btn" bindtap="goToLogin">去登录</button>
   </view>
 
@@ -18,22 +18,58 @@
 
   <!-- 文章列表 -->
   <view class="article-list" wx:if="{{!loading && hasLogin}}">
-    <view class="article-item" wx:for="{{articles}}" wx:key="articleid" bindtap="onViewArticle" data-id="{{item.articleid}}">
+    <view
+      class="article-item"
+      wx:for="{{articles}}"
+      wx:key="articleid"
+      bindtap="onViewArticle"
+      data-id="{{item.articleid}}"
+    >
       <view class="article-header">
         <text class="article-title">{{item.title}}</text>
         <text class="article-arrow">›</text>
       </view>
       <view class="article-meta">
-        <text class="author">{{item.author_name}}</text>
+        <text class="author">{{item.author_name || '自塾作者'}}</text>
         <text class="date" wx:if="{{item.create_time}}">{{item.create_time}}</text>
       </view>
-      <view class="article-preview">{{item.fulltext}}</view>
+      <view class="article-preview">{{item._preview || item.fulltext}}</view>
     </view>
 
     <!-- 空状态 -->
     <view class="empty" wx:if="{{articles.length === 0}}">
       <text>暂无文章</text>
       <view class="empty-tip">开始创作你的第一篇文章吧</view>
+    </view>
+  </view>
+
+  <!-- 文章详情阅读弹窗 -->
+  <view class="reader-mask" wx:if="{{showReaderModal}}" bindtap="closeArticleModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-badge">专栏阅读</view>
+        <view class="reader-close" bindtap="closeArticleModal">✕</view>
+      </view>
+
+      <view class="reader-loading" wx:if="{{readerLoading && !currentArticle}}">
+        <text>正在加载文章正文...</text>
+      </view>
+
+      <scroll-view class="reader-scroll" scroll-y="true" wx:if="{{currentArticle}}">
+        <view class="reader-title">{{currentArticle.title}}</view>
+        <view class="reader-meta">
+          <text class="reader-author">{{currentArticle.author_name}}</text>
+          <text class="reader-dept" wx:if="{{currentArticle.bumen}}">{{currentArticle.bumen}}</text>
+          <text class="reader-date" wx:if="{{currentArticle.create_time}}">{{currentArticle.create_time}}</text>
+        </view>
+        <view class="reader-divider"></view>
+        <view class="reader-loading-inline" wx:if="{{readerLoading}}">
+          <text>正在同步完整正文...</text>
+        </view>
+        <view class="reader-content">
+          <text user-select="true">{{currentArticle.content || '暂无正文内容'}}</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 

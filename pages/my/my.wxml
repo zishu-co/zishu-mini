@@ -11,18 +11,26 @@
         mode="aspectFill"
       />
     </view>
-    <!-- 已登录：显示昵称 + 箭头 -->
+    <!-- 已登录：显示昵称 + 段位徽章 + 学习单按钮 -->
     <block wx:if="{{isLoggedIn}}">
       <view class="user-card__info" bindtap="goToEditProfile">
-        <view class="nickname">{{userInfo.nickName}}</view>
+        <view class="nickname-row">
+          <text class="nickname">{{userInfo.nickName}}</text>
+          <text class="level-pill">{{levelBadge}}</text>
+        </view>
         <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+        <view class="phone" wx:else>点击编辑个人共学名片 ›</view>
       </view>
-      <view class="user-card__arrow" bindtap="goToEditProfile">
-        <text class="arrow-icon">›</text>
-      </view>
+      <button class="sheet-quick-btn" catchtap="goToMyLearnSheet">📋 学习单</button>
     </block>
-    <!-- 未登录：显示登录按钮 -->
-    <button wx:else class="user-card__login-btn" bindtap="goToLogin">登 录</button>
+    <!-- 未登录：显示欢迎文案 + 登录按钮 -->
+    <block wx:else>
+      <view class="user-card__info" bindtap="goToLogin">
+        <view class="nickname">欢迎来到自塾</view>
+        <view class="phone">登录解锁共学搭子、方舟与闯关勋章</view>
+      </view>
+      <button class="user-card__login-btn" bindtap="goToLogin">登 录</button>
+    </block>
   </view>
 
   <!-- 学习数据统计条（已登录时显示） -->

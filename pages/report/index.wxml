@@ -12,7 +12,7 @@
     <view class="record-card" wx:for="{{records}}" wx:key="pperformid" data-pperformid="{{item.pperformid}}" data-paperid="{{item.testpaperid}}" bindtap="onViewDetail">
       <view class="record-top">
         <text class="record-title">{{item.testpaper_title}}</text>
-        <text class="record-score {{getScoreClass(item.test_score, item.full_score)}}">
+        <text class="record-score {{item._scoreClass}}">
           {{item.test_score}}/{{item.full_score}}
         </text>
       </view>

@@ -1,6 +1,14 @@
-<view class="fab-container" bindtap="onTap" bindlongpress="onLongPress">
+<view
+  class="fab-container"
+  bindtap="onTap"
+  bindlongpress="onLongPress"
+  bindtouchstart="onTouchStart"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchEnd"
+>
   <view class="fab-btn {{isPressed ? 'pressed' : ''}}">
-    <text class="fab-icon">💬</text>
+    <text class="fab-icon">✨</text>
+    <text class="fab-label">AI</text>
   </view>
   <view wx:if="{{dot}}" class="fab-dot"></view>
   <view wx:elif="{{badge}}" class="fab-badge"></view>

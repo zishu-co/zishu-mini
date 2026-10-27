@@ -10,48 +10,60 @@ interface IReportData {
   loading: boolean;
 }
 
-Page<IReportPageData, IReportData>({
+Page<IReportPageData, any>({
   data: {
     records: [],
     loading: true,
   },
 
-  onLoad() {},
+  onLoad() {
+    wx.setNavigationBarTitle({ title: '学习汇报' });
+  },
 
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().init();
-    }
     this.fetchRecords();
   },
 
   onPullDownRefresh() {
-    this.fetchRecords();
-    setTimeout(() => wx.stopPullDownRefresh(), 500);
+    this.fetchRecords(() => wx.stopPullDownRefresh());
   },
 
-  fetchRecords() {
+  fetchRecords(done?: () => void) {
     this.setData({ loading: true });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const userInfo = wx.getStorageSync('userInfo') || _appReport.globalData.userInfo || {};
-    const userId = userInfo.userId || _appReport.globalData.userId || '';
+    const userInfo = wx.getStorageSync('userInfo') || _appReport?.globalData?.userInfo || {};
+    const userId =
+      wx.getStorageSync('userId') ||
+      userInfo.userId ||
+      userInfo.id ||
+      _appReport?.globalData?.userId ||
+      _appReport?.globalData?.userInfo?.userId ||
+      '';
     console.log('[report] userId:', userId, 'userInfo:', userInfo, 'token:', token);
-    
+
     if (!token || !userId) {
       this.setData({ loading: false, records: [] });
       console.warn('[report] token或userId为空，无法请求');
       wx.showToast({ title: '请先登录', icon: 'none' });
+      if (done) done();
       return;
     }
-    
+
     wx.request({
       url: getBaseUrl() + '/api/ques/fetchtrans/by_id/' + userId,
       method: 'GET',
-      header: { Authorization: 'Bearer ' + token },
+      header: { Authorization: 'Bearer ' + token, token },
       success: (res: any) => {
         console.log('[report] fetchtrans响应:', res.statusCode, res.data);
-        if (res.statusCode === 200) {
-          this.setData({ records: res.data || [], loading: false });
+        if (res.statusCode === 200 && Array.isArray(res.data)) {
+          const records = res.data.map((item: any) => ({
+            ...item,
+            _scoreClass: this.getScoreClass(
+              Number(item.test_score || 0),
+              Number(item.full_score || 0)
+            ),
+          }));
+          this.setData({ records, loading: false });
         } else {
           this.setData({ loading: false, records: [] });
         }
@@ -59,6 +71,9 @@ Page<IReportPageData, IReportData>({
       fail: () => {
         this.setData({ loading: false, records: [] });
         wx.showToast({ title: '网络请求失败', icon: 'none' });
+      },
+      complete: () => {
+        if (done) done();
       },
     });
   },

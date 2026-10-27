@@ -3,20 +3,22 @@
 
 .finish-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40rpx 20rpx;
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  padding: 24rpx 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .finish-card {
   background: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  max-width: 560rpx;
-  width: 100%;
-  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+  border-radius: 24rpx;
+  padding: 40rpx 36rpx;
+  margin: 24rpx 32rpx;
+  width: calc(100% - 64rpx);
+  box-sizing: border-box;
+  box-shadow: 0 20rpx 60rpx rgba(124, 58, 237, 0.22);
 }
 
 .finish-header {
@@ -142,9 +144,15 @@
 .quiz-btn {
   width: 100%;
   margin-top: 16rpx;
-  background: #fff;
-  color: #667eea;
-  border: 1rpx solid #667eea;
+  background: rgba(170, 0, 255, 0.06);
+  color: #aa00ff;
+  border: 2rpx solid #aa00ff;
+  border-radius: 16rpx;
+  font-weight: 600;
+}
+
+.quiz-btn::after {
+  border: none;
 }
 
 /* 作业输入 */
@@ -163,7 +171,7 @@
 .homework-input {
   flex: 1;
   border: 1rpx solid #dcdfe6;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   padding: 0 20rpx;
   height: 72rpx;
   font-size: 28rpx;
@@ -171,13 +179,17 @@
 }
 
 .submit-btn {
-  background: #667eea;
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
   color: #fff;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   font-size: 28rpx;
   min-width: 120rpx;
   height: 72rpx;
   line-height: 72rpx;
+}
+
+.submit-btn::after {
+  border: none;
 }
 
 .homework-submitted {
@@ -191,13 +203,13 @@
 }
 
 .check-icon {
-  color: #67c23a;
+  color: #aa00ff;
   font-weight: bold;
   font-size: 32rpx;
 }
 
 .homework-link {
-  color: #667eea;
+  color: #7c3aed;
   word-break: break-all;
   flex: 1;
   min-width: 0;
@@ -279,12 +291,18 @@
   width: 100%;
   height: 88rpx;
   font-size: 32rpx;
-  background: #67c23a;
+  font-weight: 600;
+  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
   color: #fff;
   border: none;
-  border-radius: 8rpx;
+  border-radius: 44rpx;
   margin-bottom: 16rpx;
   line-height: 88rpx;
+  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.3);
+}
+
+.confirm-btn::after {
+  border: none;
 }
 
 .confirm-tip {

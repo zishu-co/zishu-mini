@@ -49,16 +49,18 @@
       <!-- 昵称授权 -->
       <view class="auth-item">
         <view class="auth-title">昵称授权</view>
-        <view class="auth-content" wx:if="{{nickName}}">
-          <view class="user-info">
-            <view class="nickname">{{nickName}}</view>
-          </view>
-          <view class="auth-status success">已完成</view>
-        </view>
-        <view class="auth-content" wx:else>
-          <view class="auth-desc">用于识别您的身份</view>
-          <input wx:if="{{!nickName}}" type="nickname" class="ipu" placeholder="点击获取昵称" bindblur="getName" />
-          <view class="auth-status">待授权</view>
+        <view class="auth-content">
+          <input
+            type="nickname"
+            class="ipu"
+            placeholder="点击获取或输入昵称"
+            value="{{nickName || ''}}"
+            bindinput="getName"
+            bindchange="getName"
+            bindblur="getName"
+          />
+          <view class="auth-status success" wx:if="{{hasUserInfo && nickName}}">已完成</view>
+          <view class="auth-status" wx:else>待授权</view>
         </view>
       </view>
 
@@ -136,9 +138,10 @@
 
       <button
         class="dev-login-btn {{canDevLogin && privacyAgreed ? 'active' : ''}}"
-        disabled="{{!canDevLogin || !privacyAgreed}}"
+        disabled="{{!canDevLogin || !privacyAgreed || submitting}}"
+        loading="{{submitting}}"
         bindtap="loginByPassword"
-      >密码登录</button>
+      >{{submitting ? '登录中...' : '密码登录'}}</button>
 
       <view class="dev-hint">
         <button class="guest-btn" bindtap="enterAsGuest">以游客身份进入</button>

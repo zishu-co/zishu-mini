@@ -34,10 +34,21 @@ App<IAppOption>({
       this.globalData.hasPhoneNumber = true;
     }
 
-    // 获取本地存储的用户ID
-    const userId = wx.getStorageSync('userId');
+    // 获取本地存储的用户ID（兼容 userInfo.userId / userInfo.id 回退）
+    const userId = wx.getStorageSync('userId') || userInfo?.userId || userInfo?.id || null;
     if (userId) {
-      this.globalData.userId = userId;
+      this.globalData.userId = Number(userId);
+      wx.setStorageSync('userId', Number(userId));
+    }
+
+    // 恢复本地缓存的 Token
+    const accessToken = wx.getStorageSync('accessToken');
+    const refreshToken = wx.getStorageSync('refreshToken');
+    if (accessToken) {
+      this.globalData.accessToken = accessToken;
+    }
+    if (refreshToken) {
+      this.globalData.refreshToken = refreshToken;
     }
 
     // 检查登录状态

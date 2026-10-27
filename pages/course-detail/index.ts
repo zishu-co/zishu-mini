@@ -13,10 +13,12 @@ import {
 
 type IPageData = {
   loading: boolean;
+  submitting: boolean;
   courseDetail: CourseDetail | null;
   currentUserId: number;
   // 选课状态
   selectedIds: number[];
+  isSelected: boolean;
   currentSelectionsCount: number;
   hasLogin: boolean;
 };
@@ -24,19 +26,31 @@ type IPageData = {
 Page<IPageData, IPageData>({
   data: {
     loading: true,
+    submitting: false,
     courseDetail: null,
     currentUserId: 0,
     selectedIds: [],
+    isSelected: false,
     currentSelectionsCount: 0,
     hasLogin: false,
   },
 
   courseId: 0,
 
+  resolveUserId(): number {
+    const app = getApp<any>();
+    return (
+      app?.globalData?.userId ||
+      app?.globalData?.userInfo?.userId ||
+      wx.getStorageSync('userId') ||
+      wx.getStorageSync('userInfo')?.userId ||
+      0
+    );
+  },
+
   onLoad(options: any) {
     this.courseId = parseInt(options.id || '0', 10);
-    const app = getApp<any>();
-    const userId = app.globalData.userId || wx.getStorageSync('userId') || 0;
+    const userId = this.resolveUserId();
     this.setData({ currentUserId: userId });
     if (this.courseId) {
       wx.setNavigationBarTitle({ title: options.title || '课程详情' });
@@ -48,7 +62,11 @@ Page<IPageData, IPageData>({
   },
 
   onShow() {
-    // 从登录页返回后刷新选课状态
+    // 从登录页返回后刷新用户信息与选课状态
+    const userId = this.resolveUserId();
+    if (userId !== this.data.currentUserId) {
+      this.setData({ currentUserId: userId });
+    }
     if (this.courseId) {
       this.loadSelections();
     }
@@ -62,8 +80,33 @@ Page<IPageData, IPageData>({
   loadDetail() {
     this.setData({ loading: true });
     return getCourseDetail(this.courseId)
-      .then((res) => {
-        this.setData({ courseDetail: res, loading: false });
+      .then((res: any) => {
+        if (res) {
+          const currentList = Array.isArray(res.current)
+            ? res.current
+            : Array.isArray(res.current_selections)
+            ? res.current_selections
+            : [];
+          const finishList = Array.isArray(res.finish)
+            ? res.finish
+            : Array.isArray(res.finish_selections)
+            ? res.finish_selections
+            : [];
+          res.current = currentList.map((item: any) => ({
+            ...item,
+            deadlineText: this.formatDate(item.deadline),
+            deadlineClass: this.getDeadlineClass(item.deadline),
+          }));
+          res.finish = finishList.map((item: any) => ({
+            ...item,
+            finishDateText: this.formatDate(item.finish_date),
+          }));
+          res.current_selections = res.current;
+          res.finish_selections = res.finish;
+        }
+        const cid = res?.course?.id || this.courseId;
+        const isSelected = this.data.selectedIds.includes(cid);
+        this.setData({ courseDetail: res, isSelected, loading: false });
         if (res?.course?.title) {
           wx.setNavigationBarTitle({ title: res.course.title });
         }
@@ -78,28 +121,36 @@ Page<IPageData, IPageData>({
   loadSelections() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
     if (!token) {
-      this.setData({ hasLogin: false, selectedIds: [], currentSelectionsCount: 0 });
+      this.setData({ hasLogin: false, selectedIds: [], isSelected: false, currentSelectionsCount: 0 });
       return Promise.resolve();
     }
     this.setData({ hasLogin: true });
     return fetchCurrentSelections()
       .then((list) => {
         const safeList = Array.isArray(list) ? list : [];
-        const ids = safeList.map((c: any) => c.course_id);
-        this.setData({ selectedIds: ids, currentSelectionsCount: safeList.length });
+        const ids = safeList.map((c: any) => Number(c.course_id));
+        const cid = this.data.courseDetail?.course?.id || this.courseId;
+        const isSelected = ids.includes(Number(cid));
+        this.setData({
+          selectedIds: ids,
+          isSelected,
+          currentSelectionsCount: safeList.length,
+        });
       })
       .catch(() => {
-        this.setData({ selectedIds: [], currentSelectionsCount: 0 });
+        this.setData({ selectedIds: [], isSelected: false, currentSelectionsCount: 0 });
       });
   },
 
   /** 选课 */
   async onSelectCourse() {
-    const { courseDetail, currentSelectionsCount, currentUserId } = this.data;
+    if (this.data.submitting) return;
+    const { courseDetail, currentSelectionsCount } = this.data;
+    const currentUserId = this.data.currentUserId || this.resolveUserId();
     if (!courseDetail) return;
 
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
-    if (!token || currentUserId == null) {
+    if (!token || !currentUserId) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1000);
       return;
@@ -115,16 +166,20 @@ Page<IPageData, IPageData>({
       content: '确定要选择「' + courseDetail.course.title + '」吗？',
       success: (res) => {
         if (res.confirm) {
+          this.setData({ submitting: true });
           wx.showLoading({ title: '选课中...', mask: true });
           selectCourse(currentUserId, this.courseId)
             .then(() => {
               wx.hideLoading();
               wx.showToast({ title: '选课成功', icon: 'success' });
-              this.loadSelections();
+              return Promise.all([this.loadDetail(), this.loadSelections()]);
             })
             .catch(() => {
               wx.hideLoading();
               wx.showToast({ title: '选课失败', icon: 'none' });
+            })
+            .finally(() => {
+              this.setData({ submitting: false });
             });
         }
       }
@@ -133,7 +188,9 @@ Page<IPageData, IPageData>({
 
   /** 退选 */
   async onQuitCourse() {
-    const { courseDetail, currentUserId } = this.data;
+    if (this.data.submitting) return;
+    const { courseDetail } = this.data;
+    const currentUserId = this.data.currentUserId || this.resolveUserId();
     if (!courseDetail) return;
 
     wx.showModal({
@@ -144,20 +201,28 @@ Page<IPageData, IPageData>({
       success: (res) => {
         if (res.confirm) {
           const reason = res.content || '主动退选';
+          this.setData({ submitting: true });
           wx.showLoading({ title: '退选中...', mask: true });
           quitCourse(currentUserId, this.courseId, reason)
             .then(() => {
               wx.hideLoading();
               wx.showToast({ title: '已退选', icon: 'success' });
-              this.loadSelections();
+              return Promise.all([this.loadDetail(), this.loadSelections()]);
             })
             .catch(() => {
               wx.hideLoading();
               wx.showToast({ title: '退选失败', icon: 'none' });
+            })
+            .finally(() => {
+              this.setData({ submitting: false });
             });
         }
       }
     });
+  },
+
+  onDeselectCourse() {
+    return this.onQuitCourse();
   },
 
   /** 格式化日期（截取前10位） */

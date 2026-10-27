@@ -1,53 +1,179 @@
 <view class="page">
-  <view class="header">
-    <text class="title">全塾成员</text>
+  <!-- 顶部交友广场品牌 Banner + 统计 -->
+  <view class="hero-stats">
+    <view class="hero-header">
+      <view>
+        <view class="hero-title">全塾同路人 · 共学交友广场</view>
+        <view class="hero-sub">遇见同频男女搭子 · 组方舟 · 约目标面谈</view>
+      </view>
+      <view class="hero-tag">🔥 {{hot7dCount}} 人本周打卡</view>
+    </view>
+    <view class="stats-row">
+      <view class="stat-card">
+        <text class="stat-num">{{totalCount}}</text>
+        <text class="stat-label">同路人总数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num brand">{{activeCount}}</text>
+        <text class="stat-label">活跃共学者</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num muted">{{hot7dCount}}</text>
+        <text class="stat-label">7日冲刺榜</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 统计卡片 -->
-  <view class="stats-row">
-    <view class="stat-card">
-      <text class="stat-num">{{totalCount}}</text>
-      <text class="stat-label">总人数</text>
+  <!-- 搜索栏 -->
+  <view class="plaza-controls">
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜昵称、所在城市、目标方向或段位..."
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">✕</text>
     </view>
-    <view class="stat-card">
-      <text class="stat-num brand">{{activeCount}}</text>
-      <text class="stat-label">活跃用户</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-num muted">{{inactiveCount}}</text>
-      <text class="stat-label">待激活</text>
+
+    <!-- 分类 Tab -->
+    <scroll-view class="category-tabs" scroll-x enable-flex>
+      <view
+        class="cat-tab {{activeCategory === 'all' ? 'active' : ''}}"
+        data-cat="all"
+        bindtap="onCategoryTap"
+      >✨ 全部同路人</view>
+      <view
+        class="cat-tab {{activeCategory === 'hot' ? 'active' : ''}}"
+        data-cat="hot"
+        bindtap="onCategoryTap"
+      >🔥 7日学霸榜</view>
+      <view
+        class="cat-tab {{activeCategory === 'buddy' ? 'active' : ''}}"
+        data-cat="buddy"
+        bindtap="onCategoryTap"
+      >🤝 找共学搭子</view>
+      <view
+        class="cat-tab {{activeCategory === 'mentor' ? 'active' : ''}}"
+        data-cat="mentor"
+        bindtap="onCategoryTap"
+      >💎 领航塾师</view>
+    </scroll-view>
+
+    <!-- 性别快速筛选 -->
+    <view class="gender-filter-bar">
+      <text class="filter-hint">筛选搭子：</text>
+      <view class="gender-pills">
+        <view
+          class="gender-pill {{genderFilter === 'all' ? 'active' : ''}}"
+          data-gender="all"
+          bindtap="onGenderFilterTap"
+        >全部</view>
+        <view
+          class="gender-pill {{genderFilter === '女' ? 'active female' : ''}}"
+          data-gender="女"
+          bindtap="onGenderFilterTap"
+        >🚺 女生搭子</view>
+        <view
+          class="gender-pill {{genderFilter === '男' ? 'active male' : ''}}"
+          data-gender="男"
+          bindtap="onGenderFilterTap"
+        >🚹 男生搭子</view>
+      </view>
     </view>
   </view>
 
   <!-- 成员列表 -->
   <view class="member-list">
     <view wx:if="{{loading}}">
-      <view class="loading-row"><text>加载中...</text></view>
+      <view class="loading-row"><text>正在寻找同频共学伙伴...</text></view>
     </view>
     <view wx:elif="{{members.length === 0}}">
-      <view class="empty-row"><text>暂无成员数据</text></view>
+      <view class="empty-row"><text>暂无符合筛选条件的同路人，换个条件试试吧 ✨</text></view>
     </view>
     <view wx:else>
       <view class="member-card" wx:for="{{members}}" wx:key="id">
-        <view class="member-avatar">
-          <text class="avatar-text">{{item.username ? item.username.slice(0,1) : '?'}}</text>
+        <view class="member-avatar {{item._genderClass}}">
+          <text class="avatar-text">{{item._avatarChar}}</text>
+          <text class="avatar-badge">{{item._levelBadge}}</text>
         </view>
         <view class="member-info">
           <view class="member-top">
             <text class="member-name">{{item.username}}</text>
-            <view class="shuzhi-badge {{item.shuzhi >= 10 ? 'active' : 'inactive'}}">
-              <text>塾值 {{item.shuzhi || 0}}</text>
+            <view class="level-pill level-{{item._levelNum}}">
+              <text>{{item._levelBadge}} {{item._levelTitle}}</text>
+            </view>
+            <view class="shuzhi-badge {{item._isActive ? 'active' : 'inactive'}}">
+              <text>💎 {{item._shuzhiStr}}</text>
             </view>
           </view>
-          <view class="member-meta">
-            <text wx:if="{{item.gender}}">{{item.gender}}</text>
-            <text wx:if="{{item.location}}">· {{item.location}}</text>
-            <text>· 学时 {{item.learn_hour || 0}}h</text>
+
+          <!-- 社交与共学标签 -->
+          <view class="social-tags-row">
+            <text class="social-tag gender-{{item._genderClass}}" wx:if="{{item._genderLabel}}">{{item._genderLabel}}</text>
+            <text class="social-tag" wx:if="{{item.location}}">📍 {{item.location}}</text>
+            <text class="social-tag">📚 累计 {{item._learnHourStr}}h</text>
+            <text class="social-tag hot" wx:if="{{item._hours7dStr}}">🔥 7日 {{item._hours7dStr}}h</text>
           </view>
-          <view class="member-meta" wx:if="{{item.total_hours_7d}}">
-            <text class="meta-accent">7天计时: {{item.total_hours_7d.toFixed(1)}}h</text>
+
+          <!-- 目标或个人签名 -->
+          <view class="goal-preview" wx:if="{{item._goalShort}}">
+            <text class="goal-preview-text">🎯 {{item._goalShort}}</text>
+          </view>
+
+          <!-- 互动按钮栏 -->
+          <view class="member-actions">
+            <view
+              class="peer-btn ghost"
+              bindtap="onViewLearnSheet"
+              data-userid="{{item.id}}"
+            >📖 看学习单</view>
+            <view
+              class="peer-btn primary"
+              bindtap="onOpenGreetModal"
+              data-item="{{item}}"
+            >👋 破冰约学</view>
           </view>
         </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 破冰约学弹窗 -->
+  <view class="greet-mask" wx:if="{{showGreetModal}}" bindtap="onCloseGreetModal"></view>
+  <view class="greet-modal" wx:if="{{showGreetModal && greetTarget}}">
+    <view class="greet-header">
+      <view>
+        <text class="greet-title">👋 向 {{greetTarget.username}} 发起破冰约学</text>
+        <text class="greet-sub">{{greetTarget._levelBadge}} {{greetTarget._levelTitle}} · 选择一个共学破冰话题</text>
+      </view>
+      <text class="greet-close" bindtap="onCloseGreetModal">✕</text>
+    </view>
+    <view class="topic-list">
+      <view
+        class="topic-item {{selectedTopicIndex === index ? 'selected' : ''}}"
+        wx:for="{{icebreakerTopics}}"
+        wx:key="index"
+        data-index="{{index}}"
+        bindtap="onSelectTopic"
+      >
+        <text>{{item}}</text>
+        <text wx:if="{{selectedTopicIndex === index}}">✓</text>
+      </view>
+    </view>
+    <input
+      class="custom-topic-input"
+      type="text"
+      placeholder="或输入自定义破冰留言（选填）..."
+      value="{{customTopic}}"
+      bindinput="onCustomTopicInput"
+    />
+    <view class="greet-footer">
+      <view class="greet-btn cancel" bindtap="onCloseGreetModal">取消</view>
+      <view class="greet-btn confirm" bindtap="onSendGreet">
+        {{greetingSubmitting ? '发送中...' : '🚀 发送共学邀请'}}
       </view>
     </view>
   </view>

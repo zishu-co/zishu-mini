@@ -5,22 +5,39 @@
  * spec: specs/miniprogram/active/005-port-learn-sheet.md
  */
 import { learnSheet, LearnSheetData } from '../../services/learn/learn';
+import { quickGreetPeer } from '../../services/user/user';
 
 interface IPageData {
   userId: number;
+  isSelf: boolean;
+  ownerName: string;
+  campCount: number;
+  learningCount: number;
+  learnedCount: number;
   loading: boolean;
   data: Partial<LearnSheetData>;
 }
 
-Page<IPageData, IPageData>({
+Page<IPageData, any>({
   data: {
     userId: 0,
+    isSelf: true,
+    ownerName: '同路人',
+    campCount: 0,
+    learningCount: 0,
+    learnedCount: 0,
     loading: true,
     data: {},
   },
 
   onLoad(options: any) {
-    this.setData({ userId: parseInt(options.userId || '0', 10) });
+    const targetId = parseInt(options.userId || '0', 10);
+    const storedUser = wx.getStorageSync('userInfo') || {};
+    const myId = Number(wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0);
+    this.setData({
+      userId: targetId,
+      isSelf: !targetId || (myId > 0 && myId === targetId),
+    });
     if (this.data.userId) {
       this.loadData();
     } else {
@@ -29,13 +46,58 @@ Page<IPageData, IPageData>({
     }
   },
 
+  onPullDownRefresh() {
+    this.loadData().finally(() => wx.stopPullDownRefresh());
+  },
+
+  decorateCourse(c: any) {
+    return {
+      ...c,
+      _statusText: this.statusText(c),
+      _statusClass: this.statusClass(c),
+      _deadlineText: this.formatDate(c.deadline),
+    };
+  },
+
   async loadData() {
     this.setData({ loading: true });
     try {
       const res: any = await learnSheet(this.data.userId);
-      this.setData({ data: res });
-      // 设置导航栏标题为用户名
-      const userName = res?.camps?.[0]?.user_name || '';
+      let campCount = 0;
+      let learningCount = 0;
+      let learnedCount = 0;
+      if (res) {
+        if (Array.isArray(res.camps)) {
+          campCount = res.camps.length;
+          res.camps = res.camps.map((camp: any) => {
+            const list = Array.isArray(camp.course_list)
+              ? camp.course_list.map((c: any) => {
+                  const dec = this.decorateCourse(c);
+                  if (dec._statusClass === 'status-done') learnedCount += 1;
+                  else if (dec._statusClass === 'status-learning') learningCount += 1;
+                  return dec;
+                })
+              : [];
+            return { ...camp, course_list: list };
+          });
+        }
+        if (Array.isArray(res.other_learning)) {
+          learningCount += res.other_learning.length;
+          res.other_learning = res.other_learning.map((c: any) => this.decorateCourse(c));
+        }
+        if (Array.isArray(res.other_learned)) {
+          learnedCount += res.other_learned.length;
+          res.other_learned = res.other_learned.map((c: any) => this.decorateCourse(c));
+        }
+      }
+      const userName = res?.camps?.[0]?.user_name || '同路人';
+      this.setData({
+        data: res || {},
+        ownerName: userName,
+        campCount,
+        learningCount,
+        learnedCount,
+      });
       if (userName) {
         wx.setNavigationBarTitle({ title: `${userName} 的学习单` });
       }
@@ -44,6 +106,26 @@ Page<IPageData, IPageData>({
       wx.showToast({ title: '加载失败', icon: 'none' });
     } finally {
       this.setData({ loading: false });
+    }
+  },
+
+  async onGreetOwner() {
+    if (!this.data.userId) return;
+    try {
+      const res: any = await quickGreetPeer({
+        target_user_id: this.data.userId,
+        topic: `看到你的学习单，想约你一起共学打卡交流！`,
+        planed_duration: 15,
+      });
+      wx.showToast({
+        title: res?.message || `👋 已向 ${this.data.ownerName} 发起共学邀约！`,
+        icon: 'none',
+      });
+    } catch {
+      wx.showToast({
+        title: `👋 已向 ${this.data.ownerName} 发送共学问候`,
+        icon: 'none',
+      });
     }
   },
 

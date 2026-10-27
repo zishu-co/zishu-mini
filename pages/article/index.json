@@ -1,3 +1,5 @@
 {
+  "navigationBarTitleText": "专栏文章",
+  "enablePullDownRefresh": true,
   "usingComponents": {}
 }

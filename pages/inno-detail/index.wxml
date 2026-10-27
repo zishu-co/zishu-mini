@@ -17,8 +17,8 @@
     <view class="card">
       <view class="card-top">
         <view class="serial-tag">{{project.task_serial || '—'}}</view>
-        <view class="status-tag status-{{getStatusColor(project)}}">
-          {{getStatusText(project)}}
+        <view class="status-tag status-{{project._statusColor}}">
+          {{project._statusText}}
         </view>
       </view>
 
@@ -43,12 +43,12 @@
         </view>
         <view class="info-row">
           <text class="info-label">开始日期</text>
-          <text class="info-value">{{project.start_date ? project.start_date.substring(0, 10) : '—'}}</text>
+          <text class="info-value">{{project._startDate}}</text>
         </view>
         <view class="info-row">
           <text class="info-label">截止日期</text>
-          <text class="info-value {{isDeadlinePassed(project.deadline) ? 'text-red' : ''}}">
-            {{project.deadline ? project.deadline.substring(0, 10) : '—'}}
+          <text class="info-value {{project._isDeadlinePassed ? 'text-red' : ''}}">
+            {{project._deadline}}
           </text>
         </view>
         <view class="info-row" wx:if="{{project.planed_hour}}">
@@ -80,7 +80,9 @@
 
     <!-- 操作按钮 -->
     <view class="action-wrap" wx:if="{{!project.taker && !project.finish_date}}">
-      <button class="btn-claim" bindtap="claimProject">认领该项目</button>
+      <button class="btn-claim" disabled="{{claiming}}" bindtap="claimProject">
+        {{claiming ? '认领中...' : '认领该项目'}}
+      </button>
     </view>
 
     <!-- 已完成状态 -->

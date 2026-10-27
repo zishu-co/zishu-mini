@@ -1,21 +1,26 @@
 <view class="page">
-  <view class="header">
-    <text class="title">塾值明细</text>
-  </view>
-
-  <!-- 统计卡片 -->
-  <view class="stats-row">
-    <view class="stat-card">
-      <text class="stat-num">{{listData.length}}</text>
-      <text class="stat-label">记录条数</text>
+  <!-- 品牌紫渐变汇总卡片 -->
+  <view class="hero-card">
+    <view class="hero-top">
+      <view>
+        <text class="hero-label">当前可用塾值</text>
+        <text class="hero-balance">{{currentBalance}}</text>
+      </view>
+      <view class="hero-badge">塾值账户</view>
     </view>
-    <view class="stat-card">
-      <text class="stat-num accent">+{{totalAmount}}</text>
-      <text class="stat-label">累计单值</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-num brand">{{currentBalance}}</text>
-      <text class="stat-label">当前塾值</text>
+    <view class="stats-row">
+      <view class="stat-card">
+        <text class="stat-num">{{listData.length}}</text>
+        <text class="stat-label">记录条数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num accent">{{totalAmountStr}}</text>
+        <text class="stat-label">累计变动</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num brand">{{currentBalance}}</text>
+        <text class="stat-label">当前塾值</text>
+      </view>
     </view>
   </view>
 
@@ -31,7 +36,7 @@
       <view class="record-card" wx:for="{{listData}}" wx:key="index">
         <view class="record-top">
           <view class="type-tag">{{item.target_type}}</view>
-          <text class="amount-pos">+{{item.amount}}</text>
+          <text class="{{item._isNeg ? 'amount-neg' : 'amount-pos'}}">{{item._amountStr}}</text>
         </view>
         <view class="record-title">{{item.target_title}}</view>
         <view class="record-bottom" wx:if="{{item.comments}}">

@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "ESNext",
     "strict": false,
     "moduleResolution": "bundler",
+    "types": ["miniprogram-api-typings"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noImplicitAny": false,

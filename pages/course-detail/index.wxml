@@ -1,3 +1,13 @@
+<wxs module="fmt">
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return ('' + dateStr).substring(0, 10);
+}
+module.exports = {
+  formatDate: formatDate
+};
+</wxs>
+
 <view class="page">
 
   <!-- 加载状态 -->
@@ -22,7 +32,7 @@
         <view class="header-actions" wx:if="{{hasLogin}}">
           <view
             class="action-btn quit-btn"
-            wx:if="{{selectedIds.includes(courseDetail.course.id)}}"
+            wx:if="{{isSelected}}"
             bindtap="onQuitCourse"
           >退选</view>
           <view
@@ -96,7 +106,7 @@
           <view class="td td-name">{{item.user_name || '—'}}</view>
           <view class="td td-name">{{item.shushi_name || '—'}}</view>
           <view class="td td-serial">{{item.current_serial || '—'}}</view>
-          <view class="td td-date {{getDeadlineClass(item.deadline)}}">{{formatDate(item.deadline)}}</view>
+          <view class="td td-date {{item.deadlineClass}}">{{item.deadlineText}}</view>
         </view>
       </view>
     </view>
@@ -125,7 +135,7 @@
           <view class="td td-index">{{index + 1}}</view>
           <view class="td td-name">{{item.user_name || '—'}}</view>
           <view class="td td-name">{{item.shushi_name || '—'}}</view>
-          <view class="td td-date">{{formatDate(item.finish_date)}}</view>
+          <view class="td td-date">{{item.finishDateText}}</view>
         </view>
       </view>
     </view>

@@ -1,3 +1,48 @@
+<wxs module="innoFmt">
+function statusClass(finishDate, halfProgress, taker) {
+  if (finishDate || halfProgress === '已完成') return 'completed';
+  if (taker) return 'in-progress';
+  return 'pending';
+}
+
+function statusText(finishDate, halfProgress, taker) {
+  if (finishDate || halfProgress === '已完成') return '已完成';
+  if (taker) return '进行中';
+  return '待认领';
+}
+
+function deadlineColor(deadline) {
+  if (!deadline) return 'normal';
+  var d = getDate(deadline);
+  var ts = d.getTime();
+  if (isNaN(ts)) {
+    var norm = ('' + deadline).replace(getRegExp('-', 'g'), '/');
+    ts = getDate(norm).getTime();
+  }
+  if (isNaN(ts)) return 'normal';
+  var now = getDate().getTime();
+  var diffDays = (ts - now) / (1000 * 60 * 60 * 24);
+  if (diffDays < 0) return 'overdue';
+  if (diffDays <= 3) return 'warning';
+  return 'normal';
+}
+
+function formatDeadline(deadline) {
+  if (!deadline) return '';
+  if (typeof deadline === 'string' && deadline.length > 10) {
+    return deadline.substring(0, 10);
+  }
+  return deadline;
+}
+
+module.exports = {
+  statusClass: statusClass,
+  statusText: statusText,
+  deadlineColor: deadlineColor,
+  formatDeadline: formatDeadline
+};
+</wxs>
+
 <view class="page">
   <!-- 加载中 -->
   <view class="loading-wrap" wx:if="{{pageLoading}}">
@@ -6,16 +51,18 @@
 
   <!-- 顶部区域：搜索 + 轮播图 -->
   <view class="home-page-header" wx:if="{{!pageLoading}}">
-    <!-- 搜索栏（保留占位） -->
+    <!-- 搜索栏 -->
     <view class="search-wrap">
       <t-search
         t-class-input="t-search__input"
         t-class-input-container="t-search__input-container"
-        placeholder="AI Agent真实场景落地"
-        leftIcon=""
-        disabled
+        placeholder="搜索项目名称、编号或执行人"
+        value="{{searchKeyword}}"
+        bind:change="onSearchChange"
+        bind:submit="onSearchSubmit"
+        bind:clear="onSearchClear"
       >
-        <t-icon slot="left-icon" prefix="wr" name="search" size="40rpx" color="#bbb" />
+        <t-icon slot="left-icon" name="search" size="40rpx" color="#bbb" />
       </t-search>
     </view>
 
@@ -74,8 +121,8 @@
       <!-- 卡片头部 -->
       <view class="card-header">
         <view class="card-serial">{{item.task_serial || '—'}}</view>
-        <view class="card-status status-{{getStatusTag(item.half_progress, item.taker)}}">
-          {{item.finish_date ? '已完成' : (item.taker ? '进行中' : '待认领')}}
+        <view class="card-status status-{{item.statusClass || innoFmt.statusClass(item.finish_date, item.half_progress, item.taker)}}">
+          {{item.statusText || innoFmt.statusText(item.finish_date, item.half_progress, item.taker)}}
         </view>
       </view>
 
@@ -85,36 +132,38 @@
       <!-- 描述 -->
       <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
 
-      <!-- 底部信息行 -->
+      <!-- 底部信息行 + 认领按钮 -->
       <view class="card-footer">
-        <!-- 执行人 -->
-        <view class="footer-item">
-          <text class="footer-icon">👤</text>
-          <text class="footer-text">{{item.taker || '待认领'}}</text>
+        <view class="card-footer-meta">
+          <!-- 执行人 -->
+          <view class="footer-item">
+            <text class="footer-icon">👤</text>
+            <text class="footer-text">{{item.taker || '待认领'}}</text>
+          </view>
+          <!-- 赏金 -->
+          <view class="footer-item" wx:if="{{item.bonus > 0}}">
+            <text class="footer-icon">💰</text>
+            <text class="footer-text bonus">{{item.bonus}}</text>
+          </view>
+          <!-- 截止日期 -->
+          <view class="footer-item" wx:if="{{item.deadlineText || item.deadline}}">
+            <text class="footer-icon">📅</text>
+            <text class="footer-text deadline-{{item.deadlineColor || innoFmt.deadlineColor(item.deadline)}}">
+              {{item.deadlineText || innoFmt.formatDeadline(item.deadline)}}
+            </text>
+          </view>
         </view>
-        <!-- 赏金 -->
-        <view class="footer-item" wx:if="{{item.bonus > 0}}">
-          <text class="footer-icon">💰</text>
-          <text class="footer-text bonus">{{item.bonus}}</text>
-        </view>
-        <!-- 截止日期 -->
-        <view class="footer-item" wx:if="{{item.deadline}}">
-          <text class="footer-icon">📅</text>
-          <text class="footer-text deadline-{{getDeadlineColor(item.deadline)}}">
-            {{item.deadline}}
-          </text>
-        </view>
-      </view>
 
-      <!-- 认领按钮（未认领时显示） -->
-      <view
-        class="claim-btn"
-        wx:if="{{!item.taker && !item.finish_date}}"
-        catchtap="claimProject"
-        data-id="{{item.id}}"
-        data-index="{{index}}"
-      >
-        认领
+        <!-- 认领按钮（未认领时显示） -->
+        <view
+          class="claim-btn"
+          wx:if="{{!item.taker && !item.finish_date && item.half_progress !== '已完成'}}"
+          catchtap="claimProject"
+          data-id="{{item.id}}"
+          data-index="{{index}}"
+        >
+          认领
+        </view>
       </view>
     </view>
 

@@ -1,10 +1,10 @@
 // @ts-nocheck
 /**
  * services/user/user.ts
- * 用户相关 API
+ * 用户与同路人社交相关 API
  */
 import base from '../base'
-const { get, post } = base
+const { get, post, requestWithRefresh } = base
 
 /**
  * 修改密码
@@ -107,26 +107,26 @@ export const fetchSupervise = () => {
 
 /**
  * 获取目标对话列表（预定）
- * GET /api/users/fetch_goaltalk?presenter=塾师
+ * POST /api/users/fetch_goaltalk
  */
-export const fetchGoaltalk = () => {
-  return post('/api/users/fetch_goaltalk', { presenter: '塾师' })
+export const fetchGoaltalk = (presenter = '塾师') => {
+  return post('/api/users/fetch_goaltalk', { presenter })
 }
 
 /**
  * 获取已完成对话列表（历史）
- * GET /api/users/fetch_finished_goaltalk?presenter=塾师
+ * POST /api/users/fetch_finished_goaltalk
  */
-export const fetchFinishedGoaltalk = () => {
-  return post('/api/users/fetch_finished_goaltalk', { presenter: '塾师' })
+export const fetchFinishedGoaltalk = (presenter = '塾师') => {
+  return post('/api/users/fetch_finished_goaltalk', { presenter })
 }
 
 /**
  * 获取所有目标
- * GET /api/users/fetch_all_goals?presenter=塾师
+ * POST /api/users/fetch_all_goals
  */
-export const fetchAllGoals = () => {
-  return post('/api/users/fetch_all_goals', { presenter: '塾师' })
+export const fetchAllGoals = (presenter = '塾师') => {
+  return post('/api/users/fetch_all_goals', { presenter })
 }
 
 /**
@@ -135,4 +135,58 @@ export const fetchAllGoals = () => {
  */
 export const fetchShushengs = () => {
   return get('/api/users/fetch_shushengs')
+}
+
+/**
+ * 获取同路人交友广场列表
+ * GET /api/users/social_plaza
+ */
+export const fetchSocialPlaza = (category = 'all', keyword = '') => {
+  const qs = `?category=${encodeURIComponent(category)}&keyword=${encodeURIComponent(keyword)}`
+  return get('/api/users/social_plaza' + qs)
+}
+
+/**
+ * 一键向同路人/学伴发起破冰约聊
+ * POST /api/users/quick_greet
+ */
+export const quickGreetPeer = (data: {
+  target_user_id: number
+  topic: string
+  planed_time?: string
+  planed_duration?: number
+}) => {
+  return requestWithRefresh({
+    url: '/api/users/quick_greet',
+    method: 'POST',
+    data,
+  })
+}
+
+/**
+ * 预约塾师目标面谈
+ * POST /api/users/confirm_reserve
+ */
+export const confirmReserveTalk = (data: {
+  shushi_id: number
+  planed_time: string
+  planed_duration: number
+}) => {
+  return requestWithRefresh({
+    url: '/api/users/confirm_reserve',
+    method: 'POST',
+    data,
+  })
+}
+
+/**
+ * 确认面谈安排
+ * POST /api/users/confirm_talk
+ */
+export const confirmTalk = (data: { id: number; confirmer: string }) => {
+  return requestWithRefresh({
+    url: '/api/users/confirm_talk',
+    method: 'POST',
+    data,
+  })
 }

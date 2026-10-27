@@ -48,10 +48,10 @@
     <view class="progress-section">
       <view class="progress-header">
         <text class="progress-label">目标进度</text>
-        <text class="progress-value">{{dateUtil.formatProgress(goal.process)}}%</text>
+        <text class="progress-value">{{dateUtil.getProgressPercent(goal.process)}}%</text>
       </view>
       <t-progress 
-        percentage="{{dateUtil.formatProgress(goal.process)}}" 
+        percentage="{{dateUtil.getProgressPercent(goal.process)}}" 
         color="#a0f"
         track-color="#E5E5E5"
         stroke-width="12rpx"

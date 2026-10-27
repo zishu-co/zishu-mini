@@ -1,4 +1,5 @@
 {
-  "component": true,
-  "styleIsolation": "apply-shared"
+  "navigationBarTitleText": "考试中心",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
 }

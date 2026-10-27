@@ -19,29 +19,41 @@ interface Message {
 
 interface AgentPageData {
   messages: Message[];
+  quickPrompts: string[];
+  lastMessageId: string;
   inputText: string;
   isLoading: boolean;
   isRecording: boolean;
   recordCancel: boolean;
   recordY: number;
+  scrollTop: number;
 }
 
 const recorder = new Recorder();
 const player = new Player();
 
-Page<AgentPageData, AgentPageData>({
+Page<AgentPageData, any>({
   data: {
     messages: [],
+    quickPrompts: [
+      '🤝 找共学搭子',
+      '🚢 怎么组2男2女方舟',
+      '🎯 制定本周目标',
+      '📚 推荐热门课程',
+      '🏆 去闯关答题',
+    ],
+    lastMessageId: '',
     inputText: '',
     isLoading: false,
     isRecording: false,
     recordCancel: false,
     recordY: 0,
+    scrollTop: 0,
   },
 
   onLoad() {
     // 欢迎语
-    this.addMessage('assistant', '你好！我是自塾 AI 助理。你可以打字或按住说话，我会尽力帮你。可以问我课程、目标、创新小组等问题，或者让我帮你跳转到不同页面。');
+    this.addMessage('assistant', '你好！我是自塾 AI 伴学教练 🤖✨\n你可以直接点下方快捷气泡，或输入想聊的目标、课程、2男2女方舟搭子匹配需求，我还能直接带你去对应页面！');
   },
 
   onUnload() {
@@ -51,16 +63,28 @@ Page<AgentPageData, AgentPageData>({
 
   // 添加消息
   addMessage(role: 'user' | 'assistant', content: string, audioUrl?: string) {
+    const msgId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const messages = this.data.messages.concat([{
-      id: Date.now().toString(),
+      id: msgId,
       role,
       content,
       time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
       audioUrl,
     }]);
-    this.setData({ messages, isLoading: false });
-    // 滚动到底
-    wx.pageScrollTo({ scrollTop: 99999, duration: 200 });
+    this.setData({
+      messages,
+      lastMessageId: msgId,
+      isLoading: role === 'assistant' ? false : this.data.isLoading,
+      scrollTop: messages.length * 1000,
+    });
+  },
+
+  onQuickPrompt(e: any) {
+    const text = e.currentTarget.dataset.prompt;
+    if (!text || this.data.isLoading) return;
+    this.setData({ inputText: text }, () => {
+      this.onSend();
+    });
   },
 
   // 打字发送
@@ -74,18 +98,20 @@ Page<AgentPageData, AgentPageData>({
     this.setData({ inputText: '', isLoading: true });
     this.addMessage('user', text);
 
-    // 解析 AI 指令
-    const command = parseCommand(text);
-    if (command) {
-      await executeCommand(command, this);
-    }
+    // 模拟真实思考延迟，确保加载指示器可见
+    await new Promise((resolve) => setTimeout(resolve, 350));
 
     // Mock AI 回复
     const reply = getMockReply(text);
     this.addMessage('assistant', reply.content);
 
-    // 模拟语音（文字转语音 Demo）
-    // 真实场景：接入 TTS API
+    // 解析并执行 AI 指令
+    const command = parseCommand(text) || reply.command;
+    if (command) {
+      setTimeout(() => {
+        executeCommand(command, this);
+      }, 650);
+    }
   },
 
   // ==================== 语音相关 ====================

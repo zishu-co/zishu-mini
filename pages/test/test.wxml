@@ -1,48 +1,132 @@
-<!--pages/test.wxml-->
-<view class="ptitle">{{papertitle}}</view>
-<view class="quizblock" wx:for="{{checkData}}" wx:key="quesid">
-  <checkbox-group wx:if="{{item.ques_type=='选择题'}}" id="{{index}}-cb" class="itemblock" bindchange="checkClick">
-      <view class="title">{{index+1}}. {{item.ques_title}}</view>
-      <view class="checkitem"><checkbox value='A'>{{item.item_a}}</checkbox></view>
-      <view class="checkitem"><checkbox value='B'>{{item.item_b}}</checkbox></view>
-      <view wx:if="{{item.item_c.length>1}}" class="checkitem"><checkbox value='C'>{{item.item_c}}</checkbox></view>
-      <view wx:if="{{item.item_d.length>1}}" class="checkitem"><checkbox value='D'>{{item.item_d}}</checkbox></view>
-      <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
-      <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
-      <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
-  </checkbox-group>
+<!--pages/test/test.wxml-->
+<view class="test-page">
+  <!-- 试卷头部横幅 -->
+  <view class="paper-hero">
+    <view class="ptitle">{{papertitle || '在线答题闯关'}}</view>
+    <view class="paper-meta">
+      <text wx:if="{{paperauthor}}">出题人：{{paperauthor}} · </text>
+      <text>共 {{checkData.length}} 题 · 已答 {{answeredCount}}/{{checkData.length}}</text>
+    </view>
+    <view class="progress-bar-track" wx:if="{{checkData.length > 0}}">
+      <view class="progress-bar-fill" style="width: {{progressPercent}}%;"></view>
+    </view>
+  </view>
 
-  <radio-group wx:if="{{item.ques_type=='判断题'}}" class="itemblock" id="{{index}}-r" bindchange="checkRadio">
-    <view class="title">{{index+1}}. {{item.ques_title}}</view>
-    <view class="checkitem">
-    <label><radio value="正确" />正确</label>
-    <label style="margin-left:50rpx;"><radio value="错误" />错误</label>
+  <!-- 成绩结算卡片（仅交卷后显示） -->
+  <view class="score-banner" wx:if="{{submitted}}">
+    <view class="score-banner__left">
+      <view class="score-banner__badge">{{rankBadge}}</view>
+      <view class="score-banner__title">答对 {{correctCount}} / {{checkData.length}} 题</view>
+      <view class="score-banner__actions">
+        <button class="score-mini-btn" bindtap="onRetryQuiz">🔄 再战一次</button>
+        <button class="score-mini-btn buddy" bindtap="onFindStudyBuddy">🤝 找同路搭子</button>
+      </view>
     </view>
-    <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
-    <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
-    <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
-  </radio-group>
+    <view class="score-banner__right">
+      <text class="score-banner__num">{{perform}}</text>
+      <text class="score-banner__unit">分</text>
+    </view>
+  </view>
 
-  <view wx:if="{{item.ques_type=='填空题'}}" class="itemblock">
-    <view class="title">{{index+1}}. {{item.ques_title}}</view>
-    <view class="checkitem" wx:if="{{item.item_a}}">
-        A:<input id="{{index}}-A" bindinput="checkSlot" class="slotinput" />
+  <!-- 题目列表 -->
+  <view class="quiz-list">
+    <view class="quizblock" wx:for="{{checkData}}" wx:key="quesid">
+      <!-- 题目头部：题号 + 题型徽章 -->
+      <view class="question-header">
+        <text class="question-index">第 {{index + 1}} 题</text>
+        <text class="type-badge {{item._badgeText === '多选题' ? 'badge-multi' : item._badgeText === '填空题' ? 'badge-slot' : 'badge-single'}}">{{item._badgeText || item.ques_type}}</text>
+      </view>
+      <view class="title">{{item.ques_title}}</view>
+
+      <!-- 选择题 -->
+      <checkbox-group
+        wx:if="{{item.ques_type == '选择题'}}"
+        id="{{index}}-cb"
+        class="itemblock"
+        bindchange="checkClick"
+      >
+        <label class="checkitem {{item._selA ? 'is-selected' : ''}}" wx:if="{{item.item_a}}">
+          <checkbox value="A" checked="{{item._selA}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-code">A.</text>
+          <text class="option-text">{{item.item_a}}</text>
+        </label>
+        <label class="checkitem {{item._selB ? 'is-selected' : ''}}" wx:if="{{item.item_b}}">
+          <checkbox value="B" checked="{{item._selB}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-code">B.</text>
+          <text class="option-text">{{item.item_b}}</text>
+        </label>
+        <label class="checkitem {{item._selC ? 'is-selected' : ''}}" wx:if="{{item.item_c}}">
+          <checkbox value="C" checked="{{item._selC}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-code">C.</text>
+          <text class="option-text">{{item.item_c}}</text>
+        </label>
+        <label class="checkitem {{item._selD ? 'is-selected' : ''}}" wx:if="{{item.item_d}}">
+          <checkbox value="D" checked="{{item._selD}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-code">D.</text>
+          <text class="option-text">{{item.item_d}}</text>
+        </label>
+      </checkbox-group>
+
+      <!-- 判断题 -->
+      <radio-group
+        wx:if="{{item.ques_type == '判断题'}}"
+        class="itemblock judge-group"
+        id="{{index}}-r"
+        bindchange="checkRadio"
+      >
+        <label class="checkitem judge-item {{item._selTrue ? 'is-selected' : ''}}">
+          <radio value="正确" checked="{{item._selTrue}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-text">正确</text>
+        </label>
+        <label class="checkitem judge-item {{item._selFalse ? 'is-selected' : ''}}">
+          <radio value="错误" checked="{{item._selFalse}}" color="#aa00ff" disabled="{{submitted}}" />
+          <text class="option-text">错误</text>
+        </label>
+      </radio-group>
+
+      <!-- 填空题 -->
+      <view wx:if="{{item.ques_type == '填空题'}}" class="itemblock">
+        <view class="slot-row" wx:if="{{item.item_a}}">
+          <text class="slot-label">空 A</text>
+          <input id="{{index}}-A" bindinput="checkSlot" disabled="{{submitted}}" placeholder="请输入答案" class="slotinput" />
+        </view>
+        <view class="slot-row" wx:if="{{item.item_b}}">
+          <text class="slot-label">空 B</text>
+          <input id="{{index}}-B" bindinput="checkSlot" disabled="{{submitted}}" placeholder="请输入答案" class="slotinput" />
+        </view>
+        <view class="slot-row" wx:if="{{item.item_c}}">
+          <text class="slot-label">空 C</text>
+          <input id="{{index}}-C" bindinput="checkSlot" disabled="{{submitted}}" placeholder="请输入答案" class="slotinput" />
+        </view>
+        <view class="slot-row" wx:if="{{item.item_d}}">
+          <text class="slot-label">空 D</text>
+          <input id="{{index}}-D" bindinput="checkSlot" disabled="{{submitted}}" placeholder="请输入答案" class="slotinput" />
+        </view>
+      </view>
+
+      <!-- 判题反馈（严格受 submitted 控制，提交前绝不泄露答案） -->
+      <view class="feedback-box {{item.check ? 'is-correct' : 'is-wrong'}}" wx:if="{{submitted}}">
+        <view class="checkresult" wx:if="{{item.check}}">✓ 恭喜你答对啦！</view>
+        <view class="checkresult wrong" wx:else>✕ 回答错误</view>
+        <view class="answer-line">正确答案：<text class="answer-val">{{item.answer}}</text></view>
+        <view class="explain-line" wx:if="{{item.explain}}">解析：{{item.explain}}</view>
+      </view>
     </view>
-    <view class="checkitem" wx:if="{{item.item_b}}">
-        B:<input id="{{index}}-B" bindinput="checkSlot" class="slotinput" />
+  </view>
+
+  <view class="bottomblock"></view>
+
+  <!-- 底部吸底提交栏 -->
+  <view class="sticky-footer">
+    <button
+      wx:if="{{!submitted}}"
+      class="submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting || checkData.length === 0}}"
+      bindtap="onSubmit"
+    >{{submitting ? '正在交卷...' : '提交试卷'}}</button>
+    <view class="submitted-summary" wx:else>
+      <text class="submitted-summary__text">已完成交卷 · 总分 {{perform}} 分</text>
     </view>
-    <view class="checkitem" wx:if="{{item.item_c}}">
-        C:<input id="{{index}}-C" bindinput="checkSlot" class="slotinput" />
-    </view>
-    <view class="checkitem" wx:if="{{item.item_d}}">
-        D:<input id="{{index}}-D" bindinput="checkSlot" class="slotinput" />
-    </view>
-    <view class="checkresult" hidden="{{!item.check}}">恭喜你答对啦！</view>
-    <view hidden="{{!item.submitted}}">正确答案是：{{item.answer}}</view>
-    <view hidden="{{!item.submitted}}">解析：{{item.explain}}</view>
   </view>
 </view>
-<button type="primary" hidden="{{showrst}}" class="submit" bindtap="onSubmit">提交</button>
-<view hidden="{{!showrst}}" class="result">{{papertitle}}</view>
-<view hidden="{{!showrst}}" class="result">您的总分是{{perform}}分</view>
-<view class="bottomblock"></view>

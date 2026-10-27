@@ -199,6 +199,55 @@
   display: inline-block;
 }
 
+/* ===== 三会排期展示 ===== */
+.meetings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.meeting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: #faf7ff;
+  border-radius: 12rpx;
+  border: 1rpx solid rgba(170, 0, 255, 0.12);
+}
+
+.meeting-badge {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #aa00ff;
+  background: rgba(170, 0, 255, 0.1);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+
+.meeting-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.meeting-link {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1a1a2e;
+  word-break: break-all;
+}
+
+.meeting-time {
+  font-size: 22rpx;
+  color: #888;
+}
+
 /* ===== 操作区 ===== */
 .actions {
   display: flex;

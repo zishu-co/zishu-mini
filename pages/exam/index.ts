@@ -12,9 +12,6 @@ Page({
   onLoad() {},
 
   onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().init();
-    }
     this.fetchPapers();
   },
 
@@ -32,12 +29,13 @@ Page({
         // showtest 返回数组，admin/审核者可见全部试卷
         // 普通用户用 fetchpapers（需要筛选 reviewed=5）
         this.setData({
-          papers: res.data || [],
+          papers: Array.isArray(res.data) ? res.data : [],
           loading: false,
         });
       },
       fail: () => {
         this.setData({ loading: false });
+        wx.showToast({ title: '加载试卷失败', icon: 'none' });
       },
     });
   },

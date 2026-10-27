@@ -1,13 +1,48 @@
 <wxs module="fmt">
 function dateOnly(s) {
   if (!s) return '';
+  if (typeof s === 'string' && s.length >= 10) {
+    return s.substring(0, 10);
+  }
   var d = getDate(s);
   var y = d.getFullYear();
   var m = d.getMonth() + 1;
   var day = d.getDate();
+  if (isNaN(y)) return s;
   return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
 }
-module.exports = { dateOnly: dateOnly };
+
+function deadlineClass(s) {
+  if (!s) return '';
+  var d = getDate(s);
+  var ts = d.getTime();
+  if (isNaN(ts)) {
+    var norm = ('' + s).replace(getRegExp('-', 'g'), '/');
+    ts = getDate(norm).getTime();
+  }
+  if (isNaN(ts)) return 'deadline-red';
+  var now = getDate().getTime();
+  var diffDays = (ts - now) / (1000 * 60 * 60 * 24);
+  if (diffDays < 0 && diffDays > -30) return 'deadline-brand';
+  if (diffDays < -30) return 'deadline-red';
+  if (diffDays <= 1) return 'deadline-orange';
+  if (diffDays <= 3) return 'deadline-blue';
+  return '';
+}
+
+function includes(arr, id) {
+  if (!arr || !arr.length) return false;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] === id) return true;
+  }
+  return false;
+}
+
+module.exports = {
+  dateOnly: dateOnly,
+  deadlineClass: deadlineClass,
+  includes: includes
+};
 </wxs>
 
 <view class="page">
@@ -41,6 +76,12 @@ module.exports = { dateOnly: dateOnly };
     <text>加载中...</text>
   </view>
 
+  <!-- 加载失败状态 -->
+  <view class="error-state" wx:if="{{!loading && loadError}}">
+    <text class="error-text">{{loadError}}</text>
+    <view class="retry-btn" bindtap="loadData">重新加载</view>
+  </view>
+
   <!-- 我的选课 -->
   <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
     <view class="section-header">
@@ -54,7 +95,7 @@ module.exports = { dateOnly: dateOnly };
             <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
           </view>
           <view class="course-meta">
-            <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
+            <text class="deadline {{item.deadlineClass || fmt.deadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
           </view>
         </view>
         <view class="course-actions">
@@ -71,12 +112,12 @@ module.exports = { dateOnly: dateOnly };
   </view>
 
   <!-- 全部课程 -->
-  <view class="section" wx:if="{{!loading}}">
+  <view class="section" wx:if="{{!loading && !loadError}}">
     <view class="section-header">
       <text class="section-title">全部课程</text>
       <text class="section-tip">最多选3门课</text>
     </view>
-    <view class="course-item {{selectedIds.includes(item.id) ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
+    <view class="course-item {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
       <view class="course-item-left" data-id="{{item.id}}" data-title="{{item.title}}" bindtap="onCourseItemTap">
         <view class="course-item-name">{{item.title}}</view>
         <view class="course-item-meta">
@@ -86,19 +127,19 @@ module.exports = { dateOnly: dateOnly };
       </view>
       <view class="course-item-right">
         <view
-          class="select-btn {{selectedIds.includes(item.id) ? 'selected' : ''}}"
+          class="select-btn {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? 'selected' : ''}}"
           data-id="{{item.id}}"
           data-title="{{item.title}}"
           bindtap="onSelectCourse"
         >
-          {{selectedIds.includes(item.id) ? '退选' : '选课'}}
+          {{(item.isSelected || fmt.includes(selectedIds, item.id)) ? '退选' : '选课'}}
         </view>
       </view>
     </view>
   </view>
 
   <!-- 空状态 -->
-  <view class="empty" wx:if="{{!loading && allCourses.length == 0}}">
+  <view class="empty" wx:if="{{!loading && !loadError && allCourses.length == 0}}">
     <text>暂无课程</text>
   </view>
 

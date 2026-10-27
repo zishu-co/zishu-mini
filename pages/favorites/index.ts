@@ -34,8 +34,9 @@ Page({
   },
 
   switchFolder(e: any) {
-    const index = e.currentTarget.dataset.index
+    const index = Number(e.currentTarget.dataset.index)
     const folder = this.data.folders[index]
+    if (!folder) return
     this.setData({ activeIndex: index, loading: true })
     this.fetchItems(folder.folderid)
   },
@@ -43,17 +44,38 @@ Page({
   fetchItems(folderId: string) {
     fetchFavor(folderId)
       .then((res: any) => {
-        let items = []
+        let rawItems: any[] = []
         if (typeof res === 'string') {
-          try { items = JSON.parse(res) } catch { items = res }
+          try {
+            const parsed = JSON.parse(res)
+            rawItems = Array.isArray(parsed) ? parsed : []
+          } catch {
+            rawItems = []
+          }
         } else if (Array.isArray(res)) {
-          items = res
+          rawItems = res
         }
+        const items = rawItems.map((item: any) => ({
+          ...item,
+          _typeIcon: this.typeIcon(item.target_type),
+        }))
         this.setData({ items, loading: false })
       })
       .catch(() => {
         this.setData({ items: [], loading: false })
       })
+  },
+
+  onItemTap(e: any) {
+    const { type, targetid } = e.currentTarget.dataset
+    if (!targetid) return
+    if (type === '课程' || type === '合集' || type === '视频') {
+      wx.navigateTo({ url: `/pages/course-detail/index?id=${targetid}` })
+    } else if (type === '文章') {
+      wx.navigateTo({ url: `/pages/article/index?id=${targetid}` })
+    } else if (type === '试卷') {
+      wx.navigateTo({ url: `/pages/test/test?testid=${targetid}` })
+    }
   },
 
   deleteItem(e: any) {
@@ -90,6 +112,7 @@ Page({
 
   typeIcon(type: string): string {
     const map: Record<string, string> = {
+      '课程': '📚',
       '试卷': '📝',
       '合集': '🎬',
       '视频': '🎥',

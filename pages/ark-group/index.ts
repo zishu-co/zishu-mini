@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * pages/ark-group/index.ts
- * 组方舟页面：列方舟 / 加入 / 创建
+ * 组方舟页面：2男2女黄金共学搭子舱 · 列方舟 / 加入 / 创建
  * spec: specs/miniprogram/active/003-complete-ark-group.md
  */
 import {
@@ -23,6 +23,7 @@ interface IPageData {
   currentGender: string | null;
   joiningArkId: number | null;
   creating: boolean;
+  submitting: boolean;
 }
 
 Page<IPageData, IPageData>({
@@ -35,6 +36,7 @@ Page<IPageData, IPageData>({
     currentGender: null,
     joiningArkId: null,
     creating: false,
+    submitting: false,
   },
 
   onLoad(options: any) {
@@ -48,48 +50,71 @@ Page<IPageData, IPageData>({
     }
   },
 
+  onPullDownRefresh() {
+    this.loadData().then(() => wx.stopPullDownRefresh());
+  },
+
   loadUserInfo() {
     const userInfo = app.globalData?.userInfo || wx.getStorageSync('userInfo') || {};
     this.setData({
-      currentUserId: userInfo.userId || 0,
+      currentUserId: Number(userInfo.userId || userInfo.id || wx.getStorageSync('userId') || 0),
       currentGender: userInfo.gender || null,
     });
   },
 
   async loadData() {
     this.setData({ loading: true });
+    let rawList: TeacherArkItem[] = [];
+    let myArkId: number | null = this.data.myArkId;
+
     try {
-      const list = await arkListByTeacher(this.data.courseId);
-      const safeList = Array.isArray(list) ? list : [];
-      this.setData({ arkList: safeList });
+      const [listRes, myRes] = await Promise.all([
+        arkListByTeacher(this.data.courseId).catch(() => []),
+        arkMy().catch(() => null),
+      ]);
+      rawList = Array.isArray(listRes) ? listRes : [];
+      myArkId = myRes && myRes.ark_id ? Number(myRes.ark_id) : null;
     } catch (e) {
       console.error('[ark-group] loadData error:', e);
       wx.showToast({ title: '加载失败', icon: 'none' });
-    } finally {
-      this.setData({ loading: false });
     }
 
-    // 拉我已加入的方舟
-    try {
-      const my: any = await arkMy();
-      if (my && my.ark_id) {
-        this.setData({ myArkId: my.ark_id });
-      } else {
-        this.setData({ myArkId: null });
-      }
-    } catch (e) {
-      // 404 = 不在任何方舟中，正常情况
-      this.setData({ myArkId: null });
-    }
+    const decorated = this.decorateArkList(rawList, myArkId);
+    this.setData({
+      arkList: decorated,
+      myArkId,
+      loading: false,
+    });
   },
 
-  /** 是否能加入该方舟（按性别） */
+  decorateArkList(list: TeacherArkItem[], myArkId: number | null) {
+    return (list || []).map((ark: any) => {
+      const members = Array.isArray(ark.members)
+        ? ark.members.map((m: any) => ({
+            ...m,
+            _genderClass: this.genderClass(m.gender),
+          }))
+        : [];
+      const isMyArk = !!ark.ark_id && Number(ark.ark_id) === Number(myArkId);
+      return {
+        ...ark,
+        members,
+        _isMyArk: isMyArk,
+        _canJoin: !isMyArk && this.canJoin(ark),
+        _statusText: this.statusText(ark),
+        _statusClass: this.statusClass(ark),
+      };
+    });
+  },
+
+  /** 是否能加入该方舟（2男2女黄金配比校验） */
   canJoin(ark: TeacherArkItem): boolean {
     if (!ark.ark_id || ark.closed || ark.finished) return false;
     const g = this.data.currentGender;
-    if (g === '男') return ark.male_count < 2;
-    if (g === '女') return ark.female_count < 2;
-    return false;
+    if (g === '男') return (ark.male_count || 0) < 2;
+    if (g === '女') return (ark.female_count || 0) < 2;
+    // 未设置性别时允许点击并在服务端提示完善性别或按余量判断
+    return (ark.male_count || 0) + (ark.female_count || 0) < 4;
   },
 
   /** 是否已加入该方舟 */
@@ -98,16 +123,17 @@ Page<IPageData, IPageData>({
   },
 
   async onJoinArk(e: any) {
+    if (this.data.submitting) return;
     const arkId = e.currentTarget.dataset.arkid;
     if (!arkId) {
       wx.showToast({ title: '该塾师尚未创建方舟', icon: 'none' });
       return;
     }
-    this.setData({ joiningArkId: arkId });
+    this.setData({ joiningArkId: arkId, submitting: true });
     try {
       const res: any = await arkJoin(arkId);
       if (res?.code === 200) {
-        wx.showToast({ title: '加入成功！', icon: 'success' });
+        wx.showToast({ title: '🎉 登船成功！快认识新搭子吧', icon: 'success' });
         this.setData({ myArkId: arkId });
         await this.loadData();
       } else {
@@ -117,18 +143,19 @@ Page<IPageData, IPageData>({
       console.error('[ark-group] join error:', err);
       wx.showToast({ title: err?.message || '加入失败', icon: 'none' });
     } finally {
-      this.setData({ joiningArkId: null });
+      this.setData({ joiningArkId: null, submitting: false });
     }
   },
 
   async onCreateArk(e: any) {
+    if (this.data.submitting) return;
     const teacherId = e.currentTarget.dataset.teacherid;
     if (this.data.currentUserId !== teacherId) return;
-    this.setData({ creating: true });
+    this.setData({ creating: true, submitting: true });
     try {
       const res: any = await arkCreate(this.data.courseId);
       if (res?.code === 200) {
-        wx.showToast({ title: '方舟创建成功！', icon: 'success' });
+        wx.showToast({ title: '🚢 方舟创建成功！', icon: 'success' });
         await this.loadData();
       } else {
         wx.showToast({ title: res?.message || '创建失败', icon: 'none' });
@@ -137,7 +164,7 @@ Page<IPageData, IPageData>({
       console.error('[ark-group] create error:', err);
       wx.showToast({ title: err?.message || '创建失败', icon: 'none' });
     } finally {
-      this.setData({ creating: false });
+      this.setData({ creating: false, submitting: false });
     }
   },
 
@@ -157,12 +184,12 @@ Page<IPageData, IPageData>({
   statusText(ark: TeacherArkItem): string {
     if (ark.finished) return '已成舟';
     if (ark.closed) return '已关闭';
-    if (ark.stage === '筹建中') return '筹建中';
-    return ark.stage || '筹建中';
+    if (ark.stage === '筹建中') return '招募搭子中';
+    return ark.stage || '招募搭子中';
   },
 
   statusClass(ark: TeacherArkItem): string {
-    if (ark.finished) return 'badge-success';
+    if (ark.finished || ark.stage === '已成舟') return 'badge-success';
     return 'badge-waiting';
   },
 });

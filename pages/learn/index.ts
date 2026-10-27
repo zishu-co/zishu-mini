@@ -18,10 +18,11 @@ import {
 const app = getApp();
 
 interface ILearnPageData {
-  myCourses: CurrentSelection[];
-  allCourses: Course[];
+  myCourses: (CurrentSelection & { deadlineClass?: string })[];
+  allCourses: (Course & { isSelected?: boolean })[];
   selectedIds: number[];
   loading: boolean;
+  loadError: string;
   hasLogin: boolean;
   showMentorModal: boolean;
   mentorList: Mentor[];
@@ -29,6 +30,9 @@ interface ILearnPageData {
   showReportModal: boolean;
   reportCourse: CurrentSelection | null;
   reportHour: string;
+  submittingMentor: boolean;
+  submittingReport: boolean;
+  selectingCourseId: number;
 }
 
 Page<ILearnPageData, ILearnPageData>({
@@ -37,6 +41,7 @@ Page<ILearnPageData, ILearnPageData>({
     allCourses: [],
     selectedIds: [],
     loading: true,
+    loadError: '',
     hasLogin: false,
     showMentorModal: false,
     mentorList: [],
@@ -44,12 +49,15 @@ Page<ILearnPageData, ILearnPageData>({
     showReportModal: false,
     reportCourse: null,
     reportHour: '',
+    submittingMentor: false,
+    submittingReport: false,
+    selectingCourseId: 0,
   },
 
   onLoad() {},
 
   onShow() {
-    if (typeof this.getTabBar === 'function') {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
     this.checkLoginAndLoad();
@@ -60,6 +68,18 @@ Page<ILearnPageData, ILearnPageData>({
     setTimeout(() => wx.stopPullDownRefresh(), 500);
   },
 
+  getUserId() {
+    const storedUserInfo = wx.getStorageSync('userInfo') || {};
+    return (
+      app?.globalData?.userInfo?.userId ||
+      app?.globalData?.userId ||
+      storedUserInfo?.userId ||
+      storedUserInfo?.id ||
+      wx.getStorageSync('userId') ||
+      null
+    );
+  },
+
   checkLoginAndLoad() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
     this.setData({ hasLogin: !!token });
@@ -67,7 +87,7 @@ Page<ILearnPageData, ILearnPageData>({
   },
 
   async loadData() {
-    this.setData({ loading: true });
+    this.setData({ loading: true, loadError: '' });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
     if (!token) {
       this.setData({ loading: false });
@@ -82,30 +102,45 @@ Page<ILearnPageData, ILearnPageData>({
       const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
       const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
       const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
+      const decoratedMyCourses = safeMyCourses.map((c: CurrentSelection) => ({
+        ...c,
+        deadlineClass: this.getDeadlineClass(c.deadline),
+      }));
+      const decoratedAllCourses = safeAllCourses.map((c: Course) => ({
+        ...c,
+        isSelected: selectedIds.includes(c.id),
+      }));
       this.setData({
-        myCourses: safeMyCourses,
-        allCourses: safeAllCourses,
+        myCourses: decoratedMyCourses,
+        allCourses: decoratedAllCourses,
         selectedIds,
         loading: false,
+        loadError: '',
       });
     } catch (e: any) {
       console.error('加载数据失败', e);
       if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
         wx.removeStorageSync('accessToken');
         wx.removeStorageSync('refreshToken');
-        this.setData({ hasLogin: false, loading: false });
+        this.setData({ hasLogin: false, loading: false, loadError: '' });
         wx.showToast({ title: '请先登录', icon: 'none' });
         setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
         return;
       }
-      this.setData({ loading: false });
+      this.setData({
+        loading: false,
+        loadError: '加载课程数据失败，请点击重试',
+      });
+      wx.showToast({ title: '加载课程失败，请重试', icon: 'none' });
     }
   },
 
   async onSelectCourse(e: any) {
     const courseId = e.currentTarget.dataset.id;
+    if (!courseId || this.data.selectingCourseId === courseId) return;
+
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const userId = app.globalData.userInfo?.userId;
+    const userId = this.getUserId();
 
     if (!token || userId == null) {
       wx.showToast({ title: '请先登录', icon: 'none' });
@@ -115,6 +150,7 @@ Page<ILearnPageData, ILearnPageData>({
 
     const isSelected = this.data.selectedIds.includes(courseId);
     if (isSelected) {
+      this.setData({ selectingCourseId: courseId });
       try {
         wx.showLoading({ title: '退选处理中...', mask: true });
         await quitCourse(userId, courseId, '主动退选');
@@ -124,12 +160,15 @@ Page<ILearnPageData, ILearnPageData>({
       } catch (e) {
         wx.hideLoading();
         wx.showToast({ title: '退选失败', icon: 'none' });
+      } finally {
+        this.setData({ selectingCourseId: 0 });
       }
     } else {
       if (this.data.selectedIds.length >= 3) {
         wx.showToast({ title: '最多选3门课', icon: 'none' });
         return;
       }
+      this.setData({ selectingCourseId: courseId });
       try {
         wx.showLoading({ title: '选课中...', mask: true });
         await selectCourse(userId, courseId);
@@ -139,11 +178,14 @@ Page<ILearnPageData, ILearnPageData>({
       } catch (e) {
         wx.hideLoading();
         wx.showToast({ title: '选课失败', icon: 'none' });
+      } finally {
+        this.setData({ selectingCourseId: 0 });
       }
     }
   },
 
   async onSelectMentor(e: any) {
+    if (this.data.submittingMentor) return;
     const courseId = e.currentTarget.dataset.courseid;
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     if (!token) {
@@ -151,6 +193,7 @@ Page<ILearnPageData, ILearnPageData>({
       return;
     }
 
+    this.setData({ submittingMentor: true });
     try {
       const res = await calMentors(courseId);
       const mentors: Mentor[] = [];
@@ -173,14 +216,18 @@ Page<ILearnPageData, ILearnPageData>({
       });
     } catch (e) {
       wx.showToast({ title: '加载失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingMentor: false });
     }
   },
 
   async onConfirmMentor(e: any) {
+    if (this.data.submittingMentor) return;
     const shushiId = e.currentTarget.dataset.shushiid;
     const shushiName = e.currentTarget.dataset.shushiname;
     const courseId = this.data.currentMentorCourseId;
 
+    this.setData({ submittingMentor: true });
     try {
       await selectMentor(shushiId, courseId);
       wx.showToast({ title: '已选择' + shushiName, icon: 'success' });
@@ -188,6 +235,8 @@ Page<ILearnPageData, ILearnPageData>({
       this.loadData();
     } catch (e) {
       wx.showToast({ title: '选择失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingMentor: false });
     }
   },
 
@@ -221,6 +270,7 @@ Page<ILearnPageData, ILearnPageData>({
   },
 
   async onConfirmReport() {
+    if (this.data.submittingReport) return;
     const { reportCourse, reportHour } = this.data;
     if (!reportCourse) return;
 
@@ -234,12 +284,13 @@ Page<ILearnPageData, ILearnPageData>({
       return;
     }
 
-    const userId = app.globalData.userInfo?.userId;
+    const userId = this.getUserId();
     if (userId == null) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
 
+    this.setData({ submittingReport: true });
     try {
       await reportLearn(
         reportCourse.chapter_id,
@@ -253,6 +304,8 @@ Page<ILearnPageData, ILearnPageData>({
       this.loadData();
     } catch (e: any) {
       wx.showToast({ title: e?.message || '申报失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingReport: false });
     }
   },
 

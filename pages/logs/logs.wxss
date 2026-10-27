@@ -1,8 +1,22 @@
+page {
+  background-color: #f6f7fb;
+}
+
 .log-list {
   display: flex;
   flex-direction: column;
-  padding: 40rpx;
+  padding: 24rpx 32rpx;
+  align-items: stretch;
+  box-sizing: border-box;
 }
+
 .log-item {
-  margin: 10rpx;
+  margin: 0 0 16rpx 0;
+  padding: 24rpx 28rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #334155;
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.05);
+  border-left: 6rpx solid #7c3aed;
 }

@@ -1,4 +1,58 @@
-<wxml>
+<wxs module="recFmt">
+function getTypeIcon(type) {
+  if (type === 'COURSE_URGENT') return 'book-open';
+  if (type === 'COURSE_POPULAR') return 'book';
+  if (type === 'TASK_CLAIM') return 'task';
+  if (type === 'GOAL_TALK') return 'chat';
+  if (type === 'REPORT_TIME') return 'document';
+  if (type === 'PROFILE_COMPLETE') return 'user';
+  if (type === 'EXAM_PUBLISH') return 'edit';
+  if (type === 'COURSE_PUBLISH') return 'video';
+  return 'list';
+}
+
+function getTypeIconClass(type) {
+  if (type === 'COURSE_URGENT' || type === 'COURSE_POPULAR') return 'course-icon';
+  if (type === 'TASK_CLAIM') return 'task-icon';
+  if (type === 'GOAL_TALK') return 'goal-icon';
+  if (type === 'REPORT_TIME') return 'report-icon';
+  if (type === 'PROFILE_COMPLETE') return 'profile-icon';
+  return 'default-icon';
+}
+
+function getUrgencyText(level) {
+  if (level === 'critical') return '紧急';
+  if (level === 'high') return '高';
+  if (level === 'medium') return '中';
+  return '低';
+}
+
+function formatDeadline(deadline) {
+  if (!deadline) return '';
+  var date = getDate(deadline);
+  var ts = date.getTime();
+  if (isNaN(ts)) {
+    var norm = ('' + deadline).replace(getRegExp('-', 'g'), '/');
+    ts = getDate(norm).getTime();
+  }
+  if (isNaN(ts)) return deadline;
+  var now = getDate().getTime();
+  var diffMs = ts - now;
+  var diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return '今天截止';
+  if (diffDays === 1) return '明天截止';
+  if (diffDays > 0) return diffDays + '天后截止';
+  return '已逾期';
+}
+
+module.exports = {
+  getTypeIcon: getTypeIcon,
+  getTypeIconClass: getTypeIconClass,
+  getUrgencyText: getUrgencyText,
+  formatDeadline: formatDeadline
+};
+</wxs>
+
 <view class="recommendation-card">
   <!-- 卡片头部 -->
   <view class="card-header">
@@ -34,9 +88,9 @@
       <view class="item-index">
         <text class="index-number" style="background: #a0f; color: #fff;">{{index + 1}}</text>
         <t-icon 
-          name="{{getTypeIcon(item.type)}}" 
+          name="{{recFmt.getTypeIcon(item.type)}}" 
           size="32rpx" 
-          class="type-icon {{getTypeIconClass(item.type)}}"
+          class="type-icon {{recFmt.getTypeIconClass(item.type)}}"
           color="#a0f"
         />
       </view>
@@ -46,7 +100,7 @@
         <view class="item-header">
           <text class="item-title">{{item.title}}</text>
           <view class="urgency-tag urgency-{{item.urgency_level}}">
-            {{getUrgencyText(item.urgency_level)}}
+            {{recFmt.getUrgencyText(item.urgency_level)}}
           </view>
         </view>
 
@@ -59,7 +113,7 @@
           </view>
           <view wx:if="{{item.deadline}}" class="meta-item">
             <t-icon name="calendar" size="24rpx" />
-            <text>{{formatDeadline(item.deadline)}}</text>
+            <text>{{recFmt.formatDeadline(item.deadline)}}</text>
           </view>
           <view class="meta-item score">
             <t-icon name="chart" size="24rpx" />
@@ -99,4 +153,3 @@
     <text>更新于 {{lastUpdated}}</text>
   </view>
 </view>
-</wxml>
