@@ -105,6 +105,14 @@ Page<IPageData, IPageData>({
       .finally(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    const title = this.data.courseDetail?.course_title || '自塾精品共学课程';
+    return {
+      title: `📚 邀你一起修习《${title}》· 组2男2女方舟结伴通关！`,
+      path: `/pages/course-detail/index?id=${this.courseId}`,
+    };
+  },
+
   onTabChange(e: any) {
     const tab = e.currentTarget.dataset.tab as 'chapters' | 'current' | 'finish';
     if (tab && tab !== this.data.activeTab) {

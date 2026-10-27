@@ -83,6 +83,13 @@ Page<IPageData, IPageData>({
     this.loadData().then(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    return {
+      title: '🚢 2男2女诺亚方舟共学搭子舱 · 黄金4人组队，一起闯关结课！',
+      path: `/pages/ark-group/index?courseId=${this.data.courseId}`,
+    };
+  },
+
   loadUserInfo() {
     const userInfo = app.globalData?.userInfo || wx.getStorageSync('userInfo') || {};
     this.setData({

@@ -1,10 +1,21 @@
 <!--logs.wxml-->
 <view class="logs-page">
   <view class="brand-header">
-    <text class="brand-title">启动与运行日志</text>
-    <text class="brand-sub">记录共 {{logs.length}} 条本地访问轨迹</text>
+    <view class="brand-header-top">
+      <view>
+        <text class="brand-title">启动与运行日志</text>
+        <text class="brand-sub">记录共 {{logs.length}} 条本地访问轨迹 · 最近：{{latestDate}}</text>
+      </view>
+    </view>
+    <view class="log-actions" wx:if="{{logs.length > 0}}">
+      <view class="log-action-btn" bindtap="onCopyLogs">📋 复制诊断</view>
+      <view class="log-action-btn danger" bindtap="onClearLogs">🗑️ 清空记录</view>
+    </view>
   </view>
   <view class="container log-list">
+    <view wx:if="{{logs.length === 0}}" class="empty-logs zs-card">
+      <text class="empty-logs-text">✨ 本地运行日志已清空或暂无记录</text>
+    </view>
     <block wx:for="{{logs}}" wx:key="timeStamp" wx:for-item="log">
       <view class="log-item zs-card">
         <text class="log-seq">#{{index + 1}}</text>

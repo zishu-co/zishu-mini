@@ -1,4 +1,19 @@
 <view class="agent-page">
+  <!-- 顶部 AI 伴学教练状态栏 -->
+  <view class="agent-topbar">
+    <view class="agent-topbar-left">
+      <view class="agent-topbar-avatar">🤖</view>
+      <view class="agent-topbar-info">
+        <view class="agent-topbar-title">自塾 AI 伴学教练</view>
+        <view class="agent-topbar-status">
+          <text class="status-dot">●</text>
+          <text>24h 智能目标规划 · 搭子匹配 · 语音领航</text>
+        </view>
+      </view>
+    </view>
+    <view class="agent-clear-btn" bindtap="onClearChat">🗑️ 重置</view>
+  </view>
+
   <!-- 消息列表 -->
   <scroll-view
     class="message-list"
@@ -15,9 +30,25 @@
     >
       <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">🤖</view>
       <view wx:else class="avatar user-avatar">👤</view>
-      <view class="message-bubble {{item.role}}">
-        <text class="message-text">{{item.content}}</text>
-        <text wx:if="{{item.time}}" class="message-time">{{item.time}}</text>
+      <view
+        class="message-bubble {{item.role}}"
+        bindtap="onCopyMessage"
+        data-content="{{item.content}}"
+      >
+        <text class="message-text" user-select="true">{{item.content}}</text>
+        <view
+          wx:if="{{item.actionLabel && item.actionUrl}}"
+          class="bubble-action-btn"
+          catchtap="onBubbleAction"
+          data-url="{{item.actionUrl}}"
+          data-istab="{{item.actionIsTab}}"
+        >
+          <text>{{item.actionLabel}} ›</text>
+        </view>
+        <view class="message-meta-row">
+          <text wx:if="{{item.role === 'assistant'}}" class="copy-hint">点按复制</text>
+          <text wx:if="{{item.time}}" class="message-time">{{item.time}}</text>
+        </view>
       </view>
     </view>
 

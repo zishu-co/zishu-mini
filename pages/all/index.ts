@@ -63,6 +63,13 @@ Page({
     this.fetchMembers().finally(() => wx.stopPullDownRefresh())
   },
 
+  onShareAppMessage() {
+    return {
+      title: `🤝 全塾同路人交友广场 · ${this.data.totalCount || ''}位学友在线寻搭子共学！`,
+      path: '/pages/all/index',
+    }
+  },
+
   fetchMembers() {
     this.setData({ loading: true })
     return get('/api/users/fetch_all_users')

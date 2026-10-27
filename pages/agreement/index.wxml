@@ -91,10 +91,16 @@
       <view class="section-content">
         如您对本协议有任何疑问，请通过以下方式联系我们：
       </view>
-      <view class="section-content">
-        邮箱：service@zishu.co
+      <view class="section-content email-row" bindtap="onCopyEmail">
+        <text>邮箱：{{contactEmail}}</text>
+        <text class="copy-tag">点击复制</text>
       </view>
     </view>
+  </view>
+
+  <view class="policy-footer">
+    <button class="policy-btn ghost" bindtap="onCopyEmail">📋 复制客服邮箱</button>
+    <button class="policy-btn primary" bindtap="onConfirmBack">✓ 我已阅读并知晓</button>
   </view>
 
   <view class="bottom-safe"></view>

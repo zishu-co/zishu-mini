@@ -119,6 +119,14 @@ Page<IReportDetailPageData, any>({
     this.fetchDetail(pperformid, paperid);
   },
 
+  onShareAppMessage() {
+    const title = this.data.papertitle || '自塾闯关试卷';
+    return {
+      title: `🏆 我在《${title}》取得了 ${this.data.test_score}/${this.data.full_score} 分（${this.data.scorePercent}%），快来挑战！`,
+      path: `/pages/test/test?testid=${this.data.paperid}`,
+    };
+  },
+
   applyQuestionFilter(questions: QuestionItem[], mode: string) {
     if (mode === 'wrong') {
       return questions.filter((q: QuestionItem) => !q.is_correct);

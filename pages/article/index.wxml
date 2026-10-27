@@ -57,6 +57,7 @@
       </view>
       <view class="article-meta">
         <text class="author">{{item.author_name || '自塾作者'}}</text>
+        <text class="read-badge" wx:if="{{item._readMins}}">约 {{item._readMins}} 分钟阅读 · {{item._wordCount}} 字</text>
         <text class="date" wx:if="{{item.create_time}}">{{item.create_time}}</text>
       </view>
       <view class="article-preview">{{item._preview || item.fulltext}}</view>
@@ -73,7 +74,26 @@
   <view class="reader-mask" wx:if="{{showReaderModal}}" bindtap="closeArticleModal">
     <view class="reader-sheet" catchtap="stopReaderBubble">
       <view class="reader-topbar">
-        <view class="reader-badge">专栏阅读</view>
+        <view class="reader-topbar-left">
+          <view class="reader-badge">专栏阅读</view>
+          <view class="font-size-switch">
+            <text
+              class="font-btn {{readerFontSize === 'sm' ? 'active' : ''}}"
+              data-size="sm"
+              bindtap="onSetFontSize"
+            >A-</text>
+            <text
+              class="font-btn {{readerFontSize === 'md' ? 'active' : ''}}"
+              data-size="md"
+              bindtap="onSetFontSize"
+            >标准</text>
+            <text
+              class="font-btn {{readerFontSize === 'lg' ? 'active' : ''}}"
+              data-size="lg"
+              bindtap="onSetFontSize"
+            >A+</text>
+          </view>
+        </view>
         <view class="reader-close" bindtap="closeArticleModal">✕</view>
       </view>
 
@@ -86,18 +106,20 @@
         <view class="reader-meta">
           <text class="reader-author">{{currentArticle.author_name}}</text>
           <text class="reader-dept" wx:if="{{currentArticle.bumen}}">{{currentArticle.bumen}}</text>
+          <text class="reader-dept" wx:if="{{currentArticle._wordCount}}">📖 {{currentArticle._wordCount}} 字 · 约 {{currentArticle._readMins}} 分钟</text>
           <text class="reader-date" wx:if="{{currentArticle.create_time}}">{{currentArticle.create_time}}</text>
         </view>
         <view class="reader-divider"></view>
         <view class="reader-loading-inline" wx:if="{{readerLoading}}">
           <text>正在同步完整正文...</text>
         </view>
-        <view class="reader-content">
+        <view class="reader-content font-{{readerFontSize}}">
           <text user-select="true">{{currentArticle.content || '暂无正文内容'}}</text>
         </view>
       </scroll-view>
 
       <view class="reader-footer" wx:if="{{currentArticle}}">
+        <view class="reader-action-btn ghost" bindtap="onCopyArticle">📋 复制正文</view>
         <view class="reader-action-btn secondary" bindtap="onGreetAuthor">👋 约作者交流</view>
         <view class="reader-action-btn primary" bindtap="onFavorArticle">⭐ 收藏文章</view>
       </view>

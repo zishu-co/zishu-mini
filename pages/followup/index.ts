@@ -1,5 +1,6 @@
 // @ts-nocheck
 import base from '../../services/base'
+import { quickGreetPeer } from '../../services/user/user'
 const { get } = base
 
 Page({
@@ -9,7 +10,13 @@ Page({
     filteredList: [] as any[],
     searchKeyword: '',
     loading: true,
+    filterMode: 'all', // 'all' | 'efficient' | 'mine'
     showMine: false,
+    stats: {
+      totalCount: 0,
+      totalActualHours: 0,
+      avgEfficiency: 100,
+    },
   },
 
   onLoad() {
@@ -20,9 +27,16 @@ Page({
     this.fetchData().finally(() => wx.stopPullDownRefresh())
   },
 
-  applyFilters(allData: any[], showMine: boolean, keyword: string) {
+  onShareAppMessage() {
+    return {
+      title: `自塾共学结项成果厅 · 已沉淀 ${this.data.stats.totalCount} 个实战结项项目`,
+      path: '/pages/followup/index',
+    }
+  },
+
+  applyFilters(allData: any[], filterMode: string, keyword: string) {
     let baseList = allData || []
-    if (showMine) {
+    if (filterMode === 'mine') {
       const storedUserInfo = wx.getStorageSync('userInfo') || {}
       const userId = wx.getStorageSync('userId') || storedUserInfo.userId || storedUserInfo.id
       const userName = storedUserInfo.name || storedUserInfo.nickName || ''
@@ -31,6 +45,8 @@ Page({
           (userId && Number(item.taker_id) === Number(userId)) ||
           (userName && item.taker === userName)
       )
+    } else if (filterMode === 'efficient') {
+      baseList = baseList.filter((item: any) => item._isEfficient)
     }
     const kw = (keyword || '').trim().toLowerCase()
     if (!kw) return baseList
@@ -50,12 +66,12 @@ Page({
 
   onSearchInput(e: any) {
     const searchKeyword = e.detail.value || ''
-    const listData = this.applyFilters(this.data.allData, this.data.showMine, searchKeyword)
+    const listData = this.applyFilters(this.data.allData, this.data.filterMode, searchKeyword)
     this.setData({ searchKeyword, listData, filteredList: listData })
   },
 
   clearSearch() {
-    const listData = this.applyFilters(this.data.allData, this.data.showMine, '')
+    const listData = this.applyFilters(this.data.allData, this.data.filterMode, '')
     this.setData({ searchKeyword: '', listData, filteredList: listData })
   },
 
@@ -64,14 +80,38 @@ Page({
     return get('/api/inno/fetch_finished_projects')
       .then((res: any) => {
         const raw = Array.isArray(res) ? res : []
-        const allData = raw.map((item: any) => ({
-          ...item,
-          _startDate: item.start_date ? String(item.start_date).slice(0, 10) : '-',
-          _deadline: item.deadline ? String(item.deadline).slice(0, 10) : '-',
-          _finishDate: item.finish_date ? String(item.finish_date).slice(0, 10) : '',
-        }))
-        const listData = this.applyFilters(allData, this.data.showMine, this.data.searchKeyword)
-        this.setData({ allData, listData, filteredList: listData, loading: false })
+        let totalActualHours = 0
+        let efficiencySum = 0
+        const allData = raw.map((item: any) => {
+          const planed = Math.max(1, Number(item.planed_hour) || 10)
+          const actual = Math.max(0, Number(item.actual_hour) || planed)
+          totalActualHours += actual
+          const rate = Math.min(100, Math.round((actual / planed) * 100))
+          efficiencySum += rate
+          const isEfficient = actual <= planed
+          return {
+            ...item,
+            _startDate: item.start_date ? String(item.start_date).slice(0, 10) : '-',
+            _deadline: item.deadline ? String(item.deadline).slice(0, 10) : '-',
+            _finishDate: item.finish_date ? String(item.finish_date).slice(0, 10) : '',
+            _hourRate: rate,
+            _isEfficient: isEfficient,
+            _efficiencyTag: isEfficient ? '⚡ 按期高效交付' : '🔥 深度攻坚结项',
+          }
+        })
+        const avgEfficiency = allData.length > 0 ? Math.round(efficiencySum / allData.length) : 100
+        const listData = this.applyFilters(allData, this.data.filterMode, this.data.searchKeyword)
+        this.setData({
+          allData,
+          listData,
+          filteredList: listData,
+          stats: {
+            totalCount: allData.length,
+            totalActualHours,
+            avgEfficiency,
+          },
+          loading: false,
+        })
       })
       .catch(() => {
         this.setData({ allData: [], listData: [], filteredList: [], loading: false })
@@ -79,11 +119,30 @@ Page({
   },
 
   toggleFilter(e?: any) {
-    const mode = e?.currentTarget?.dataset?.mode
-    const showMine =
-      mode === 'mine' ? true : mode === 'all' ? false : !this.data.showMine
-    const listData = this.applyFilters(this.data.allData, showMine, this.data.searchKeyword)
-    this.setData({ listData, filteredList: listData, showMine })
+    const mode = e?.currentTarget?.dataset?.mode || 'all'
+    const showMine = mode === 'mine'
+    const listData = this.applyFilters(this.data.allData, mode, this.data.searchKeyword)
+    this.setData({ listData, filteredList: listData, filterMode: mode, showMine })
+  },
+
+  async onGreetTaker(e: any) {
+    const item = e.currentTarget.dataset.item
+    if (!item) return
+    const takerName = item.taker || '项目执行人'
+    const takerId = Number(item.taker_id || 0)
+    try {
+      if (takerId) {
+        await quickGreetPeer({
+          target_user_id: takerId,
+          topic: `🏆 看到你结项的《${item.title}》，想向你请教实战复盘经验！`,
+          planed_duration: 15,
+        })
+      }
+    } catch {}
+    wx.showToast({
+      title: `👋 已向 ${takerName} 发送取经邀约`,
+      icon: 'none',
+    })
   },
 
   onProjectTap(e: any) {

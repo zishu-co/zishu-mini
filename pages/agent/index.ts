@@ -16,6 +16,29 @@ interface Message {
   avatar?: string;
   time?: string;
   audioUrl?: string;
+  actionLabel?: string;
+  actionUrl?: string;
+  actionIsTab?: boolean;
+}
+
+function resolveQuickAction(text: string): { actionLabel?: string; actionUrl?: string; actionIsTab?: boolean } {
+  const t = String(text || '');
+  if (t.includes('方舟') || t.includes('2男2女')) {
+    return { actionLabel: '🚢 进入诺亚方舟搭子舱', actionUrl: '/pages/ark-group/index', actionIsTab: false };
+  }
+  if (t.includes('搭子') || t.includes('同路人') || t.includes('交友')) {
+    return { actionLabel: '🤝 前往全塾同路人交友广场', actionUrl: '/pages/all/index', actionIsTab: false };
+  }
+  if (t.includes('目标')) {
+    return { actionLabel: '🎯 打开以终为始目标页', actionUrl: '/pages/aim/index', actionIsTab: true };
+  }
+  if (t.includes('闯关') || t.includes('答题') || t.includes('测验')) {
+    return { actionLabel: '🏆 前往闯关题库大厅', actionUrl: '/pages/exam/index', actionIsTab: false };
+  }
+  if (t.includes('课程') || t.includes('学习')) {
+    return { actionLabel: '📚 前往共学选课中心', actionUrl: '/pages/learn/index', actionIsTab: true };
+  }
+  return {};
 }
 
 interface AgentPageData {
@@ -57,8 +80,60 @@ Page<AgentPageData, any>({
   },
 
   onLoad() {
-    // 欢迎语
-    this.addMessage('assistant', '你好！我是自塾 AI 伴学教练 🤖✨\n你可以直接点下方快捷气泡，或输入想聊的目标、课程、2男2女方舟搭子匹配需求，我还能直接带你去对应页面！');
+    this.initWelcome();
+  },
+
+  initWelcome() {
+    this.setData({ messages: [], suggestedGoal: '' }, () => {
+      this.addMessage(
+        'assistant',
+        '你好！我是自塾 AI 伴学教练 🤖✨\n你可以直接点下方快捷气泡，或输入想聊的目标、课程、2男2女方舟搭子匹配需求，我还能直接带你去对应页面！',
+        undefined,
+        { actionLabel: '🤝 逛逛同路人交友广场', actionUrl: '/pages/all/index', actionIsTab: false }
+      );
+    });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '自塾 AI 伴学教练 🤖 定制学习目标 · 匹配 2男2女方舟共学搭子',
+      path: '/pages/agent/index',
+    };
+  },
+
+  onClearChat() {
+    wx.showModal({
+      title: '重置对话',
+      content: '确定清空当前对话记录并重新开始吗？',
+      confirmColor: '#7c3aed',
+      success: (res) => {
+        if (res.confirm) {
+          this.initWelcome();
+          wx.showToast({ title: '已重置对话', icon: 'none' });
+        }
+      },
+    });
+  },
+
+  onCopyMessage(e: any) {
+    const content = e.currentTarget.dataset.content;
+    if (!content) return;
+    wx.setClipboardData({
+      data: String(content),
+      success: () => {
+        wx.showToast({ title: '📋 已复制消息内容', icon: 'none' });
+      },
+    });
+  },
+
+  onBubbleAction(e: any) {
+    const { url, istab } = e.currentTarget.dataset;
+    if (!url) return;
+    if (istab) {
+      wx.switchTab({ url });
+    } else {
+      wx.navigateTo({ url });
+    }
   },
 
   onUnload() {
@@ -67,7 +142,12 @@ Page<AgentPageData, any>({
   },
 
   // 添加消息
-  addMessage(role: 'user' | 'assistant', content: string, audioUrl?: string) {
+  addMessage(
+    role: 'user' | 'assistant',
+    content: string,
+    audioUrl?: string,
+    extra?: { actionLabel?: string; actionUrl?: string; actionIsTab?: boolean }
+  ) {
     const msgId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const messages = this.data.messages.concat([{
       id: msgId,
@@ -75,6 +155,7 @@ Page<AgentPageData, any>({
       content,
       time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
       audioUrl,
+      ...(extra || {}),
     }]);
     this.setData({
       messages,
@@ -136,7 +217,8 @@ Page<AgentPageData, any>({
       }
     }
 
-    this.addMessage('assistant', replyContent);
+    const quickAction = resolveQuickAction(text + ' ' + replyContent);
+    this.addMessage('assistant', replyContent, undefined, quickAction);
     if (suggestedGoal) {
       this.setData({ suggestedGoal });
     }

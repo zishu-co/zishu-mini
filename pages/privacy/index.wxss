@@ -79,6 +79,57 @@ page {
   color: #334155;
 }
 
+.email-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f3ff;
+  padding: 16rpx 24rpx;
+  border-radius: 16rpx;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.copy-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.policy-footer {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 28rpx;
+}
+
+.policy-btn {
+  flex: 1;
+  height: 84rpx;
+  line-height: 84rpx;
+  border-radius: 42rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  border: none;
+}
+
+.policy-btn::after {
+  border: none;
+}
+
+.policy-btn.ghost {
+  background: #ffffff;
+  color: #7c3aed;
+  border: 2rpx solid rgba(124, 58, 237, 0.25);
+}
+
+.policy-btn.primary {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
+}
+
 .bottom-safe {
-  height: 100rpx;
+  height: 60rpx;
 }

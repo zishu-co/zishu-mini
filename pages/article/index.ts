@@ -18,6 +18,8 @@ interface IArticleItem {
   author_name: string
   create_time?: string
   _preview?: string
+  _wordCount?: number
+  _readMins?: number
 }
 
 interface IReaderArticle {
@@ -28,6 +30,8 @@ interface IReaderArticle {
   bumen?: string
   create_time?: string
   content: string
+  _wordCount?: number
+  _readMins?: number
 }
 
 interface IArticlePageData {
@@ -40,6 +44,7 @@ interface IArticlePageData {
   currentUserId: number
   showReaderModal: boolean
   readerLoading: boolean
+  readerFontSize: 'sm' | 'md' | 'lg'
   currentArticle: IReaderArticle | null
   pendingArticleId: number
 }
@@ -69,6 +74,7 @@ Page<IArticlePageData, any>({
     currentUserId: 0,
     showReaderModal: false,
     readerLoading: false,
+    readerFontSize: 'md',
     currentArticle: null,
     pendingArticleId: 0,
   },
@@ -91,6 +97,37 @@ Page<IArticlePageData, any>({
   onPullDownRefresh() {
     this.checkLogin(() => {
       wx.stopPullDownRefresh()
+    })
+  },
+
+  onShareAppMessage() {
+    const cur = this.data.currentArticle
+    if (this.data.showReaderModal && cur && cur.articleid) {
+      return {
+        title: `📖 推荐阅读自塾专栏：《${cur.title}》`,
+        path: `/pages/article/index?id=${cur.articleid}`,
+      }
+    }
+    return {
+      title: '自塾专栏精选 · 记录共学点滴，沉淀思考精华',
+      path: '/pages/article/index',
+    }
+  },
+
+  onSetFontSize(e: any) {
+    const size = (e.currentTarget.dataset.size || 'md') as 'sm' | 'md' | 'lg'
+    this.setData({ readerFontSize: size })
+  },
+
+  onCopyArticle() {
+    const cur = this.data.currentArticle
+    if (!cur || !cur.content) return
+    const text = `《${cur.title}》\n作者：${cur.author_name || '自塾作者'}\n\n${cur.content}`
+    wx.setClipboardData({
+      data: text,
+      success: () => {
+        wx.showToast({ title: '📋 已复制文章全文', icon: 'none' })
+      },
     })
   },
 
@@ -136,10 +173,17 @@ Page<IArticlePageData, any>({
               app.globalData?.userInfo?.id ||
               0
           )
-          const allFormatted: IArticleItem[] = res.data.map((a: any) => ({
-            ...a,
-            _preview: stripHtmlTags(a.fulltext || ''),
-          }))
+          const allFormatted: IArticleItem[] = res.data.map((a: any) => {
+            const preview = stripHtmlTags(a.fulltext || '')
+            const wordCount = Math.max(10, preview.replace(/\s+/g, '').length)
+            const readMins = Math.max(1, Math.ceil(wordCount / 300))
+            return {
+              ...a,
+              _preview: preview,
+              _wordCount: wordCount,
+              _readMins: readMins,
+            }
+          })
           this.setData({
             allArticles: allFormatted,
             currentUserId: userId,
@@ -240,10 +284,14 @@ Page<IArticlePageData, any>({
     })
 
     this.fetchArticleFulltext(Number(articleid)).then((article) => {
+      const wordCount = Math.max(10, String(article.content || '').replace(/\s+/g, '').length)
+      const readMins = Math.max(1, Math.ceil(wordCount / 300))
       this.setData({
         currentArticle: {
           ...article,
           author_id: article.author_id || fallbackItem?.author_id,
+          _wordCount: wordCount,
+          _readMins: readMins,
         },
         readerLoading: false,
       })

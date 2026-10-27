@@ -74,6 +74,18 @@ Page<IPageData, IPageData>({
     }
   },
 
+  onPullDownRefresh() {
+    this.loadData().finally(() => wx.stopPullDownRefresh());
+  },
+
+  onShareAppMessage() {
+    const courseTitle = this.data.courseInfo?.course_title || '自塾共学课程';
+    return {
+      title: `🎓 我在自塾完成了《${courseTitle}》全部课程学习，荣获结课证书！`,
+      path: `/pages/course-detail/index?id=${this.courseId}`,
+    };
+  },
+
   formatDate(d: Date): string {
     const year = d.getFullYear();
     const month = d.getMonth() + 1;

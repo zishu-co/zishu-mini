@@ -55,6 +55,14 @@ Page<IParticipantsPageData, any>({
     this.loadData().then(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    const title = this.data.eventInfo?.title || '自塾同城共学活动';
+    return {
+      title: `🎉 已有 ${this.data.participants.length} 位学友报名「${title}」，一起来参加吧！`,
+      path: `/pages/event/participants/index?id=${this.data.eventId}`,
+    };
+  },
+
   decorateParticipant(p: any, idx: number, defaultCity: string): DecoratedParticipant {
     const name = String(p?.username || '搭').trim();
     const _avatarInitial = name ? name.substring(0, 1).toUpperCase() : '塾';

@@ -37,6 +37,13 @@ Page({
     }
   },
 
+  onShareAppMessage() {
+    return {
+      title: '🎯 自塾目标约谈中心 · 1v1 导师领航与同路人目标复盘',
+      path: '/pages/goaltalk/index',
+    }
+  },
+
   switchTab(e: any) {
     const tab = parseInt(e.currentTarget.dataset.tab, 10)
     this.setData({ activeTab: tab })

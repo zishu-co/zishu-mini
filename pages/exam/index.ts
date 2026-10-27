@@ -23,6 +23,13 @@ Page({
     setTimeout(() => wx.stopPullDownRefresh(), 500);
   },
 
+  onShareAppMessage() {
+    return {
+      title: `⚡ 自塾闯关题库大厅 · 精选 ${this.data.papers.length || ''} 套真题试卷等你来挑战！`,
+      path: '/pages/exam/index',
+    };
+  },
+
   loadPapers() {
     this.fetchPapers();
   },

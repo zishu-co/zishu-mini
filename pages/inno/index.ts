@@ -122,6 +122,14 @@ Page<IInnoPageData, any>({
 
   onPullDownRefresh() {
     this.loadProjects(true);
+    setTimeout(() => wx.stopPullDownRefresh(), 450);
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '🚀 自塾创新实战揭榜大厅 · 认领开源与工程项目，赢取高额塾值悬赏！',
+      path: '/pages/inno/index',
+    };
   },
 
   init() {

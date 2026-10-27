@@ -1,25 +1,51 @@
 <view class="page">
-  <!-- 顶部统计与筛选栏 -->
+  <!-- 顶部统计与筛选 Hero 栏 -->
   <view class="top-bar">
-    <view class="top-summary">
-      <text class="summary-count">{{listData.length}}</text>
-      <text class="summary-label">个结项项目</text>
+    <view class="top-bar-header">
+      <view>
+        <view class="top-badge">PROJECT ACHIEVEMENT HALL</view>
+        <view class="top-title">全塾结项成果厅</view>
+      </view>
+      <view class="filter-row">
+        <button
+          class="filter-btn {{filterMode === 'all' ? 'active' : ''}}"
+          bindtap="toggleFilter"
+          data-mode="all"
+        >
+          全部
+        </button>
+        <button
+          class="filter-btn {{filterMode === 'efficient' ? 'active' : ''}}"
+          bindtap="toggleFilter"
+          data-mode="efficient"
+        >
+          ⚡ 高效交付
+        </button>
+        <button
+          class="filter-btn {{filterMode === 'mine' ? 'active' : ''}}"
+          bindtap="toggleFilter"
+          data-mode="mine"
+        >
+          我的结项
+        </button>
+      </view>
     </view>
-    <view class="filter-row">
-      <button
-        class="filter-btn {{!showMine ? 'active' : ''}}"
-        bindtap="toggleFilter"
-        data-mode="all"
-      >
-        全部项目
-      </button>
-      <button
-        class="filter-btn {{showMine ? 'active' : ''}}"
-        bindtap="toggleFilter"
-        data-mode="mine"
-      >
-        我的结项
-      </button>
+
+    <view class="hero-stats-grid">
+      <view class="hero-stat-item">
+        <text class="hero-stat-num">{{stats.totalCount}}</text>
+        <text class="hero-stat-label">已结项总数</text>
+      </view>
+      <view class="hero-stat-divider"></view>
+      <view class="hero-stat-item">
+        <text class="hero-stat-num">{{stats.totalActualHours}}h</text>
+        <text class="hero-stat-label">累计实战工时</text>
+      </view>
+      <view class="hero-stat-divider"></view>
+      <view class="hero-stat-item">
+        <text class="hero-stat-num">{{stats.avgEfficiency}}%</text>
+        <text class="hero-stat-label">平均执行效率</text>
+      </view>
     </view>
   </view>
 
@@ -39,10 +65,13 @@
   <!-- 列表 -->
   <view class="list-area">
     <view wx:if="{{loading}}">
-      <view class="loading-row"><text>加载中...</text></view>
+      <view class="loading-row"><text>正在加载结项成果档案...</text></view>
     </view>
     <view wx:elif="{{filteredList.length === 0}}">
-      <view class="empty-row"><text>{{searchKeyword ? '未找到匹配的结项项目' : '暂无结项记录'}}</text></view>
+      <view class="empty-row">
+        <text class="empty-emoji">🏆</text>
+        <text>{{searchKeyword ? '未找到匹配的结项项目' : '当前筛选下暂无结项记录'}}</text>
+      </view>
     </view>
     <view wx:else>
       <view
@@ -53,41 +82,58 @@
         data-id="{{item.id}}"
       >
         <view class="project-top">
-          <text class="project-serial">{{item.task_serial}}</text>
+          <text class="project-serial">#{{item.task_serial}}</text>
           <text class="project-title">{{item.title}}</text>
-          <text class="project-arrow">›</text>
+          <text class="efficiency-pill {{item._isEfficient ? 'eff-good' : 'eff-deep'}}">{{item._efficiencyTag}}</text>
         </view>
         <view class="project-persons">
           <view class="person-item">
-            <text class="person-role">执行人</text>
+            <text class="person-role">👤 执行人</text>
             <text class="person-name">{{item.taker}}</text>
           </view>
           <view class="person-item">
-            <text class="person-role">塾师</text>
+            <text class="person-role">🎓 指导塾师</text>
             <text class="person-name">{{item.shushi}}</text>
           </view>
         </view>
+
+        <!-- 工时执行进度条 -->
+        <view class="hour-progress-wrap">
+          <view class="hour-progress-head">
+            <text class="hour-progress-label">工时投入比（实际 {{item.actual_hour}}h / 计划 {{item.planed_hour}}h）</text>
+            <text class="hour-progress-val">{{item._hourRate}}%</text>
+          </view>
+          <view class="hour-progress-track">
+            <view class="hour-progress-fill" style="width: {{item._hourRate}}%;"></view>
+          </view>
+        </view>
+
         <view class="project-meta">
           <view class="meta-item">
-            <text class="meta-label">开始</text>
+            <text class="meta-label">立项启动</text>
             <text class="meta-value">{{item._startDate}}</text>
           </view>
           <view class="meta-item">
-            <text class="meta-label">截止</text>
+            <text class="meta-label">计划截止</text>
             <text class="meta-value deadline">{{item._deadline}}</text>
           </view>
-          <view class="meta-item">
-            <text class="meta-label">计划</text>
-            <text class="meta-value">{{item.planed_hour}}h</text>
-          </view>
-          <view class="meta-item">
-            <text class="meta-label">实际</text>
-            <text class="meta-value accent">{{item.actual_hour}}h</text>
+          <view class="meta-item" wx:if="{{item._finishDate}}">
+            <text class="meta-label">实际结项</text>
+            <text class="meta-value accent">✓ {{item._finishDate}}</text>
           </view>
         </view>
-        <view class="project-progress" wx:if="{{item.half_progress || item._finishDate}}">
-          <text class="progress-label" wx:if="{{item.half_progress}}">半程进度：{{item.half_progress}}</text>
-          <text class="progress-value" wx:if="{{item._finishDate}}">✓ 结项于 {{item._finishDate}}</text>
+
+        <view class="project-footer">
+          <text class="progress-label" wx:if="{{item.half_progress}}">📌 半程里程碑：{{item.half_progress}}</text>
+          <text class="progress-label" wx:else>✨ 已通过自塾共学结项验收</text>
+          <view class="project-actions">
+            <view
+              class="action-chip greet"
+              catchtap="onGreetTaker"
+              data-item="{{item}}"
+            >👋 约TA取经</view>
+            <view class="action-chip detail">详情 ›</view>
+          </view>
         </view>
       </view>
     </view>

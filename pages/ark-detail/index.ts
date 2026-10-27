@@ -78,7 +78,7 @@ Page<IPageData, IPageData>({
   },
 
   onLoad(options: any) {
-    this.setData({ arkId: parseInt(options.arkId || '0', 10) });
+    this.setData({ arkId: parseInt(options.arkId || options.id || '0', 10) });
     this.loadUserInfo();
     if (this.data.arkId) {
       this.loadData();
@@ -90,6 +90,14 @@ Page<IPageData, IPageData>({
 
   onPullDownRefresh() {
     this.loadData().then(() => wx.stopPullDownRefresh());
+  },
+
+  onShareAppMessage() {
+    const arkName = this.data.ark?.arkname || '诺亚方舟共学舱';
+    return {
+      title: `🚢 邀请你加入自塾「${arkName}」2男2女共学搭子舱！`,
+      path: `/pages/ark-detail/index?arkId=${this.data.arkId}`,
+    };
   },
 
   loadUserInfo() {

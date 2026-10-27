@@ -217,6 +217,17 @@ Page<IAimPageData, IAimData>({
 
   onPullDownRefresh() {
     this.init();
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 450);
+  },
+
+  onShareAppMessage() {
+    const goalText = this.data.currentGoal?.content?.split('\n')[0] || '以终为始 · AI 英语与技能共学';
+    return {
+      title: `🎯 我在自塾立下阶段目标：「${goalText.slice(0, 22)}」，快来一起打卡！`,
+      path: '/pages/aim/index',
+    };
   },
 
   init() {

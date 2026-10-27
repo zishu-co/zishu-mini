@@ -29,6 +29,31 @@ page {
   opacity: 0.88;
 }
 
+.log-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.log-action-btn {
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.log-action-btn.danger {
+  background: rgba(239, 68, 68, 0.28);
+}
+
+.empty-logs {
+  justify-content: center;
+  padding: 48rpx 28rpx;
+  color: #64748b;
+}
+
 .log-list {
   display: flex;
   flex-direction: column;

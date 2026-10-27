@@ -89,6 +89,13 @@ Page<ILearnPageData, any>({
     setTimeout(() => wx.stopPullDownRefresh(), 500);
   },
 
+  onShareAppMessage() {
+    return {
+      title: '📚 自塾共学选课中心 · 选好课、拜塾师、组2男2女方舟结伴通关！',
+      path: '/pages/learn/index',
+    };
+  },
+
   getUserId() {
     const storedUserInfo = wx.getStorageSync('userInfo') || {};
     return (

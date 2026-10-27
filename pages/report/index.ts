@@ -36,6 +36,13 @@ Page<IReportPageData, any>({
     this.fetchRecords(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    return {
+      title: `📊 我在自塾已完成 ${this.data.records.length} 场闯关测评，平均得分 ${this.data.avgScore}！`,
+      path: '/pages/exam/index',
+    };
+  },
+
   decorateRecord(item: any) {
     const score = Number(item.test_score || 0);
     const full = Number(item.full_score || 0);

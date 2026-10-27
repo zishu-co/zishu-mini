@@ -51,6 +51,13 @@ Page<IEventPageData, any>({
     this.loadEvents().then(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    return {
+      title: '🎉 自塾同城活动与共学聚会 · 快来报名寻找同频搭子！',
+      path: '/pages/event/index',
+    };
+  },
+
   decorateEvent(ev: any) {
     const count = Number(ev?.participant_count || 0);
     return {

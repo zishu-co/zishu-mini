@@ -59,6 +59,14 @@ Page<IInnoDetailPageData, any>({
     this.loadProject().finally(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    const title = this.data.project?.title || '自塾创新实战项目';
+    return {
+      title: `🚀 邀你一起参与自塾创新项目《${title}》！`,
+      path: `/pages/inno-detail/index?id=${this.projectId}`,
+    };
+  },
+
   onRetry() {
     if (this.projectId) {
       this.loadProject();

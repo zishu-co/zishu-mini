@@ -56,6 +56,13 @@ Page<IPageData, any>({
     this.loadData().finally(() => wx.stopPullDownRefresh());
   },
 
+  onShareAppMessage() {
+    return {
+      title: `📋 ${this.data.ownerName} 的自塾共学档案 · 结课完成率 ${this.data.completionRate}%`,
+      path: `/pages/learn-sheet/index?userId=${this.data.userId}`,
+    };
+  },
+
   onTabChange(e: any) {
     const tab = e.currentTarget.dataset.tab as 'all' | 'camps' | 'learning' | 'learned';
     if (tab && tab !== this.data.activeTab) {
