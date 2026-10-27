@@ -4,6 +4,12 @@ Page({
     contactEmail: 'service@zishu.co',
   },
   onLoad() {},
+  onShareAppMessage() {
+    return {
+      title: '自塾隐私政策与安全合规承诺',
+      path: '/pages/privacy/index',
+    };
+  },
   onCopyEmail() {
     wx.setClipboardData({
       data: this.data.contactEmail,

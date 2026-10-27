@@ -49,6 +49,13 @@ Page<ILoginPageData, ILoginPageData>({
     privacyAgreed: false,
   },
 
+  onShareAppMessage() {
+    return {
+      title: '学本领，上自塾 · 2男2女诺亚方舟共学与 AI 伴学平台',
+      path: '/pages/login/login',
+    }
+  },
+
   onLoad() {
     // 检测环境
     const devMode = isDevMode()

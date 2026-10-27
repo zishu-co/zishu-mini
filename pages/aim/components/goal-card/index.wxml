@@ -5,15 +5,11 @@
   <view class="card-header">
     <view class="card-title">
       <t-icon name="flag" size="40rpx" color="#a0f" />
-      <text style="color: #a0f;">当前目标</text>
+      <text style="color: #a0f;">当前阶段目标</text>
     </view>
     <view class="card-actions">
-      <t-icon 
-        name="edit-1" 
-        size="36rpx" 
-        class="edit-icon"
-        bind:tap="onEdit"
-      />
+      <view wx:if="{{goal}}" class="header-chip" bindtap="onCopyGoal">📋 复制</view>
+      <view class="header-chip edit" bindtap="onEdit">✏️ 编辑</view>
     </view>
   </view>
 
@@ -44,10 +40,10 @@
       </text>
     </view>
 
-    <!-- 进度条 -->
+    <!-- 进度条与10阶里程碑格 -->
     <view class="progress-section">
       <view class="progress-header">
-        <text class="progress-label">目标进度</text>
+        <text class="progress-label">目标达成度（10阶里程碑）</text>
         <text class="progress-value">{{dateUtil.getProgressPercent(goal.process)}}%</text>
       </view>
       <t-progress 
@@ -57,16 +53,24 @@
         stroke-width="12rpx"
         label="{{false}}"
       />
+      <view class="milestone-segments">
+        <view
+          wx:for="{{steps}}"
+          wx:key="*this"
+          class="milestone-seg {{item * 10 <= dateUtil.getProgressPercent(goal.process) ? 'active' : ''}}"
+        ></view>
+      </view>
     </view>
 
     <!-- 进度更新按钮 -->
     <view class="progress-actions">
+      <view class="goal-action-pill ghost" bindtap="onEdit">✏️ 调整目标</view>
       <t-button 
         size="small" 
         theme="primary"
         color="#a0f"
         bind:tap="onUpdateProgress"
-      >更新进度</t-button>
+      >⚡ 推进 +10%</t-button>
     </view>
 
     <!-- 复盘/回顾 -->

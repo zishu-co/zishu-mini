@@ -62,6 +62,15 @@
         value="{{form.region}}"
         bindinput="onRegionInput"
       />
+      <view class="city-preset-row">
+        <view
+          wx:for="{{cityPresets}}"
+          wx:key="*this"
+          class="city-chip {{form.region === item ? 'active' : ''}}"
+          data-city="{{item}}"
+          bindtap="onSelectCity"
+        >{{item}}</view>
+      </view>
     </view>
 
     <view class="form-item">
@@ -82,12 +91,12 @@
       <text class="social-tag-hint">点击快捷添加共学兴趣标签（将在同路人广场展示）：</text>
       <view class="social-tag-list">
         <view
-          class="social-tag-chip"
-          wx:for="{{socialTagPresets}}"
-          wx:key="*this"
-          data-tag="{{item}}"
+          class="social-tag-chip {{item.active ? 'active' : ''}}"
+          wx:for="{{socialTagItems}}"
+          wx:key="text"
+          data-tag="{{item.text}}"
           bindtap="onToggleSocialTag"
-        >{{item}}</view>
+        >{{item.text}}</view>
       </view>
     </view>
 

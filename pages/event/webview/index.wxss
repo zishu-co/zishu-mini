@@ -1,6 +1,6 @@
 /* pages/event/webview/index.wxss */
 page {
-  background: #f7f7f7;
+  background: #f6f7fb;
 }
 
 .empty-webview {
@@ -9,8 +9,21 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48rpx;
+  padding: 40rpx;
   box-sizing: border-box;
+}
+
+.webview-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 28rpx;
+  padding: 56rpx 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10rpx 32rpx rgba(124, 58, 237, 0.08);
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
 }
 
 .empty-icon {
@@ -20,31 +33,69 @@ page {
 
 .empty-title {
   font-size: 34rpx;
-  font-weight: 700;
+  font-weight: 800;
   color: #1a1a2e;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 .empty-desc {
   font-size: 26rpx;
-  color: #6b7280;
-  margin-bottom: 40rpx;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 32rpx;
   text-align: center;
+}
+
+.url-preview {
+  width: 100%;
+  padding: 16rpx 24rpx;
+  background: #f5f3ff;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  color: #7c3aed;
+  word-break: break-all;
+  margin-bottom: 28rpx;
+  text-align: center;
+}
+
+.webview-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.copy-btn,
+.plaza-btn,
+.back-btn {
+  width: 100%;
+  font-size: 28rpx;
+  font-weight: 700;
+  height: 82rpx;
+  line-height: 82rpx;
+  border-radius: 41rpx;
+  border: none;
+}
+
+.copy-btn::after,
+.plaza-btn::after,
+.back-btn::after {
+  border: none;
+}
+
+.copy-btn {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.plaza-btn {
+  background: #f8fafc;
+  color: #475569;
+  border: 2rpx solid #e2e8f0;
 }
 
 .back-btn {
   background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
   color: #ffffff;
-  font-size: 28rpx;
-  font-weight: 600;
-  padding: 0 56rpx;
-  height: 80rpx;
-  line-height: 80rpx;
-  border-radius: 40rpx;
-  border: none;
   box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.25);
-}
-
-.back-btn::after {
-  border: none;
 }

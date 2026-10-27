@@ -5,6 +5,7 @@
 Page({
   data: {
     url: '',
+    loadFailed: false,
   },
 
   onLoad(options: any) {
@@ -13,7 +14,32 @@ Page({
       wx.showToast({ title: '链接无效', icon: 'none' });
       return;
     }
-    this.setData({ url });
+    this.setData({ url, loadFailed: false });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '🎉 自塾同城活动详情 · 邀你结伴参加！',
+      path: '/pages/event/index',
+    };
+  },
+
+  onWebviewError() {
+    this.setData({ loadFailed: true });
+  },
+
+  onCopyUrl() {
+    if (!this.data.url) return;
+    wx.setClipboardData({
+      data: this.data.url,
+      success: () => {
+        wx.showToast({ title: '📋 已复制链接，可在浏览器打开', icon: 'none' });
+      },
+    });
+  },
+
+  onGoPlaza() {
+    wx.navigateTo({ url: '/pages/all/index' });
   },
 
   onGoBack() {

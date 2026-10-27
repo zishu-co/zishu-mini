@@ -51,6 +51,7 @@ Page({
     strengthLevel: '',
     strengthClass: '',
     strengthPercent: 0,
+    matchStatus: '', // '' | 'match' | 'mismatch'
     submitting: false,
     errorMsg: '',
   },
@@ -60,6 +61,13 @@ Page({
     const name = userInfo.name || userInfo.nickName || userInfo.username || ''
     if (name) {
       this.setData({ name })
+    }
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '学本领，上自塾 · 以终为始，结伴共学',
+      path: '/pages/aim/index',
     }
   },
 
@@ -86,17 +94,48 @@ Page({
   onPasswordInput(e: any) {
     const val = e.detail.value
     const strength = evaluateStrength(val)
+    const confirm = this.data.confirmPass
+    const matchStatus = !confirm ? '' : val === confirm ? 'match' : 'mismatch'
     this.setData({
       newPass: val,
       password: val,
       ...strength,
+      matchStatus,
       errorMsg: '',
     })
   },
 
   onCheckpassInput(e: any) {
     const val = e.detail.value
-    this.setData({ confirmPass: val, checkpass: val, errorMsg: '' })
+    const newPass = this.data.newPass
+    const matchStatus = !val ? '' : val === newPass ? 'match' : 'mismatch'
+    this.setData({ confirmPass: val, checkpass: val, matchStatus, errorMsg: '' })
+  },
+
+  onGenerateStrongPass() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$'
+    let pwd = 'Zs!'
+    for (let i = 0; i < 7; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    const strength = evaluateStrength(pwd)
+    this.setData({
+      newPass: pwd,
+      password: pwd,
+      confirmPass: pwd,
+      checkpass: pwd,
+      showNew: true,
+      showConfirm: true,
+      matchStatus: 'match',
+      ...strength,
+      errorMsg: '',
+    })
+    wx.setClipboardData({
+      data: pwd,
+      success: () => {
+        wx.showToast({ title: '🎲 已生成并复制高强密码', icon: 'none' })
+      },
+    })
   },
 
   submitForm() {

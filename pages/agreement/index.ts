@@ -4,6 +4,12 @@ Page({
     contactEmail: 'service@zishu.co',
   },
   onLoad() {},
+  onShareAppMessage() {
+    return {
+      title: '自塾用户服务协议 · 以终为始共学平台',
+      path: '/pages/agreement/index',
+    };
+  },
   onCopyEmail() {
     wx.setClipboardData({
       data: this.data.contactEmail,

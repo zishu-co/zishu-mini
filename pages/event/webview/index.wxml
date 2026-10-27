@@ -1,8 +1,17 @@
 <!-- pages/event/webview/index.wxml -->
-<web-view wx:if="{{url}}" src="{{url}}" />
+<web-view wx:if="{{url && !loadFailed}}" src="{{url}}" binderror="onWebviewError" />
 <view wx:else class="empty-webview">
-  <text class="empty-icon">🔗</text>
-  <text class="empty-title">暂无活动文章链接</text>
-  <text class="empty-desc">该活动暂未关联公众号推文或外部详情链接</text>
-  <button class="back-btn" bindtap="onGoBack">返回活动列表</button>
+  <view class="webview-card">
+    <text class="empty-icon">🔗</text>
+    <text class="empty-title">{{loadFailed ? '外部链接需在浏览器打开' : '暂无活动文章链接'}}</text>
+    <text class="empty-desc">
+      {{loadFailed ? '可一键复制下方活动链接至微信或系统浏览器查看详情' : '该活动暂未关联公众号推文或外部详情链接，可返回活动大厅查看报名同路人'}}
+    </text>
+    <view wx:if="{{url}}" class="url-preview" bindtap="onCopyUrl">{{url}}</view>
+    <view class="webview-actions">
+      <button wx:if="{{url}}" class="copy-btn" bindtap="onCopyUrl">📋 复制活动链接</button>
+      <button class="plaza-btn" bindtap="onGoPlaza">🤝 去同路人广场</button>
+      <button class="back-btn" bindtap="onGoBack">返回活动列表</button>
+    </view>
+  </view>
 </view>

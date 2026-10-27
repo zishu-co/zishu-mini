@@ -195,3 +195,66 @@ export const confirmTalk = (data: { id: number; confirmer: string }) => {
     data,
   })
 }
+
+/**
+ * 新增或编辑目标面谈
+ * POST /api/users/edit_goaltalk
+ */
+export const editGoaltalk = (data: {
+  id: number | string
+  presenter: string
+  access_info: string
+  counter_part_id?: number
+  planed_time: string
+  planed_duration: number
+}) => {
+  return requestWithRefresh({
+    url: '/api/users/edit_goaltalk',
+    method: 'POST',
+    data,
+  })
+}
+
+/**
+ * 完结目标面谈并记录纪要
+ * POST /api/users/finish_talk
+ */
+export const finishTalk = (data: {
+  id: number
+  actual_duration: number
+  content: string
+}) => {
+  return requestWithRefresh({
+    url: '/api/users/finish_talk',
+    method: 'POST',
+    data,
+  })
+}
+
+/**
+ * 提交用户反馈 / 共创建议
+ * POST /api/feedback
+ */
+export const submitFeedback = (data: {
+  type: 'bug' | 'feature' | 'ux' | 'other'
+  title: string
+  content: string
+  contact?: string
+}) => {
+  return requestWithRefresh({
+    url: '/api/feedback',
+    method: 'POST',
+    data,
+  })
+}
+
+/**
+ * 获取我的反馈列表
+ * GET /api/feedback/mine
+ */
+export const fetchMyFeedbacks = () => {
+  return requestWithRefresh({
+    url: '/api/feedback/mine',
+    method: 'GET',
+  })
+}

@@ -26,12 +26,16 @@ const SOCIAL_TAG_PRESETS = [
   '#早起打卡监督',
 ]
 
+const CITY_PRESETS = ['上海', '北京', '深圳', '杭州', '广州', '成都']
+
 Page({
   data: {
     gender: '',
     avatarInitial: '塾',
     completenessPercent: 20,
     socialTagPresets: SOCIAL_TAG_PRESETS,
+    socialTagItems: SOCIAL_TAG_PRESETS.map((t) => ({ text: t, active: false })),
+    cityPresets: CITY_PRESETS,
     form: {
       name: '',
       gender: '',
@@ -47,11 +51,25 @@ Page({
     this.fetchProfile()
   },
 
+  onShareAppMessage() {
+    const name = this.data.form?.name || '自塾学友'
+    return {
+      title: `👋 我是 ${name}，邀请你来同路人交友广场与我结伴共学！`,
+      path: '/pages/all/index',
+    }
+  },
+
   updatePreviewMeta(nextForm: any) {
     const meta = computeProfileMeta(nextForm)
+    const descStr = String(nextForm.desc || '')
+    const socialTagItems = SOCIAL_TAG_PRESETS.map((t) => ({
+      text: t,
+      active: descStr.indexOf(t) !== -1,
+    }))
     this.setData({
       form: nextForm,
       gender: nextForm.gender || '',
+      socialTagItems,
       ...meta,
       errorMsg: '',
     })
@@ -99,6 +117,12 @@ Page({
 
   onRegionInput(e: any) {
     this.updatePreviewMeta({ ...this.data.form, region: e.detail.value })
+  },
+
+  onSelectCity(e: any) {
+    const city = e.currentTarget.dataset.city
+    if (!city) return
+    this.updatePreviewMeta({ ...this.data.form, region: city })
   },
 
   onGoalInput(e: any) {

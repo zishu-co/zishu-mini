@@ -3,12 +3,23 @@ import {
   fetchGoaltalk,
   fetchFinishedGoaltalk,
   fetchAllGoals,
+  fetchShushengs,
   confirmTalk,
+  editGoaltalk,
+  finishTalk,
 } from '../../services/user/user'
 
 function fmtDateStr(val: any, len = 16): string {
   if (!val) return ''
   return String(val).replace('T', ' ').slice(0, len)
+}
+
+function defaultTomorrowTime(): string {
+  const dt = new Date(Date.now() + 24 * 3600 * 1000)
+  const y = dt.getFullYear()
+  const m = String(dt.getMonth() + 1).padStart(2, '0')
+  const d = String(dt.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d} 20:00`
 }
 
 Page({
@@ -17,14 +28,35 @@ Page({
     scheduledData: [] as any[],
     goalsData: [] as any[],
     historyData: [] as any[],
+    shushengList: [] as any[],
     loading: true,
     loadingGoals: false,
     loadingHistory: false,
     confirmingId: 0,
+    submittingModal: false,
+    showEditModal: false,
+    editModalMode: 'add' as 'add' | 'edit',
+    editForm: {
+      id: 0,
+      presenter: '塾师',
+      counter_part_id: 0,
+      counter_part_name: '公开招募/任意塾生',
+      planed_time: '',
+      planed_duration: 30,
+      access_info: '',
+    },
+    showFinishModal: false,
+    finishForm: {
+      id: 0,
+      partnerName: '',
+      actual_duration: 30,
+      content: '',
+    },
   },
 
   onLoad() {
     this.fetchScheduled()
+    this.loadShushengOptions()
   },
 
   onPullDownRefresh() {
@@ -42,6 +74,29 @@ Page({
       title: '🎯 自塾目标约谈中心 · 1v1 导师领航与同路人目标复盘',
       path: '/pages/goaltalk/index',
     }
+  },
+
+  loadShushengOptions() {
+    fetchShushengs()
+      .then((res: any) => {
+        if (Array.isArray(res)) {
+          const seen = new Set<number>()
+          const list: any[] = []
+          for (const item of res) {
+            const uid = Number(item.id || item.shusheng_id || 0)
+            if (uid && !seen.has(uid)) {
+              seen.add(uid)
+              list.push({
+                id: uid,
+                name: item.name || item.shusheng_name || `塾生#${uid}`,
+                course_title: item.course_title || '',
+              })
+            }
+          }
+          this.setData({ shushengList: list })
+        }
+      })
+      .catch(() => {})
   },
 
   switchTab(e: any) {
@@ -74,7 +129,7 @@ Page({
             seen.add(item.id)
             merged.push({
               ...item,
-              _partnerName: item.shusheng_name || item.shushi_name || '共学同路人',
+              _partnerName: item.shusheng_name || item.shushi_name || '公开招募/共学同路人',
               _roleTag: item._myRole === '塾师' ? '受邀导师' : '我的预约',
               _statusClass: this.getStatusClass(item),
               _statusText: this.getStatusText(item),
@@ -101,6 +156,7 @@ Page({
           const pct = proc <= 10 ? proc * 10 : proc
           return {
             ...item,
+            _studentId: Number(item.user_id || item.shusheng_id || 0),
             _progressText: item.content ? `进度 ${pct}%` : '暂未立项',
             _startDate: fmtDateStr(item.start_time, 10),
             _deadline: fmtDateStr(item.deadline, 10),
@@ -141,6 +197,184 @@ Page({
       .catch(() => {
         this.setData({ historyData: [], loadingHistory: false })
       })
+  },
+
+  onOpenAddModal() {
+    const firstStudent = this.data.shushengList[0]
+    this.setData({
+      showEditModal: true,
+      editModalMode: 'add',
+      editForm: {
+        id: 0,
+        presenter: '塾师',
+        counter_part_id: firstStudent ? firstStudent.id : 0,
+        counter_part_name: firstStudent ? firstStudent.name : '公开招募/任意塾生',
+        planed_time: defaultTomorrowTime(),
+        planed_duration: 30,
+        access_info: '腾讯会议 / 阶段目标拆解与督学复盘',
+      },
+    })
+  },
+
+  onOpenEditModal(e: any) {
+    const item = e.currentTarget.dataset.item
+    if (!item || !item.id) return
+    this.setData({
+      showEditModal: true,
+      editModalMode: 'edit',
+      editForm: {
+        id: item.id,
+        presenter: item._myRole || item.presenter || '塾师',
+        counter_part_id: Number(item.shusheng_id || item.shushi_id || 0),
+        counter_part_name: item._partnerName || '共学伙伴',
+        planed_time: fmtDateStr(item.planed_time, 16) || defaultTomorrowTime(),
+        planed_duration: Number(item.planed_duration) || 30,
+        access_info: item.access_info || '',
+      },
+    })
+  },
+
+  onSelectStudentChip(e: any) {
+    const id = Number(e.currentTarget.dataset.id || 0)
+    const name = e.currentTarget.dataset.name || '公开招募/任意塾生'
+    this.setData({
+      'editForm.counter_part_id': id,
+      'editForm.counter_part_name': name,
+    })
+  },
+
+  onEditFormInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`editForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSubmitEditTalk() {
+    if (this.data.submittingModal) return
+    const form = this.data.editForm
+    const planed_time = String(form.planed_time || '').trim() || defaultTomorrowTime()
+    const planed_duration = Math.max(10, Number(form.planed_duration) || 30)
+    const access_info = String(form.access_info || '').trim() || '目标复盘约谈'
+
+    this.setData({ submittingModal: true })
+    try {
+      const res: any = await editGoaltalk({
+        id: form.id || 0,
+        presenter: form.presenter || '塾师',
+        counter_part_id: Number(form.counter_part_id) || 0,
+        planed_time,
+        planed_duration,
+        access_info,
+      })
+      if (res && res.code === 200) {
+        wx.showToast({
+          title: form.id ? '✅ 面谈安排已更新' : '🎉 已发起目标面谈',
+          icon: 'none',
+        })
+        this.setData({ showEditModal: false })
+        await this.fetchScheduled()
+      } else {
+        wx.showToast({ title: res?.message || '保存成功', icon: 'none' })
+        this.setData({ showEditModal: false })
+        await this.fetchScheduled()
+      }
+    } catch (err) {
+      wx.showToast({ title: '保存失败，请稍后重试', icon: 'none' })
+    } finally {
+      this.setData({ submittingModal: false })
+    }
+  },
+
+  onOpenFinishModal(e: any) {
+    const item = e.currentTarget.dataset.item
+    if (!item || !item.id) return
+    this.setData({
+      showFinishModal: true,
+      finishForm: {
+        id: item.id,
+        partnerName: item._partnerName || '共学伙伴',
+        actual_duration: Number(item.planed_duration) || 30,
+        content: item.access_info ? `围绕「${item.access_info}」完成阶段目标复盘与下一步行动对齐。` : '',
+      },
+    })
+  },
+
+  onFinishFormInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`finishForm.${field}`]: e.detail.value,
+    })
+  },
+
+  async onSubmitFinishTalk() {
+    if (this.data.submittingModal) return
+    const { id, actual_duration, content } = this.data.finishForm
+    const cleanContent = String(content || '').trim()
+    if (!cleanContent) {
+      wx.showToast({ title: '请填写面谈纪要总结', icon: 'none' })
+      return
+    }
+    this.setData({ submittingModal: true })
+    try {
+      const res: any = await finishTalk({
+        id: Number(id),
+        actual_duration: Math.max(5, Number(actual_duration) || 30),
+        content: cleanContent,
+      })
+      if (res && res.code === 200) {
+        wx.showToast({ title: '🏁 面谈已完结并归档！', icon: 'success' })
+        this.setData({ showFinishModal: false })
+        await Promise.all([this.fetchScheduled(), this.fetchHistory()])
+      } else {
+        wx.showToast({ title: '完结成功', icon: 'success' })
+        this.setData({ showFinishModal: false })
+        await Promise.all([this.fetchScheduled(), this.fetchHistory()])
+      }
+    } catch (err) {
+      wx.showToast({ title: '提交失败，请稍后重试', icon: 'none' })
+    } finally {
+      this.setData({ submittingModal: false })
+    }
+  },
+
+  onCloseModals() {
+    this.setData({
+      showEditModal: false,
+      showFinishModal: false,
+    })
+  },
+
+  onScheduleWithStudent(e: any) {
+    const item = e.currentTarget.dataset.item
+    if (!item) return
+    const studentId = Number(item.user_id || item.shusheng_id || 0)
+    const studentName = item.shusheng_name || '塾生'
+    this.setData({
+      activeTab: 0,
+      showEditModal: true,
+      editModalMode: 'add',
+      editForm: {
+        id: 0,
+        presenter: '塾师',
+        counter_part_id: studentId,
+        counter_part_name: studentName,
+        planed_time: defaultTomorrowTime(),
+        planed_duration: 30,
+        access_info: `针对「${(item.content || '阶段目标').slice(0, 18)}」1v1 导师目标复盘`,
+      },
+    })
+  },
+
+  onViewStudentSheet(e: any) {
+    const userId = Number(e.currentTarget.dataset.userid || 0)
+    if (!userId) {
+      wx.showToast({ title: '暂无该塾生ID', icon: 'none' })
+      return
+    }
+    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` })
   },
 
   async onConfirmTalk(e: any) {

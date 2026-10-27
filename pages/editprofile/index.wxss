@@ -170,6 +170,29 @@
   font-weight: 600;
 }
 
+.city-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.city-chip {
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  color: #64748b;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.city-chip.active {
+  background: #ede9fe;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
 .social-tag-presets {
   margin-bottom: 24rpx;
 }
@@ -199,6 +222,13 @@
 
 .social-tag-chip:active {
   background: #ede9fe;
+}
+
+.social-tag-chip.active {
+  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.22);
 }
 
 .form-textarea {

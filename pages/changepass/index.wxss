@@ -141,6 +141,41 @@
   color: #059669;
 }
 
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.form-label-row .form-label {
+  margin-bottom: 0;
+}
+
+.gen-pass-chip {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border: 1rpx solid rgba(124, 58, 237, 0.22);
+  padding: 4rpx 18rpx;
+  border-radius: 999rpx;
+}
+
+.match-hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.match-hint.match {
+  color: #059669;
+}
+
+.match-hint.mismatch {
+  color: #ef4444;
+}
+
 .error-tip {
   padding: 16rpx 0;
   color: #ef4444;

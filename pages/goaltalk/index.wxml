@@ -5,7 +5,10 @@
       <text class="talk-banner-title">💬 目标约谈 · 1v1 共学室</text>
       <text class="talk-banner-sub">与领航塾师或同频搭子深度复盘目标、碰撞灵感</text>
     </view>
-    <view class="talk-banner-btn" bindtap="onGoSocialPlaza">+ 找搭子约聊</view>
+    <view class="talk-banner-actions">
+      <view class="talk-banner-btn primary" bindtap="onOpenAddModal">＋ 发起面谈</view>
+      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">找搭子</view>
+    </view>
   </view>
 
   <!-- Tab 切换 -->
@@ -65,19 +68,29 @@
             <text class="info-value success">{{item._confirmedTimeStr}}</text>
           </view>
         </view>
-        <view class="talk-actions" wx:if="{{item._canConfirm || item.access_info}}">
+        <view class="talk-actions">
           <view
             class="talk-action-btn ghost"
             wx:if="{{item.access_info}}"
             catchtap="onCopyAccess"
             data-info="{{item.access_info}}"
-          >复制入口/主题</view>
+          >复制入口</view>
+          <view
+            class="talk-action-btn ghost"
+            catchtap="onOpenEditModal"
+            data-item="{{item}}"
+          >✎ 编辑排期</view>
           <view
             class="talk-action-btn primary"
             wx:if="{{item._canConfirm}}"
             catchtap="onConfirmTalk"
             data-item="{{item}}"
           >{{confirmingId === item.id ? '确认中...' : '✓ 确认赴约'}}</view>
+          <view
+            class="talk-action-btn finish"
+            catchtap="onOpenFinishModal"
+            data-item="{{item}}"
+          >🏁 完结纪要</view>
         </view>
       </view>
     </view>
@@ -104,6 +117,19 @@
           <text wx:if="{{item._startDate}}">开始: {{item._startDate}}</text>
           <text wx:if="{{item._deadline}}">截止: {{item._deadline}}</text>
         </view>
+        <view class="talk-actions">
+          <view
+            class="talk-action-btn ghost"
+            wx:if="{{item._studentId}}"
+            catchtap="onViewStudentSheet"
+            data-userid="{{item._studentId}}"
+          >📋 查看学习单</view>
+          <view
+            class="talk-action-btn primary"
+            catchtap="onScheduleWithStudent"
+            data-item="{{item}}"
+          >💬 约TA面谈</view>
+        </view>
       </view>
     </view>
   </view>
@@ -127,6 +153,104 @@
         </view>
         <view class="history-time" wx:if="{{item._finishTimeStr}}">
           完成于 {{item._finishTimeStr}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增 / 编辑目标面谈弹窗 -->
+  <view class="gt-modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseModals">
+    <view class="gt-modal-card" catchtap="true">
+      <view class="gt-modal-title">{{editModalMode === 'add' ? '＋ 发起 1v1 目标面谈' : '✎ 编辑面谈排期与会议号'}}</view>
+
+      <block wx:if="{{editModalMode === 'add'}}">
+        <view class="gt-field-label">选择面谈对象</view>
+        <view class="gt-chip-list">
+          <view
+            class="gt-chip {{editForm.counter_part_id === 0 ? 'active' : ''}}"
+            data-id="0"
+            data-name="公开招募/任意塾生"
+            bindtap="onSelectStudentChip"
+          >🌟 公开招募</view>
+          <view
+            class="gt-chip {{editForm.counter_part_id === item.id ? 'active' : ''}}"
+            wx:for="{{shushengList}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}"
+            bindtap="onSelectStudentChip"
+          >🎓 {{item.name}}</view>
+        </view>
+      </block>
+
+      <view class="gt-field-label">预定时间（YYYY-MM-DD HH:MM）</view>
+      <input
+        class="gt-input"
+        value="{{editForm.planed_time}}"
+        placeholder="例如 2026-10-28 20:00"
+        data-field="planed_time"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-field-label">计划时长（分钟）</view>
+      <input
+        class="gt-input"
+        type="number"
+        value="{{editForm.planed_duration}}"
+        placeholder="30"
+        data-field="planed_duration"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-field-label">会议号 / 面谈主题入口</view>
+      <textarea
+        class="gt-textarea"
+        value="{{editForm.access_info}}"
+        placeholder="填写腾讯会议号、飞书链接或本次目标复盘议题..."
+        maxlength="300"
+        data-field="access_info"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-modal-actions">
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">取消</view>
+        <view class="gt-modal-btn confirm" bindtap="onSubmitEditTalk">
+          {{submittingModal ? '保存中...' : '确认保存'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 完结面谈并填写纪要弹窗 -->
+  <view class="gt-modal-mask" wx:if="{{showFinishModal}}" bindtap="onCloseModals">
+    <view class="gt-modal-card" catchtap="true">
+      <view class="gt-modal-title">🏁 完结面谈 · 记录复盘纪要</view>
+      <view class="gt-modal-sub">共学伙伴：{{finishForm.partnerName}}</view>
+
+      <view class="gt-field-label">实际用时（分钟）</view>
+      <input
+        class="gt-input"
+        type="number"
+        value="{{finishForm.actual_duration}}"
+        placeholder="30"
+        data-field="actual_duration"
+        bindinput="onFinishFormInput"
+      />
+
+      <view class="gt-field-label">面谈复盘纪要（必填）</view>
+      <textarea
+        class="gt-textarea"
+        value="{{finishForm.content}}"
+        placeholder="记录本次面谈的核心收获、阶段目标校准结论与下一步微行动..."
+        maxlength="1500"
+        data-field="content"
+        bindinput="onFinishFormInput"
+      />
+
+      <view class="gt-modal-actions">
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">取消</view>
+        <view class="gt-modal-btn confirm" bindtap="onSubmitFinishTalk">
+          {{submittingModal ? '归档中...' : '确认完结归档'}}
         </view>
       </view>
     </view>

@@ -9,6 +9,12 @@ Page({
   onLoad() {
     this.loadLogs()
   },
+  onShareAppMessage() {
+    return {
+      title: '学本领，上自塾 · 以终为始共学平台',
+      path: '/pages/aim/index',
+    }
+  },
   loadLogs() {
     const rawLogs = ((wx.getStorageSync('logs') || []) as number[]).map(log => ({
       date: util.formatTime(new Date(log)),

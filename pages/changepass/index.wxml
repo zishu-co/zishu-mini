@@ -38,7 +38,10 @@
     </view>
 
     <view class="form-item">
-      <text class="form-label">新密码</text>
+      <view class="form-label-row">
+        <text class="form-label">新密码</text>
+        <text class="gen-pass-chip" bindtap="onGenerateStrongPass">🎲 生成高强密码</text>
+      </view>
       <view class="input-wrap">
         <input
           class="form-input with-toggle"
@@ -74,6 +77,9 @@
           maxlength="20"
         />
         <text class="eye-toggle" bindtap="toggleShowConfirm">{{showConfirm ? '隐藏' : '显示'}}</text>
+      </view>
+      <view class="match-hint {{matchStatus}}" wx:if="{{matchStatus}}">
+        {{matchStatus === 'match' ? '✓ 两次输入的新密码一致' : '✕ 两次输入的新密码不一致'}}
       </view>
     </view>
 
