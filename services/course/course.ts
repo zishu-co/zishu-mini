@@ -91,7 +91,7 @@ function request<T = any>(options: {
       method: (options.method || 'GET') as any,
       data: options.data,
       header: {
-        'content-type': options.contentType || 'application/x-www-form-urlencoded',
+        'content-type': options.contentType || 'application/json',
         'token': token,
       },
       timeout: 80000,
@@ -126,12 +126,12 @@ export function fetchCurrentSelections(): Promise<CurrentSelection[]> {
 
 /** 选课（loading 由调用方控制，不在服务层弹） */
 export function selectCourse(id: number, courseid: number): Promise<any> {
-  return request({ url: '/api/course/select_course', method: 'POST', data: { id, courseid } });
+  return request({ url: '/api/learn/select_course', method: 'POST', data: { id, courseid } });
 }
 
 /** 退选（loading 由调用方控制，不在服务层弹） */
 export function quitCourse(id: number, courseid: number, reason: string): Promise<any> {
-  return request({ url: '/api/course/quit_course', method: 'POST', data: { id, courseid, reason } });
+  return request({ url: '/api/learn/quit_course', method: 'POST', data: { id, courseid, reason } });
 }
 
 /** 申报学习时长 */
@@ -153,12 +153,12 @@ export function reportLearn(
 
 /** 获取可选塾师列表 */
 export function calMentors(courseId: number): Promise<CalMentorsResult> {
-  return request<CalMentorsResult>({ url: '/api/course/cal_mentors/' + courseId });
+  return request<CalMentorsResult>({ url: '/api/learn/cal_mentors/' + courseId });
 }
 
 /** 选择塾师 */
 export function selectMentor(shushi_id: number, courseid: number): Promise<any> {
-  return request({ url: '/api/course/select_mentor', method: 'POST', data: { shushi_id, courseid }, showLoading: true });
+  return request({ url: '/api/learn/select_mentor', method: 'POST', data: { shushi_id, courseid }, showLoading: true });
 }
 
 // ==================== 课程详情相关类型 ====================

@@ -293,7 +293,7 @@ const handleTokenExpired = <T = any>(
  */
 const buildHeaders = (options: RequestOptions): Record<string, string> => {
   const header: Record<string, string> = {
-    'content-type': 'application/x-www-form-urlencoded',
+    'content-type': 'application/json',
     ...options.header
   };
 

@@ -22,7 +22,7 @@ Page({
 
   fetchData() {
     this.setData({ loading: true })
-    return get('/api/course/list_all_mentors')
+    return get('/api/learn/list_all_mentors')
       .then((res: any) => {
         const raw = Array.isArray(res) ? res : []
         const shushiIds = new Set<number>()

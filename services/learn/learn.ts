@@ -71,7 +71,7 @@ function request<T = any>(options: {
       method: (options.method || 'GET') as any,
       data: options.data,
       header: {
-        'content-type': 'application/x-www-form-urlencoded',
+        'content-type': 'application/json',
         'token': token,
       },
       timeout: 80000,

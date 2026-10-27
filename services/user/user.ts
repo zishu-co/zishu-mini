@@ -83,26 +83,26 @@ export const fetchShuzhi = (userId: number) => {
 
 /**
  * 获取跟进列表
- * GET /api/users/fetch_followup
+ * GET /api/inno/fetch_finished_projects
  */
 export const fetchFollowup = () => {
-  return get('/api/users/fetch_followup')
+  return get('/api/inno/fetch_finished_projects')
 }
 
 /**
  * 获取导师列表
- * GET /api/users/fetch_mentors
+ * GET /api/learn/fetch_mentors
  */
 export const fetchMentors = () => {
-  return get('/api/users/fetch_mentors')
+  return get('/api/learn/fetch_mentors')
 }
 
 /**
  * 获取督导列表
- * GET /api/users/fetch_supervise
+ * GET /api/learn/fetch_current_selections
  */
 export const fetchSupervise = () => {
-  return get('/api/users/fetch_supervise')
+  return get('/api/learn/fetch_current_selections')
 }
 
 /**
@@ -133,8 +133,13 @@ export const fetchAllGoals = (presenter = '塾师') => {
  * 获取塾生列表
  * GET /api/users/fetch_shushengs
  */
-export const fetchShushengs = () => {
-  return get('/api/users/fetch_shushengs')
+export const fetchShushengs = (userId?: number) => {
+  const uid =
+    userId ||
+    wx.getStorageSync('userId') ||
+    wx.getStorageSync('userInfo')?.userId ||
+    wx.getStorageSync('userInfo')?.id
+  return get(uid ? `/api/users/fetch_shushengs/${uid}` : '/api/users/fetch_shushengs')
 }
 
 /**
