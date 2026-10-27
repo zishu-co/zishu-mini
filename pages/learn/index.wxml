@@ -29,6 +29,10 @@
       <text class="quick-icon">👀</text>
       <text class="quick-text">督学看板</text>
     </view>
+    <view class="quick-btn" bindtap="onOpenCampModal">
+      <text class="quick-icon">🏕️</text>
+      <text class="quick-text">进阶预备营</text>
+    </view>
   </view>
 
   <!-- 未登录提示 -->
@@ -210,6 +214,72 @@
       <view class="modal-actions">
         <view class="action-btn secondary" bindtap="onCloseReportModal">取消</view>
         <view class="action-btn primary" bindtap="onConfirmReport">确认申报</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 102-camp.md: 进阶预备营弹窗（塾员预备营 / 塾师预备营 / 塾主预备营） -->
+  <view class="modal-mask" wx:if="{{showCampModal}}" bindtap="onCloseCampModal"></view>
+  <view class="modal" wx:if="{{showCampModal}}">
+    <view class="modal-header">
+      <text class="modal-title">🏕️ 自塾进阶预备营 ({{campInfo ? campInfo.camp_name : '预备营'}})</text>
+      <text class="modal-close" bindtap="onCloseCampModal">✕</text>
+    </view>
+    <view class="modal-body">
+      <view class="course-filter-pills" style="margin-bottom: 18rpx;">
+        <view
+          class="filter-pill {{activeCampId === 1 ? 'active' : ''}}"
+          data-campid="1"
+          bindtap="onSwitchCampTab"
+        >🌱 塾员营</view>
+        <view
+          class="filter-pill {{activeCampId === 2 ? 'active' : ''}}"
+          data-campid="2"
+          bindtap="onSwitchCampTab"
+        >🎓 塾师营</view>
+        <view
+          class="filter-pill {{activeCampId === 3 ? 'active' : ''}}"
+          data-campid="3"
+          bindtap="onSwitchCampTab"
+        >👑 塾主营</view>
+      </view>
+
+      <view class="report-info" wx:if="{{campInfo}}">
+        <text>营主理人：{{campInfo.admin_name || '自塾教务处'}} · 必修课程号：{{campInfo.must_course || '1、2'}}</text>
+        <text>在营成员 {{campMembers.length}} 人 · 已毕业 {{campFinishs.length}} 人 · 排队审核 {{campWaitings.length}} 人</text>
+      </view>
+
+      <view class="input-row">
+        <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8rpx;">
+          <text class="input-label">入营承诺书 *</text>
+          <text style="color:#7c3aed;font-size:24rpx;font-weight:700;" bindtap="onFillCampPledge">📋 一键填入标准誓词</text>
+        </view>
+        <textarea
+          class="input-field"
+          style="height:140rpx;padding:14rpx;"
+          placeholder="{{campPledgeExample}}"
+          value="{{campForm.commitment}}"
+          data-field="commitment"
+          bindinput="onCampFormInput"
+        />
+      </view>
+
+      <view class="input-row">
+        <text class="input-label">本人真名签字 *</text>
+        <input
+          class="input-field"
+          placeholder="请输入您的真实姓名确认承诺"
+          value="{{campForm.signature}}"
+          data-field="signature"
+          bindinput="onCampFormInput"
+        />
+      </view>
+
+      <view class="modal-actions">
+        <view class="action-btn secondary" bindtap="onCloseCampModal">关闭</view>
+        <view class="action-btn primary" bindtap="onSubmitJoinCamp">
+          {{submittingCamp ? '提交中...' : '🚀 申请加入预备营'}}
+        </view>
       </view>
     </view>
   </view>

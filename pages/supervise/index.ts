@@ -1,4 +1,5 @@
 // @ts-nocheck
+import base from '../../services/base'
 import { fetchAllSelections, fetchCurrentSelections } from '../../services/course/course'
 import { quickGreetPeer } from '../../services/user/user'
 
@@ -145,6 +146,38 @@ Page({
     wx.showToast({
       title: `⚡ 已向 ${userName} 发送共学加油鼓励！`,
       icon: 'none',
+    })
+  },
+
+  // 108-supervise.md: 清理超期选课记录 (POST /api/learn/quit_course, reason='废弃')
+  onCleanseSelection(e: any) {
+    const userId = Number(e.currentTarget.dataset.userid || 0)
+    const courseId = Number(e.currentTarget.dataset.courseid || 0)
+    const userName = e.currentTarget.dataset.username || '该塾生'
+    const courseTitle = e.currentTarget.dataset.course || '该课程'
+    if (!userId || !courseId) return
+    wx.showModal({
+      title: '清理逾期选课记录',
+      content: `确认将 ${userName} 逾期超过 30 天的《${courseTitle}》选课记录标记为「废弃」并清理吗？`,
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          const resp: any = await base.post('/api/learn/quit_course', {
+            id: userId,
+            courseid: courseId,
+            reason: '废弃',
+          })
+          if (resp && String(resp.code) === '200') {
+            wx.showToast({ title: '🧹 已清理逾期记录', icon: 'success' })
+            this.fetchData()
+          } else {
+            wx.showToast({ title: resp?.message || '仅本人或管理员可清理', icon: 'none' })
+          }
+        } catch (err) {
+          wx.showToast({ title: '清理失败，请稍后重试', icon: 'none' })
+        }
+      },
     })
   },
 

@@ -14,8 +14,15 @@ import {
   Course,
   Mentor,
 } from '../../services/course/course';
+import base from '../../services/base';
 
 const app = getApp();
+
+const CAMP_COMMIT_EXAMPLES: Record<number, string> = {
+  1: '我志愿加入塾员预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾员预备营的微信群发30元红包。',
+  2: '我志愿加入塾师预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾师预备营的微信群发30元红包。',
+  3: '我志愿加入塾主预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾主预备营的微信群发30元红包。',
+};
 
 type DecoratedSelection = CurrentSelection & {
   deadlineClass: string;
@@ -73,6 +80,20 @@ Page<ILearnPageData, any>({
     submittingMentor: false,
     submittingReport: false,
     selectingCourseId: 0,
+    // 102-camp.md: 进阶预备营（塾员营 / 塾师营 / 塾主营）
+    showCampModal: false,
+    activeCampId: 1,
+    campLoading: false,
+    submittingCamp: false,
+    campInfo: null as any,
+    campMembers: [] as any[],
+    campFinishs: [] as any[],
+    campWaitings: [] as any[],
+    campPledgeExample: CAMP_COMMIT_EXAMPLES[1],
+    campForm: {
+      commitment: '',
+      signature: '',
+    },
   },
 
   onLoad() {},
@@ -480,6 +501,97 @@ Page<ILearnPageData, any>({
 
   onGotoSupervise() {
     wx.navigateTo({ url: '/pages/supervise/index' });
+  },
+
+  // ── 102-camp.md: 进阶预备营（塾员营 / 塾师营 / 塾主营） ──────────────
+  onOpenCampModal(e?: any) {
+    if (!this.data.hasLogin) {
+      this.goToLogin();
+      return;
+    }
+    const campid = Number(e?.currentTarget?.dataset?.campid || this.data.activeCampId || 1);
+    this.setData({
+      showCampModal: true,
+      activeCampId: campid,
+      campPledgeExample: CAMP_COMMIT_EXAMPLES[campid] || CAMP_COMMIT_EXAMPLES[1],
+      'campForm.commitment': '',
+      'campForm.signature': '',
+    });
+    this.loadCampDetail(campid);
+  },
+
+  onCloseCampModal() {
+    this.setData({ showCampModal: false });
+  },
+
+  onSwitchCampTab(e: any) {
+    const campid = Number(e.currentTarget.dataset.campid || 1);
+    if (campid === this.data.activeCampId) return;
+    this.setData({
+      activeCampId: campid,
+      campPledgeExample: CAMP_COMMIT_EXAMPLES[campid] || CAMP_COMMIT_EXAMPLES[1],
+      'campForm.commitment': '',
+    });
+    this.loadCampDetail(campid);
+  },
+
+  async loadCampDetail(campid: number) {
+    this.setData({ campLoading: true });
+    try {
+      const res: any = await base.get(`/api/learn/get_camp/${campid}`);
+      this.setData({
+        campInfo: res?.camp || { id: campid, camp_name: campid === 1 ? '塾员预备营' : campid === 2 ? '塾师预备营' : '塾主预备营' },
+        campMembers: Array.isArray(res?.members) ? res.members : [],
+        campFinishs: Array.isArray(res?.finishs) ? res.finishs : [],
+        campWaitings: Array.isArray(res?.waitings) ? res.waitings : [],
+        campLoading: false,
+      });
+    } catch {
+      this.setData({
+        campInfo: { id: campid, camp_name: campid === 1 ? '塾员预备营' : campid === 2 ? '塾师预备营' : '塾主预备营' },
+        campMembers: [],
+        campFinishs: [],
+        campWaitings: [],
+        campLoading: false,
+      });
+    }
+  },
+
+  onFillCampPledge() {
+    this.setData({
+      'campForm.commitment': this.data.campPledgeExample,
+    });
+    wx.showToast({ title: '已填入入营承诺书', icon: 'none' });
+  },
+
+  onCampFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [`campForm.${field}`]: e.detail.value });
+  },
+
+  async onSubmitJoinCamp() {
+    if (this.data.submittingCamp) return;
+    const { commitment, signature } = this.data.campForm;
+    if (!String(commitment || '').trim() || !String(signature || '').trim()) {
+      wx.showToast({ title: '请填写承诺书并输入真名签字', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingCamp: true });
+    try {
+      const payload = {
+        campid: this.data.activeCampId,
+        commitment: String(commitment).trim(),
+        signature: String(signature).trim(),
+      };
+      await base.post('/api/learn/join_camp', { info: JSON.stringify(payload) });
+      wx.showToast({ title: '🏕️ 已提交入营申请！', icon: 'success' });
+      this.loadCampDetail(this.data.activeCampId);
+    } catch {
+      wx.showToast({ title: '提交失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ submittingCamp: false });
+    }
   },
 
   goToLogin() {

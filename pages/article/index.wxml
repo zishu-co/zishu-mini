@@ -18,24 +18,36 @@
 
   <!-- 顶部筛选与搜索栏 -->
   <view class="article-toolbar" wx:if="{{hasLogin}}">
-    <view class="article-tabs">
-      <view
-        class="article-tab {{articleTab === 'all' ? 'active' : ''}}"
-        data-tab="all"
-        bindtap="onTabChange"
-      >🌟 全塾精选 ({{allArticles.length}})</view>
-      <view
-        class="article-tab {{articleTab === 'zhuanlan' ? 'active' : ''}}"
-        data-tab="zhuanlan"
-        bindtap="onTabChange"
-      >📚 专栏合集 ({{zhuanlanList.length}})</view>
-      <view
-        class="article-tab {{articleTab === 'mine' ? 'active' : ''}}"
-        data-tab="mine"
-        bindtap="onTabChange"
-      >📝 我的创作</view>
-    </view>
-    <view class="article-search-bar" wx:if="{{articleTab !== 'zhuanlan'}}">
+    <scroll-view class="article-tabs-scroll" scroll-x="true">
+      <view class="article-tabs">
+        <view
+          class="article-tab {{articleTab === 'all' ? 'active' : ''}}"
+          data-tab="all"
+          bindtap="onTabChange"
+        >🌟 全塾精选 ({{allArticles.length}})</view>
+        <view
+          class="article-tab {{articleTab === 'zhuanlan' ? 'active' : ''}}"
+          data-tab="zhuanlan"
+          bindtap="onTabChange"
+        >📚 专栏合集 ({{zhuanlanList.length}})</view>
+        <view
+          class="article-tab {{articleTab === 'video' ? 'active' : ''}}"
+          data-tab="video"
+          bindtap="onTabChange"
+        >🎬 微课专辑 ({{videoAlbums.length}})</view>
+        <view
+          class="article-tab {{articleTab === 'map' ? 'active' : ''}}"
+          data-tab="map"
+          bindtap="onTabChange"
+        >🗺️ 知识脑图 ({{mapList.length}})</view>
+        <view
+          class="article-tab {{articleTab === 'mine' ? 'active' : ''}}"
+          data-tab="mine"
+          bindtap="onTabChange"
+        >📝 我的创作</view>
+      </view>
+    </scroll-view>
+    <view class="article-search-bar" wx:if="{{articleTab === 'all' || articleTab === 'mine'}}">
       <text class="article-search-icon">🔍</text>
       <input
         class="article-search-input"
@@ -45,10 +57,21 @@
       />
       <text wx:if="{{searchKeyword}}" class="article-search-clear" bindtap="onClearSearch">✕</text>
     </view>
+    <view class="article-search-bar" wx:if="{{articleTab === 'map' && !activeMap}}">
+      <text class="article-search-icon">🧠</text>
+      <input
+        class="article-search-input"
+        placeholder="搜索脑图节点关键词 (102-search-map.md)..."
+        value="{{mapSearchQuery}}"
+        bindinput="onMapSearchInput"
+        bindconfirm="onRunMapSearch"
+      />
+      <text class="map-search-go" bindtap="onRunMapSearch">检索</text>
+    </view>
   </view>
 
   <!-- 加载状态 -->
-  <view class="loading" wx:if="{{(loading || zhuanlanLoading) && hasLogin}}">
+  <view class="loading" wx:if="{{(loading || zhuanlanLoading || videoLoading || mapLoading) && hasLogin}}">
     <text>加载中...</text>
   </view>
 
@@ -105,8 +128,139 @@
     </block>
   </view>
 
+  <!-- 微课视频专辑视图 (104-show-album.md, 103-fetch-album.md, 105-watch-video.md) -->
+  <view class="article-list" wx:if="{{!videoLoading && hasLogin && articleTab === 'video'}}">
+    <block wx:if="{{!activeAlbum}}">
+      <view
+        class="article-item"
+        wx:for="{{videoAlbums}}"
+        wx:key="album_id"
+        data-id="{{item.album_id}}"
+        data-item="{{item}}"
+        bindtap="onSelectVideoAlbum"
+      >
+        <view class="article-header">
+          <text class="article-title">🎬 {{item.album_title || '未命名微课专辑'}}</text>
+          <text class="article-arrow">进入专辑 ›</text>
+        </view>
+        <view class="article-meta">
+          <text class="author">主讲：{{item.album_author || '自塾讲师'}}</text>
+          <text class="read-badge">总时长 {{item.whole_length || 0}} 分钟</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{videoAlbums.length === 0}}">
+        <text>暂无微课视频专辑</text>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="zhuanlan-back-bar">
+        <text class="zhuanlan-back-btn" bindtap="onBackToAlbumList">← 返回微课专辑</text>
+        <text class="zhuanlan-active-title">🎬 {{activeAlbum.album_title || '微课目录'}}</text>
+        <text class="zhuanlan-favor-btn" bindtap="onFavorAlbum">⭐ 收藏专辑</text>
+      </view>
+      <view class="album-intro-card" wx:if="{{activeAlbum.album_intro}}">
+        <text>{{activeAlbum.album_intro}}</text>
+      </view>
+      <view
+        class="article-item"
+        wx:for="{{albumVideos}}"
+        wx:key="video_id"
+        data-id="{{item.video_id}}"
+        data-item="{{item}}"
+        bindtap="onWatchVideo"
+      >
+        <view class="article-header">
+          <text class="article-title">▶️ {{item.video_title || '微课视频'}}</text>
+          <text class="article-arrow">观看/讲义 ›</text>
+        </view>
+        <view class="article-meta">
+          <text class="read-badge">时长 {{item.video_length || 0}} 分钟</text>
+          <text class="date" wx:if="{{item.update_time}}">更新于 {{item.update_time}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{albumVideos.length === 0}}">
+        <text>该专辑下暂无微课视频</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- 知识脑图视图 (103-show-maps.md, 101-map.md, 102-search-map.md) -->
+  <view class="article-list" wx:if="{{!mapLoading && hasLogin && articleTab === 'map'}}">
+    <block wx:if="{{!activeMap}}">
+      <view wx:if="{{mapSearchResults.length > 0}}" class="map-search-results-box">
+        <view class="map-search-results-header">🔍 脑图节点匹配结果 ({{mapSearchResults.length}})</view>
+        <view
+          class="article-item"
+          wx:for="{{mapSearchResults}}"
+          wx:key="index"
+          data-id="{{item.map_id}}"
+          data-item="{{item}}"
+          bindtap="onSelectMindMap"
+        >
+          <view class="article-header">
+            <text class="article-title">🧠 节点：{{item.node?.name || item.node?.title || '匹配节点'}}</text>
+            <text class="article-arrow">打开脑图 ›</text>
+          </view>
+          <view class="article-meta">
+            <text class="author">所属脑图：{{item.map_title}}</text>
+            <text class="read-badge">作者：{{item.author_name || '自塾共创'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view
+        class="article-item"
+        wx:for="{{mapList}}"
+        wx:key="mapid"
+        data-id="{{item.mapid}}"
+        data-item="{{item}}"
+        bindtap="onSelectMindMap"
+      >
+        <view class="article-header">
+          <text class="article-title">🗺️ {{item.map_title || '未命名知识脑图'}}</text>
+          <text class="article-arrow">展开脑图 ›</text>
+        </view>
+        <view class="article-meta">
+          <text class="author">创建者：{{item.map_author || '自塾共创'}}</text>
+          <text class="read-badge">脑图 #{{item.mapid}}</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{mapList.length === 0}}">
+        <text>暂无知识脑图</text>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="zhuanlan-back-bar">
+        <text class="zhuanlan-back-btn" bindtap="onBackToMapList">← 返回全部脑图</text>
+        <text class="zhuanlan-active-title">🗺️ {{activeMap.map_title || '知识脑图'}}</text>
+        <text class="zhuanlan-favor-btn" bindtap="onFavorMap">⭐ 收藏脑图</text>
+      </view>
+      <view class="album-intro-card" wx:if="{{activeMap.map_desc}}">
+        <text>{{activeMap.map_desc}}</text>
+      </view>
+      <view class="mindmap-outline-card">
+        <view class="mindmap-outline-header">🌿 结构化脑图节点大纲 ({{activeMapNodes.length}} 个节点)</view>
+        <view
+          class="mindmap-node-row depth-{{item.depth}}"
+          wx:for="{{activeMapNodes}}"
+          wx:key="id"
+          style="{{item.indentStyle}}"
+        >
+          <view class="mindmap-node-main">
+            <text class="mindmap-node-bullet">{{item.depth === 0 ? '🎯' : item.childrenCount > 0 ? '▾' : '•'}}</text>
+            <text class="mindmap-node-name">{{item.name}}</text>
+            <text wx:if="{{item.childrenCount > 0}}" class="mindmap-node-count">{{item.childrenCount}} 子项</text>
+          </view>
+          <view wx:if="{{item.note}}" class="mindmap-node-note">{{item.note}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
   <!-- 文章列表 -->
-  <view class="article-list" wx:if="{{!loading && hasLogin && articleTab !== 'zhuanlan'}}">
+  <view class="article-list" wx:if="{{!loading && hasLogin && (articleTab === 'all' || articleTab === 'mine')}}">
     <view
       class="article-item"
       wx:for="{{articles}}"
@@ -236,6 +390,43 @@
           class="reader-action-btn primary"
           bindtap="onSaveArticle"
         >{{savingArticle ? '保存中...' : (editorForm.id > 0 ? '保存修改' : '立即发布')}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 105-watch-video.md: 微课视频与讲义弹窗 -->
+  <view class="reader-mask" wx:if="{{showVideoModal && currentVideo}}" bindtap="onCloseVideoModal">
+    <view class="reader-sheet" catchtap="stopReaderBubble">
+      <view class="reader-topbar">
+        <view class="reader-topbar-left">
+          <view class="reader-badge">🎬 微课视频学习</view>
+        </view>
+        <view class="reader-close" bindtap="onCloseVideoModal">✕</view>
+      </view>
+      <scroll-view class="reader-scroll" scroll-y="true">
+        <view class="reader-title">{{currentVideo.video_title}}</view>
+        <view class="reader-meta">
+          <text class="reader-author">{{currentVideo.video_author || '自塾讲师'}}</text>
+          <text class="reader-dept" wx:if="{{currentVideo.album_title}}">专辑：{{currentVideo.album_title}}</text>
+          <text class="reader-dept">时长 {{currentVideo.video_length || 0}} 分钟</text>
+          <text class="reader-date" wx:if="{{currentVideo.update_time}}">{{currentVideo.update_time}}</text>
+        </view>
+        <view class="video-player-box" wx:if="{{currentVideo.video_url}}">
+          <video
+            class="video-player"
+            src="{{currentVideo.video_url}}"
+            controls="{{true}}"
+            show-fullscreen-btn="{{true}}"
+          ></video>
+        </view>
+        <view class="reader-divider"></view>
+        <view class="reader-content font-md">
+          <text user-select="true">{{currentVideo.video_fulltext || '暂无配套文字讲义'}}</text>
+        </view>
+      </scroll-view>
+      <view class="reader-footer">
+        <view class="reader-action-btn ghost" bindtap="onCopyVideoUrl">🔗 复制视频链接</view>
+        <view class="reader-action-btn primary" bindtap="onFavorVideo">⭐ 收藏本节微课</view>
       </view>
     </view>
   </view>

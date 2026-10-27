@@ -102,6 +102,16 @@
             data-userid="{{item.user_id}}"
           >📋 查看学习单</view>
           <view
+            wx:if="{{item._deadlineClass === 'red'}}"
+            class="action-pill secondary"
+            style="color:#dc2626;border-color:#fecaca;background:#fef2f2;"
+            bindtap="onCleanseSelection"
+            data-userid="{{item.user_id}}"
+            data-courseid="{{item.course_id}}"
+            data-username="{{item.user_name}}"
+            data-course="{{item.course_title}}"
+          >🧹 清理逾期</view>
+          <view
             class="action-pill primary"
             bindtap="onNudgePeer"
             data-userid="{{item.user_id}}"

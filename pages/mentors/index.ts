@@ -88,10 +88,15 @@ Page({
         const listData = raw.map((item: any) => {
           if (item.shushi_id) shushiIds.add(Number(item.shushi_id))
           if (item.shusheng_id) shushengIds.add(Number(item.shusheng_id))
+          const staleness = this.getUpdateStaleness(item.update_time || item.start_time)
           return {
             ...item,
             _startDate: item.start_time ? String(item.start_time).slice(0, 10) : '',
+            _updateDate: item.update_time ? String(item.update_time).slice(0, 10) : '',
             _isActive: item.status === '活跃' || item.status === '新选' || item.status === '改课' || !item.status,
+            _stalenessClass: staleness.cls,
+            _stalenessLabel: staleness.label,
+            _isStale: staleness.isStale,
           }
         })
         const filteredList = this.applySearch(listData, this.data.searchKeyword, this.data.statusFilter)
@@ -147,5 +152,46 @@ Page({
         icon: 'none',
       })
     }
+  },
+
+  // 104-mentors.md: 4 色超期状态与清理超期师生关系 (POST /api/learn/cleanse_mentor)
+  getUpdateStaleness(updateStr: string) {
+    if (!updateStr) return { cls: '', label: '', isStale: false }
+    const d = new Date(updateStr)
+    const now = new Date()
+    if (isNaN(d.getTime())) return { cls: '', label: '', isStale: false }
+    const diffDays = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    if (diffDays <= -180) {
+      return { cls: 'red', label: '⚠️ 超半年未更新', isStale: true }
+    }
+    if (diffDays <= -90) {
+      return { cls: 'purple', label: '⏳ 超3个月未更新', isStale: true }
+    }
+    if (diffDays <= -30) {
+      return { cls: 'orange', label: '⏳ 超1个月未更新', isStale: true }
+    }
+    return { cls: 'blue', label: '✅ 近期活跃', isStale: false }
+  },
+
+  onCleanseMentor(e: any) {
+    const id = Number(e.currentTarget.dataset.id || 0)
+    const shushiName = e.currentTarget.dataset.shushi || '塾师'
+    const shushengName = e.currentTarget.dataset.shusheng || '塾生'
+    if (!id) return
+    wx.showModal({
+      title: '清理超期师生结对',
+      content: `确认清理「${shushiName} ⇄ ${shushengName}」超期一个月以上的师生关系吗？`,
+      confirmColor: '#ef4444',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          await base.post('/api/learn/cleanse_mentor', { id })
+          wx.showToast({ title: '🧹 已清理超期关系', icon: 'success' })
+          this.fetchData()
+        } catch (err) {
+          wx.showToast({ title: '清理失败，请稍后重试', icon: 'none' })
+        }
+      },
+    })
   },
 })

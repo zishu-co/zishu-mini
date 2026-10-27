@@ -39,7 +39,7 @@ interface IArticlePageData {
   loading: boolean
   allArticles: IArticleItem[]
   articles: IArticleItem[]
-  articleTab: 'all' | 'mine' | 'zhuanlan'
+  articleTab: 'all' | 'mine' | 'zhuanlan' | 'video' | 'map'
   searchKeyword: string
   currentUserId: number
   showReaderModal: boolean
@@ -52,6 +52,20 @@ interface IArticlePageData {
   activeZhuanlan: any | null
   zhuanlanArticles: any[]
   zhuanlanLoading: boolean
+  // 104-show-album.md, 103-fetch-album.md, 105-watch-video.md: 微课视频专辑
+  videoAlbums: any[]
+  activeAlbum: any | null
+  albumVideos: any[]
+  videoLoading: boolean
+  showVideoModal: boolean
+  currentVideo: any | null
+  // 103-show-maps.md, 101-map.md, 102-search-map.md: 知识脑图
+  mapList: any[]
+  activeMap: any | null
+  activeMapNodes: any[]
+  mapLoading: boolean
+  mapSearchQuery: string
+  mapSearchResults: any[]
   // 102-edit.md: 写文章 / 编辑文章
   showEditorModal: boolean
   savingArticle: boolean
@@ -60,6 +74,30 @@ interface IArticlePageData {
     title: string
     content: string
   }
+}
+
+function flattenMindMapNodes(raw: any, depth = 0, out: any[] = []): any[] {
+  if (!raw) return out
+  const list = Array.isArray(raw) ? raw : [raw]
+  for (const node of list) {
+    if (!node || typeof node !== 'object') continue
+    const name = String(node.name || node.title || node.topic || node.text || '').trim()
+    const children = Array.isArray(node.children) ? node.children : []
+    if (name) {
+      out.push({
+        id: `${depth}-${out.length}`,
+        name,
+        depth,
+        indentStyle: `padding-left: ${Math.min(depth * 28, 140)}rpx;`,
+        childrenCount: children.length,
+        note: String(node.note || node.remark || node.desc || '').trim(),
+      })
+    }
+    if (children.length > 0) {
+      flattenMindMapNodes(children, depth + 1, out)
+    }
+  }
+  return out
 }
 
 function stripHtmlTags(input: string): string {
@@ -94,6 +132,18 @@ Page<IArticlePageData, any>({
     activeZhuanlan: null,
     zhuanlanArticles: [],
     zhuanlanLoading: false,
+    videoAlbums: [],
+    activeAlbum: null,
+    albumVideos: [],
+    videoLoading: false,
+    showVideoModal: false,
+    currentVideo: null,
+    mapList: [],
+    activeMap: null,
+    activeMapNodes: [],
+    mapLoading: false,
+    mapSearchQuery: '',
+    mapSearchResults: [],
     showEditorModal: false,
     savingArticle: false,
     editorForm: {
@@ -169,8 +219,249 @@ Page<IArticlePageData, any>({
     if (hasLogin) {
       this.fetchArticles(done)
       this.fetchZhuanlans()
+      this.fetchVideoAlbums()
+      this.fetchMindMaps()
     } else if (done) {
       done()
+    }
+  },
+
+  // ── 104-show-album.md, 103-fetch-album.md, 105-watch-video.md: 微课专辑 ──
+  fetchVideoAlbums() {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ videoLoading: true })
+    wx.request({
+      url: `${getBaseUrl()}/api/video/show_album`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        const list = Array.isArray(res.data?.cdata)
+          ? res.data.cdata
+          : Array.isArray(res.data)
+          ? res.data
+          : []
+        this.setData({ videoAlbums: list })
+      },
+      complete: () => {
+        this.setData({ videoLoading: false })
+      },
+    })
+  },
+
+  onSelectVideoAlbum(e: any) {
+    const item = e.currentTarget.dataset.item
+    const albumid = Number(item?.album_id || e.currentTarget.dataset.id || 0)
+    if (!albumid) return
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ videoLoading: true, activeAlbum: item })
+    wx.request({
+      url: `${getBaseUrl()}/api/video/fetch_album/${albumid}`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        const vdata = Array.isArray(res.data?.vdata) ? res.data.vdata : []
+        const albumdata = res.data?.albumdata || item
+        this.setData({
+          albumVideos: vdata,
+          activeAlbum: { ...item, ...albumdata, album_id: albumid },
+        })
+      },
+      complete: () => {
+        this.setData({ videoLoading: false })
+      },
+    })
+  },
+
+  onBackToAlbumList() {
+    this.setData({ activeAlbum: null, albumVideos: [] })
+  },
+
+  onWatchVideo(e: any) {
+    const item = e.currentTarget.dataset.item
+    const videoid = Number(item?.video_id || e.currentTarget.dataset.id || 0)
+    if (!videoid) return
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({
+      showVideoModal: true,
+      currentVideo: {
+        video_id: videoid,
+        video_title: item?.video_title || '微课视频',
+        video_length: item?.video_length || 0,
+        video_url: item?.video_url || '',
+        video_fulltext: '加载讲义文稿中...',
+      },
+    })
+    wx.request({
+      url: `${getBaseUrl()}/api/video/watch_video/${videoid}`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        const d = res.data || {}
+        this.setData({
+          currentVideo: {
+            ...d,
+            video_id: Number(d.video_id || videoid),
+            video_title: d.video_title || item?.video_title || '微课视频',
+            video_fulltext: stripHtmlTags(d.video_fulltext || '暂无配套文字讲义'),
+          },
+        })
+      },
+    })
+  },
+
+  onCloseVideoModal() {
+    this.setData({ showVideoModal: false })
+  },
+
+  onCopyVideoUrl() {
+    const url = this.data.currentVideo?.video_url
+    if (!url) {
+      wx.showToast({ title: '暂无外部视频链接', icon: 'none' })
+      return
+    }
+    wx.setClipboardData({
+      data: String(url),
+      success: () => {
+        wx.showToast({ title: '🔗 已复制视频链接', icon: 'none' })
+      },
+    })
+  },
+
+  async onFavorAlbum() {
+    const album = this.data.activeAlbum
+    if (!album || !album.album_id) return
+    await this.favorResource(Number(album.album_id), '视频专辑', album.album_title || '微课专辑')
+  },
+
+  async onFavorVideo() {
+    const v = this.data.currentVideo
+    if (!v || !v.video_id) return
+    await this.favorResource(Number(v.video_id), '视频', v.video_title || '微课视频')
+  },
+
+  // ── 103-show-maps.md, 101-map.md, 102-search-map.md: 知识脑图 ──
+  fetchMindMaps() {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ mapLoading: true })
+    wx.request({
+      url: `${getBaseUrl()}/api/map/show_map`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        if (Array.isArray(res.data)) {
+          this.setData({ mapList: res.data })
+        }
+      },
+      complete: () => {
+        this.setData({ mapLoading: false })
+      },
+    })
+  },
+
+  onSelectMindMap(e: any) {
+    const item = e.currentTarget.dataset.item
+    const mapid = Number(item?.mapid || item?.map_id || e.currentTarget.dataset.id || 0)
+    if (!mapid) return
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    this.setData({ mapLoading: true, activeMap: item, activeMapNodes: [] })
+    wx.request({
+      url: `${getBaseUrl()}/api/map/get_map/${mapid}`,
+      method: 'GET',
+      header: { token, Authorization: token ? `Bearer ${token}` : '' },
+      success: (res: any) => {
+        const d = res.data || {}
+        let parsed: any = null
+        try {
+          parsed = typeof d.map_data === 'string' ? JSON.parse(d.map_data) : d.map_data
+        } catch (err) {
+          parsed = null
+        }
+        const nodes = flattenMindMapNodes(parsed)
+        this.setData({
+          activeMap: {
+            ...item,
+            ...d,
+            mapid,
+            map_title: d.map_title || item?.map_title || '知识脑图',
+            map_desc: stripHtmlTags(d.map_desc || ''),
+          },
+          activeMapNodes:
+            nodes.length > 0
+              ? nodes
+              : [
+                  {
+                    id: '0-0',
+                    name: d.map_title || item?.map_title || '核心主题',
+                    depth: 0,
+                    indentStyle: 'padding-left: 0rpx;',
+                    childrenCount: 0,
+                    note: stripHtmlTags(d.map_desc || ''),
+                  },
+                ],
+        })
+      },
+      complete: () => {
+        this.setData({ mapLoading: false })
+      },
+    })
+  },
+
+  onBackToMapList() {
+    this.setData({ activeMap: null, activeMapNodes: [] })
+  },
+
+  onMapSearchInput(e: any) {
+    const q = e.detail.value || ''
+    this.setData({ mapSearchQuery: q })
+    if (!q.trim()) {
+      this.setData({ mapSearchResults: [] })
+    }
+  },
+
+  async onRunMapSearch() {
+    const query = String(this.data.mapSearchQuery || '').trim()
+    if (!query) {
+      this.setData({ mapSearchResults: [] })
+      return
+    }
+    this.setData({ mapLoading: true })
+    try {
+      const res: any = await base.post('/api/map/search', { query })
+      const list = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : []
+      this.setData({ mapSearchResults: list })
+    } catch (err) {
+      this.setData({ mapSearchResults: [] })
+    } finally {
+      this.setData({ mapLoading: false })
+    }
+  },
+
+  async onFavorMap() {
+    const m = this.data.activeMap
+    if (!m || !m.mapid) return
+    await this.favorResource(Number(m.mapid), '脑图', m.map_title || '知识脑图')
+  },
+
+  async favorResource(targetId: number, targetType: string, label: string) {
+    try {
+      let folders: any[] = (await fetchFolder().catch(() => [])) || []
+      if (!Array.isArray(folders) || folders.length === 0) {
+        const created: any = await newFolder('精选专栏')
+        folders = [{ folderid: created?.newfid || 1, folder_title: '精选专栏', selected: true }]
+      } else {
+        folders = folders.map((f: any, idx: number) => ({
+          ...f,
+          selected: idx === 0,
+        }))
+      }
+      await base.post('/api/users/add_favor', {
+        target_id: targetId,
+        target_type: targetType,
+        folderlist: JSON.stringify(folders),
+      })
+      wx.showToast({ title: `⭐ 已收藏「${label}」`, icon: 'none' })
+    } catch (err) {
+      wx.showToast({ title: '收藏失败，请稍后重试', icon: 'none' })
     }
   },
 
@@ -369,7 +660,7 @@ Page<IArticlePageData, any>({
   },
 
   applyArticleFilter(
-    tab: 'all' | 'mine' | 'zhuanlan',
+    tab: 'all' | 'mine' | 'zhuanlan' | 'video' | 'map',
     keyword: string,
     sourceList = this.data.allArticles,
     uid = this.data.currentUserId
@@ -381,6 +672,26 @@ Page<IArticlePageData, any>({
       })
       if (!this.data.zhuanlanList.length) {
         this.fetchZhuanlans()
+      }
+      return
+    }
+    if (tab === 'video') {
+      this.setData({
+        articleTab: 'video',
+        searchKeyword: keyword,
+      })
+      if (!this.data.videoAlbums.length) {
+        this.fetchVideoAlbums()
+      }
+      return
+    }
+    if (tab === 'map') {
+      this.setData({
+        articleTab: 'map',
+        searchKeyword: keyword,
+      })
+      if (!this.data.mapList.length) {
+        this.fetchMindMaps()
       }
       return
     }
@@ -403,7 +714,7 @@ Page<IArticlePageData, any>({
   },
 
   onTabChange(e: any) {
-    const tab = (e.currentTarget.dataset.tab || 'all') as 'all' | 'mine' | 'zhuanlan'
+    const tab = (e.currentTarget.dataset.tab || 'all') as 'all' | 'mine' | 'zhuanlan' | 'video' | 'map'
     if (tab === this.data.articleTab) return
     this.applyArticleFilter(tab, this.data.searchKeyword)
   },

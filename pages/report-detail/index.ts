@@ -2,7 +2,7 @@
 // pages/report-detail/index.ts
 // 成绩详情页：展示某次考试的答题详情
 const _app = getApp();
-import { getBaseUrl } from '../../services/base';
+import base, { getBaseUrl } from '../../services/base';
 
 interface QuestionItem {
   quesid: number;
@@ -86,6 +86,7 @@ function buildQuestionItems(
 
 Page<IReportDetailPageData, any>({
   data: {
+    pperformid: '',
     paperid: '',
     papertitle: '',
     test_score: 0,
@@ -98,6 +99,11 @@ Page<IReportDetailPageData, any>({
     questions: [],
     filteredQuestions: [],
     loading: true,
+    // 108-review-jianda.md: 简答题自评 / 导师批阅
+    jiandaList: [],
+    jiandaReviewed: false,
+    showJiandaModal: false,
+    savingJianda: false,
   },
 
   onLoad(options: any) {
@@ -108,15 +114,93 @@ Page<IReportDetailPageData, any>({
       setTimeout(() => wx.navigateBack(), 1500);
       return;
     }
-    if (paperid) {
-      this.setData({ paperid: String(paperid) });
-    }
+    this.setData({
+      pperformid: String(pperformid),
+      paperid: paperid ? String(paperid) : '',
+    });
     wx.setNavigationBarTitle({ title: '答题报告详情' });
     this.loadReportDetail(pperformid, paperid);
   },
 
   loadReportDetail(pperformid: string, paperid?: string) {
     this.fetchDetail(pperformid, paperid);
+    this.fetchJiandaDetail(pperformid);
+  },
+
+  // ── 108-review-jianda.md: 简答题自评/导师批阅 ──────────────────
+  fetchJiandaDetail(pperformid: string) {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+    wx.request({
+      url: `${getBaseUrl()}/api/ques/fetchjianda/${pperformid}`,
+      method: 'GET',
+      header: { token },
+      success: (res: any) => {
+        const jddata = Array.isArray(res.data?.jddata) ? res.data.jddata : [];
+        const pdict = res.data?.pdict || {};
+        this.setData({
+          jiandaList: jddata.map((j: any) => ({
+            ...j,
+            getscore: j.getscore !== undefined && j.getscore !== null ? j.getscore : j.fullscore || 5,
+            comments: j.comments || '',
+          })),
+          jiandaReviewed: Number(pdict.exami_state || 0) === 1,
+        });
+      },
+    });
+  },
+
+  onOpenJiandaModal() {
+    this.setData({ showJiandaModal: true });
+  },
+
+  onCloseJiandaModal() {
+    this.setData({ showJiandaModal: false });
+  },
+
+  onJiandaScoreInput(e: any) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const val = Number(e.detail.value || 0);
+    const list = [...(this.data.jiandaList || [])];
+    if (!list[idx]) return;
+    const maxScore = Number(list[idx].fullscore || 10);
+    list[idx].getscore = Math.max(0, Math.min(maxScore, val));
+    this.setData({ jiandaList: list });
+  },
+
+  onJiandaCommentInput(e: any) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const list = [...(this.data.jiandaList || [])];
+    if (!list[idx]) return;
+    list[idx].comments = e.detail.value || '';
+    this.setData({ jiandaList: list });
+  },
+
+  async onSubmitJiandaReview() {
+    const ppid = Number(this.data.pperformid || 0);
+    const list = this.data.jiandaList || [];
+    if (!ppid || !list.length) return;
+    const storedUser = wx.getStorageSync('userInfo') || {};
+    const reviewer = storedUser.username || storedUser.name || storedUser.nickName || '自评/导师';
+    const payload = list.map((j: any) => [
+      Number(j.qperformid),
+      reviewer,
+      Number(j.getscore || 0),
+      String(j.comments || '已完成简答题评阅').trim(),
+    ]);
+    this.setData({ savingJianda: true });
+    try {
+      await base.post('/api/ques/reviewjianda', {
+        pp_updateid: ppid,
+        message: JSON.stringify(payload),
+      });
+      wx.showToast({ title: '简答题评阅已保存 ✨', icon: 'success' });
+      this.setData({ showJiandaModal: false, jiandaReviewed: true });
+      this.loadReportDetail(String(ppid), this.data.paperid);
+    } catch (err) {
+      wx.showToast({ title: '保存评阅失败', icon: 'none' });
+    } finally {
+      this.setData({ savingJianda: false });
+    }
   },
 
   onShareAppMessage() {
