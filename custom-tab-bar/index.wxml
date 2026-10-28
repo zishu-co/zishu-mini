@@ -4,24 +4,15 @@
     wx:for-item="item"
     wx:for-index="index"
     wx:key="index"
-    class="custom-tab-bar-wrapper {{active === index ? 'is-active' : ''}} {{index === 2 ? 'is-center-orb' : ''}}"
+    class="custom-tab-bar-wrapper {{active === index ? 'is-active' : ''}}"
     data-index="{{index}}"
     bindtap="onChange"
   >
-    <block wx:if="{{index === 2}}">
-      <view class="orb-halo"></view>
-      <view class="orb-badge {{active === index ? 'orb-badge--active' : ''}}">
-        <t-icon name="{{item.icon}}" size="44rpx" color="#ffffff" />
-      </view>
-      <view class="text orb-text">{{ item.text }}</view>
-    </block>
-    <block wx:else>
-      <view class="active-indicator" wx:if="{{active === index}}"></view>
-      <view class="tab-icon-pill {{active === index ? 'tab-icon-pill--active' : ''}}">
-        <t-icon name="{{item.icon}}" size="38rpx" color="{{active === index ? '#ffffff' : '#6d28d9'}}" />
-      </view>
-      <view class="text">{{ item.text }}</view>
-    </block>
+    <view class="active-indicator" wx:if="{{active === index}}"></view>
+    <view class="tab-icon-pill {{active === index ? 'tab-icon-pill--active' : ''}}">
+      <t-icon name="{{item.icon}}" size="38rpx" color="{{active === index ? '#ffffff' : '#6d28d9'}}" />
+    </view>
+    <view class="text">{{ item.text }}</view>
   </view>
 </view>
 
