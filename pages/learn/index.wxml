@@ -42,7 +42,7 @@
   <!-- 未登录提示 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
     <text>登录后可使用选课、组方舟与学时申报功能</text>
-    <button class="login-btn" bindtap="goToLogin">去登录</button>
+    <button class="login-btn" bindtap="goToLogin">🔑 去登录</button>
   </view>
 
   <!-- 加载状态 -->
@@ -53,7 +53,7 @@
   <!-- 加载失败状态 -->
   <view class="error-state" wx:if="{{!loading && loadError}}">
     <text class="error-text">{{loadError}}</text>
-    <view class="retry-btn" bindtap="loadData">重新加载</view>
+    <view class="retry-btn" bindtap="loadData">🔄 重新加载</view>
   </view>
 
   <!-- 我的选课 -->
@@ -78,7 +78,7 @@
         </view>
         <view class="course-actions">
           <text class="mentor-tag" wx:if="{{item.shushi_name}}">🎓 {{item.shushi_name}}</text>
-          <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
+          <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">🎓 选塾师</text>
           <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         </view>
       </view>
@@ -120,7 +120,7 @@
           class="filter-pill {{courseFilter === 'all' ? 'active' : ''}}"
           data-filter="all"
           bindtap="onFilterChange"
-        >全部 ({{tableData.length}})</view>
+        >📚 全部 ({{tableData.length}})</view>
         <view
           class="filter-pill {{courseFilter === 'hot' ? 'active' : ''}}"
           data-filter="hot"
@@ -130,12 +130,12 @@
           class="filter-pill {{courseFilter === 'selected' ? 'active' : ''}}"
           data-filter="selected"
           bindtap="onFilterChange"
-        >我已选 ({{currentSelections.length}})</view>
+        >✅ 我已选 ({{currentSelections.length}})</view>
         <view
           class="filter-pill {{courseFilter === 'available' ? 'active' : ''}}"
           data-filter="available"
           bindtap="onFilterChange"
-        >可报名 ({{availableCount}})</view>
+        >✨ 可报名 ({{availableCount}})</view>
       </view>
     </view>
 
@@ -154,7 +154,7 @@
           data-title="{{item.title}}"
           bindtap="onSelectCourse"
         >
-          {{item.isSelected ? '退选' : '选课'}}
+          {{item.isSelected ? '✕ 退选' : '＋ 选课'}}
         </view>
       </view>
     </view>
@@ -162,7 +162,7 @@
     <!-- 筛选为空状态 -->
     <view class="empty" wx:if="{{filteredCourses.length === 0}}">
       <text>{{searchKeyword || courseFilter !== 'all' ? '未找到符合筛选条件的课程' : '暂无课程'}}</text>
-      <view wx:if="{{searchKeyword || courseFilter !== 'all'}}" class="reset-course-filter" bindtap="onResetCourseFilter">重置筛选</view>
+      <view wx:if="{{searchKeyword || courseFilter !== 'all'}}" class="reset-course-filter" bindtap="onResetCourseFilter">🔄 重置筛选</view>
     </view>
   </view>
 
@@ -184,7 +184,7 @@
           data-shushiid="{{item.shushi_id}}"
           data-shushiname="{{item.shushi_name}}"
           bindtap="onConfirmMentor"
-        >选择</view>
+        >✓ 选择</view>
       </view>
       <view class="mentor-empty" wx:if="{{mentorList.length == 0}}">
         <text>暂无可选塾师</text>
@@ -216,8 +216,8 @@
         <text class="input-tip">最多申报5小时</text>
       </view>
       <view class="modal-actions">
-        <view class="action-btn secondary" bindtap="onCloseReportModal">取消</view>
-        <view class="action-btn primary" bindtap="onConfirmReport">确认申报</view>
+        <view class="action-btn secondary" bindtap="onCloseReportModal">✕ 取消</view>
+        <view class="action-btn primary" bindtap="onConfirmReport">✅ 确认申报</view>
       </view>
     </view>
   </view>
@@ -279,9 +279,9 @@
       </view>
 
       <view class="modal-actions">
-        <view class="action-btn secondary" bindtap="onCloseCampModal">关闭</view>
+        <view class="action-btn secondary" bindtap="onCloseCampModal">✕ 关闭</view>
         <view class="action-btn primary" bindtap="onSubmitJoinCamp">
-          {{submittingCamp ? '提交中...' : '🚀 申请加入预备营'}}
+          {{submittingCamp ? '⏳ 提交中...' : '🚀 申请加入预备营'}}
         </view>
       </view>
     </view>

@@ -53,7 +53,7 @@
   <!-- Dev 模式游客提示条 -->
   <view class="dev-banner" wx:if="{{showDevBanner}}">
     <text class="dev-banner-text">🔧 Dev 模式 · 游客身份（数据为模拟）</text>
-    <text class="dev-banner-login" bindtap="goLogin">去登录</text>
+    <text class="dev-banner-login" bindtap="goLogin">🔑 去登录</text>
   </view>
 
   <!-- 顶部区域：今日推荐 -->
@@ -141,8 +141,8 @@
         />
       </view>
       <view class="goal-modal-actions">
-        <view class="modal-btn cancel" bindtap="onCloseGoalModal">取消</view>
-        <view class="modal-btn confirm" bindtap="onConfirmGoalModal">{{goalSaving ? '保存中...' : '保存目标'}}</view>
+        <view class="modal-btn cancel" bindtap="onCloseGoalModal">✕ 取消</view>
+        <view class="modal-btn confirm" bindtap="onConfirmGoalModal">{{goalSaving ? '⏳ 保存中...' : '💾 保存目标'}}</view>
       </view>
     </view>
   </view>

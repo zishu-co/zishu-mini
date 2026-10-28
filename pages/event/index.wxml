@@ -35,21 +35,21 @@
       data-tab="current"
       bindtap="onTabChange"
     >
-      <text>当前活动 ({{filteredCurrentEvents.length}})</text>
+      <text>🔥 当前活动 ({{filteredCurrentEvents.length}})</text>
     </view>
     <view
       class="tab {{activeTab === 'mine' ? 'tab-active' : ''}}"
       data-tab="mine"
       bindtap="onTabChange"
     >
-      <text>我的参与 ({{myActivities.length}})</text>
+      <text>🎫 我的参与 ({{myActivities.length}})</text>
     </view>
     <view
       class="tab {{activeTab === 'historical' ? 'tab-active' : ''}}"
       data-tab="historical"
       bindtap="onTabChange"
     >
-      <text>历史活动 ({{filteredHistoricalEvents.length}})</text>
+      <text>🏛️ 历史活动 ({{filteredHistoricalEvents.length}})</text>
     </view>
   </view>
 
@@ -63,8 +63,8 @@
     <view class="empty" wx:if="{{!loading && filteredCurrentEvents.length === 0}}">
       <text class="empty-text">{{searchKeyword ? '未找到匹配的当前活动' : '暂无进行中的活动'}}</text>
       <view class="empty-actions">
-        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">清空搜索</button>
-        <button class="retry-btn" bindtap="loadEvents">重新加载</button>
+        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">🧹 清空搜索</button>
+        <button class="retry-btn" bindtap="loadEvents">🔄 重新加载</button>
       </view>
     </view>
 

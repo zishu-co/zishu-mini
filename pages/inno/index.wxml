@@ -18,12 +18,12 @@
             class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
             data-mode="projects"
             bindtap="onSwitchMode"
-          >项目 ({{filteredProjects.length}})</view>
+          >🚀 项目 ({{filteredProjects.length}})</view>
           <view
             class="mode-pill {{viewMode === 'groups' ? 'active' : ''}}"
             data-mode="groups"
             bindtap="onSwitchMode"
-          >小组 ({{filteredGroups.length}})</view>
+          >🤝 小组 ({{filteredGroups.length}})</view>
         </view>
       </view>
       <view class="inno-hero-right">
@@ -77,7 +77,7 @@
         data-key="{{item.key || ''}}"
         bindtap="tabChangeHandle"
       >
-        <text class="inno-domain-tab__text">{{item.text}}</text>
+        <text class="inno-domain-tab__text">{{item.key === 'F' ? '💻 ' : (item.key === 'B' ? '⚙️ ' : (item.key === 'D' ? '📄 ' : (item.key === 'T' ? '🎬 ' : (item.key === 'C' ? '🎓 ' : '🌟 '))))}}{{item.text}}</text>
         <view class="inno-domain-tab__line" wx:if="{{activeTab === (item.key || '')}}"></view>
       </view>
     </scroll-view>
@@ -88,7 +88,7 @@
         class="status-pill {{statusFilter === 'all' ? 'active' : ''}}"
         data-status="all"
         bindtap="onStatusFilterTap"
-      >全部</view>
+      >📋 全部</view>
       <view
         class="status-pill {{statusFilter === 'pending' ? 'active' : ''}}"
         data-status="pending"
@@ -112,7 +112,7 @@
       <view class="empty-state" wx:if="{{filteredProjects.length === 0 && !listLoading}}">
         <text class="empty-icon">📭</text>
         <text class="empty-text">暂无符合筛选条件的项目</text>
-        <view class="reset-filter-btn" bindtap="onResetFilters">重置筛选条件</view>
+        <view class="reset-filter-btn" bindtap="onResetFilters">🔄 重置筛选条件</view>
       </view>
 
       <!-- 项目卡片 -->
@@ -170,7 +170,7 @@
             data-id="{{item.id}}"
             data-index="{{index}}"
           >
-            {{claimingId === item.id ? '认领中' : '立即认领'}}
+            {{claimingId === item.id ? '⏳ 认领中' : '⚡ 立即认领'}}
           </view>
         </view>
       </view>
@@ -188,7 +188,7 @@
       <view class="empty-state" wx:if="{{filteredGroups.length === 0}}">
         <text class="empty-icon">🤝</text>
         <text class="empty-text">未找到匹配的共创小组</text>
-        <view class="reset-filter-btn" bindtap="onResetFilters">清空搜索词</view>
+        <view class="reset-filter-btn" bindtap="onResetFilters">🧹 清空搜索词</view>
       </view>
 
       <view
@@ -226,7 +226,7 @@
               catchtap="onOpenJoinGroupModal"
               data-group="{{item}}"
             >🤝 入组</view>
-            <view class="group-enter-btn">课题 ›</view>
+            <view class="group-enter-btn">🚀 课题 ›</view>
           </view>
         </view>
       </view>
@@ -245,27 +245,27 @@
           class="inno-type-chip {{publishForm.task_type === 'F' ? 'active' : ''}}"
           data-type="F"
           bindtap="onSelectPublishType"
-        >F 前端</view>
+        >💻 F 前端</view>
         <view
           class="inno-type-chip {{publishForm.task_type === 'B' ? 'active' : ''}}"
           data-type="B"
           bindtap="onSelectPublishType"
-        >B 后端</view>
+        >⚙️ B 后端</view>
         <view
           class="inno-type-chip {{publishForm.task_type === 'D' ? 'active' : ''}}"
           data-type="D"
           bindtap="onSelectPublishType"
-        >D 文档</view>
+        >📄 D 文档</view>
         <view
           class="inno-type-chip {{publishForm.task_type === 'T' ? 'active' : ''}}"
           data-type="T"
           bindtap="onSelectPublishType"
-        >T 教程</view>
+        >🎬 T 教程</view>
         <view
           class="inno-type-chip {{publishForm.task_type === 'C' ? 'active' : ''}}"
           data-type="C"
           bindtap="onSelectPublishType"
-        >C 课程</view>
+        >🎓 C 课程</view>
       </view>
 
       <view class="inno-field-label">课题名称</view>
@@ -320,9 +320,9 @@
       />
 
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitPublishProject">
-          {{submittingPublish ? '发布中...' : '确认发布'}}
+          {{submittingPublish ? '⏳ 发布中...' : '🚀 确认发布'}}
         </view>
       </view>
     </view>
@@ -344,9 +344,9 @@
       />
 
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitJoinGroup">
-          {{submittingJoinGroup ? '提交中...' : '提交入组申请'}}
+          {{submittingJoinGroup ? '⏳ 提交中...' : '✅ 提交入组申请'}}
         </view>
       </view>
     </view>
@@ -387,9 +387,9 @@
       />
 
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitAttendReport">
-          {{submittingAttend ? '提交中...' : '保存周报考勤'}}
+          {{submittingAttend ? '⏳ 提交中...' : '💾 保存周报考勤'}}
         </view>
       </view>
 
@@ -424,8 +424,8 @@
             data-field="feedback"
             bindinput="onAdviceFormInput"
           />
-          <view class="group-join-btn" bindtap="onSubmitAttendAdvice">送出互评</view>
-          <view class="group-join-btn" bindtap="onSubmitAttendFeedback">塾主评议</view>
+          <view class="group-join-btn" bindtap="onSubmitAttendAdvice">💬 送出互评</view>
+          <view class="group-join-btn" bindtap="onSubmitAttendFeedback">🏅 塾主评议</view>
         </view>
       </view>
     </view>
@@ -459,7 +459,7 @@
       </view>
 
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">关闭</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 关闭</view>
       </view>
     </view>
   </view>
@@ -503,9 +503,9 @@
         bindinput="onCreateGroupFormInput"
       />
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitCreateOrSaveGroup">
-          {{submittingCreateGroup ? '保存中...' : '确认提交'}}
+          {{submittingCreateGroup ? '⏳ 保存中...' : '✅ 确认提交'}}
         </view>
       </view>
     </view>
@@ -544,7 +544,7 @@
       </view>
 
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">关闭</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 关闭</view>
       </view>
     </view>
   </view>

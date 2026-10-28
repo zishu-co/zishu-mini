@@ -326,7 +326,12 @@ page {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 14rpx;
+  gap: 12rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 28rpx;
+  padding: 12rpx 14rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10);
 }
 .camp-filter-pills {
   margin-bottom: 20rpx;
@@ -336,24 +341,24 @@ page {
   align-items: center;
   justify-content: center;
   height: 60rpx;
-  padding: 0 28rpx;
+  padding: 0 26rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  color: #475569;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
   font-size: 24rpx;
   font-weight: 600;
-  border: 1.5rpx solid rgba(148, 163, 184, 0.24);
-  box-shadow: 0 4rpx 10rpx rgba(15, 23, 42, 0.03), inset 0 1rpx 0 #ffffff;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 4rpx 10rpx rgba(15, 23, 42, 0.04), inset 0 1rpx 0 #ffffff;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .filter-pill.active {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
-  border-color: transparent;
+  border-color: rgba(255, 255, 255, 0.32);
   font-weight: 800;
   box-shadow:
-    0 8rpx 20rpx rgba(124, 58, 237, 0.28),
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.32);
+    0 8rpx 20rpx rgba(124, 58, 237, 0.34),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.36);
 }
 .reset-course-filter {
   margin-top: 24rpx;
