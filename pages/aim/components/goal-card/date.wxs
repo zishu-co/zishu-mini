@@ -13,8 +13,8 @@ var getProgressPercent = function(process) {
   if (process === undefined || process === null || isNaN(process)) {
     return 0;
   }
-  var num = Number(process);
-  if (num < 0) return 0;
+  var num = parseFloat(process);
+  if (isNaN(num) || num < 0) return 0;
   if (num <= 10) {
     return Math.min(Math.round(num * 10), 100);
   }
