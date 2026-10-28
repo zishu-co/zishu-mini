@@ -100,8 +100,7 @@
           <view class="relation-actions">
             <text
               wx:if="{{item._isStale}}"
-              class="action-chip secondary"
-              style="color:#dc2626;border-color:#fecaca;background:#fef2f2;"
+              class="action-chip danger"
               bindtap="onCleanseMentor"
               data-id="{{item.id}}"
               data-shushi="{{item.shushi_name}}"

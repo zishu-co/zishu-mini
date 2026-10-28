@@ -1,14 +1,14 @@
 /* pages/agent/index.wxss */
 page {
   height: 100%;
-  background: #f5f5f5;
+  background: #f6f5fb;
 }
 
 .agent-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f6f7fb;
+  background: #f6f5fb;
 }
 
 /* 顶部 AI 教练状态栏 */
@@ -16,10 +16,10 @@ page {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 28rpx;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   color: #ffffff;
-  box-shadow: 0 6rpx 20rpx rgba(124, 58, 237, 0.2);
+  box-shadow: 0 10rpx 28rpx rgba(91, 33, 182, 0.24);
 }
 
 .agent-topbar-left {
@@ -29,10 +29,11 @@ page {
 }
 
 .agent-topbar-avatar {
-  width: 68rpx;
-  height: 68rpx;
+  width: 72rpx;
+  height: 72rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1rpx solid rgba(255, 255, 255, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,9 +60,10 @@ page {
 }
 
 .agent-clear-btn {
-  padding: 10rpx 22rpx;
+  padding: 10rpx 24rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.18);
+  border: 1rpx solid rgba(255, 255, 255, 0.26);
   font-size: 22rpx;
   font-weight: 600;
   color: #ffffff;
@@ -70,7 +72,7 @@ page {
 /* 消息列表 */
 .message-list {
   flex: 1;
-  padding: 24rpx 32rpx;
+  padding: 28rpx 32rpx;
   overflow-y: auto;
 }
 
@@ -85,8 +87,8 @@ page {
 }
 
 .avatar {
-  width: 72rpx;
-  height: 72rpx;
+  width: 76rpx;
+  height: 76rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -96,17 +98,18 @@ page {
 }
 
 .assistant-avatar {
-  background: linear-gradient(135deg, #aa00ff, #6c2aff);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24);
 }
 
 .user-avatar {
-  background: #e8e8e8;
+  background: #ede9fe;
 }
 
 .message-bubble {
-  max-width: 70%;
-  padding: 20rpx 28rpx;
-  border-radius: 24rpx;
+  max-width: 72%;
+  padding: 22rpx 28rpx;
+  border-radius: 26rpx;
   word-break: break-all;
 }
 
@@ -114,14 +117,16 @@ page {
   background: #ffffff;
   margin-left: 20rpx;
   border-top-left-radius: 8rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+  box-shadow: 0 6rpx 20rpx rgba(15, 23, 42, 0.05);
 }
 
 .message-bubble.user {
-  background: linear-gradient(135deg, #aa00ff, #6c2aff);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
   margin-right: 20rpx;
   border-top-right-radius: 8rpx;
+  box-shadow: 0 8rpx 22rpx rgba(124, 58, 237, 0.24);
 }
 
 .message-text {

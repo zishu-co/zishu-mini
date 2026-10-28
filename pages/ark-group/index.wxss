@@ -2,8 +2,8 @@
 /* 诺亚方舟搭子舱旗舰版样式 */
 
 page {
-  background: #f6f4fa;
-  color: #1a1a2e;
+  background: #f6f5fb;
+  color: #0f172a;
 }
 
 .page {
@@ -19,17 +19,17 @@ page {
 .ark-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 28rpx;
-  padding: 36rpx 32rpx 30rpx;
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 48%, #aa00ff 100%);
+  border-radius: 32rpx;
+  padding: 40rpx 36rpx 34rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   color: #ffffff;
-  box-shadow: 0 14rpx 36rpx rgba(124, 58, 237, 0.28);
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.26);
 }
 
 .ark-hero__glow {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   pointer-events: none;
 }
 
@@ -53,13 +53,14 @@ page {
   font-weight: 700;
   letter-spacing: 2rpx;
   padding: 4rpx 16rpx;
-  border-radius: 20rpx;
+  border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.16);
+  border: 1rpx solid rgba(255, 255, 255, 0.24);
   margin-bottom: 12rpx;
 }
 
 .ark-hero__title {
-  font-size: 38rpx;
+  font-size: 40rpx;
   font-weight: 800;
   margin-bottom: 10rpx;
 }
@@ -76,8 +77,9 @@ page {
   justify-content: space-around;
   background: rgba(255, 255, 255, 0.14);
   border: 1rpx solid rgba(255, 255, 255, 0.22);
-  border-radius: 20rpx;
-  padding: 18rpx 12rpx;
+  border-radius: 24rpx;
+  padding: 20rpx 12rpx;
+  backdrop-filter: blur(8px);
 }
 
 .ark-stat {
@@ -111,29 +113,30 @@ page {
 
 .filter-pill {
   flex: 1;
-  height: 68rpx;
-  line-height: 68rpx;
+  height: 72rpx;
+  line-height: 72rpx;
   text-align: center;
-  border-radius: 34rpx;
+  border-radius: 999rpx;
   background: #ffffff;
-  color: #6b6380;
+  color: #64748b;
   font-size: 26rpx;
   font-weight: 600;
-  border: 1rpx solid rgba(170, 0, 255, 0.12);
+  border: 1rpx solid rgba(124, 58, 237, 0.12);
+  box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.03);
   transition: all 0.2s ease;
 }
 
 .filter-pill--active {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  box-shadow: 0 6rpx 18rpx rgba(170, 0, 255, 0.26);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.26);
   border-color: transparent;
 }
 
 .loading {
   padding: 100rpx 0;
   text-align: center;
-  color: #8b859e;
+  color: #94a3b8;
   font-size: 28rpx;
 }
 
@@ -146,13 +149,13 @@ page {
 
 .teacher-card {
   background: #ffffff;
-  border: 1rpx solid rgba(170, 0, 255, 0.08);
-  border-radius: 24rpx;
-  padding: 28rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+  border-radius: 28rpx;
+  padding: 30rpx;
   display: flex;
   flex-direction: column;
   gap: 22rpx;
-  box-shadow: 0 6rpx 24rpx rgba(26, 26, 46, 0.05);
+  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
 }
 
 .teacher-row {
@@ -171,10 +174,10 @@ page {
 }
 
 .teacher-avatar {
-  width: 76rpx;
-  height: 76rpx;
-  border-radius: 22rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 32rpx;
   font-weight: 800;
@@ -182,7 +185,7 @@ page {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 6rpx 16rpx rgba(170, 0, 255, 0.2);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
 }
 
 .teacher-title-box {

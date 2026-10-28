@@ -55,25 +55,22 @@
         <view class="progress-bar member-progress-bar">
           <view class="progress-bar__fill" style="width: {{m._progressPercent}}%;"></view>
         </view>
-        <view class="status-row" style="margin-top: 12rpx; margin-bottom: 0; justify-content: space-between;">
+        <view class="status-row member-footer-row">
           <view
-            class="learn-sheet-link"
-            style="margin-top: 0;"
+            class="learn-sheet-link learn-sheet-link--inline"
             bindtap="onGoLearnSheet"
             data-userid="{{m.user_id}}"
           >📖 查看学习单 ›</view>
-          <view style="display:flex;gap:20rpx;align-items:center;">
+          <view class="member-action-links">
             <view
-              class="learn-sheet-link"
-              style="margin-top: 0; color:#dc2626;"
+              class="learn-sheet-link learn-sheet-link--inline learn-sheet-link--danger"
               wx:if="{{isTeacher && ark.stage !== '已成舟'}}"
               bindtap="onKickCrew"
               data-crewid="{{m.crew_id}}"
               data-username="{{m.username}}"
             >移除</view>
             <view
-              class="learn-sheet-link"
-              style="margin-top: 0;"
+              class="learn-sheet-link learn-sheet-link--inline"
               wx:if="{{m.user_id !== currentUserId}}"
               bindtap="onGreetMember"
               data-userid="{{m.user_id}}"

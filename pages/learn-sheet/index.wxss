@@ -2,8 +2,8 @@
 /* 学习单旗舰版样式 */
 
 page {
-  background: #f6f4fa;
-  color: #1a1a2e;
+  background: #f6f5fb;
+  color: #0f172a;
 }
 
 .page {
@@ -18,17 +18,19 @@ page {
 .loading {
   padding: 120rpx 0;
   text-align: center;
-  color: #8b859e;
+  color: #94a3b8;
   font-size: 28rpx;
 }
 
 /* ========== Hero 概览卡 ========== */
 .sheet-hero {
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 48%, #aa00ff 100%);
-  border-radius: 28rpx;
-  padding: 34rpx 32rpx 30rpx;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 32rpx;
+  padding: 38rpx 34rpx 32rpx;
   color: #fff;
-  box-shadow: 0 14rpx 36rpx rgba(124, 58, 237, 0.28);
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.28);
 }
 
 .sheet-hero__top {

@@ -6,7 +6,7 @@
         <view class="banner-title">专栏文章</view>
         <view class="banner-sub">记录学习点滴 · 沉淀思考精华</view>
       </view>
-      <view wx:if="{{hasLogin}}" style="display: flex; gap: 12rpx; align-items: center;">
+      <view wx:if="{{hasLogin}}" class="banner-actions">
         <view wx:if="{{articleTab === 'zhuanlan'}}" class="banner-write-btn" bindtap="onOpenCreateZhuanlanModal">＋ 新建专栏</view>
         <view wx:if="{{articleTab === 'video'}}" class="banner-write-btn" bindtap="onOpenCreateVideoModal">＋ 发布微课</view>
         <view wx:if="{{articleTab === 'map'}}" class="banner-write-btn" bindtap="onOpenCreateMapModal">＋ 新建脑图</view>
@@ -66,7 +66,7 @@
       <text class="article-search-icon">🧠</text>
       <input
         class="article-search-input"
-        placeholder="搜索脑图节点关键词 (102-search-map.md)..."
+        placeholder="搜索脑图节点关键词..."
         value="{{mapSearchQuery}}"
         bindinput="onMapSearchInput"
         bindconfirm="onRunMapSearch"
@@ -441,7 +441,7 @@
     <view class="reader-sheet" catchtap="stopReaderBubble">
       <view class="reader-topbar">
         <view class="reader-topbar-left">
-          <view class="reader-badge">📚 新建专栏合集 (104-edit-zhuanlan)</view>
+          <view class="reader-badge">📚 新建专栏合集</view>
         </view>
         <view class="reader-close" bindtap="onCloseEditorModal">✕</view>
       </view>

@@ -103,8 +103,7 @@
           >📋 查看学习单</view>
           <view
             wx:if="{{item._deadlineClass === 'red'}}"
-            class="action-pill secondary"
-            style="color:#dc2626;border-color:#fecaca;background:#fef2f2;"
+            class="action-pill danger"
             bindtap="onCleanseSelection"
             data-userid="{{item.user_id}}"
             data-courseid="{{item.course_id}}"

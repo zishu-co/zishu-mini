@@ -2,8 +2,8 @@
 /* 课程详情页旗舰版样式 */
 
 page {
-  background-color: #f6f4fa;
-  color: #1a1a2e;
+  background-color: #f6f5fb;
+  color: #0f172a;
 }
 
 .page {
@@ -35,29 +35,29 @@ page {
 
 .empty-text {
   font-size: 28rpx;
-  color: #8b859e;
+  color: #64748b;
 }
 
 .empty-retry {
   margin-top: 32rpx;
   padding: 16rpx 52rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 26rpx;
-  font-weight: 600;
-  border-radius: 40rpx;
-  box-shadow: 0 8rpx 20rpx rgba(170, 0, 255, 0.25);
+  font-weight: 700;
+  border-radius: 999rpx;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.25);
 }
 
 /* ========== 品牌紫 Hero 头部卡片 ========== */
 .hero-card {
   position: relative;
   overflow: hidden;
-  border-radius: 28rpx;
-  padding: 36rpx 32rpx 30rpx;
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 45%, #aa00ff 100%);
+  border-radius: 32rpx;
+  padding: 40rpx 34rpx 34rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   color: #ffffff;
-  box-shadow: 0 16rpx 40rpx rgba(124, 58, 237, 0.28);
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.28);
   margin-bottom: 28rpx;
 }
 

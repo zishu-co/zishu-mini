@@ -102,7 +102,7 @@
           <view class="cert-date">{{currentDate}} · 自塾共学委员会</view>
         </view>
       </view>
-      <button class="download-btn" type="primary" plain bindtap="downloadCertificate">🏅 生成与保存荣誉证书</button>
+      <button class="download-btn" bindtap="downloadCertificate">🏅 生成与保存荣誉证书</button>
     </view>
 
     <!-- 确认结课按钮（单人学习特有） -->

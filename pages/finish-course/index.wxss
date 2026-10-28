@@ -1,24 +1,25 @@
-/* pages/finish-course/index.wxss */
-/* spec: specs/miniprogram/active/001-port-finish-course.md */
+/* pages/finish-course/index.wxss — 荣誉结课与证书生成旗舰视觉 */
 
 .finish-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
-  padding: 24rpx 0;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  padding: 28rpx 0 calc(env(safe-area-inset-bottom) + 60rpx);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   box-sizing: border-box;
 }
 
 .finish-card {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 40rpx 36rpx;
-  margin: 24rpx 32rpx;
-  width: calc(100% - 64rpx);
+  background: #ffffff;
+  border-radius: 36rpx;
+  padding: 44rpx 36rpx;
+  margin: 12rpx 28rpx 24rpx;
+  width: calc(100% - 56rpx);
   box-sizing: border-box;
-  box-shadow: 0 20rpx 60rpx rgba(124, 58, 237, 0.22);
+  box-shadow: 0 24rpx 60rpx rgba(15, 23, 42, 0.25);
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
 }
 
 .finish-header {
@@ -338,12 +339,16 @@
 
 .download-btn {
   width: 100%;
-  background: #fff;
-  color: #d4af37;
-  border: 1rpx solid #d4af37;
-  margin-bottom: 24rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  color: #b45309;
+  border: 2rpx solid #f59e0b;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  margin: 0 0 24rpx;
+  height: 84rpx;
+  line-height: 84rpx;
+  box-shadow: 0 6rpx 18rpx rgba(245, 158, 11, 0.16);
 }
 
 /* 确认结课 */

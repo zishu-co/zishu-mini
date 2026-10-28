@@ -1,21 +1,24 @@
 .page {
   min-height: 100vh;
-  background: #f6f4fb;
+  background: #f6f5fb;
   padding-top: 20rpx;
   padding-bottom: 60rpx;
 }
 
 .talk-banner {
+  position: relative;
+  overflow: hidden;
   margin: 0 24rpx 20rpx;
-  padding: 28rpx 26rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #6d28d9 100%);
-  border-radius: 24rpx;
+  padding: 34rpx 30rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 32rpx;
   color: #ffffff;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16rpx;
-  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.22);
+  gap: 18rpx;
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.25);
 }
 
 .talk-banner-left {
@@ -25,33 +28,36 @@
 }
 
 .talk-banner-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 800;
 }
 
 .talk-banner-sub {
-  font-size: 22rpx;
+  font-size: 23rpx;
   opacity: 0.9;
 }
 
 .talk-banner-btn {
-  background: #ffffff;
-  color: #7c3aed;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1rpx solid rgba(255, 255, 255, 0.34);
+  color: #ffffff;
   font-size: 24rpx;
   font-weight: 700;
-  padding: 12rpx 24rpx;
+  padding: 12rpx 26rpx;
   border-radius: 999rpx;
   white-space: nowrap;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
 
 .tab-bar {
   display: flex;
   background: #fff;
   margin: 0 24rpx;
-  border-radius: 20rpx;
-  padding: 6rpx;
-  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
+  border-radius: 24rpx;
+  padding: 8rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+  box-shadow: 0 6rpx 20rpx rgba(15, 23, 42, 0.04);
 }
 
 .tab-item {
@@ -61,16 +67,17 @@
   justify-content: center;
   gap: 8rpx;
   padding: 20rpx 0;
-  font-size: 28rpx;
+  font-size: 27rpx;
+  font-weight: 600;
   color: #64748b;
-  border-radius: 14rpx;
+  border-radius: 18rpx;
 }
 
 .tab-item.active {
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
-  font-weight: 600;
-  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.25);
+  font-weight: 700;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.25);
 }
 
 .tab-badge {
@@ -84,7 +91,7 @@
 
 .tab-item:not(.active) .tab-badge {
   background: rgba(124, 58, 237, 0.12);
-  color: #7c3aed;
+  color: #6d28d9;
 }
 
 .tab-content {
@@ -98,11 +105,13 @@
   color: #94a3b8;
   font-size: 28rpx;
   background: #ffffff;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
 }
 
 .empty-title {
@@ -118,21 +127,22 @@
 }
 
 .empty-cta {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 26rpx;
   font-weight: 700;
-  padding: 16rpx 36rpx;
+  padding: 16rpx 40rpx;
   border-radius: 999rpx;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
 }
 
 /* 预定面谈卡片 */
 .talk-card {
   background: #fff;
-  border-radius: 22rpx;
-  padding: 26rpx;
+  border-radius: 28rpx;
+  padding: 30rpx;
   margin-bottom: 18rpx;
-  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.05);
+  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
   border: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 

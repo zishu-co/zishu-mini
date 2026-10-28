@@ -1,18 +1,20 @@
 .page {
   min-height: 100vh;
-  background: #f6f7fb;
+  background: #f6f5fb;
 }
 
 .summary-banner {
+  position: relative;
+  overflow: hidden;
   margin: 24rpx 24rpx 16rpx;
-  padding: 32rpx 28rpx;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
-  border-radius: 24rpx;
+  padding: 36rpx 32rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 32rpx;
   color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.2);
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.25);
 }
 
 .summary-left {
@@ -22,22 +24,24 @@
 }
 
 .summary-title {
-  font-size: 36rpx;
-  font-weight: 700;
+  font-size: 38rpx;
+  font-weight: 800;
 }
 
 .summary-sub {
-  font-size: 22rpx;
-  opacity: 0.86;
+  font-size: 23rpx;
+  opacity: 0.88;
 }
 
 .summary-stats {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1rpx solid rgba(255, 255, 255, 0.24);
   padding: 14rpx 24rpx;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
+  backdrop-filter: blur(8px);
 }
 
 .summary-stat {

@@ -1,16 +1,30 @@
 .page {
   min-height: 100vh;
-  background: #f6f7fb;
+  background: #f6f5fb;
   padding-top: 24rpx;
 }
 
 .hero-card {
+  position: relative;
+  overflow: hidden;
   margin: 0 24rpx 28rpx;
-  padding: 36rpx 28rpx 28rpx;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
-  border-radius: 28rpx;
+  padding: 40rpx 32rpx 32rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 32rpx;
   color: #fff;
-  box-shadow: 0 12rpx 32rpx rgba(124, 58, 237, 0.24);
+  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.26);
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  top: -70rpx;
+  right: -50rpx;
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(216, 180, 254, 0.25) 0%, rgba(216, 180, 254, 0) 70%);
+  pointer-events: none;
 }
 
 .hero-top {
@@ -29,7 +43,7 @@
 
 .hero-balance {
   display: block;
-  font-size: 60rpx;
+  font-size: 64rpx;
   font-weight: 800;
   line-height: 1.1;
 }
@@ -40,7 +54,8 @@
   font-weight: 700;
   padding: 10rpx 24rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1rpx solid rgba(255, 255, 255, 0.26);
 }
 
 .level-progress-wrap {
@@ -70,10 +85,10 @@
 
 .earn-guide-card {
   margin: 0 24rpx 22rpx;
-  padding: 24rpx;
+  padding: 28rpx;
   background: #ffffff;
-  border-radius: 22rpx;
-  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.04);
+  border-radius: 28rpx;
+  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
   border: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 
@@ -87,12 +102,12 @@
 .earn-guide-title {
   font-size: 28rpx;
   font-weight: 800;
-  color: #1e293b;
+  color: #0f172a;
 }
 
 .earn-guide-sub {
   font-size: 22rpx;
-  color: #7c3aed;
+  color: #6d28d9;
   font-weight: 600;
 }
 
@@ -104,8 +119,8 @@
 .earn-task-pill {
   flex: 1;
   background: #f5f3ff;
-  border-radius: 16rpx;
-  padding: 16rpx 12rpx;
+  border-radius: 20rpx;
+  padding: 18rpx 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,7 +141,7 @@
 .earn-task-bonus {
   font-size: 20rpx;
   font-weight: 700;
-  color: #7c3aed;
+  color: #6d28d9;
 }
 
 .search-bar {
@@ -134,10 +149,11 @@
   align-items: center;
   gap: 14rpx;
   margin: 0 24rpx 20rpx;
-  padding: 16rpx 24rpx;
+  padding: 16rpx 28rpx;
   background: #ffffff;
   border-radius: 999rpx;
-  box-shadow: 0 2rpx 10rpx rgba(15, 23, 42, 0.04);
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
 }
 
 .search-icon {
@@ -170,14 +186,16 @@
   color: #64748b;
   font-size: 26rpx;
   font-weight: 600;
-  border-radius: 18rpx;
-  box-shadow: 0 2rpx 10rpx rgba(15, 23, 42, 0.04);
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.03);
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.24);
+  border-color: transparent;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
 }
 
 .stats-row {
@@ -188,20 +206,21 @@
 .stat-card {
   flex: 1;
   background: rgba(255, 255, 255, 0.96);
-  border-radius: 18rpx;
+  border-radius: 22rpx;
   padding: 20rpx 12rpx;
   text-align: center;
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.08);
 }
 
 .stat-num {
   display: block;
   font-size: 34rpx;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-weight: 800;
+  color: #0f172a;
   line-height: 1.2;
   margin-bottom: 6rpx;
 }
-.stat-num.brand { color: #7c3aed; }
+.stat-num.brand { color: #6d28d9; }
 .stat-num.accent { color: #16a34a; }
 
 .stat-label {
@@ -217,17 +236,17 @@
 .empty-row {
   text-align: center;
   padding: 80rpx 0;
-  color: #9a9ab0;
+  color: #94a3b8;
   font-size: 28rpx;
 }
 
 .record-card {
   background: #fff;
-  border-radius: 20rpx;
-  padding: 26rpx 28rpx;
+  border-radius: 28rpx;
+  padding: 28rpx 30rpx;
   margin-bottom: 18rpx;
-  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
-  border: 1rpx solid rgba(124, 58, 237, 0.06);
+  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 
 .record-top {
