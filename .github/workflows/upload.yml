@@ -2,7 +2,7 @@ name: 小程序上传
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, momo]
   workflow_dispatch:
 
 jobs:
