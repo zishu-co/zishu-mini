@@ -190,20 +190,34 @@ page {
 }
 
 .paper-card {
-  background: #ffffff;
-  border-radius: 24rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
   padding: 28rpx 26rpx;
   display: flex;
   align-items: center;
   gap: 22rpx;
-  box-shadow: 0 6rpx 22rpx rgba(26, 26, 46, 0.05);
-  border: 1rpx solid rgba(124, 58, 237, 0.08);
-  transition: transform 0.15s ease;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.paper-card:nth-child(even),
+.paper-card.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-color: rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .paper-card:active {
-  transform: scale(0.99);
-  background: #fcfaff;
+  transform: scale(0.98);
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%) !important;
+  border-color: #fb923c !important;
 }
 
 .paper-seq-badge {
@@ -383,27 +397,34 @@ page {
   height: 120rpx;
 }
 
-/* ========== 共创出题与组卷底部抽屉弹窗 ========== */
+/* ========== 共创出题与组卷底部抽屉弹窗 — Candy Aurora 极光糖果抽屉 ========== */
 .exam-sheet-mask {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.56);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(36, 16, 68, 0.42);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 999;
   display: flex;
   align-items: flex-end;
+  padding: 0;
 }
 
 .exam-sheet-card {
   width: 100%;
-  max-height: 85vh;
-  background: #ffffff;
-  border-radius: 40rpx 40rpx 0 0;
-  padding: 36rpx 36rpx calc(36rpx + env(safe-area-inset-bottom));
+  max-height: 86vh;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 85% 0%, rgba(129, 140, 248, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 40%, #f8f7ff 100%);
+  border-radius: 48rpx 48rpx 0 0;
+  padding: 26rpx 34rpx calc(36rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   overflow-y: auto;
-  box-shadow: 0 -16rpx 48rpx rgba(15, 23, 42, 0.16);
+  border-top: 2rpx solid rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 -20rpx 64rpx rgba(109, 40, 217, 0.22),
+    inset 0 3rpx 0 #ffffff;
 }
 
 .exam-sheet-header {
@@ -411,21 +432,26 @@ page {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24rpx;
+  padding-bottom: 18rpx;
+  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24);
 }
 
 .exam-sheet-title {
-  font-size: 34rpx;
+  font-size: 33rpx;
   font-weight: 800;
-  color: #0f172a;
+  color: #3b0764;
 }
 
 .exam-sheet-close {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  background: #f1f5f9;
-  font-size: 28rpx;
-  color: #64748b;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
+  color: #9333ea;
+  border: 2rpx solid rgba(244, 114, 182, 0.30);
+  box-shadow: 0 6rpx 16rpx rgba(147, 51, 234, 0.12), inset 0 2rpx 0 #ffffff;
+  font-size: 26rpx;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -438,7 +464,7 @@ page {
   padding: 10rpx;
   background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
   border: 2rpx solid rgba(124, 58, 237, 0.22);
-  border-radius: 26rpx;
+  border-radius: 28rpx;
 }
 
 .exam-type-pill {
@@ -452,6 +478,7 @@ page {
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
   border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04), inset 0 1rpx 0 #ffffff;
   white-space: nowrap;
   transition: all 0.18s ease;
 }
@@ -460,11 +487,27 @@ page {
   background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.34);
-  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.32);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.34), inset 0 2rpx 0 rgba(255, 255, 255, 0.38);
 }
 
 .exam-form-group {
   margin-bottom: 20rpx;
+  padding: 22rpx 26rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(236, 72, 153, 0.10), inset 0 3rpx 0 #ffffff;
+}
+
+.exam-form-group:nth-child(even) {
+  background: linear-gradient(145deg, #f5f3ff 0%, #eef2ff 52%, #ecfeff 100%);
+  border-color: rgba(129, 140, 248, 0.28);
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(99, 102, 241, 0.12), inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
+}
+
+.exam-form-group:focus-within {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%);
+  border-color: #fb923c;
 }
 
 .exam-form-group-last {
@@ -472,36 +515,39 @@ page {
 }
 
 .exam-form-label {
-  display: block;
+  display: inline-flex;
+  align-items: center;
   font-size: 25rpx;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 10rpx;
+  font-weight: 800;
+  color: #581c87;
+  margin-bottom: 12rpx;
 }
 
 .exam-form-input {
   width: 100%;
-  height: 78rpx;
-  background: #f8fafc;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 18rpx;
-  padding: 0 22rpx;
-  font-size: 26rpx;
-  color: #0f172a;
+  min-height: 82rpx;
+  background: rgba(255, 255, 255, 0.94);
+  border: 2rpx solid rgba(192, 132, 252, 0.30);
+  border-radius: 24rpx;
+  padding: 0 26rpx;
+  font-size: 27rpx;
+  color: #1e1b4b;
   box-sizing: border-box;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9);
 }
 
 .exam-form-textarea {
   width: 100%;
-  height: 148rpx;
-  background: #f8fafc;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 18rpx;
-  padding: 18rpx 22rpx;
-  font-size: 26rpx;
-  color: #0f172a;
+  min-height: 160rpx;
+  background: rgba(255, 255, 255, 0.94);
+  border: 2rpx solid rgba(192, 132, 252, 0.30);
+  border-radius: 26rpx;
+  padding: 20rpx 26rpx;
+  font-size: 27rpx;
+  color: #1e1b4b;
   box-sizing: border-box;
-  line-height: 1.5;
+  line-height: 1.55;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9);
 }
 
 .exam-options-grid {
@@ -512,42 +558,68 @@ page {
 }
 
 .exam-option-input {
-  height: 74rpx;
-  background: #f8fafc;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 16rpx;
-  padding: 0 18rpx;
-  font-size: 25rpx;
-  color: #0f172a;
+  min-height: 82rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.28);
+  border-radius: 24rpx;
+  padding: 0 22rpx;
+  font-size: 26rpx;
+  color: #1e1b4b;
   box-sizing: border-box;
+  box-shadow: 0 6rpx 16rpx -4rpx rgba(236, 72, 153, 0.10), inset 0 2rpx 0 #ffffff;
+}
+
+.exam-option-input:nth-child(even) {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-color: rgba(129, 140, 248, 0.30);
 }
 
 .exam-bank-scroll {
-  max-height: 360rpx;
+  max-height: 400rpx;
   margin-bottom: 24rpx;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 22rpx;
-  padding: 12rpx 16rpx;
-  background: #f8fafc;
+  border: 2rpx solid rgba(192, 132, 252, 0.24);
+  border-radius: 32rpx;
+  padding: 16rpx;
+  background: rgba(255, 250, 254, 0.72);
   box-sizing: border-box;
+  box-shadow: inset 0 2rpx 8rpx rgba(147, 51, 234, 0.05);
 }
 
 .exam-bank-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18rpx 16rpx;
-  border-bottom: 1rpx dashed #e2e8f0;
-  border-radius: 16rpx;
-  transition: background 0.15s ease;
+  padding: 22rpx 24rpx;
+  margin-bottom: 14rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  border-radius: 28rpx;
+  box-shadow:
+    0 8rpx 22rpx -6rpx rgba(236, 72, 153, 0.10),
+    inset 0 2rpx 0 #ffffff;
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), background 0.16s ease;
+}
+
+.exam-bank-item:nth-child(even),
+.exam-bank-item.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-color: rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 8rpx 22rpx -6rpx rgba(99, 102, 241, 0.12),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .exam-bank-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .exam-bank-item.selected {
-  background: rgba(124, 58, 237, 0.1);
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%) !important;
+  border: 3rpx solid #fb923c !important;
+  box-shadow:
+    0 12rpx 28rpx -6rpx rgba(251, 146, 60, 0.24),
+    0 0 0 4rpx rgba(251, 146, 60, 0.12),
+    inset 0 3rpx 0 #ffffff !important;
 }
 
 .exam-bank-item-main {

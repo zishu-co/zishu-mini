@@ -286,12 +286,22 @@
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 26rpx 24rpx;
-  background: #fff;
-  border-radius: 18rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 4rpx 16rpx rgba(15, 23, 42, 0.05);
-  border: 1rpx solid rgba(124, 58, 237, 0.06);
+  padding: 28rpx 26rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
+  margin-bottom: 18rpx;
+  box-shadow:
+    0 14rpx 34rpx rgba(168, 85, 247, 0.08),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(236, 72, 153, 0.2);
+}
+
+.favor-item:nth-child(even) {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-color: rgba(96, 165, 250, 0.28);
+  box-shadow:
+    0 14rpx 34rpx rgba(96, 165, 250, 0.1),
+    inset 0 3rpx 0 #ffffff;
 }
 
 .favor-icon {

@@ -52,23 +52,50 @@
 
 .form-card {
   margin: 0 24rpx 24rpx;
-  padding: 36rpx 30rpx;
-  background: #fff;
-  border-radius: 28rpx;
-  border: 1rpx solid rgba(124, 58, 237, 0.08);
-  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
+  padding: 32rpx 28rpx;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.14) 0%, transparent 48%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 48%, #faf5ff 100%);
+  border-radius: 36rpx;
+  border: 2rpx solid rgba(244, 114, 182, 0.24);
+  box-shadow:
+    0 14rpx 36rpx -10rpx rgba(109, 40, 217, 0.14),
+    inset 0 3rpx 0 #ffffff;
 }
 
 .form-item {
-  margin-bottom: 30rpx;
+  margin-bottom: 22rpx;
+  padding: 22rpx 26rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(236, 72, 153, 0.10), inset 0 3rpx 0 #ffffff;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.form-item:nth-child(even) {
+  background: linear-gradient(145deg, #f5f3ff 0%, #eef2ff 52%, #ecfeff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.28);
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(99, 102, 241, 0.12), inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
+}
+
+.form-item:focus-within {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%);
+  border: 2.5rpx solid #fb923c;
+  box-shadow:
+    0 14rpx 32rpx -8rpx rgba(251, 146, 60, 0.24),
+    0 0 0 6rpx rgba(251, 146, 60, 0.12),
+    inset 0 3rpx 0 #ffffff;
+  transform: translateY(-2rpx);
 }
 
 .form-label {
-  display: block;
-  font-size: 28rpx;
-  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  font-size: 25rpx;
+  color: #581c87;
   margin-bottom: 12rpx;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .input-wrap {
@@ -80,21 +107,23 @@
 .form-input {
   width: 100%;
   box-sizing: border-box;
-  height: 84rpx;
-  padding: 0 24rpx;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 18rpx;
-  font-size: 28rpx;
-  background: #f8fafc;
+  min-height: 82rpx;
+  padding: 0 26rpx;
+  border: 2rpx solid rgba(192, 132, 252, 0.30);
+  border-radius: 24rpx;
+  font-size: 27rpx;
+  color: #1e1b4b;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9);
 }
 
 .form-input.with-toggle {
-  padding-right: 110rpx;
+  padding-right: 130rpx;
 }
 
 .form-input:focus {
-  border-color: #7c3aed;
-  background: #fff;
+  border-color: #fb923c;
+  background: #ffffff;
 }
 
 .eye-toggle {
@@ -222,24 +251,38 @@
 .tips-card {
   margin: 0 24rpx;
   padding: 28rpx 30rpx;
-  background: #ffffff;
-  border-radius: 28rpx;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.14) 0%, transparent 48%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 48%, #faf5ff 100%);
+  border-radius: 36rpx;
   display: flex;
   flex-direction: column;
-  gap: 10rpx;
-  border: 1rpx solid rgba(124, 58, 237, 0.08);
-  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
+  gap: 14rpx;
+  border: 2rpx solid rgba(244, 114, 182, 0.24);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    inset 0 3rpx 0 #ffffff;
 }
 
 .tips-title {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #6d28d9;
+  font-size: 27rpx;
+  font-weight: 800;
+  color: #581c87;
   margin-bottom: 4rpx;
 }
 
 .tips-item {
-  font-size: 24rpx;
-  color: #64748b;
-  line-height: 1.5;
+  font-size: 25rpx;
+  color: #334155;
+  line-height: 1.55;
+  padding: 16rpx 22rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%);
+  border: 1.5rpx solid rgba(244, 114, 182, 0.24);
+  box-shadow: inset 0 2rpx 0 #ffffff;
+}
+
+.tips-item:nth-child(odd) {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-color: rgba(129, 140, 248, 0.28);
 }

@@ -206,29 +206,45 @@ page {
 
 /* ========== 卡片区块 ========== */
 .section {
-  background: #fff;
-  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 32rpx;
   padding: 28rpx;
-  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.04);
-  border: 1rpx solid rgba(124, 58, 237, 0.08);
+  box-shadow:
+    0 12rpx 30rpx rgba(147, 51, 234, 0.06),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(192, 132, 252, 0.22);
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 800;
-  color: #1a1a2e;
+  color: #3b0764;
   margin-bottom: 18rpx;
   padding-bottom: 14rpx;
-  border-bottom: 1rpx solid #f3f0fa;
+  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24);
 }
 
 /* Camp 卡 */
 .camp-card {
-  padding: 20rpx;
-  background: #faf8ff;
-  border-radius: 18rpx;
-  border: 1rpx solid rgba(124, 58, 237, 0.1);
-  margin-bottom: 18rpx;
+  padding: 26rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  margin-bottom: 20rpx;
+}
+
+.camp-card:nth-child(even),
+.camp-card.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .camp-card:last-child {
@@ -252,9 +268,9 @@ page {
   font-size: 20rpx;
   font-weight: 700;
   color: #6d28d9;
-  background: rgba(124, 58, 237, 0.1);
-  padding: 4rpx 14rpx;
-  border-radius: 16rpx;
+  background: rgba(124, 58, 237, 0.12);
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -268,8 +284,8 @@ page {
 
 .course-list {
   margin-top: 16rpx;
-  border-top: 1rpx solid rgba(124, 58, 237, 0.1);
-  padding-top: 8rpx;
+  border-top: 2rpx dashed rgba(192, 132, 252, 0.22);
+  padding-top: 16rpx;
 }
 
 /* 课程项 */
@@ -278,20 +294,38 @@ page {
   align-items: center;
   justify-content: space-between;
   gap: 16rpx;
-  padding: 20rpx 4rpx;
-  border-bottom: 1rpx solid #f1f5f9;
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow:
+    0 10rpx 26rpx -8rpx rgba(236, 72, 153, 0.10),
+    0 4rpx 10rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+}
+
+.course-item:nth-child(even),
+.course-item.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 10rpx 26rpx -8rpx rgba(99, 102, 241, 0.12),
+    0 4rpx 10rpx rgba(56, 189, 248, 0.05),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .course-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .course-item:active {
-  opacity: 0.8;
+  transform: scale(0.98);
 }
 
 .course-item.standalone {
-  padding: 22rpx 8rpx;
+  padding: 26rpx 28rpx;
 }
 
 .course-item.standalone.done {

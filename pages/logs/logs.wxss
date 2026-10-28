@@ -86,14 +86,27 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 16rpx 0;
-  padding: 26rpx 30rpx;
-  background: #ffffff;
-  border-radius: 22rpx;
+  margin: 0 0 18rpx 0;
+  padding: 28rpx 32rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 30rpx;
   font-size: 26rpx;
   color: #334155;
-  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.05);
-  border-left: 8rpx solid #7c3aed;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+}
+
+.log-item:nth-child(even),
+.log-item.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .log-seq {

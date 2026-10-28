@@ -14,7 +14,7 @@
   </t-cell-group>
   <view class="order-group__content">
     <view
-      class="order-group__item"
+      class="order-group__item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{orderTagInfos}}"
       wx:for-item="item"
       wx:key="index"

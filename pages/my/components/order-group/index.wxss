@@ -1,27 +1,36 @@
 .order-group {
   margin-bottom: 24rpx;
-  background-color: #ffffff;
-  border-radius: 16rpx 16rpx 0 0;
+  background: linear-gradient(180deg, #fffafe 0%, #ffffff 50%, #faf7ff 100%);
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(244, 114, 182, 0.24);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(147, 51, 234, 0.10),
+    inset 0 3rpx 0 #ffffff;
+  overflow: hidden;
+  padding: 8rpx 16rpx 18rpx;
 }
 .order-group .order-group__top {
-  padding: 24rpx 18rpx 24rpx 32rpx;
-  border-radius: 16rpx 16rpx 0 0;
+  padding: 24rpx 18rpx 20rpx 18rpx;
+  border-radius: 28rpx 28rpx 0 0;
 }
 .order-group__top___title {
   font-size: 32rpx;
   line-height: 48rpx;
-  font-weight: bold;
+  font-weight: 800;
+  color: #3b0764;
 }
 .order-group__top__note {
-  font-size: 28rpx;
+  font-size: 26rpx;
+  color: #7c3aed;
 }
 .order-group__content {
   overflow: hidden;
   width: 100%;
-  height: 164rpx;
+  min-height: 164rpx;
   display: flex;
-  background-color: #fff;
-  border-radius: 0 0 16rpx 16rpx;
+  gap: 12rpx;
+  background-color: transparent;
+  border-radius: 24rpx;
 }
 .order-group__item {
   overflow: hidden;
@@ -30,26 +39,32 @@
   align-items: center;
   justify-content: center;
   flex: 1;
+  padding: 20rpx 8rpx;
+  border-radius: 26rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  box-shadow: 0 8rpx 20rpx -6rpx rgba(236, 72, 153, 0.10), inset 0 2rpx 0 #ffffff;
 }
-.order-group__item:first-child {
-  border-radius: 0 0 0 16rpx;
-}
-.order-group__item:last-child {
-  border-radius: 0 0 16rpx 0;
+.order-group__item:nth-child(even) {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow: 0 8rpx 20rpx -6rpx rgba(99, 102, 241, 0.12), inset 0 2rpx 0 rgba(255, 255, 255, 0.94);
 }
 .order-group__item__title {
   font-size: 24rpx;
-  color: #666;
+  color: #3b0764;
+  font-weight: 700;
   line-height: 32rpx;
 }
 .order-group__item__icon {
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
   width: 56rpx;
   height: 56rpx;
   position: relative;
 }
 .order-group__top__title {
-  font-weight: bold;
+  font-weight: 800;
+  color: #3b0764;
 }
 .order-group .order-group__left {
   margin-right: 0;

@@ -10,7 +10,7 @@
     </view>
     <picker-view class="picker" indicator-class="picker-center-row" value="{{pickerValue}}" bind:change="onChange">
       <picker-view-column class="picker-column">
-        <view wx:for="{{ pickerOptions }}" wx:key="code">{{ item.name }}</view>
+        <view class="picker-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{ pickerOptions }}" wx:key="code">{{ item.name }}</view>
       </picker-view-column>
     </picker-view>
     <view class="city-picker-footer" wx:if="{{!headerVisible}}">

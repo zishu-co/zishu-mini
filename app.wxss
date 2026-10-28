@@ -450,7 +450,8 @@ button:active {
 .reader-mask,
 .greet-mask,
 .jianda-sheet-mask,
-.cert-modal-mask {
+.cert-modal-mask,
+.login-sheet-mask {
   position: fixed;
   inset: 0;
   background: rgba(36, 16, 68, 0.42) !important;
@@ -465,7 +466,10 @@ button:active {
   animation: zsFadeIn 0.22s ease-out;
 }
 
-.zs-modal-mask--bottom {
+.zs-modal-mask--bottom,
+.login-sheet-mask,
+.jianda-sheet-mask,
+.exam-sheet-mask {
   align-items: flex-end;
   padding: 0;
 }
@@ -478,7 +482,8 @@ button:active {
 .gt-modal-card,
 .fb-modal-card,
 .event-modal-card,
-.greet-modal {
+.greet-modal,
+.cert-modal-card {
   width: 100%;
   max-width: 670rpx;
   max-height: 84vh;
@@ -504,7 +509,8 @@ button:active {
 .mentor-modal,
 .exam-sheet-card,
 .reader-sheet,
-.jianda-sheet-card {
+.jianda-sheet-card,
+.login-sheet-card {
   width: 100%;
   max-height: 86vh;
   background:
@@ -538,7 +544,9 @@ button:active {
 .exam-sheet-card::before,
 .reader-sheet::before,
 .greet-modal::before,
-.jianda-sheet-card::before {
+.jianda-sheet-card::before,
+.cert-modal-card::before,
+.login-sheet-card::before {
   content: '';
   display: block;
   width: 78rpx;
@@ -557,7 +565,8 @@ button:active {
 .exam-sheet-header,
 .jianda-sheet-header,
 .fb-modal-header,
-.greet-header {
+.greet-header,
+.login-sheet-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -577,7 +586,8 @@ button:active {
 .event-modal-title,
 .exam-sheet-title,
 .jianda-sheet-title,
-.greet-title {
+.greet-title,
+.login-sheet-title {
   font-size: 33rpx !important;
   font-weight: 800 !important;
   color: #3b0764 !important;
@@ -606,7 +616,8 @@ button:active {
 .reader-close,
 .greet-close,
 .fb-modal-close,
-.jianda-sheet-close {
+.jianda-sheet-close,
+.login-sheet-close {
   width: 58rpx !important;
   height: 58rpx !important;
   border-radius: 999rpx !important;
@@ -631,7 +642,8 @@ button:active {
 .reader-close:active,
 .greet-close:active,
 .fb-modal-close:active,
-.jianda-sheet-close:active {
+.jianda-sheet-close:active,
+.login-sheet-close:active {
   transform: scale(0.88) rotate(8deg);
 }
 
@@ -647,7 +659,8 @@ button:active {
 .slot-row,
 .field-row,
 .info-row,
-.meeting-item {
+.meeting-item,
+.login-sheet-field {
   margin-bottom: 20rpx;
   padding: 22rpx 26rpx;
   border-radius: 30rpx !important;
@@ -666,6 +679,7 @@ button:active {
 .field-row:nth-child(odd),
 .info-row:nth-child(odd),
 .meeting-item:nth-child(odd),
+.login-sheet-field:nth-child(odd),
 .content > .section:nth-child(odd) {
   background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%) !important;
   border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
@@ -684,6 +698,7 @@ button:active {
 .field-row:nth-child(even),
 .info-row:nth-child(even),
 .meeting-item:nth-child(even),
+.login-sheet-field:nth-child(even),
 .content > .section:nth-child(even) {
   background: linear-gradient(145deg, #f5f3ff 0%, #eef2ff 52%, #ecfeff 100%) !important;
   border: 2rpx solid rgba(129, 140, 248, 0.28) !important;
@@ -699,6 +714,7 @@ button:active {
 .event-form-field:focus-within,
 .exam-form-group:focus-within,
 .slot-row:focus-within,
+.login-sheet-field:focus-within,
 .zs-form-group.selected,
 .form-item.selected,
 .form-item.active {
@@ -757,7 +773,11 @@ button:active {
 .chapter-row:nth-child(odd),
 .task-card:nth-child(odd),
 .supervise-card:nth-child(odd),
-.mentor-card:nth-child(odd) {
+.mentor-card:nth-child(odd),
+.auth-item:nth-child(odd),
+.method-option:nth-child(odd),
+.quick-nav-card:nth-child(odd),
+.earn-task-pill:nth-child(odd) {
   background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%) !important;
   border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
   border-radius: 32rpx !important;
@@ -813,7 +833,11 @@ button:active {
 .chapter-row:nth-child(even),
 .task-card:nth-child(even),
 .supervise-card:nth-child(even),
-.mentor-card:nth-child(even) {
+.mentor-card:nth-child(even),
+.auth-item:nth-child(even),
+.method-option:nth-child(even),
+.quick-nav-card:nth-child(even),
+.earn-task-pill:nth-child(even) {
   background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%) !important;
   border: 2rpx solid rgba(129, 140, 248, 0.30) !important;
   border-radius: 32rpx !important;
@@ -852,6 +876,7 @@ button:active {
 .favor-item.selected,
 .chapter-item.active,
 .chapter-row.active,
+.method-option.selected,
 .menu-cell:active,
 .ark-item:active {
   background: var(--row-selected-gradient) !important;
@@ -898,6 +923,8 @@ button:active {
 .chapter-edit-subinput,
 .jianda-score-input,
 .jianda-comment-input,
+.login-sheet-input,
+.homework-input,
 .slotinput {
   width: 100%;
   min-height: 82rpx;
@@ -920,7 +947,8 @@ button:active {
 .exam-form-textarea,
 .inno-textarea,
 .gt-textarea,
-.fb-textarea {
+.fb-textarea,
+.homework-input {
   width: 100%;
   min-height: 160rpx;
   padding: 20rpx 26rpx !important;

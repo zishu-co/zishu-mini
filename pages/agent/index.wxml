@@ -73,7 +73,7 @@
   <!-- 快捷提示词气泡栏 -->
   <scroll-view class="prompt-chips-bar" scroll-x="true" enable-flex="true">
     <view
-      class="prompt-chip"
+      class="prompt-chip {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{quickPrompts}}"
       wx:key="*this"
       data-prompt="{{item}}"

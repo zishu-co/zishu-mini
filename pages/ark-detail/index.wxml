@@ -85,21 +85,21 @@
     <view class="section" wx:if="{{hasMeetings || canEditMeetings}}">
       <view class="section-title">📅 方舟三会排期（点击可复制会议号）</view>
       <view class="meetings-list">
-        <view class="meeting-item" bindtap="onCopyMeeting" data-code="{{ark.meet_start}}">
+        <view class="meeting-item zs-row-odd" bindtap="onCopyMeeting" data-code="{{ark.meet_start}}">
           <text class="meeting-badge">🚀 启动会</text>
           <view class="meeting-detail">
             <text class="meeting-link">{{ark.meet_start || '待舟长/塾师排期'}}</text>
             <text class="meeting-time" wx:if="{{ark.meet_start_time}}">{{ark.meet_start_time}}</text>
           </view>
         </view>
-        <view class="meeting-item" bindtap="onCopyMeeting" data-code="{{ark.meet_mid}}">
+        <view class="meeting-item zs-row-even" bindtap="onCopyMeeting" data-code="{{ark.meet_mid}}">
           <text class="meeting-badge">⛵ 中期会</text>
           <view class="meeting-detail">
             <text class="meeting-link">{{ark.meet_mid || '待舟长/塾师排期'}}</text>
             <text class="meeting-time" wx:if="{{ark.meet_mid_time}}">{{ark.meet_mid_time}}</text>
           </view>
         </view>
-        <view class="meeting-item" bindtap="onCopyMeeting" data-code="{{ark.meet_end}}">
+        <view class="meeting-item zs-row-odd" bindtap="onCopyMeeting" data-code="{{ark.meet_end}}">
           <text class="meeting-badge">🏁 完航会</text>
           <view class="meeting-detail">
             <text class="meeting-link">{{ark.meet_end || '待舟长/塾师排期'}}</text>
