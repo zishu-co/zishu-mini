@@ -154,13 +154,19 @@ module.exports = {
             catchtap="onFinishTap"
             data-item="{{item}}"
             data-index="{{index}}"
-          >✓ 完成</view>
+          >
+            <text class="micro-btn__badge finish-badge">✓</text>
+            <text class="micro-btn__text">完成</text>
+          </view>
           <view
             class="micro-btn skip"
             catchtap="onSkipTap"
             data-item="{{item}}"
             data-index="{{index}}"
-          >✕ 跳过</view>
+          >
+            <text class="micro-btn__badge skip-badge">🫧</text>
+            <text class="micro-btn__text">跳过</text>
+          </view>
         </view>
       </view>
     </view>

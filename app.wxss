@@ -968,18 +968,68 @@ button:active {
   margin-top: 32rpx;
 }
 
-.zs-btn-cancel {
-  flex: 1;
-  height: 84rpx;
-  line-height: 84rpx;
-  text-align: center;
-  background: #f1f5f9;
-  color: #475569;
-  border-radius: 999rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  margin: 0;
-  padding: 0;
+/* ── 全局“完成”按钮：薄荷青提 3D 糖果果冻胶囊 ── */
+.micro-btn.finish,
+.btn-finish,
+.zs-btn-finish,
+.talk-action-btn.finish {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 52%, #059669 100%) !important;
+  color: #ffffff !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.65) !important;
+  border-radius: 999rpx !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 10rpx 22rpx -4rpx rgba(16, 185, 129, 0.42),
+    0 3rpx 8rpx rgba(5, 150, 105, 0.22),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.55) !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+}
+
+.micro-btn.finish:active,
+.btn-finish:active,
+.zs-btn-finish:active,
+.talk-action-btn.finish:active {
+  transform: scale(0.92) translateY(2rpx) !important;
+}
+
+/* ── 全局“跳过 / 取消”按钮：蜜桃樱花苏打 3D 马卡龙果冻胶囊 ── */
+.micro-btn.skip,
+.btn-skip,
+.btn-abandon,
+.zs-btn-skip,
+.zs-btn-cancel,
+.modal-btn.cancel,
+.gt-modal-btn.cancel,
+.inno-modal-btn.cancel,
+.event-modal-btn.cancel,
+.fb-btn.cancel,
+.greet-btn.cancel,
+.talk-action-btn.ghost {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 48%, #f3e8ff 100%) !important;
+  color: #be185d !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.52) !important;
+  border-radius: 999rpx !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 10rpx 22rpx -4rpx rgba(236, 72, 153, 0.24),
+    0 3rpx 8rpx rgba(192, 132, 252, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+}
+
+.micro-btn.skip:active,
+.btn-skip:active,
+.btn-abandon:active,
+.zs-btn-skip:active,
+.zs-btn-cancel:active,
+.modal-btn.cancel:active,
+.gt-modal-btn.cancel:active,
+.inno-modal-btn.cancel:active,
+.event-modal-btn.cancel:active,
+.fb-btn.cancel:active,
+.greet-btn.cancel:active,
+.talk-action-btn.ghost:active {
+  transform: scale(0.92) translateY(2rpx) !important;
 }
 
 .zs-btn-submit {
@@ -987,12 +1037,15 @@ button:active {
   height: 84rpx;
   line-height: 84rpx;
   text-align: center;
-  background: var(--brand-gradient);
+  background: linear-gradient(135deg, #f472b6 0%, #a855f7 52%, #7c3aed 100%);
   color: #ffffff;
   border-radius: 999rpx;
   font-size: 28rpx;
-  font-weight: 700;
-  box-shadow: var(--shadow-brand);
+  font-weight: 800;
+  border: 2rpx solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 12rpx 28rpx -4rpx rgba(168, 85, 247, 0.38),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.48);
   margin: 0;
   padding: 0;
 }

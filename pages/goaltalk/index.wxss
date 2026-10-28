@@ -291,23 +291,40 @@
 }
 
 .talk-action-btn {
-  padding: 10rpx 14rpx;
+  padding: 12rpx 22rpx;
   border-radius: 999rpx;
-  font-size: 21rpx;
-  font-weight: 600;
+  font-size: 22rpx;
+  font-weight: 800;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.talk-action-btn:active {
+  transform: scale(0.93);
 }
 
 .talk-action-btn.ghost {
-  background: #f8fafc;
-  color: #475569;
-  border: 1rpx solid #e2e8f0;
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 48%, #f3e8ff 100%);
+  color: #be185d;
+  border: 2rpx solid rgba(244, 114, 182, 0.48);
+  box-shadow: 0 8rpx 18rpx -4rpx rgba(236, 72, 153, 0.22), inset 0 2rpx 0 #ffffff;
 }
 
 .talk-action-btn.primary {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 52%, #6d28d9 100%);
   color: #ffffff;
+  border: 2rpx solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8rpx 18rpx -4rpx rgba(124, 58, 237, 0.32), inset 0 2rpx 0 rgba(255, 255, 255, 0.4);
+}
+
+.talk-action-btn.finish {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 52%, #059669 100%);
+  color: #ffffff;
+  border: 2rpx solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 10rpx 22rpx -4rpx rgba(16, 185, 129, 0.4),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.55);
 }
 
 /* 目标卡片 */
