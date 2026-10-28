@@ -45,10 +45,10 @@
       <text class="form-label">性别</text>
       <view class="radio-group">
         <view class="radio-item {{form.gender === '男' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="男">
-          <text>男</text>
+          <text>🚹 男</text>
         </view>
         <view class="radio-item {{form.gender === '女' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="女">
-          <text>女</text>
+          <text>🚺 女</text>
         </view>
       </view>
     </view>
@@ -69,7 +69,7 @@
           class="city-chip {{form.region === item ? 'active' : ''}}"
           data-city="{{item}}"
           bindtap="onSelectCity"
-        >{{item}}</view>
+        >📍 {{item}}</view>
       </view>
     </view>
 
@@ -141,7 +141,7 @@
     </view>
 
     <button class="submit-btn" disabled="{{submitting}}" bindtap="submitForm">
-      {{submitting ? '保存中...' : '保存个人档案'}}
+      {{submitting ? '⏳ 保存中...' : '💾 保存个人档案'}}
     </button>
   </view>
 </view>

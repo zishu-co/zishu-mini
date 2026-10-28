@@ -57,26 +57,28 @@
   -webkit-backdrop-filter: blur(14px);
   margin: 0 24rpx;
   border-radius: 28rpx;
-  padding: 10rpx;
+  padding: 8rpx;
   border: 2rpx solid rgba(124, 58, 237, 0.22);
   box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10), 0 6rpx 20rpx rgba(15, 23, 42, 0.05);
-  gap: 10rpx;
+  gap: 8rpx;
 }
 
 .tab-item {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  padding: 18rpx 8rpx;
-  font-size: 25rpx;
+  gap: 6rpx;
+  padding: 16rpx 6rpx;
+  font-size: 23rpx;
   font-weight: 700;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
   border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   border-radius: 999rpx;
   box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  white-space: nowrap;
   transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -91,10 +93,12 @@
 .tab-badge {
   background: rgba(255, 255, 255, 0.25);
   color: #fff;
-  padding: 2rpx 12rpx;
+  padding: 2rpx 10rpx;
   border-radius: 100rpx;
-  font-size: 22rpx;
+  font-size: 20rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tab-item:not(.active) .tab-badge {
@@ -148,7 +152,7 @@
 .talk-card {
   background: #fff;
   border-radius: 28rpx;
-  padding: 30rpx;
+  padding: 28rpx 24rpx;
   margin-bottom: 18rpx;
   box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
   border: 1rpx solid rgba(124, 58, 237, 0.08);
@@ -158,20 +162,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12rpx;
   margin-bottom: 16rpx;
 }
 
 .talk-person-wrap {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 10rpx;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .person-badge {
-  padding: 6rpx 20rpx;
+  padding: 6rpx 18rpx;
   border-radius: 100rpx;
-  font-size: 26rpx;
+  font-size: 25rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .person-badge.person {
@@ -190,13 +199,17 @@
   background: #f1f5f9;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-badge {
   padding: 4rpx 16rpx;
   border-radius: 100rpx;
-  font-size: 22rpx;
+  font-size: 21rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-badge.pending {
@@ -250,17 +263,21 @@
 .talk-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 14rpx;
+  align-items: center;
+  gap: 10rpx;
+  flex-wrap: nowrap;
   margin-top: 18rpx;
   padding-top: 14rpx;
   border-top: 1rpx solid #f1f5f9;
 }
 
 .talk-action-btn {
-  padding: 10rpx 24rpx;
+  padding: 10rpx 14rpx;
   border-radius: 999rpx;
-  font-size: 23rpx;
+  font-size: 21rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .talk-action-btn.ghost {
@@ -298,12 +315,14 @@
 }
 
 .goal-progress {
-  font-size: 23rpx;
+  font-size: 22rpx;
   color: #7c3aed;
   background: rgba(124, 58, 237, 0.1);
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .goal-body-preview {
@@ -432,6 +451,8 @@
   color: #475569;
   font-size: 23rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .gt-chip.active {
@@ -476,6 +497,8 @@
   border-radius: 999rpx;
   font-size: 26rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .gt-modal-btn.cancel {

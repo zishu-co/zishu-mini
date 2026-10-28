@@ -47,7 +47,7 @@
       value="{{searchKeyword}}"
       bindinput="onSearchInput"
     />
-    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">重置</text>
+    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 重置</text>
   </view>
 
   <!-- 列表 -->
@@ -58,7 +58,7 @@
     <view wx:elif="{{filteredList.length === 0}}">
       <view class="empty-row">
         <text class="empty-text">{{searchKeyword || statusFilter !== 'all' ? '未找到匹配的学习监督记录' : '暂无学习监督记录'}}</text>
-        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">查看全部记录</view>
+        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 查看全部记录</view>
       </view>
     </view>
     <view wx:else>

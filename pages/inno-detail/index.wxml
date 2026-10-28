@@ -8,7 +8,7 @@
   <view class="empty-state" wx:if="{{!loading && !project}}">
     <text class="empty-icon">📭</text>
     <text class="empty-text">项目不存在或加载失败</text>
-    <button class="retry-btn" bindtap="onRetry">重新加载</button>
+    <button class="retry-btn" bindtap="onRetry">🔄 重新加载</button>
   </view>
 
   <!-- 项目详情 -->
@@ -219,9 +219,9 @@
         bindinput="onHalfInput"
       />
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">✕ 取消</view>
         <view class="inno-modal-btn confirm" bindtap="onSubmitHalfReport">
-          {{submittingTask ? '提交中...' : '保存进度'}}
+          {{submittingTask ? '⏳ 提交中...' : '💾 保存进度'}}
         </view>
       </view>
     </view>
@@ -249,17 +249,17 @@
         bindinput="onSlnInput"
       />
       <view class="inno-modal-actions">
-        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">取消</view>
+        <view class="inno-modal-btn cancel" bindtap="onCloseTaskModals">✕ 取消</view>
         <view
           class="inno-modal-btn ghost"
           data-mode="save_sln"
           bindtap="onSubmitSolution"
-        >暂存草稿</view>
+        >💾 暂存草稿</view>
         <view
           class="inno-modal-btn confirm"
           data-mode="submit_sln"
           bindtap="onSubmitSolution"
-        >{{submittingTask ? '提交中...' : '正式提交'}}</view>
+        >{{submittingTask ? '⏳ 提交中...' : '🚀 正式提交'}}</view>
       </view>
     </view>
   </view>
@@ -290,17 +290,17 @@
           class="inno-modal-btn ghost"
           data-action="save_comment"
           bindtap="onSubmitReview"
-        >仅存点评</view>
+        >💬 仅存点评</view>
         <view
           class="inno-modal-btn warn"
           data-action="redo"
           bindtap="onSubmitReview"
-        >要求返工</view>
+        >🔧 要求返工</view>
         <view
           class="inno-modal-btn confirm"
           data-action="finish_task"
           bindtap="onSubmitReview"
-        >{{submittingTask ? '验收中...' : '🏆 结项验收'}}</view>
+        >{{submittingTask ? '⏳ 验收中...' : '🏆 结项验收'}}</view>
       </view>
     </view>
   </view>

@@ -73,6 +73,7 @@
 .stat-label {
   font-size: 22rpx;
   color: #64748b;
+  white-space: nowrap;
 }
 
 /* 搜索与筛选栏 */
@@ -124,15 +125,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14rpx 28rpx;
+  padding: 14rpx 26rpx;
   border-radius: 999rpx;
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 700;
   color: #4c1d95;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   margin-right: 12rpx;
   border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -156,25 +159,29 @@
 }
 
 .filter-hint {
-  font-size: 24rpx;
+  font-size: 23rpx;
   color: #4c1d95;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .gender-pills {
   display: flex;
   gap: 10rpx;
+  flex-shrink: 0;
 }
 
 .gender-pill {
   font-size: 22rpx;
-  padding: 10rpx 22rpx;
+  padding: 10rpx 20rpx;
   border-radius: 999rpx;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
   border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   font-weight: 700;
   box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.18s ease;
 }
 
@@ -214,8 +221,8 @@
 
 .member-card {
   display: flex;
-  gap: 22rpx;
-  padding: 30rpx;
+  gap: 20rpx;
+  padding: 28rpx 24rpx;
   background: #fff;
   border-radius: 28rpx;
   margin-bottom: 18rpx;
@@ -291,6 +298,8 @@
   font-weight: 700;
   background: #f5f3ff;
   color: #6d28d9;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .level-pill.level-5,
@@ -304,6 +313,8 @@
   border-radius: 100rpx;
   font-size: 21rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .shuzhi-badge.active {
   background: rgba(124, 58, 237, 0.1);
@@ -322,11 +333,13 @@
 }
 
 .social-tag {
-  font-size: 22rpx;
+  font-size: 21rpx;
   padding: 4rpx 14rpx;
   border-radius: 10rpx;
   background: #f8fafc;
   color: #475569;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .social-tag.gender-female {
@@ -364,15 +377,23 @@
 
 .member-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 14rpx;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10rpx;
+  flex-wrap: nowrap;
 }
 
 .peer-btn {
-  padding: 10rpx 24rpx;
+  flex: 1;
+  min-width: 0;
+  padding: 10rpx 8rpx;
   border-radius: 999rpx;
-  font-size: 23rpx;
+  font-size: 22rpx;
   font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .peer-btn.ghost {
@@ -490,8 +511,9 @@
   line-height: 80rpx;
   text-align: center;
   border-radius: 999rpx;
-  font-size: 27rpx;
+  font-size: 26rpx;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .greet-btn.cancel {

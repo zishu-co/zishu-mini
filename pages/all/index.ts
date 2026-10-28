@@ -11,6 +11,47 @@ const ICEBREAKER_TOPICS = [
   '🚀 一起组队挑战自塾创新实战项目',
 ]
 
+function extractCleanGoalText(raw: any, maxLen = 32): string {
+  const str = String(raw || '').trim()
+  if (!str) return ''
+  if (str.startsWith('{') || str.includes('"nodeData"') || str.includes('"topic"')) {
+    try {
+      const parsed = JSON.parse(str)
+      const root = parsed?.nodeData || parsed
+      const topics: string[] = []
+      if (root?.topic && root.topic !== '新建节点' && root.topic !== 'Root') {
+        topics.push(String(root.topic).trim())
+      }
+      if (Array.isArray(root?.children)) {
+        for (const ch of root.children) {
+          if (ch?.topic) topics.push(String(ch.topic).trim())
+          if (topics.length >= 3) break
+        }
+      }
+      if (topics.length > 0) {
+        const joined = topics.join(' · ')
+        return maxLen > 0 ? joined.slice(0, maxLen) : joined
+      }
+    } catch (_e) {
+      const matches: string[] = []
+      const re = /"topic"\s*:\s*"([^"]+)"/g
+      let m: RegExpExecArray | null
+      while ((m = re.exec(str)) !== null) {
+        const t = m[1].trim()
+        if (t && t !== '新建节点' && t !== 'Root') matches.push(t)
+        if (matches.length >= 3) break
+      }
+      if (matches.length > 0) {
+        const joined = matches.join(' · ')
+        return maxLen > 0 ? joined.slice(0, maxLen) : joined
+      }
+      return ''
+    }
+  }
+  const firstLine = str.split('\n')[0].trim()
+  return maxLen > 0 ? firstLine.slice(0, maxLen) : firstLine
+}
+
 function computeFallbackGamification(u: any) {
   const sz = Number(u.shuzhi) || 0
   const lh = Number(u.learn_hour) || 0
@@ -89,8 +130,7 @@ Page({
             const shuzhi = Number(u.shuzhi) || 0
             const learnHour = Number(u.learn_hour) || 0
             const g = computeFallbackGamification(u)
-            const goalRaw = String(u.goal || u.desc || '').trim()
-            const goalFirstLine = goalRaw ? goalRaw.split('\n')[0].slice(0, 32) : ''
+            const goalFirstLine = extractCleanGoalText(u.goal, 32) || extractCleanGoalText(u.desc, 32)
             return {
               ...u,
               _avatarChar: name ? name.slice(0, 1) : '塾',
@@ -220,9 +260,10 @@ Page({
         location: userRes?.location || item.location || '同城/线上',
         shuzhi: userRes?.shuzhi ?? item.shuzhi,
       }
+      const cleanedGoalContent = goalRes && goalRes.content ? extractCleanGoalText(goalRes.content, 160) : ''
       this.setData({
         profilePeer: mergedPeer,
-        profileGoal: goalRes && goalRes.content ? goalRes : null,
+        profileGoal: cleanedGoalContent ? { ...goalRes, content: cleanedGoalContent } : null,
         profileLoading: false,
       })
     } catch (err) {

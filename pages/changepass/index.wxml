@@ -33,7 +33,7 @@
           bindinput="onOldPassInput"
           maxlength="20"
         />
-        <text class="eye-toggle" bindtap="toggleShowOld">{{showOld ? '隐藏' : '显示'}}</text>
+        <text class="eye-toggle" bindtap="toggleShowOld">{{showOld ? '🙈 隐藏' : '👁️ 显示'}}</text>
       </view>
     </view>
 
@@ -52,7 +52,7 @@
           bindinput="onPasswordInput"
           maxlength="20"
         />
-        <text class="eye-toggle" bindtap="toggleShowNew">{{showNew ? '隐藏' : '显示'}}</text>
+        <text class="eye-toggle" bindtap="toggleShowNew">{{showNew ? '🙈 隐藏' : '👁️ 显示'}}</text>
       </view>
 
       <!-- 实时密码强度指示器 -->
@@ -76,7 +76,7 @@
           bindinput="onCheckpassInput"
           maxlength="20"
         />
-        <text class="eye-toggle" bindtap="toggleShowConfirm">{{showConfirm ? '隐藏' : '显示'}}</text>
+        <text class="eye-toggle" bindtap="toggleShowConfirm">{{showConfirm ? '🙈 隐藏' : '👁️ 显示'}}</text>
       </view>
       <view class="match-hint {{matchStatus}}" wx:if="{{matchStatus}}">
         {{matchStatus === 'match' ? '✓ 两次输入的新密码一致' : '✕ 两次输入的新密码不一致'}}
@@ -88,7 +88,7 @@
     </view>
 
     <button class="submit-btn" disabled="{{submitting}}" bindtap="submitForm">
-      {{submitting ? '提交中...' : '确认修改'}}
+      {{submitting ? '⏳ 提交中...' : '🔑 确认修改'}}
     </button>
   </view>
 

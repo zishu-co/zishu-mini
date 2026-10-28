@@ -23,7 +23,7 @@
       class="filter-pill {{statusFilter === 'all' ? 'active' : ''}}"
       bindtap="onSelectStatus"
       data-status="all"
-    >全部结对</view>
+    >🤝 全部结对</view>
     <view
       class="filter-pill {{statusFilter === 'active' ? 'active' : ''}}"
       bindtap="onSelectStatus"
@@ -47,7 +47,7 @@
       value="{{searchKeyword}}"
       bindinput="onSearchInput"
     />
-    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">重置</text>
+    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 重置</text>
   </view>
 
   <!-- 列表 -->
@@ -58,7 +58,7 @@
     <view wx:elif="{{filteredList.length === 0}}">
       <view class="empty-row">
         <text class="empty-text">{{searchKeyword || statusFilter !== 'all' ? '未找到匹配的师生结对关系' : '暂无师生结对关系'}}</text>
-        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">查看全部结对</view>
+        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 查看全部结对</view>
       </view>
     </view>
     <view wx:else>
@@ -94,9 +94,11 @@
           <text class="course-title">《{{item.course_title}}》 ›</text>
         </view>
         <view class="relation-meta">
-          <text class="status-tag {{item._isActive ? 'active' : ''}}">{{item.status || '结对中'}}</text>
-          <text wx:if="{{item._stalenessLabel}}" class="meta-text" style="{{item._isStale ? 'color:#d97706;font-weight:600;' : 'color:#059669;'}}">{{item._stalenessLabel}}</text>
-          <text class="meta-text" wx:if="{{item._startDate}}">结对日期：{{item._startDate}}</text>
+          <view class="relation-meta-info">
+            <text class="status-tag {{item._isActive ? 'active' : ''}}">{{item.status || '结对中'}}</text>
+            <text wx:if="{{item._stalenessLabel}}" class="meta-text" style="{{item._isStale ? 'color:#d97706;font-weight:600;' : 'color:#059669;'}}">{{item._stalenessLabel}}</text>
+            <text class="meta-text" wx:if="{{item._startDate}}">结对日期：{{item._startDate}}</text>
+          </view>
           <view class="relation-actions">
             <text
               wx:if="{{item._isStale}}"

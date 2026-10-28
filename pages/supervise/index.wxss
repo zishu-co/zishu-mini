@@ -52,8 +52,9 @@
 .stat-num.success { color: #16a34a; }
 
 .stat-label {
-  font-size: 22rpx;
+  font-size: 21rpx;
   color: #64748b;
+  white-space: nowrap;
 }
 
 .search-bar {
@@ -79,9 +80,11 @@
 }
 
 .search-clear {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #94a3b8;
   padding: 4rpx 10rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .list-area { padding: 0 24rpx 48rpx; }
@@ -123,6 +126,7 @@
 .role {
   font-size: 22rpx;
   color: #9a9ab0;
+  white-space: nowrap;
 }
 
 .name {
@@ -134,13 +138,16 @@
 .arrow {
   font-size: 32rpx;
   color: #a78bfa;
+  flex-shrink: 0;
 }
 
 .deadline-badge {
-  padding: 6rpx 20rpx;
+  padding: 6rpx 18rpx;
   border-radius: 100rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .deadline-badge.blue { background: rgba(59,130,246,0.10); color: #3b82f6; }
 .deadline-badge.orange { background: rgba(249,115,22,0.10); color: #f97316; }
@@ -166,6 +173,8 @@
 .chapter-label {
   font-size: 24rpx;
   color: #9a9ab0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .chapter-title {
@@ -175,9 +184,11 @@
 }
 
 .serial {
-  font-size: 24rpx;
+  font-size: 23rpx;
   color: #16a34a;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .empty-text {
@@ -194,22 +205,26 @@
   color: #6d28d9;
   font-size: 24rpx;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .record-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16rpx;
+  gap: 12rpx;
   margin-top: 18rpx;
   padding-top: 16rpx;
   border-top: 1rpx solid #f1f5f9;
+  flex-wrap: nowrap;
 }
 
 .action-pill {
-  padding: 10rpx 24rpx;
+  padding: 10rpx 22rpx;
   border-radius: 999rpx;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .action-pill.secondary {

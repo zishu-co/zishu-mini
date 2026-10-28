@@ -67,7 +67,7 @@
       <text class="goal-adopt-badge">🎯 AI 目标提案</text>
       <text class="goal-adopt-text">{{suggestedGoal}}</text>
     </view>
-    <view class="goal-adopt-btn">一键设为目标</view>
+    <view class="goal-adopt-btn">⚡ 一键设为目标</view>
   </view>
 
   <!-- 快捷提示词气泡栏 -->
@@ -110,7 +110,7 @@
 
     <!-- 发送按钮 -->
     <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="onSend">
-      <text>发送</text>
+      <text>🚀 发送</text>
     </view>
   </view>
 </view>

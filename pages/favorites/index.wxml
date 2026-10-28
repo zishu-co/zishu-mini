@@ -27,7 +27,7 @@
         bindtap="switchFolder"
         data-index="{{index}}"
       >
-        <text>{{item.folder_title}}</text>
+        <text>📁 {{item.folder_title}}</text>
         <text class="tab-count">{{item.item_num}}</text>
       </view>
     </scroll-view>
@@ -56,7 +56,7 @@
       class="type-filter-pill {{typeFilter === 'all' ? 'active' : ''}}"
       data-type="all"
       bindtap="onTypeFilterChange"
-    >全部 ({{items.length}})</view>
+    >⭐ 全部 ({{items.length}})</view>
     <view
       class="type-filter-pill {{typeFilter === '课程' ? 'active' : ''}}"
       data-type="课程"
@@ -113,7 +113,7 @@
           data-favorid="{{item.favorid}}"
           data-index="{{index}}"
         >
-          删除
+          🗑️ 删除
         </view>
         <text class="favor-arrow">›</text>
       </view>
