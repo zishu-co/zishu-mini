@@ -23,10 +23,10 @@ page {
   --bg-page-gradient: linear-gradient(180deg, #e4dcfb 0%, #dde6ff 45%, #e9e2fe 78%, #f6f5fb 100%);
   --bg-card: #f7f4ff;
   --bg-subtle: #efeaff;
-  --row-odd-bg: #f5f0ff;
-  --row-even-bg: #e2d9fe;
-  --form-row-odd-bg: #f5f0ff;
-  --form-row-even-bg: #e2d9fe;
+  --row-odd-bg: #ffffff;
+  --row-even-bg: #ede9fe;
+  --form-row-odd-bg: #ffffff;
+  --form-row-even-bg: #ede9fe;
   --row-hover-bg: #d8b4fe;
   --row-selected-bg: #fde68a;
   --row-selected-gradient: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%);
@@ -250,7 +250,7 @@ button:active {
 .post-filter-tabs,
 .fb-tabs,
 .course-filter-pills,
-.inno-domain-tabs,
+.inno-domain-tabs-box,
 .status-filter-bar,
 .category-tabs,
 .type-filter-bar,
@@ -282,6 +282,7 @@ button:active {
 .fb-tab,
 .filter-pill,
 .domain-tab,
+.inno-domain-tab,
 .status-pill,
 .cat-tab,
 .type-filter-pill,
@@ -321,6 +322,7 @@ button:active {
 .filter-pill.active,
 .filter-pill--active,
 .domain-tab.active,
+.inno-domain-tab.active,
 .status-pill.active,
 .cat-tab.active,
 .type-filter-pill.active,
@@ -350,6 +352,7 @@ button:active {
 .filter-pill.active text,
 .filter-pill--active text,
 .domain-tab.active text,
+.inno-domain-tab.active text,
 .status-pill.active text,
 .cat-tab.active text,
 .type-filter-pill.active text,
@@ -510,24 +513,42 @@ button:active {
 
 .zs-form-group:nth-child(odd),
 .form-item:nth-child(odd),
+.form-row:nth-child(odd),
+.input-row:nth-child(odd),
+.edit-field:nth-child(odd),
+.editor-field:nth-child(odd),
+.event-form-field:nth-child(odd),
+.exam-form-group:nth-child(odd),
 .slot-row:nth-child(odd),
 .field-row:nth-child(odd),
-.info-row:nth-child(odd) {
-  background: var(--form-row-odd-bg) !important;
-  border-left: 6rpx solid #a78bfa !important;
+.info-row:nth-child(odd),
+.meeting-item:nth-child(odd),
+.content > .section:nth-child(odd) {
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
+  border-left: 8rpx solid #9333ea !important;
 }
 
 .zs-form-group:nth-child(even),
 .form-item:nth-child(even),
+.form-row:nth-child(even),
+.input-row:nth-child(even),
+.edit-field:nth-child(even),
+.editor-field:nth-child(even),
+.event-form-field:nth-child(even),
+.exam-form-group:nth-child(even),
 .slot-row:nth-child(even),
 .field-row:nth-child(even),
-.info-row:nth-child(even) {
-  background: var(--form-row-even-bg) !important;
-  border-left: 6rpx solid #6366f1 !important;
+.info-row:nth-child(even),
+.meeting-item:nth-child(even),
+.content > .section:nth-child(even) {
+  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%) !important;
+  border-left: 8rpx solid #4f46e5 !important;
 }
 
 .zs-form-group:focus-within,
 .form-item:focus-within,
+.form-row:focus-within,
+.input-row:focus-within,
 .slot-row:focus-within,
 .zs-form-group.selected,
 .form-item.selected,
@@ -539,64 +560,124 @@ button:active {
 }
 
 /* ── 专业设计师级：全局列表 / 表格 / 选项 相邻行交替底色与选中行互补底色 ── */
+.zs-row-odd,
 .menu-cell:nth-child(odd),
 .ark-item:nth-child(odd),
 .checkitem:nth-child(odd),
 .option-item:nth-child(odd),
+.option:nth-child(odd),
 .member-card:nth-child(odd),
 .course-card:nth-child(odd),
+.course-item:nth-child(odd),
+.mentor-item:nth-child(odd),
+.chapter-edit-card:nth-child(odd),
+.chapter-card:nth-child(odd),
+.cohort-card:nth-child(odd),
+.teacher-card:nth-child(odd),
+.seat-slot:nth-child(odd),
+.topic-item:nth-child(odd),
+.article-item:nth-child(odd),
+.zhuanlan-card:nth-child(odd),
+.mindmap-node-row:nth-child(odd),
 .paper-card:nth-child(odd),
-.record-card:nth-child(odd),
+.exam-bank-item:nth-child(odd),
+.favor-item:nth-child(odd),
+.project-card:nth-child(odd),
+.group-card:nth-child(odd),
+.inno-list-row:nth-child(odd),
+.inno-record-row:nth-child(odd),
+.talk-card:nth-child(odd),
+.goal-card:nth-child(odd),
+.history-card:nth-child(odd),
 .camp-card:nth-child(odd),
+.relation-card:nth-child(odd),
+.fb-item:nth-child(odd),
+.record-card:nth-child(odd),
+.question-card:nth-child(odd),
+.jianda-item-card:nth-child(odd),
+.quizblock:nth-child(odd),
+.log-item:nth-child(odd),
+.log-card:nth-child(odd),
+.event-card:nth-child(odd),
+.participant-card:nth-child(odd),
+.recommendation-item:nth-child(odd),
 .chapter-item:nth-child(odd),
 .chapter-row:nth-child(odd),
 .task-card:nth-child(odd),
-.project-card:nth-child(odd),
-.talk-card:nth-child(odd),
 .supervise-card:nth-child(odd),
-.mentor-card:nth-child(odd),
-.favor-item:nth-child(odd),
-.log-card:nth-child(odd),
-.event-card:nth-child(odd),
-.participant-card:nth-child(odd) {
-  background: linear-gradient(180deg, #f5f0ff 0%, #f1ebff 100%) !important;
-  border-left: 6rpx solid #a78bfa !important;
+.mentor-card:nth-child(odd) {
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
+  border-left: 8rpx solid #9333ea !important;
 }
 
+.zs-row-even,
 .menu-cell:nth-child(even),
 .ark-item:nth-child(even),
 .checkitem:nth-child(even),
 .option-item:nth-child(even),
+.option:nth-child(even),
 .member-card:nth-child(even),
 .course-card:nth-child(even),
+.course-item:nth-child(even),
+.mentor-item:nth-child(even),
+.chapter-edit-card:nth-child(even),
+.chapter-card:nth-child(even),
+.cohort-card:nth-child(even),
+.teacher-card:nth-child(even),
+.seat-slot:nth-child(even),
+.topic-item:nth-child(even),
+.article-item:nth-child(even),
+.zhuanlan-card:nth-child(even),
+.mindmap-node-row:nth-child(even),
 .paper-card:nth-child(even),
-.record-card:nth-child(even),
+.exam-bank-item:nth-child(even),
+.favor-item:nth-child(even),
+.project-card:nth-child(even),
+.group-card:nth-child(even),
+.inno-list-row:nth-child(even),
+.inno-record-row:nth-child(even),
+.talk-card:nth-child(even),
+.goal-card:nth-child(even),
+.history-card:nth-child(even),
 .camp-card:nth-child(even),
+.relation-card:nth-child(even),
+.fb-item:nth-child(even),
+.record-card:nth-child(even),
+.question-card:nth-child(even),
+.jianda-item-card:nth-child(even),
+.quizblock:nth-child(even),
+.log-item:nth-child(even),
+.log-card:nth-child(even),
+.event-card:nth-child(even),
+.participant-card:nth-child(even),
+.recommendation-item:nth-child(even),
 .chapter-item:nth-child(even),
 .chapter-row:nth-child(even),
 .task-card:nth-child(even),
-.project-card:nth-child(even),
-.talk-card:nth-child(even),
 .supervise-card:nth-child(even),
-.mentor-card:nth-child(even),
-.favor-item:nth-child(even),
-.log-card:nth-child(even),
-.event-card:nth-child(even),
-.participant-card:nth-child(even) {
-  background: linear-gradient(180deg, #e2d9fe 0%, #dce4ff 100%) !important;
-  border-left: 6rpx solid #6366f1 !important;
+.mentor-card:nth-child(even) {
+  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%) !important;
+  border-left: 8rpx solid #4f46e5 !important;
 }
 
+.zs-row-odd.selected,
+.zs-row-even.selected,
+.zs-row-odd.is-selected,
+.zs-row-even.is-selected,
 .checkitem.is-selected,
 .checkitem.selected,
 .checkitem:active,
 .radio-item.radio-checked,
 .option-item.selected,
 .option-item.active,
+.option.user-selected,
+.topic-item.selected,
+.exam-bank-item.selected,
 .member-card.selected,
 .member-card.active,
 .course-card.selected,
 .course-card.enrolled,
+.course-item.selected,
 .paper-card.selected,
 .paper-card:active,
 .record-card.selected,

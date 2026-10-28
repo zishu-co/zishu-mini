@@ -84,7 +84,7 @@ module.exports = {
     <view 
       wx:for="{{recommendations}}"
       wx:key="id"
-      class="recommendation-item"
+      class="recommendation-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       bindtap="onItemTap"
       data-item="{{item}}"
     >
