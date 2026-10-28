@@ -232,7 +232,6 @@ Page<IReportDetailPageData, any>({
     if (!paperid) {
       wx.navigateTo({
         url: '/pages/exam/index',
-        fail: () => wx.switchTab({ url: '/pages/exam/index' }),
       });
       return;
     }

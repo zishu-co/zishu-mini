@@ -51,7 +51,10 @@ Page<IPageData, IPageData>({
   courseId: 0,
 
   onLoad(options: any) {
-    this.courseId = parseInt(options.course_id || '0', 10);
+    this.courseId = parseInt(
+      options?.course_id || options?.courseId || options?.id || '0',
+      10,
+    );
     if (!this.courseId) {
       wx.showToast({ title: '参数错误', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
@@ -299,7 +302,7 @@ Page<IPageData, IPageData>({
   onGoArkDetail() {
     const arkId = this.data.courseInfo?.ark_info?.ark_id;
     if (arkId) {
-      wx.navigateTo({ url: `/pages/ark-detail/index?id=${arkId}` });
+      wx.navigateTo({ url: `/pages/ark-detail/index?arkId=${arkId}&id=${arkId}` });
     } else {
       wx.navigateTo({ url: `/pages/ark-group/index?courseId=${this.courseId}` });
     }

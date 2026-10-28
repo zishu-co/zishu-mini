@@ -37,17 +37,23 @@ Page<IPageData, any>({
   },
 
   onLoad(options: any) {
-    const targetId = parseInt(options.userId || '0', 10);
+    const rawTargetId = parseInt(
+      options?.userId || options?.user_id || options?.id || '0',
+      10,
+    );
     const storedUser = wx.getStorageSync('userInfo') || {};
-    const myId = Number(wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0);
+    const myId = Number(
+      wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0,
+    );
+    const resolvedUserId = rawTargetId || myId;
     this.setData({
-      userId: targetId,
-      isSelf: !targetId || (myId > 0 && myId === targetId),
+      userId: resolvedUserId,
+      isSelf: !rawTargetId || (myId > 0 && myId === rawTargetId),
     });
     if (this.data.userId) {
       this.loadData();
     } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
+      wx.showToast({ title: '请先登录', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 1500);
     }
   },

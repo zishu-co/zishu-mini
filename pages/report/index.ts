@@ -246,18 +246,12 @@ Page<IReportPageData, any>({
   goToExam() {
     wx.navigateTo({
       url: '/pages/exam/index',
-      fail: () => {
-        wx.switchTab({ url: '/pages/exam/index' });
-      },
     });
   },
 
   goToLearn() {
-    wx.navigateTo({
+    wx.switchTab({
       url: '/pages/learn/index',
-      fail: () => {
-        wx.switchTab({ url: '/pages/learn/index' });
-      },
     });
   },
 });
