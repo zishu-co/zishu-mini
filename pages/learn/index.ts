@@ -110,6 +110,20 @@ Page<ILearnPageData, any>({
 
   onLoad() {},
 
+  onModalTouchMove() {
+    // 遮罩、标题和操作区拦截触摸；内容区交给原生 scroll-view。
+    return false;
+  },
+
+  onCloseLearningModal() {
+    this.setData({
+      showMentorModal: false,
+      showReportModal: false,
+      showCampModal: false,
+      showEditCourseModal: false,
+    });
+  },
+
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();

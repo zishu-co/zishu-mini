@@ -107,7 +107,7 @@ page {
   transform: scale(0.95);
 }
 .quick-btn.primary {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #6d28d9 100%);
   color: #ffffff;
   border: 1rpx solid rgba(255, 255, 255, 0.28);
   box-shadow:
@@ -127,6 +127,31 @@ page {
 .quick-btn.primary .quick-text {
   color: #ffffff;
 }
+.quick-btn--report {
+  background: linear-gradient(145deg, #eff6ff 0%, #bfdbfe 100%);
+  border-color: #93c5fd;
+}
+.quick-btn--report .quick-text { color: #1e40af; }
+.quick-btn--social {
+  background: linear-gradient(145deg, #ecfdf5 0%, #a7f3d0 100%);
+  border-color: #6ee7b7;
+}
+.quick-btn--social .quick-text { color: #065f46; }
+.quick-btn--supervise {
+  background: linear-gradient(145deg, #fff7ed 0%, #fed7aa 100%);
+  border-color: #fdba74;
+}
+.quick-btn--supervise .quick-text { color: #9a3412; }
+.quick-btn--camp {
+  background: linear-gradient(145deg, #fffbeb 0%, #fde68a 100%);
+  border-color: #fcd34d;
+}
+.quick-btn--camp .quick-text { color: #92400e; }
+.quick-btn--create {
+  background: linear-gradient(145deg, #fdf2f8 0%, #fbcfe8 100%);
+  border-color: #f9a8d4;
+}
+.quick-btn--create .quick-text { color: #9d174d; }
 
 /* 登录提示 */
 .login-tip {
@@ -558,105 +583,169 @@ page {
   height: calc(env(safe-area-inset-bottom) + 160rpx);
 }
 
-/* 弹窗 & 遮罩（同时支持 .modal 独立定位与 .modal-mask 内嵌 .modal-card） */
-.modal-mask {
+/* 独立弹窗层覆盖 tabbar(990) 和 AI 按钮(9999)，避免浮层遮住操作。 */
+.learn-modal-layer {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(36, 16, 68, 0.44);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  z-index: 1000;
+  inset: 0;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32rpx;
+  padding: 20px 16px;
+  padding-top: calc(20px + env(safe-area-inset-top));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
   box-sizing: border-box;
 }
-.modal {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 660rpx;
-  max-height: 84vh;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
-    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.20) 0%, transparent 52%),
-    linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%);
-  border-radius: 44rpx;
-  padding: 26rpx 32rpx 34rpx;
-  box-sizing: border-box;
-  z-index: 1001;
-  overflow: hidden;
-  box-shadow:
-    0 28rpx 72rpx -12rpx rgba(109, 40, 217, 0.26),
-    0 10rpx 28rpx -6rpx rgba(236, 72, 153, 0.14),
-    inset 0 3rpx 0 #ffffff;
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
-  display: flex;
-  flex-direction: column;
+.learn-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(36, 16, 68, 0.44);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.modal-card {
+.learn-dialog {
+  position: relative;
   width: 100%;
-  max-width: 660rpx;
-  max-height: 84vh;
+  max-width: 560px;
+  max-height: 100%;
   background:
     radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
-    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.20) 0%, transparent 52%),
+    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.16) 0%, transparent 52%),
     linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%);
-  border-radius: 44rpx;
-  padding: 28rpx 32rpx 34rpx;
+  border-radius: 24px;
+  padding: 20px;
   box-sizing: border-box;
-  box-shadow:
-    0 28rpx 72rpx -12rpx rgba(109, 40, 217, 0.26),
-    0 10rpx 28rpx -6rpx rgba(236, 72, 153, 0.14),
-    inset 0 3rpx 0 #ffffff;
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(74, 20, 140, 0.22), inset 0 2px 0 #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.96);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
-.modal-card .modal-header {
-  padding: 0 0 20rpx;
-  margin-bottom: 20rpx;
-}
-.modal-header {
+.learn-dialog .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8rpx 4rpx 20rpx;
-  margin-bottom: 18rpx;
-  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24);
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 0 0 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #ede2f7;
 }
-.modal-title {
-  font-size: 33rpx;
+.learn-dialog .modal-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px !important;
   font-weight: 800;
+  line-height: 1.4;
   color: #3b0764;
+  word-break: break-word;
 }
-.modal-close {
-  width: 58rpx;
-  height: 58rpx;
+.learn-dialog__heading { flex: 1; min-width: 0; }
+.learn-dialog__subtitle {
+  margin-top: 4px;
+  color: #7c6596;
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+.learn-dialog .modal-close {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0;
+  padding: 0;
   border-radius: 999rpx;
   background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
   color: #9333ea;
   border: 2rpx solid rgba(244, 114, 182, 0.30);
   box-shadow: 0 6rpx 16rpx rgba(147, 51, 234, 0.12), inset 0 2rpx 0 #ffffff;
-  font-size: 26rpx;
+  font-size: 16px !important;
+  line-height: 1;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.modal-body {
-  padding: 8rpx 4rpx 8rpx;
-  overflow-y: auto;
+.learn-dialog__body {
+  /* 原生纵向 scroll-view 必须有明确高度；短屏时仅收缩此中间区域。 */
+  height: 50vh;
+  min-height: 0;
+  flex-shrink: 1;
 }
-.modal-scroll {
-  max-height: 60vh;
+.learn-dialog--report .learn-dialog__body { height: 32vh; }
+.learn-dialog__content {
+  padding: 2px 2px 4px;
+  box-sizing: border-box;
+}
+.learn-dialog .camp-filter-pills {
+  margin-bottom: 14px;
+  padding: 5px;
+  gap: 4px;
+  border-radius: 18px;
+  flex-shrink: 0;
+}
+.learn-dialog .camp-filter-pills .filter-pill {
+  height: 36px;
+  padding: 0 4px;
+  font-size: 13px;
+}
+.learn-dialog .modal-actions-footer {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+  padding-top: 14px;
+  margin-top: 12px;
+}
+.learn-dialog .modal-actions-footer .action-btn {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  box-sizing: border-box;
+}
+.learn-dialog .label-row {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.learn-dialog .fill-pledge-link { font-size: 12px; }
+.learn-dialog .input-row { padding: 14px; margin-bottom: 12px; }
+.learn-dialog .input-field { min-height: 44px; }
+.learn-dialog .input-textarea { height: 120px; }
+.learn-dialog .input-textarea-sm { height: 90px; }
+.learn-dialog .report-info { font-size: 13px; padding: 12px; margin-bottom: 14px; }
+
+@media (min-width: 600px) {
+  .learn-dialog .input-field,
+  .learn-dialog .chapter-edit-input,
+  .learn-dialog .chapter-edit-subinput {
+    font-size: 14px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    min-height: 44px;
+  }
+  .learn-dialog .input-label { font-size: 14px !important; }
+  .learn-dialog .mentor-name { font-size: 15px; }
+  .learn-dialog .mentor-select-btn { font-size: 13px; padding: 8px 14px; }
+  .learn-dialog .chapter-outline-title { font-size: 14px; }
+  .learn-dialog .chapter-outline-header { flex-wrap: wrap; gap: 8px; }
+  .learn-dialog .chapter-add-btn { font-size: 13px; }
+}
+
+@media (max-height: 450px) {
+  .learn-modal-layer { padding-top: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+  .learn-dialog { padding: 12px 16px; border-radius: 20px; }
+  .learn-dialog .modal-header { padding-bottom: 8px; margin-bottom: 8px; }
+  .learn-dialog .camp-filter-pills { margin-bottom: 8px; }
+  .learn-dialog .modal-actions-footer { padding-top: 8px; margin-top: 8px; }
 }
 
 /* 塾师列表 */

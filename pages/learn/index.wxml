@@ -1,3 +1,4 @@
+<page-meta page-style="{{showMentorModal || showReportModal || showCampModal || showEditCourseModal ? 'overflow: hidden;' : ''}}" />
 <view class="page">
 
   <!-- 顶部 Banner -->
@@ -13,27 +14,27 @@
 
   <!-- 快捷入口 -->
   <view class="quick-btns">
-    <view class="quick-btn primary" bindtap="onGotoExam">
+    <view class="quick-btn primary quick-btn--exam" bindtap="onGotoExam">
       <text class="quick-icon">📝</text>
       <text class="quick-text">闯关考试</text>
     </view>
-    <view class="quick-btn" bindtap="onGotoReport">
+    <view class="quick-btn quick-btn--report" bindtap="onGotoReport">
       <text class="quick-icon">📊</text>
       <text class="quick-text">成绩单学时</text>
     </view>
-    <view class="quick-btn" bindtap="onGotoSocialPlaza">
+    <view class="quick-btn quick-btn--social" bindtap="onGotoSocialPlaza">
       <text class="quick-icon">🏫</text>
       <text class="quick-text">共学广场</text>
     </view>
-    <view class="quick-btn" bindtap="onGotoSupervise">
+    <view class="quick-btn quick-btn--supervise" bindtap="onGotoSupervise">
       <text class="quick-icon">👀</text>
       <text class="quick-text">督学看板</text>
     </view>
-    <view class="quick-btn" bindtap="onOpenCampModal">
+    <view class="quick-btn quick-btn--camp" bindtap="onOpenCampModal">
       <text class="quick-icon">🏕️</text>
       <text class="quick-text">进阶预备营</text>
     </view>
-    <view class="quick-btn" bindtap="onOpenEditCourseModal">
+    <view class="quick-btn quick-btn--create" bindtap="onOpenEditCourseModal">
       <text class="quick-icon">🛠️</text>
       <text class="quick-text">共创课程</text>
     </view>
@@ -169,14 +170,18 @@
   <!-- 底部安全区 -->
   <view class="safe-bottom"></view>
 
+  <!-- 弹窗共用遮罩；page-meta 随四个可见状态锁定/恢复底层页面滚动。 -->
+  <view class="learn-modal-layer" wx:if="{{showMentorModal || showReportModal || showCampModal || showEditCourseModal}}">
+    <view class="learn-modal-backdrop" bindtap="onCloseLearningModal" catchtouchmove="onModalTouchMove"></view>
+
   <!-- 选塾师弹窗 -->
-  <view class="modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
-  <view class="modal" wx:if="{{showMentorModal}}">
-    <view class="modal-header">
+  <view class="learn-dialog" wx:if="{{showMentorModal}}" aria-role="dialog" aria-label="选择塾师">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">选择塾师</text>
-      <text class="modal-close" bindtap="onCloseMentorModal">✕</text>
+      <button class="modal-close" bindtap="onCloseMentorModal" aria-label="关闭选择塾师">✕</button>
     </view>
-    <view class="modal-body">
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
       <view class="mentor-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{mentorList}}" wx:key="shushi_id">
         <text class="mentor-name">{{item.shushi_name}}</text>
         <view
@@ -189,17 +194,18 @@
       <view class="mentor-empty" wx:if="{{mentorList.length == 0}}">
         <text>暂无可选塾师</text>
       </view>
-    </view>
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 申报学时弹窗 -->
-  <view class="modal-mask" wx:if="{{showReportModal}}" bindtap="onCloseReportModal"></view>
-  <view class="modal" wx:if="{{showReportModal}}">
-    <view class="modal-header">
+  <view class="learn-dialog learn-dialog--report" wx:elif="{{showReportModal}}" aria-role="dialog" aria-label="申报学时">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">申报学时</text>
-      <text class="modal-close" bindtap="onCloseReportModal">✕</text>
+      <button class="modal-close" bindtap="onCloseReportModal" aria-label="关闭申报学时">✕</button>
     </view>
-    <view class="modal-body">
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
       <view class="report-info" wx:if="{{reportCourse}}">
         <text>课程：{{reportCourse.course_title}}</text>
         <text>章节：{{reportCourse.chapter_title}}</text>
@@ -215,22 +221,24 @@
         />
         <text class="input-tip">最多申报5小时</text>
       </view>
-      <view class="modal-actions">
+      </view>
+    </scroll-view>
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
         <view class="action-btn secondary" bindtap="onCloseReportModal">✕ 取消</view>
         <view class="action-btn primary" bindtap="onConfirmReport">✅ 确认申报</view>
       </view>
-    </view>
   </view>
 
   <!-- 102-camp.md: 进阶预备营弹窗（塾员预备营 / 塾师预备营 / 塾主预备营） -->
-  <view class="modal-mask" wx:if="{{showCampModal}}" bindtap="onCloseCampModal"></view>
-  <view class="modal" wx:if="{{showCampModal}}">
-    <view class="modal-header">
-      <text class="modal-title">🏕️ 自塾进阶预备营 ({{campInfo ? campInfo.camp_name : '预备营'}})</text>
-      <text class="modal-close" bindtap="onCloseCampModal">✕</text>
+  <view class="learn-dialog learn-dialog--camp" wx:elif="{{showCampModal}}" aria-role="dialog" aria-label="进阶预备营">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
+      <view class="learn-dialog__heading">
+        <view class="modal-title">🏕️ 进阶预备营</view>
+        <view class="learn-dialog__subtitle">{{campInfo ? campInfo.camp_name : '选择适合你的成长阶段'}}</view>
+      </view>
+      <button class="modal-close" bindtap="onCloseCampModal" aria-label="关闭预备营">✕</button>
     </view>
-    <view class="modal-body">
-      <view class="course-filter-pills camp-filter-pills">
+      <view class="course-filter-pills camp-filter-pills" catchtouchmove="onModalTouchMove">
         <view
           class="filter-pill {{activeCampId === 1 ? 'active' : ''}}"
           data-campid="1"
@@ -248,6 +256,8 @@
         >👑 塾主营</view>
       </view>
 
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
       <view class="report-info" wx:if="{{campInfo}}">
         <text>营主理人：{{campInfo.admin_name || '自塾教务处'}} · 必修课程号：{{campInfo.must_course || '1、2'}}</text>
         <text>在营成员 {{campMembers.length}} 人 · 已毕业 {{campFinishs.length}} 人 · 排队审核 {{campWaitings.length}} 人</text>
@@ -278,23 +288,24 @@
         />
       </view>
 
-      <view class="modal-actions">
-        <view class="action-btn secondary" bindtap="onCloseCampModal">✕ 关闭</view>
-        <view class="action-btn primary" bindtap="onSubmitJoinCamp">
-          {{submittingCamp ? '⏳ 提交中...' : '🚀 申请加入预备营'}}
-        </view>
       </view>
-    </view>
+    </scroll-view>
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
+        <view class="action-btn secondary" bindtap="onCloseCampModal">✕ 关闭</view>
+        <button class="action-btn primary camp-submit" bindtap="onSubmitJoinCamp" disabled="{{submittingCamp}}" loading="{{submittingCamp}}">
+          {{submittingCamp ? '⏳ 提交中...' : '🚀 申请加入预备营'}}
+        </button>
+      </view>
   </view>
 
   <!-- 103-edit-course.md: 塾主/塾师共创课程弹窗 -->
-  <view class="modal-mask" wx:if="{{showEditCourseModal}}" bindtap="onCloseEditCourseModal">
-    <view class="modal-card" catchtap="">
-      <view class="modal-header">
+    <view class="learn-dialog" wx:elif="{{showEditCourseModal}}" aria-role="dialog" aria-label="共创课程">
+      <view class="modal-header" catchtouchmove="onModalTouchMove">
         <text class="modal-title">🛠️ 共创与发布自塾课程</text>
-        <text class="modal-close" bindtap="onCloseEditCourseModal">✕</text>
+        <button class="modal-close" bindtap="onCloseEditCourseModal" aria-label="关闭共创课程">✕</button>
       </view>
-      <scroll-view scroll-y="true" class="modal-scroll">
+      <scroll-view scroll-y="{{true}}" class="learn-dialog__body" enhanced="{{true}}" bounces="{{false}}">
+        <view class="learn-dialog__content">
         <view class="input-row">
           <text class="input-label">课程名称 *</text>
           <input
@@ -353,8 +364,9 @@
             />
           </view>
         </view>
+        </view>
       </scroll-view>
-      <view class="modal-actions modal-actions-footer">
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
         <view class="action-btn secondary" bindtap="onSaveCourseDraft">💾 存草稿</view>
         <view class="action-btn primary" bindtap="onSubmitSaveCourse">
           {{savingCourse ? '发布中...' : '🚀 立即发布课程'}}
