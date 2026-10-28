@@ -390,37 +390,41 @@ page {
 
 /* 课程列表项 */
 .course-item {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
-  border-radius: 26rpx;
-  padding: 26rpx 28rpx;
-  margin-bottom: 16rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 20rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
-  box-shadow: 0 6rpx 20rpx rgba(15, 23, 42, 0.04);
-  border: 1rpx solid rgba(124, 58, 237, 0.14);
-  border-left: 8rpx solid #9333ea;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
 }
 .course-item.zs-row-odd,
 .course-card.zs-row-odd {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
-  border-left: 8rpx solid #9333ea;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
 }
 .course-item.zs-row-even,
 .course-card.zs-row-even {
-  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%);
-  border-left: 8rpx solid #4f46e5;
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
 }
 .course-item:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 .course-item.selected {
-  border: 2rpx solid #d97706;
-  border-left: 8rpx solid #d97706;
-  background: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%);
-  box-shadow: 0 8rpx 24rpx rgba(217, 119, 6, 0.18);
+  border: 3rpx solid #fb923c;
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%);
+  box-shadow:
+    0 14rpx 34rpx -6rpx rgba(251, 146, 60, 0.24),
+    0 0 0 4rpx rgba(251, 146, 60, 0.12),
+    inset 0 3rpx 0 #ffffff;
 }
 .course-item-left {
   flex: 1;

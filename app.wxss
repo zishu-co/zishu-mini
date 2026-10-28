@@ -18,19 +18,19 @@ page {
   --brand-gradient-hero: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   --brand-gradient-soft: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 
-  /* 背景与文字（专业设计师多层薰衣草/靛蓝微光氛围与互补琥珀金选中色系） */
-  --bg-page: #f6f5fb;
-  --bg-page-gradient: linear-gradient(180deg, #e4dcfb 0%, #dde6ff 45%, #e9e2fe 78%, #f6f5fb 100%);
-  --bg-card: #f7f4ff;
-  --bg-subtle: #efeaff;
-  --row-odd-bg: #ffffff;
-  --row-even-bg: #ede9fe;
-  --form-row-odd-bg: #ffffff;
-  --form-row-even-bg: #ede9fe;
-  --row-hover-bg: #d8b4fe;
-  --row-selected-bg: #fde68a;
-  --row-selected-gradient: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%);
-  --row-selected-border: #d97706;
+  /* 背景与文字（新潮多巴胺马卡龙轻甜微光氛围 + 樱花奶昔/苏打蓝紫相间色系 + 蜜桃柠檬选中色） */
+  --bg-page: #f8f5ff;
+  --bg-page-gradient: linear-gradient(165deg, #fdf2f8 0%, #f3e8ff 38%, #eef2ff 72%, #f0f9ff 100%);
+  --bg-card: #ffffff;
+  --bg-subtle: #f5f3ff;
+  --row-odd-bg: #fff7fb;
+  --row-even-bg: #eef2ff;
+  --form-row-odd-bg: #fff7fb;
+  --form-row-even-bg: #eef2ff;
+  --row-hover-bg: #f5d0fe;
+  --row-selected-bg: #fef08a;
+  --row-selected-gradient: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%);
+  --row-selected-border: #fb923c;
   --text-main: #0f172a;
   --text-sec: #475569;
   --text-muted: #94a3b8;
@@ -438,19 +438,31 @@ button:active {
   to { transform: scale(1); opacity: 1; }
 }
 
-.zs-modal-mask {
+.zs-modal-mask,
+.modal-mask,
+.mentor-modal-mask,
+.goal-modal-mask,
+.inno-modal-mask,
+.gt-modal-mask,
+.fb-modal-mask,
+.event-modal-mask,
+.exam-sheet-mask,
+.reader-mask,
+.greet-mask,
+.jianda-sheet-mask,
+.cert-modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.56);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(36, 16, 68, 0.42) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 32rpx;
   box-sizing: border-box;
-  animation: zsFadeIn 0.2s ease-out;
+  animation: zsFadeIn 0.22s ease-out;
 }
 
 .zs-modal-mask--bottom {
@@ -458,81 +470,188 @@ button:active {
   padding: 0;
 }
 
-.zs-modal-card {
+.zs-modal-card,
+.modal,
+.modal-card,
+.goal-modal,
+.inno-modal-card,
+.gt-modal-card,
+.fb-modal-card,
+.event-modal-card,
+.greet-modal {
   width: 100%;
-  max-width: 660rpx;
+  max-width: 670rpx;
   max-height: 84vh;
-  background: #ffffff;
-  border-radius: 36rpx;
-  padding: 40rpx 36rpx;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%) !important;
+  border-radius: 44rpx !important;
+  padding: 28rpx 34rpx 36rpx !important;
   box-sizing: border-box;
-  box-shadow: var(--shadow-lg);
-  border: 1rpx solid rgba(147, 51, 234, 0.1);
+  box-shadow:
+    0 28rpx 72rpx -12rpx rgba(109, 40, 217, 0.26),
+    0 10rpx 28rpx -6rpx rgba(236, 72, 153, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.96) !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: zsPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: zsPopIn 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.zs-modal-sheet {
+.zs-modal-sheet,
+.mentor-modal,
+.exam-sheet-card,
+.reader-sheet,
+.jianda-sheet-card {
   width: 100%;
   max-height: 86vh;
-  background: #ffffff;
-  border-radius: 40rpx 40rpx 0 0;
-  padding: 36rpx 36rpx calc(36rpx + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 15% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 85% 0%, rgba(129, 140, 248, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 40%, #f8f7ff 100%) !important;
+  border-radius: 48rpx 48rpx 0 0 !important;
+  padding: 26rpx 34rpx calc(36rpx + env(safe-area-inset-bottom)) !important;
   box-sizing: border-box;
-  box-shadow: 0 -16rpx 48rpx rgba(15, 23, 42, 0.14);
+  box-shadow:
+    0 -20rpx 64rpx rgba(109, 40, 217, 0.22),
+    inset 0 3rpx 0 #ffffff !important;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.98) !important;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  animation: zsSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: zsSlideUp 0.26s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.zs-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20rpx;
-  margin-bottom: 28rpx;
-}
-
-.zs-modal-title {
-  font-size: 34rpx;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.35;
-}
-
-.zs-modal-sub {
-  font-size: 24rpx;
-  color: #64748b;
-  margin-top: 8rpx;
-  line-height: 1.5;
-}
-
-.zs-modal-close {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 新潮移动端弹窗顶部马卡龙灵动拖拽胶囊条 */
+.zs-modal-card::before,
+.zs-modal-sheet::before,
+.modal::before,
+.modal-card::before,
+.mentor-modal::before,
+.goal-modal::before,
+.inno-modal-card::before,
+.gt-modal-card::before,
+.fb-modal-card::before,
+.event-modal-card::before,
+.exam-sheet-card::before,
+.reader-sheet::before,
+.greet-modal::before,
+.jianda-sheet-card::before {
+  content: '';
+  display: block;
+  width: 78rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #f9a8d4 0%, #c084fc 50%, #818cf8 100%);
+  margin: 0 auto 20rpx;
+  opacity: 0.9;
   flex-shrink: 0;
 }
 
-.zs-modal-close:active {
-  background: #e2e8f0;
+.zs-modal-header,
+.modal-header,
+.mentor-modal__header,
+.goal-modal-header,
+.exam-sheet-header,
+.jianda-sheet-header,
+.fb-modal-header,
+.greet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+  padding-bottom: 18rpx;
+  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24) !important;
 }
 
-.zs-form-group {
+.zs-modal-title,
+.modal-title,
+.mentor-modal__title,
+.goal-modal-title,
+.inno-modal-title,
+.gt-modal-title,
+.fb-modal-title,
+.event-modal-title,
+.exam-sheet-title,
+.jianda-sheet-title,
+.greet-title {
+  font-size: 33rpx !important;
+  font-weight: 800 !important;
+  color: #3b0764 !important;
+  line-height: 1.35;
+  letter-spacing: 0.4rpx;
+}
+
+.zs-modal-sub,
+.mentor-modal__sub,
+.inno-modal-sub,
+.gt-modal-sub,
+.greet-sub {
+  font-size: 24rpx;
+  color: #7c3aed;
+  margin-top: 8rpx;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* 可爱果冻感圆形关闭按钮 */
+.zs-modal-close,
+.modal-close,
+.mentor-modal__close,
+.goal-modal-close,
+.exam-sheet-close,
+.reader-close,
+.greet-close,
+.fb-modal-close,
+.jianda-sheet-close {
+  width: 58rpx !important;
+  height: 58rpx !important;
+  border-radius: 999rpx !important;
+  background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%) !important;
+  color: #9333ea !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.30) !important;
+  box-shadow: 0 6rpx 16rpx rgba(147, 51, 234, 0.12), inset 0 2rpx 0 #ffffff !important;
+  font-size: 26rpx !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.zs-modal-close:active,
+.modal-close:active,
+.mentor-modal__close:active,
+.goal-modal-close:active,
+.exam-sheet-close:active,
+.reader-close:active,
+.greet-close:active,
+.fb-modal-close:active,
+.jianda-sheet-close:active {
+  transform: scale(0.88) rotate(8deg);
+}
+
+/* ── 新潮移动互联网软糖胶囊表单项 (Candy Bento Form Pods) ── */
+.zs-form-group,
+.form-item,
+.form-row,
+.input-row,
+.edit-field,
+.editor-field,
+.event-form-field,
+.exam-form-group,
+.slot-row,
+.field-row,
+.info-row,
+.meeting-item {
   margin-bottom: 20rpx;
-  padding: 20rpx 24rpx;
-  border-radius: 22rpx;
-  border: 1.5rpx solid rgba(124, 58, 237, 0.12);
-  transition: all 0.2s ease;
+  padding: 22rpx 26rpx;
+  border-radius: 30rpx !important;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .zs-form-group:nth-child(odd),
@@ -548,8 +667,9 @@ button:active {
 .info-row:nth-child(odd),
 .meeting-item:nth-child(odd),
 .content > .section:nth-child(odd) {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
-  border-left: 8rpx solid #9333ea !important;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%) !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(236, 72, 153, 0.10), inset 0 3rpx 0 #ffffff !important;
 }
 
 .zs-form-group:nth-child(even),
@@ -565,25 +685,33 @@ button:active {
 .info-row:nth-child(even),
 .meeting-item:nth-child(even),
 .content > .section:nth-child(even) {
-  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%) !important;
-  border-left: 8rpx solid #4f46e5 !important;
+  background: linear-gradient(145deg, #f5f3ff 0%, #eef2ff 52%, #ecfeff 100%) !important;
+  border: 2rpx solid rgba(129, 140, 248, 0.28) !important;
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(99, 102, 241, 0.12), inset 0 3rpx 0 rgba(255, 255, 255, 0.94) !important;
 }
 
 .zs-form-group:focus-within,
 .form-item:focus-within,
 .form-row:focus-within,
 .input-row:focus-within,
+.edit-field:focus-within,
+.editor-field:focus-within,
+.event-form-field:focus-within,
+.exam-form-group:focus-within,
 .slot-row:focus-within,
 .zs-form-group.selected,
 .form-item.selected,
 .form-item.active {
   background: var(--row-selected-gradient) !important;
-  border-color: var(--row-selected-border) !important;
-  border-left: 8rpx solid var(--row-selected-border) !important;
-  box-shadow: 0 6rpx 18rpx rgba(217, 119, 6, 0.20) !important;
+  border: 2.5rpx solid #fb923c !important;
+  box-shadow:
+    0 14rpx 32rpx -8rpx rgba(251, 146, 60, 0.24),
+    0 0 0 6rpx rgba(251, 146, 60, 0.12),
+    inset 0 3rpx 0 #ffffff !important;
+  transform: translateY(-2rpx);
 }
 
-/* ── 专业设计师级：全局列表 / 表格 / 选项 相邻行交替底色与选中行互补底色 ── */
+/* ── 新潮移动互联网：全局列表 / 卡片 轻甜马卡龙果冻感奇偶相间与蜜桃柠檬选中态（彻底告别老式Web左粗线） ── */
 .zs-row-odd,
 .menu-cell:nth-child(odd),
 .ark-item:nth-child(odd),
@@ -630,8 +758,14 @@ button:active {
 .task-card:nth-child(odd),
 .supervise-card:nth-child(odd),
 .mentor-card:nth-child(odd) {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
-  border-left: 8rpx solid #9333ea !important;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%) !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff !important;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
 }
 
 .zs-row-even,
@@ -680,8 +814,14 @@ button:active {
 .task-card:nth-child(even),
 .supervise-card:nth-child(even),
 .mentor-card:nth-child(even) {
-  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%) !important;
-  border-left: 8rpx solid #4f46e5 !important;
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%) !important;
+  border: 2rpx solid rgba(129, 140, 248, 0.30) !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94) !important;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
 }
 
 .zs-row-odd.selected,
@@ -715,43 +855,83 @@ button:active {
 .menu-cell:active,
 .ark-item:active {
   background: var(--row-selected-gradient) !important;
-  border-color: var(--row-selected-border) !important;
-  border-left: 8rpx solid var(--row-selected-border) !important;
-  box-shadow: 0 8rpx 22rpx rgba(217, 119, 6, 0.22) !important;
+  border: 3rpx solid #fb923c !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 14rpx 34rpx -6rpx rgba(251, 146, 60, 0.25),
+    0 0 0 4rpx rgba(251, 146, 60, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
 }
 
-.zs-form-label {
-  display: block;
-  font-size: 25rpx;
-  font-weight: 600;
-  color: #334155;
+.zs-form-label,
+.form-label,
+.input-label,
+.edit-field__label,
+.editor-label,
+.event-form-label,
+.exam-form-label,
+.inno-field-label,
+.gt-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 25rpx !important;
+  font-weight: 800 !important;
+  color: #581c87 !important;
   margin-bottom: 12rpx;
 }
 
-.zs-form-input {
+.zs-form-input,
+.form-input,
+.input-field,
+.edit-field__input,
+.editor-input,
+.event-form-input,
+.event-form-picker,
+.exam-form-input,
+.exam-option-input,
+.inno-input,
+.gt-input,
+.fb-input,
+.custom-topic-input,
+.chapter-edit-input,
+.chapter-edit-subinput,
+.jianda-score-input,
+.jianda-comment-input,
+.slotinput {
   width: 100%;
-  height: 84rpx;
-  padding: 0 24rpx;
-  background: #f8fafc;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #0f172a;
+  min-height: 82rpx;
+  padding: 0 26rpx !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 2rpx solid rgba(192, 132, 252, 0.30) !important;
+  border-radius: 24rpx !important;
+  font-size: 27rpx !important;
+  color: #1e1b4b !important;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.zs-form-textarea {
+.zs-form-textarea,
+.form-textarea,
+.edit-field__textarea,
+.editor-textarea,
+.event-form-textarea,
+.exam-form-textarea,
+.inno-textarea,
+.gt-textarea,
+.fb-textarea {
   width: 100%;
   min-height: 160rpx;
-  padding: 20rpx 24rpx;
-  background: #f8fafc;
-  border: 2rpx solid #e2e8f0;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #0f172a;
+  padding: 20rpx 26rpx !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 2rpx solid rgba(192, 132, 252, 0.30) !important;
+  border-radius: 26rpx !important;
+  font-size: 27rpx !important;
+  color: #1e1b4b !important;
   box-sizing: border-box;
-  line-height: 1.5;
+  line-height: 1.55;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9) !important;
 }
 
 .zs-modal-actions {
