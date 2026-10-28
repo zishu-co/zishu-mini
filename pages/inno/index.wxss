@@ -23,10 +23,10 @@ page {
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
-  padding: 36rpx 28rpx 28rpx;
+  padding: 36rpx 28rpx 36rpx;
   border-radius: 0 0 40rpx 40rpx;
   box-shadow: 0 14rpx 36rpx rgba(91, 33, 182, 0.22);
-  margin-bottom: 12rpx;
+  margin-bottom: 28rpx;
 }
 
 .home-page-header::before {
@@ -175,7 +175,8 @@ page {
 .swiper-wrap {
   position: relative;
   z-index: 1;
-  margin-top: 20rpx;
+  margin-top: 22rpx;
+  margin-bottom: 8rpx;
   border-radius: 24rpx;
   overflow: hidden;
   box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.16);
@@ -187,19 +188,40 @@ page {
   border-radius: 24rpx;
 }
 
-/* 领域标签栏（商业级横向滑块胶囊） */
-.inno-domain-tabs {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  margin: 18rpx 28rpx 8rpx;
-  padding: 12rpx 16rpx;
+/* 顶部图片与下方“全部”筛选区之间的独立呼吸间距容器 */
+.inno-filter-section {
+  padding: 8rpx 28rpx 0;
+  margin-top: 8rpx;
+  box-sizing: border-box;
+}
+
+/* 领域标签栏（商业级横向滑块胶囊外框） */
+.inno-domain-tabs-box {
+  width: 100%;
+  margin: 0 0 20rpx;
+  padding: 12rpx 14rpx;
   background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
   border: 2rpx solid rgba(124, 58, 237, 0.22);
   border-radius: 28rpx;
-  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10);
+  box-shadow:
+    inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10),
+    0 4rpx 14rpx rgba(124, 58, 237, 0.08);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.inno-domain-tabs {
+  width: 100%;
   white-space: nowrap;
   overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.inno-domain-tabs__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 2rpx 4rpx;
   box-sizing: border-box;
 }
 
@@ -211,6 +233,7 @@ page {
   justify-content: center;
   height: 66rpx;
   padding: 0 28rpx;
+  margin-right: 12rpx;
   border-radius: 999rpx;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
@@ -220,6 +243,10 @@ page {
   box-shadow: 0 4rpx 10rpx rgba(15, 23, 42, 0.04), inset 0 1rpx 0 #ffffff;
   flex-shrink: 0;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.inno-domain-tab:last-child {
+  margin-right: 0;
 }
 
 .inno-domain-tab:active {
@@ -257,9 +284,9 @@ page {
 .status-filter-bar {
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  margin: 10rpx 28rpx 6rpx;
-  padding: 8rpx 10rpx;
+  gap: 10rpx;
+  margin: 0 0 8rpx;
+  padding: 10rpx 12rpx;
   background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
   border: 2rpx solid rgba(124, 58, 237, 0.20);
   border-radius: 26rpx;

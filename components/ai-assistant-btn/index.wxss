@@ -40,6 +40,7 @@
   color: #ffffff;
   line-height: 1;
   letter-spacing: 1rpx;
+  white-space: nowrap;
 }
 
 .fab-dot {

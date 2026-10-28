@@ -183,6 +183,8 @@ page {
   font-weight: 500;
   box-shadow: 0 6rpx 20rpx rgba(124, 58, 237, 0.28);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .auth-btn::after {
@@ -213,6 +215,8 @@ page {
   border-radius: 36rpx;
   font-weight: 500;
   box-shadow: 0 6rpx 20rpx rgba(124, 58, 237, 0.28);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .pop_avatar::after {
@@ -417,6 +421,7 @@ page {
   color: #4c1d95;
   font-weight: 600;
   margin-left: 12rpx;
+  white-space: nowrap;
 }
 
 /* ========== Dev 模式登录表单样式 ========== */
@@ -437,6 +442,7 @@ page {
   padding: 0 24rpx;
   color: #a78bfa;
   font-size: 28rpx;
+  white-space: nowrap;
 }
 
 .dev-login-form {

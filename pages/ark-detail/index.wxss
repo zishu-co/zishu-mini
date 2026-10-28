@@ -65,6 +65,8 @@
   font-weight: 800;
   padding: 6rpx 20rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .badge-success {
@@ -85,6 +87,8 @@
   color: rgba(255, 255, 255, 0.9);
   padding: 6rpx 20rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .meta-row {
@@ -212,6 +216,8 @@
   color: #b45309;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .gender-tag {
@@ -219,6 +225,8 @@
   font-weight: 600;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .gender-male {
@@ -235,6 +243,8 @@
   font-size: 24rpx;
   font-weight: 700;
   color: #7c3aed;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .learn-sheet-link {
@@ -243,6 +253,7 @@
   color: #7c3aed;
   margin-top: 10rpx;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .member-footer-row {
@@ -289,6 +300,7 @@
   background: #ffffff;
   padding: 8rpx 20rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
   flex-shrink: 0;
   margin-right: 16rpx;
   box-shadow: 0 2rpx 8rpx rgba(124, 58, 237, 0.1);
@@ -329,9 +341,10 @@ button.action-btn,
   height: 88rpx;
   line-height: 88rpx;
   border-radius: 999rpx;
-  font-size: 29rpx;
+  font-size: 28rpx;
   font-weight: 800;
   text-align: center;
+  white-space: nowrap;
   border: 1.5rpx solid rgba(124, 58, 237, 0.22);
   background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
   color: #6d28d9;

@@ -30,6 +30,7 @@ page {
   -webkit-backdrop-filter: blur(10px);
   box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.35);
   margin-bottom: 16rpx;
+  white-space: nowrap;
 }
 
 .title {
@@ -97,6 +98,8 @@ page {
   border-radius: 999rpx;
   background: #7c3aed;
   color: #ffffff;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .policy-footer {
@@ -113,6 +116,7 @@ page {
   font-size: 28rpx;
   font-weight: 700;
   border: none;
+  white-space: nowrap;
 }
 
 .policy-btn::after {

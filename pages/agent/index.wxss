@@ -76,6 +76,8 @@ page {
   font-size: 22rpx;
   font-weight: 600;
   color: #ffffff;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* 消息列表 */
@@ -159,6 +161,7 @@ page {
   font-weight: 700;
   display: inline-flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .message-meta-row {
@@ -250,6 +253,7 @@ page {
   color: #ffffff;
   font-size: 24rpx;
   font-weight: 700;
+  white-space: nowrap;
   box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.25);
 }
 
@@ -273,6 +277,8 @@ page {
   color: #6d28d9;
   font-size: 24rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
   box-shadow: 0 2rpx 8rpx rgba(124, 58, 237, 0.06);
 }
 

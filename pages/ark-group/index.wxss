@@ -98,6 +98,7 @@ page {
 .ark-stat__label {
   font-size: 22rpx;
   color: rgba(255, 255, 255, 0.86);
+  white-space: nowrap;
 }
 
 .ark-stat-divider {
@@ -119,14 +120,17 @@ page {
 
 .filter-pill {
   flex: 1;
-  height: 68rpx;
-  line-height: 68rpx;
+  min-width: 0;
+  height: 66rpx;
+  line-height: 66rpx;
+  padding: 0 6rpx;
   text-align: center;
   border-radius: 999rpx;
   background: transparent;
   color: #5b5470;
-  font-size: 26rpx;
-  font-weight: 600;
+  font-size: 23rpx;
+  font-weight: 700;
+  white-space: nowrap;
   border: none;
   box-shadow: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -247,13 +251,15 @@ page {
 
 .action-btn {
   margin: 0;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 700;
-  padding: 0 26rpx;
+  padding: 0 24rpx;
   height: 60rpx;
   line-height: 60rpx;
   border-radius: 30rpx;
   border: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .action-btn.primary {
@@ -267,24 +273,28 @@ page {
 }
 
 .joined-pill {
-  font-size: 24rpx;
+  font-size: 23rpx;
   color: #059669;
   background: #ecfdf5;
   border: 1rpx solid #a7f3d0;
   padding: 8rpx 20rpx;
   border-radius: 28rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .closed-tip,
 .full-tip,
 .no-ark-tip {
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 600;
   color: #9ca3af;
   background: #f3f4f6;
   padding: 8rpx 20rpx;
   border-radius: 24rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ========== 4 席位可视化船舱网格 ========== */
@@ -339,6 +349,7 @@ page {
 .seat-tag {
   font-size: 20rpx;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .seat-slot--male .seat-tag {
@@ -356,6 +367,8 @@ page {
   background: #fef3c7;
   padding: 2rpx 10rpx;
   border-radius: 12rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .seat-user {
@@ -390,6 +403,8 @@ page {
   font-size: 24rpx;
   font-weight: 700;
   color: #6d28d9;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .no-cabin-bar {

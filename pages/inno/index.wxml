@@ -66,44 +66,50 @@
 
   <!-- 项目视图 -->
   <block wx:if="{{!pageLoading && viewMode === 'projects'}}">
-    <!-- 领域标签栏（商业级胶囊分段栏） -->
-    <scroll-view class="inno-domain-tabs" scroll-x enable-flex>
-      <view
-        wx:for="{{tabList}}"
-        wx:for-index="index"
-        wx:key="index"
-        class="inno-domain-tab {{activeTab === (item.key || '') ? 'active' : ''}}"
-        data-index="{{index}}"
-        data-key="{{item.key || ''}}"
-        bindtap="tabChangeHandle"
-      >
-        <text class="inno-domain-tab__text">{{item.key === 'F' ? '💻 ' : (item.key === 'B' ? '⚙️ ' : (item.key === 'D' ? '📄 ' : (item.key === 'T' ? '🎬 ' : (item.key === 'C' ? '🎓 ' : '🌟 '))))}}{{item.text}}</text>
-        <view class="inno-domain-tab__line" wx:if="{{activeTab === (item.key || '')}}"></view>
+    <view class="inno-filter-section">
+      <!-- 领域标签栏（商业级胶囊分段栏） -->
+      <view class="inno-domain-tabs-box">
+        <scroll-view class="inno-domain-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+          <view class="inno-domain-tabs__inner">
+            <view
+              wx:for="{{tabList}}"
+              wx:for-index="index"
+              wx:key="index"
+              class="inno-domain-tab {{activeTab === (item.key || '') ? 'active' : ''}}"
+              data-index="{{index}}"
+              data-key="{{item.key || ''}}"
+              bindtap="tabChangeHandle"
+            >
+              <text class="inno-domain-tab__text">{{item.key === 'F' ? '💻 ' : (item.key === 'B' ? '⚙️ ' : (item.key === 'D' ? '📄 ' : (item.key === 'T' ? '🎬 ' : (item.key === 'C' ? '🎓 ' : '🌟 '))))}}{{item.text}}</text>
+              <view class="inno-domain-tab__line" wx:if="{{activeTab === (item.key || '')}}"></view>
+            </view>
+          </view>
+        </scroll-view>
       </view>
-    </scroll-view>
 
-    <!-- 状态筛选胶囊 -->
-    <view class="status-filter-bar">
-      <view
-        class="status-pill {{statusFilter === 'all' ? 'active' : ''}}"
-        data-status="all"
-        bindtap="onStatusFilterTap"
-      >📋 全部</view>
-      <view
-        class="status-pill {{statusFilter === 'pending' ? 'active' : ''}}"
-        data-status="pending"
-        bindtap="onStatusFilterTap"
-      >🔥 招募中</view>
-      <view
-        class="status-pill {{statusFilter === 'in-progress' ? 'active' : ''}}"
-        data-status="in-progress"
-        bindtap="onStatusFilterTap"
-      >⚡ 进行中</view>
-      <view
-        class="status-pill {{statusFilter === 'completed' ? 'active' : ''}}"
-        data-status="completed"
-        bindtap="onStatusFilterTap"
-      >✅ 已结项</view>
+      <!-- 状态筛选胶囊 -->
+      <view class="status-filter-bar">
+        <view
+          class="status-pill {{statusFilter === 'all' ? 'active' : ''}}"
+          data-status="all"
+          bindtap="onStatusFilterTap"
+        >📋 全部</view>
+        <view
+          class="status-pill {{statusFilter === 'pending' ? 'active' : ''}}"
+          data-status="pending"
+          bindtap="onStatusFilterTap"
+        >🔥 招募中</view>
+        <view
+          class="status-pill {{statusFilter === 'in-progress' ? 'active' : ''}}"
+          data-status="in-progress"
+          bindtap="onStatusFilterTap"
+        >⚡ 进行中</view>
+        <view
+          class="status-pill {{statusFilter === 'completed' ? 'active' : ''}}"
+          data-status="completed"
+          bindtap="onStatusFilterTap"
+        >✅ 已结项</view>
+      </view>
     </view>
 
     <!-- 项目列表 -->

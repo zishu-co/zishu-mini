@@ -104,6 +104,7 @@
   color: #6d28d9;
   font-weight: 600;
   padding: 8rpx;
+  white-space: nowrap;
 }
 
 .strength-meter {
@@ -141,6 +142,8 @@
 .strength-label {
   font-size: 22rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .strength-label.weak {
@@ -174,6 +177,8 @@
   border: 1rpx solid rgba(124, 58, 237, 0.22);
   padding: 4rpx 18rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .match-hint {

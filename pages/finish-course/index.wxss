@@ -102,6 +102,7 @@
   font-size: 22rpx;
   font-weight: 600;
   color: #6b6380;
+  white-space: nowrap;
 }
 
 .checklist-step.done .checklist-label {
@@ -165,10 +166,12 @@
 }
 
 .quiz-status-tag {
-  font-size: 24rpx;
+  font-size: 23rpx;
   padding: 4rpx 20rpx;
   border-radius: 20rpx;
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* 三色样式 */

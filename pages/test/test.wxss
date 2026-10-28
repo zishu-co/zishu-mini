@@ -88,9 +88,9 @@ page {
 
 .post-filter-tabs {
   display: flex;
-  gap: 12rpx;
+  gap: 10rpx;
   margin: 20rpx 28rpx 0;
-  padding: 10rpx;
+  padding: 8rpx;
   background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
   border: 2rpx solid rgba(124, 58, 237, 0.22);
   border-radius: 26rpx;
@@ -98,15 +98,17 @@ page {
 
 .post-filter-tab {
   flex: 1;
+  min-width: 0;
   text-align: center;
-  padding: 16rpx 12rpx;
+  padding: 16rpx 8rpx;
   border-radius: 999rpx;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 700;
   border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  white-space: nowrap;
 }
 
 .post-filter-tab.active {
@@ -137,13 +139,14 @@ page {
 
 .score-banner__badge {
   display: inline-block;
-  font-size: 24rpx;
+  font-size: 23rpx;
   color: #6d28d9;
   background: rgba(124, 58, 237, 0.12);
   padding: 6rpx 16rpx;
   border-radius: 999rpx;
   font-weight: 700;
   margin-bottom: 10rpx;
+  white-space: nowrap;
 }
 
 .score-banner__title {
@@ -160,7 +163,7 @@ page {
 
 .score-mini-btn {
   margin: 0;
-  padding: 0 22rpx;
+  padding: 0 20rpx;
   height: 54rpx;
   line-height: 54rpx;
   font-size: 22rpx;
@@ -168,6 +171,8 @@ page {
   background: #ede9fe;
   color: #6d28d9;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .score-mini-btn.buddy {
   background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
@@ -229,6 +234,8 @@ page {
   font-weight: 600;
   padding: 6rpx 18rpx;
   border-radius: 20rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .badge-single {

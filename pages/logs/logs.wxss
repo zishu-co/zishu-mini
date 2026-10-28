@@ -53,6 +53,8 @@ page {
   color: #ffffff;
   font-size: 22rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .log-action-btn.danger {

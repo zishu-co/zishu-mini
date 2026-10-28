@@ -162,6 +162,8 @@ page {
   background: #f3e8ff;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sheet-quick-btn {
@@ -174,6 +176,7 @@ page {
   color: #ffffff;
   font-size: 22rpx;
   font-weight: 700;
+  white-space: nowrap;
   flex-shrink: 0;
   box-shadow: 0 4rpx 14rpx rgba(124, 58, 237, 0.25);
 }
@@ -227,10 +230,11 @@ page {
 }
 
 .stats-label {
-  font-size: 23rpx;
+  font-size: 22rpx;
   font-weight: 500;
   color: #64748b;
   margin-top: 8rpx;
+  white-space: nowrap;
 }
 
 .stats-divider {
@@ -266,14 +270,14 @@ page {
 .quick-nav-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16rpx;
+  gap: 14rpx;
   margin: 0 28rpx 24rpx;
 }
 
 .quick-nav-card {
   background: #ffffff;
   border-radius: 26rpx;
-  padding: 24rpx 10rpx;
+  padding: 22rpx 6rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -299,15 +303,17 @@ page {
 }
 
 .quick-nav-title {
-  font-size: 25rpx;
+  font-size: 24rpx;
   font-weight: 800;
   color: #0f172a;
   margin-bottom: 4rpx;
+  white-space: nowrap;
 }
 
 .quick-nav-sub {
-  font-size: 20rpx;
+  font-size: 19rpx;
   color: #64748b;
+  white-space: nowrap;
 }
 
 /* ========== 功能菜单 ========== */
@@ -348,6 +354,8 @@ page {
   background: #f3e8ff;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ark-loading {
@@ -399,6 +407,7 @@ page {
   font-weight: 700;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
@@ -646,15 +655,17 @@ page {
 
 .fb-tab {
   flex: 1;
+  min-width: 0;
   text-align: center;
-  padding: 14rpx 8rpx;
+  padding: 14rpx 6rpx;
   border-radius: 999rpx;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 700;
   background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   color: #4c1d95;
   border: 1.5rpx solid rgba(139, 92, 246, 0.20);
   box-shadow: 0 2rpx 6rpx rgba(15, 23, 42, 0.04), inset 0 1rpx 0 #ffffff;
+  white-space: nowrap;
 }
 
 .fb-tab.active {
@@ -667,20 +678,22 @@ page {
 
 .fb-type-row {
   display: flex;
-  gap: 12rpx;
+  gap: 10rpx;
   margin-bottom: 18rpx;
 }
 
 .fb-type-chip {
   flex: 1;
+  min-width: 0;
   text-align: center;
-  padding: 14rpx 0;
+  padding: 14rpx 4rpx;
   border-radius: 999rpx;
   background: #f8fafc;
   border: 1rpx solid #e2e8f0;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 600;
   color: #475569;
+  white-space: nowrap;
 }
 
 .fb-type-chip.active {
@@ -727,6 +740,8 @@ page {
   border-radius: 999rpx;
   font-size: 26rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .fb-btn.cancel {

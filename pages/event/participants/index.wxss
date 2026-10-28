@@ -80,21 +80,24 @@
 }
 .info-actions {
   display: flex;
-  gap: 16rpx;
+  gap: 10rpx;
+  flex-wrap: nowrap;
   margin-top: 24rpx;
 }
 
 .btn-primary,
 .btn-secondary {
   flex: 1;
+  min-width: 0;
   border-radius: 999rpx;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 700;
   height: 76rpx;
   line-height: 76rpx;
-  padding: 0;
+  padding: 0 8rpx;
   margin: 0;
   border: none;
+  white-space: nowrap;
 }
 .btn-primary {
   background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
@@ -136,6 +139,8 @@
   background: #f3e8ff;
   padding: 6rpx 22rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .participant-search {
@@ -215,6 +220,8 @@
   background: #f3e8ff;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .city-tag {
   font-size: 21rpx;
@@ -223,6 +230,8 @@
   background: #f1f5f9;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .join-time-sub {
   font-size: 23rpx;
@@ -232,10 +241,11 @@
   flex-shrink: 0;
   background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
   color: #ffffff;
-  font-size: 24rpx;
+  font-size: 23rpx;
   font-weight: 700;
-  padding: 12rpx 26rpx;
+  padding: 12rpx 24rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
   box-shadow: 0 6rpx 14rpx rgba(124, 58, 237, 0.22);
 }
 .greet-btn.greeted {
@@ -259,6 +269,8 @@
   border-radius: 999rpx;
   font-size: 22rpx;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .tag-success {
   background: #dcfce7;
