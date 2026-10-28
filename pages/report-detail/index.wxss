@@ -135,29 +135,33 @@
 
 .filter-bar {
   display: flex;
-  gap: 16rpx;
-  padding: 4rpx 28rpx 22rpx;
+  gap: 12rpx;
+  margin: 4rpx 28rpx 22rpx;
+  padding: 10rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 26rpx;
 }
 
 .filter-tab {
   flex: 1;
   text-align: center;
-  padding: 20rpx 12rpx;
-  background: #ffffff;
-  color: #64748b;
-  font-size: 26rpx;
+  padding: 18rpx 12rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  font-size: 25rpx;
   font-weight: 700;
   border-radius: 999rpx;
-  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
-  border: 1rpx solid rgba(147, 51, 234, 0.08);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   transition: all 0.18s ease;
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.24);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.32);
 }
 
 .score-row {

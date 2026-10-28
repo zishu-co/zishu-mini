@@ -113,6 +113,11 @@
   display: flex;
   white-space: nowrap;
   margin-bottom: 16rpx;
+  padding: 10rpx 12rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 28rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10);
 }
 
 .cat-tab {
@@ -123,20 +128,20 @@
   border-radius: 999rpx;
   font-size: 25rpx;
   font-weight: 700;
-  color: #475569;
-  background: rgba(255, 255, 255, 0.96);
-  margin-right: 14rpx;
-  border: 2rpx solid rgba(124, 58, 237, 0.14);
-  box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
+  color: #4c1d95;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  margin-right: 12rpx;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cat-tab.active {
-  background: linear-gradient(135deg, #a855f7 0%, #9333ea 52%, #7c3aed 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
   font-weight: 800;
-  border-color: transparent;
-  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.28), inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.34), inset 0 2rpx 0 rgba(255, 255, 255, 0.38);
 }
 
 .gender-filter-bar {
@@ -144,36 +149,40 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8rpx;
+  padding: 10rpx 16rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.20);
+  border-radius: 26rpx;
 }
 
 .filter-hint {
   font-size: 24rpx;
-  color: #64748b;
-  font-weight: 600;
+  color: #4c1d95;
+  font-weight: 700;
 }
 
 .gender-pills {
   display: flex;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .gender-pill {
   font-size: 22rpx;
-  padding: 8rpx 22rpx;
+  padding: 10rpx 22rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.96);
-  color: #64748b;
-  border: 2rpx solid rgba(148, 163, 184, 0.24);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   font-weight: 700;
-  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.03);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
   transition: all 0.18s ease;
 }
 
 .gender-pill.active {
-  background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
-  color: #6d28d9;
-  border-color: rgba(168, 85, 247, 0.45);
-  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.12);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.32);
 }
 
 .gender-pill.active.female {

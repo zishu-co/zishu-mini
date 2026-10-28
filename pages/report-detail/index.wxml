@@ -46,14 +46,14 @@
       bindtap="switchFilterMode"
       data-mode="all"
     >
-      全部题目 ({{questions.length}})
+      📋 全部题目 ({{questions.length}})
     </view>
     <view
       class="filter-tab {{filterMode === 'wrong' ? 'active' : ''}}"
       bindtap="switchFilterMode"
       data-mode="wrong"
     >
-      仅看错题 ({{wrongCount}})
+      🔥 仅看错题 ({{wrongCount}})
     </view>
   </view>
 
@@ -183,7 +183,7 @@
       <button
         class="jianda-submit-btn"
         bindtap="onSubmitJiandaReview"
-      >{{savingJianda ? '保存中...' : '保存简答题批阅得分'}}</button>
+      >{{savingJianda ? '⏳ 保存中...' : '💾 保存简答题批阅得分'}}</button>
     </view>
   </view>
 

@@ -54,7 +54,7 @@
         </view>
       </view>
       <button class="quiz-btn" bindtap="goQuiz">
-        {{courseInfo.quiz_info.has_taken ? '重新测验' : '参加测验'}}
+        {{courseInfo.quiz_info.has_taken ? '🔄 重新测验' : '⚡ 参加测验'}}
       </button>
     </view>
 
@@ -76,7 +76,7 @@
           loading="{{hwLoading}}"
           disabled="{{hwLoading}}"
           bindtap="submitHomework"
-        >提交</button>
+        >🚀 提交</button>
       </view>
       <view class="homework-submitted" wx:elif="{{courseInfo.ark_info && courseInfo.ark_info.homework_url}}">
         <text class="check-icon">✓</text>
@@ -112,7 +112,7 @@
         loading="{{confirmLoading}}"
         disabled="{{confirmLoading || submitting}}"
         bindtap="confirmFinish"
-      >确认结课</button>
+      >🎓 确认结课</button>
       <view class="confirm-tip">确认后这门课将从"我的选课"列表中消失</view>
     </view>
   </view>
@@ -140,7 +140,7 @@
       <button class="cert-action-btn copy" bindtap="onCopyCertInfo">📋 复制证书喜报</button>
       <button class="cert-action-btn save" bindtap="onSaveCertPoster">💾 保存证书到相册</button>
     </view>
-    <view class="cert-modal-close" bindtap="onCloseCertModal">关闭预览</view>
+    <view class="cert-modal-close" bindtap="onCloseCertModal">✕ 关闭预览</view>
   </view>
 
   <!-- 离屏绘制证书 Canvas -->

@@ -147,19 +147,22 @@
   margin-bottom: 24rpx;
   padding: 20rpx 24rpx;
   border-radius: 22rpx;
-  border: 1.5rpx solid rgba(124, 58, 237, 0.12);
-  background: #fcfaff;
+  border: 1.5rpx solid rgba(109, 40, 217, 0.16);
+  border-left: 6rpx solid #a78bfa;
+  background: #f5f0ff;
   transition: all 0.2s ease;
 }
 
 .form-item:nth-child(even) {
-  background: #f2ecff;
+  background: #e2d9fe;
+  border-left: 6rpx solid #6366f1;
 }
 
 .form-item:focus-within {
-  background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%);
-  border-color: #7c3aed;
-  box-shadow: inset 6rpx 0 0 #7c3aed, 0 6rpx 18rpx rgba(124, 58, 237, 0.14);
+  background: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%);
+  border-color: #d97706;
+  border-left: 8rpx solid #d97706;
+  box-shadow: 0 6rpx 18rpx rgba(217, 119, 6, 0.20);
 }
 
 .form-label {

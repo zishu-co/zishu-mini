@@ -35,7 +35,7 @@
           <view class="nickname">欢迎来到自塾</view>
           <view class="phone">登录解锁共学搭子、方舟与闯关勋章</view>
         </view>
-        <button class="user-card__login-btn" bindtap="goToLogin">登 录</button>
+        <button class="user-card__login-btn" bindtap="goToLogin">🔑 登录</button>
       </block>
     </view>
 
@@ -307,9 +307,9 @@
           bindinput="onFeedbackInput"
         />
         <view class="fb-actions">
-          <view class="fb-btn cancel" bindtap="onCloseFeedbackModal">取消</view>
+          <view class="fb-btn cancel" bindtap="onCloseFeedbackModal">✕ 取消</view>
           <view class="fb-btn confirm" bindtap="onSubmitFeedback">
-            {{submittingFeedback ? '提交中...' : '🚀 提交共创反馈'}}
+            {{submittingFeedback ? '⏳ 提交中...' : '🚀 提交共创反馈'}}
           </view>
         </view>
       </block>

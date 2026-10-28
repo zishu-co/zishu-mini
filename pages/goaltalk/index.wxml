@@ -7,21 +7,21 @@
     </view>
     <view class="talk-banner-actions">
       <view class="talk-banner-btn primary" bindtap="onOpenAddModal">＋ 发起面谈</view>
-      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">找搭子</view>
+      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">🤝 找搭子</view>
     </view>
   </view>
 
   <!-- Tab 切换 -->
   <view class="tab-bar">
     <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">
-      <text>预定面谈</text>
+      <text>📅 预定面谈</text>
       <view class="tab-badge" wx:if="{{scheduledData.length > 0}}">{{scheduledData.length}}</view>
     </view>
     <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">
-      <text>塾生目标</text>
+      <text>🎯 塾生目标</text>
     </view>
     <view class="tab-item {{activeTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">
-      <text>历史面谈</text>
+      <text>🏛️ 历史面谈</text>
     </view>
   </view>
 
@@ -74,7 +74,7 @@
             wx:if="{{item.access_info}}"
             catchtap="onCopyAccess"
             data-info="{{item.access_info}}"
-          >复制入口</view>
+          >📋 复制入口</view>
           <view
             class="talk-action-btn ghost"
             catchtap="onOpenEditModal"
@@ -85,7 +85,7 @@
             wx:if="{{item._canConfirm}}"
             catchtap="onConfirmTalk"
             data-item="{{item}}"
-          >{{confirmingId === item.id ? '确认中...' : '✓ 确认赴约'}}</view>
+          >{{confirmingId === item.id ? '⏳ 确认中...' : '✓ 确认赴约'}}</view>
           <view
             class="talk-action-btn finish"
             catchtap="onOpenFinishModal"
@@ -213,9 +213,9 @@
       />
 
       <view class="gt-modal-actions">
-        <view class="gt-modal-btn cancel" bindtap="onCloseModals">取消</view>
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">✕ 取消</view>
         <view class="gt-modal-btn confirm" bindtap="onSubmitEditTalk">
-          {{submittingModal ? '保存中...' : '确认保存'}}
+          {{submittingModal ? '⏳ 保存中...' : '💾 确认保存'}}
         </view>
       </view>
     </view>
@@ -248,9 +248,9 @@
       />
 
       <view class="gt-modal-actions">
-        <view class="gt-modal-btn cancel" bindtap="onCloseModals">取消</view>
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">✕ 取消</view>
         <view class="gt-modal-btn confirm" bindtap="onSubmitFinishTalk">
-          {{submittingModal ? '归档中...' : '确认完结归档'}}
+          {{submittingModal ? '⏳ 归档中...' : '🏁 确认完结归档'}}
         </view>
       </view>
     </view>

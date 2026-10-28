@@ -126,7 +126,7 @@
     <view class="empty" wx:if="{{!loading && myActivities.length === 0}}">
       <text class="empty-text">暂未报名任何共学活动</text>
       <view class="empty-actions">
-        <button class="retry-btn" data-tab="current" bindtap="onTabChange">去看看当前活动</button>
+        <button class="retry-btn" data-tab="current" bindtap="onTabChange">🔥 去看看当前活动</button>
       </view>
     </view>
 
@@ -170,8 +170,8 @@
     <view class="empty" wx:if="{{!loading && filteredHistoricalEvents.length === 0}}">
       <text class="empty-text">{{searchKeyword ? '未找到匹配的历史活动' : '暂无历史活动'}}</text>
       <view class="empty-actions">
-        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">清空搜索</button>
-        <button class="retry-btn" bindtap="loadEvents">重新加载</button>
+        <button wx:if="{{searchKeyword}}" class="retry-btn secondary" bindtap="onClearSearch">🧹 清空搜索</button>
+        <button class="retry-btn" bindtap="loadEvents">🔄 重新加载</button>
       </view>
     </view>
 
@@ -267,9 +267,9 @@
         />
       </view>
       <view class="event-modal-actions">
-        <view class="event-modal-btn cancel" bindtap="onCloseCreateModal">取消</view>
+        <view class="event-modal-btn cancel" bindtap="onCloseCreateModal">✕ 取消</view>
         <view class="event-modal-btn confirm" bindtap="onSubmitCreateEvent">
-          {{creatingEvent ? '发布中...' : '立即发布'}}
+          {{creatingEvent ? '⏳ 发布中...' : '🚀 立即发布'}}
         </view>
       </view>
     </view>

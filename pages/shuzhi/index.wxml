@@ -65,21 +65,21 @@
       bindtap="switchTab"
       data-tab="all"
     >
-      全部明细
+      📋 全部明细
     </view>
     <view
       class="filter-tab {{activeTab === 'income' ? 'active' : ''}}"
       bindtap="switchTab"
       data-tab="income"
     >
-      获得 +
+      💎 获得 +
     </view>
     <view
       class="filter-tab {{activeTab === 'expense' ? 'active' : ''}}"
       bindtap="switchTab"
       data-tab="expense"
     >
-      消耗 -
+      ⚡ 消耗 -
     </view>
   </view>
 

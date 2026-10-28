@@ -43,7 +43,7 @@
       class="post-filter-tab {{!filterWrongOnly ? 'active' : ''}}"
       data-mode="all"
       bindtap="onToggleWrongOnly"
-    >全部题目 ({{checkData.length}})</view>
+    >📋 全部题目 ({{checkData.length}})</view>
     <view
       class="post-filter-tab {{filterWrongOnly ? 'active' : ''}}"
       data-mode="wrong"
@@ -152,7 +152,7 @@
       loading="{{submitting}}"
       disabled="{{submitting || checkData.length === 0}}"
       bindtap="onSubmit"
-    >{{submitting ? '正在交卷...' : '提交试卷'}}</button>
+    >{{submitting ? '⏳ 正在交卷...' : '🚀 提交试卷'}}</button>
     <view class="submitted-summary" wx:else>
       <text class="submitted-summary__text">已完成交卷 · 总分 {{perform}} 分</text>
     </view>

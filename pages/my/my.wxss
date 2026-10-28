@@ -635,27 +635,34 @@ page {
 
 .fb-tabs {
   display: flex;
-  background: #f1f5f9;
-  border-radius: 999rpx;
-  padding: 6rpx;
+  gap: 8rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 26rpx;
+  padding: 8rpx;
   margin-bottom: 22rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.08);
 }
 
 .fb-tab {
   flex: 1;
   text-align: center;
-  padding: 14rpx 0;
+  padding: 14rpx 8rpx;
   border-radius: 999rpx;
-  font-size: 25rpx;
-  font-weight: 600;
-  color: #64748b;
+  font-size: 24rpx;
+  font-weight: 700;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.20);
+  box-shadow: 0 2rpx 6rpx rgba(15, 23, 42, 0.04), inset 0 1rpx 0 #ffffff;
 }
 
 .fb-tab.active {
-  background: #ffffff;
-  color: #7c3aed;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
   font-weight: 800;
-  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.08);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 6rpx 18rpx rgba(124, 58, 237, 0.32), inset 0 2rpx 0 rgba(255, 255, 255, 0.36);
 }
 
 .fb-type-row {

@@ -106,49 +106,53 @@ page {
   text-align: center;
   padding: 18rpx 12rpx;
   border-radius: 999rpx;
-  background: transparent;
-  color: #64748b;
-  font-size: 26rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  font-size: 25rpx;
   font-weight: 700;
-  border: none;
-  box-shadow: none;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
   transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mode-switch-btn.active {
-  background: linear-gradient(135deg, #a855f7 0%, #9333ea 52%, #7c3aed 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
   font-weight: 800;
-  border-color: transparent;
-  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.28), inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.34), inset 0 2rpx 0 rgba(255, 255, 255, 0.38);
 }
 
 .filter-tabs {
   display: flex;
-  gap: 12rpx;
-  padding: 0 24rpx 20rpx;
+  gap: 10rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 10rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 26rpx;
 }
 
 .filter-tab {
   flex: 1;
   text-align: center;
-  padding: 16rpx 8rpx;
-  font-size: 24rpx;
+  padding: 16rpx 6rpx;
+  font-size: 23rpx;
   font-weight: 700;
-  color: #64748b;
-  background: rgba(255, 255, 255, 0.96);
+  color: #4c1d95;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
   border-radius: 999rpx;
-  border: 2rpx solid rgba(124, 58, 237, 0.14);
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
   box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #a855f7 0%, #9333ea 52%, #7c3aed 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
   font-weight: 800;
-  border-color: transparent;
-  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.28), inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.34), inset 0 2rpx 0 rgba(255, 255, 255, 0.38);
 }
 
 .search-bar {

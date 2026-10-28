@@ -12,7 +12,7 @@
           bindtap="toggleFilter"
           data-mode="all"
         >
-          全部
+          📋 全部
         </button>
         <button
           class="filter-btn {{filterMode === 'efficient' ? 'active' : ''}}"
@@ -26,7 +26,7 @@
           bindtap="toggleFilter"
           data-mode="mine"
         >
-          我的结项
+          🏆 我的结项
         </button>
       </view>
     </view>
@@ -132,7 +132,7 @@
               catchtap="onGreetTaker"
               data-item="{{item}}"
             >👋 约TA取经</view>
-            <view class="action-chip detail">详情 ›</view>
+            <view class="action-chip detail">📖 详情 ›</view>
           </view>
         </view>
       </view>

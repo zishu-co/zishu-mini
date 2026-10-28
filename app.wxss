@@ -18,24 +18,24 @@ page {
   --brand-gradient-hero: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   --brand-gradient-soft: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 
-  /* 背景与文字（专业设计师多层薰衣草/靛蓝微光氛围与斑马纹行色系） */
+  /* 背景与文字（专业设计师多层薰衣草/靛蓝微光氛围与互补琥珀金选中色系） */
   --bg-page: #f6f5fb;
-  --bg-page-gradient: linear-gradient(180deg, #ede9fe 0%, #f3f0ff 28%, #eef2ff 68%, #f6f5fb 100%);
-  --bg-card: #ffffff;
-  --bg-subtle: #f8fafc;
-  --row-odd-bg: #ffffff;
-  --row-even-bg: #f3effe;
-  --form-row-odd-bg: #fcfaff;
-  --form-row-even-bg: #f2ecff;
-  --row-hover-bg: #e9d5ff;
-  --row-selected-bg: #ddd6fe;
-  --row-selected-gradient: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%);
-  --row-selected-border: #7c3aed;
+  --bg-page-gradient: linear-gradient(180deg, #e4dcfb 0%, #dde6ff 45%, #e9e2fe 78%, #f6f5fb 100%);
+  --bg-card: #f7f4ff;
+  --bg-subtle: #efeaff;
+  --row-odd-bg: #f5f0ff;
+  --row-even-bg: #e2d9fe;
+  --form-row-odd-bg: #f5f0ff;
+  --form-row-even-bg: #e2d9fe;
+  --row-hover-bg: #d8b4fe;
+  --row-selected-bg: #fde68a;
+  --row-selected-gradient: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%);
+  --row-selected-border: #d97706;
   --text-main: #0f172a;
   --text-sec: #475569;
   --text-muted: #94a3b8;
-  --border-subtle: rgba(15, 23, 42, 0.06);
-  --border-card: rgba(147, 51, 234, 0.12);
+  --border-subtle: rgba(109, 40, 217, 0.14);
+  --border-card: rgba(109, 40, 217, 0.18);
 
   /* 语义色 */
   --color-success: #10b981;
@@ -68,8 +68,8 @@ page {
 .page,
 .container,
 .test-page {
-  background-color: var(--bg-page);
-  background-image: var(--bg-page-gradient);
+  background-color: var(--bg-page) !important;
+  background-image: var(--bg-page-gradient) !important;
   background-attachment: fixed;
 }
 
@@ -502,7 +502,8 @@ button:active {
 .slot-row:nth-child(odd),
 .field-row:nth-child(odd),
 .info-row:nth-child(odd) {
-  background: var(--form-row-odd-bg);
+  background: var(--form-row-odd-bg) !important;
+  border-left: 6rpx solid #a78bfa !important;
 }
 
 .zs-form-group:nth-child(even),
@@ -510,7 +511,8 @@ button:active {
 .slot-row:nth-child(even),
 .field-row:nth-child(even),
 .info-row:nth-child(even) {
-  background: var(--form-row-even-bg);
+  background: var(--form-row-even-bg) !important;
+  border-left: 6rpx solid #6366f1 !important;
 }
 
 .zs-form-group:focus-within,
@@ -521,10 +523,11 @@ button:active {
 .form-item.active {
   background: var(--row-selected-gradient) !important;
   border-color: var(--row-selected-border) !important;
-  box-shadow: inset 6rpx 0 0 var(--row-selected-border), 0 6rpx 18rpx rgba(124, 58, 237, 0.14) !important;
+  border-left: 8rpx solid var(--row-selected-border) !important;
+  box-shadow: 0 6rpx 18rpx rgba(217, 119, 6, 0.20) !important;
 }
 
-/* ── 专业设计师级：全局列表 / 表格 / 选项 相邻行交替底色与选中行底色 ── */
+/* ── 专业设计师级：全局列表 / 表格 / 选项 相邻行交替底色与选中行互补底色 ── */
 .menu-cell:nth-child(odd),
 .ark-item:nth-child(odd),
 .checkitem:nth-child(odd),
@@ -545,7 +548,8 @@ button:active {
 .log-card:nth-child(odd),
 .event-card:nth-child(odd),
 .participant-card:nth-child(odd) {
-  background: linear-gradient(180deg, #ffffff 0%, #fcfaff 100%);
+  background: linear-gradient(180deg, #f5f0ff 0%, #f1ebff 100%) !important;
+  border-left: 6rpx solid #a78bfa !important;
 }
 
 .menu-cell:nth-child(even),
@@ -568,7 +572,8 @@ button:active {
 .log-card:nth-child(even),
 .event-card:nth-child(even),
 .participant-card:nth-child(even) {
-  background: linear-gradient(180deg, #f3effe 0%, #eef2ff 100%);
+  background: linear-gradient(180deg, #e2d9fe 0%, #dce4ff 100%) !important;
+  border-left: 6rpx solid #6366f1 !important;
 }
 
 .checkitem.is-selected,
@@ -595,7 +600,8 @@ button:active {
 .ark-item:active {
   background: var(--row-selected-gradient) !important;
   border-color: var(--row-selected-border) !important;
-  box-shadow: inset 8rpx 0 0 var(--row-selected-border), 0 8rpx 22rpx rgba(124, 58, 237, 0.16) !important;
+  border-left: 8rpx solid var(--row-selected-border) !important;
+  box-shadow: 0 8rpx 22rpx rgba(217, 119, 6, 0.22) !important;
 }
 
 .zs-form-label {

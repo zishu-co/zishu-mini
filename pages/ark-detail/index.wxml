@@ -68,7 +68,7 @@
               bindtap="onKickCrew"
               data-crewid="{{m.crew_id}}"
               data-username="{{m.username}}"
-            >移除</view>
+            >✕ 移除</view>
             <view
               class="learn-sheet-link learn-sheet-link--inline"
               wx:if="{{m.user_id !== currentUserId}}"
@@ -153,7 +153,7 @@
         wx:if="{{canLeaveArk}}"
         disabled="{{submitting}}"
         bindtap="onLeaveArk"
-      >退出方舟</button>
+      >🚪 退出方舟</button>
     </view>
 
     <!-- 三会弹窗 -->
@@ -181,8 +181,8 @@
         </view>
       </view>
       <view class="modal-footer">
-        <view class="action-btn ghost" bindtap="onCloseMeetings">取消</view>
-        <view class="action-btn primary" bindtap="onSaveMeetings">{{submitting ? '保存中...' : '保存排期'}}</view>
+        <view class="action-btn ghost" bindtap="onCloseMeetings">✕ 取消</view>
+        <view class="action-btn primary" bindtap="onSaveMeetings">{{submitting ? '⏳ 保存中...' : '💾 保存排期'}}</view>
       </view>
     </view>
   </block>

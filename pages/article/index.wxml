@@ -18,7 +18,7 @@
   <!-- 未登录提示 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
     <text class="login-tip-text">登录后可查看和阅读专栏文章</text>
-    <button class="login-btn" bindtap="goToLogin">去登录</button>
+    <button class="login-btn" bindtap="goToLogin">🔑 去登录</button>
   </view>
 
   <!-- 顶部筛选与搜索栏 -->
@@ -71,7 +71,7 @@
         bindinput="onMapSearchInput"
         bindconfirm="onRunMapSearch"
       />
-      <text class="map-search-go" bindtap="onRunMapSearch">检索</text>
+      <text class="map-search-go" bindtap="onRunMapSearch">🔍 检索</text>
     </view>
   </view>
 
@@ -390,11 +390,11 @@
         </view>
       </scroll-view>
       <view class="reader-footer">
-        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">✕ 取消</view>
         <view
           class="reader-action-btn primary"
           bindtap="onSaveArticle"
-        >{{savingArticle ? '保存中...' : (editorForm.id > 0 ? '保存修改' : '立即发布')}}</view>
+        >{{savingArticle ? '⏳ 保存中...' : (editorForm.id > 0 ? '💾 保存修改' : '🚀 立即发布')}}</view>
       </view>
     </view>
   </view>
@@ -468,9 +468,9 @@
         </view>
       </scroll-view>
       <view class="reader-footer">
-        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">✕ 取消</view>
         <view class="reader-action-btn primary" bindtap="onSaveZhuanlan">
-          {{savingZhuanlan ? '创建中...' : '创建专栏合集'}}
+          {{savingZhuanlan ? '⏳ 创建中...' : '📚 创建专栏合集'}}
         </view>
       </view>
     </view>
@@ -528,9 +528,9 @@
         </view>
       </scroll-view>
       <view class="reader-footer">
-        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">✕ 取消</view>
         <view class="reader-action-btn primary" bindtap="onSaveVideoAndAlbum">
-          {{savingVideo ? '发布中...' : '立即发布微课'}}
+          {{savingVideo ? '⏳ 发布中...' : '🎬 立即发布微课'}}
         </view>
       </view>
     </view>
@@ -578,9 +578,9 @@
         </view>
       </scroll-view>
       <view class="reader-footer">
-        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">取消</view>
+        <view class="reader-action-btn ghost" bindtap="onCloseEditorModal">✕ 取消</view>
         <view class="reader-action-btn primary" bindtap="onSaveMindMap">
-          {{savingMap ? '生成中...' : '生成并保存脑图'}}
+          {{savingMap ? '⏳ 生成中...' : '🗺️ 生成并保存脑图'}}
         </view>
       </view>
     </view>

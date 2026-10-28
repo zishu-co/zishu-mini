@@ -70,7 +70,7 @@
           class="gender-pill {{genderFilter === 'all' ? 'active' : ''}}"
           data-gender="all"
           bindtap="onGenderFilterTap"
-        >全部</view>
+        >👥 全部</view>
         <view
           class="gender-pill {{genderFilter === '女' ? 'active female' : ''}}"
           data-gender="女"
@@ -180,9 +180,9 @@
       bindinput="onCustomTopicInput"
     />
     <view class="greet-footer">
-      <view class="greet-btn cancel" bindtap="onCloseGreetModal">取消</view>
+      <view class="greet-btn cancel" bindtap="onCloseGreetModal">✕ 取消</view>
       <view class="greet-btn confirm" bindtap="onSendGreet">
-        {{greetingSubmitting ? '发送中...' : '🚀 发送共学邀请'}}
+        {{greetingSubmitting ? '⏳ 发送中...' : '🚀 发送共学邀请'}}
       </view>
     </view>
   </view>

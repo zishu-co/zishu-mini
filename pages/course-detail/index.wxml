@@ -9,7 +9,7 @@
   <view class="empty-state" wx:if="{{!loading && !courseDetail}}">
     <view class="empty-icon">📭</view>
     <text class="empty-text">课程不存在或已被删除</text>
-    <view class="empty-retry" bindtap="loadDetail">重新加载</view>
+    <view class="empty-retry" bindtap="loadDetail">🔄 重新加载</view>
   </view>
 
   <!-- 课程详情主体 -->
@@ -41,7 +41,7 @@
             disabled="{{submitting}}"
             loading="{{submitting}}"
             bindtap="onQuitCourse"
-          >退选课程</button>
+          >✕ 退选课程</button>
           <button
             class="enroll-btn enroll-btn--select"
             wx:elif="{{!hasLogin || currentSelectionsCount < 3}}"
@@ -49,7 +49,7 @@
             loading="{{submitting}}"
             bindtap="onSelectCourse"
           >＋ 立即选课</button>
-          <view class="enroll-btn enroll-btn--disabled" wx:else>已满3门</view>
+          <view class="enroll-btn enroll-btn--disabled" wx:else>🔒 已满3门</view>
         </view>
       </view>
 
@@ -121,7 +121,7 @@
         data-tab="chapters"
         bindtap="onTabChange"
       >
-        <text class="seg-tab__label">课程章节</text>
+        <text class="seg-tab__label">📖 课程章节</text>
         <text class="seg-tab__count">{{courseDetail.chapters.length}}</text>
       </view>
       <view
@@ -129,7 +129,7 @@
         data-tab="current"
         bindtap="onTabChange"
       >
-        <text class="seg-tab__label">在学同塾</text>
+        <text class="seg-tab__label">🔥 在学同塾</text>
         <text class="seg-tab__count">{{courseDetail.current.length}}</text>
       </view>
       <view
@@ -137,7 +137,7 @@
         data-tab="finish"
         bindtap="onTabChange"
       >
-        <text class="seg-tab__label">结课同塾</text>
+        <text class="seg-tab__label">🎓 结课同塾</text>
         <text class="seg-tab__count">{{courseDetail.finish.length}}</text>
       </view>
     </view>
@@ -162,7 +162,7 @@
             </view>
           </view>
           <view class="chapter-action">
-            <text class="chapter-action__text">{{item.url ? '学习 ›' : '待开放'}}</text>
+            <text class="chapter-action__text">{{item.url ? '📖 学习 ›' : '⏳ 待开放'}}</text>
           </view>
         </view>
       </view>
@@ -269,7 +269,7 @@
           </view>
           <view class="mentor-item__desc">点击选择该塾师并完成选课绑定</view>
         </view>
-        <view class="mentor-item__cta">选择 ›</view>
+        <view class="mentor-item__cta">✓ 选择 ›</view>
       </view>
 
       <view class="mentor-empty" wx:if="{{mentorList.length === 0}}">
@@ -283,7 +283,7 @@
         disabled="{{submitting}}"
         loading="{{submitting}}"
         bindtap="onDirectSelectCourse"
-      >先直接选课，稍后分配塾师</button>
+      >⚡ 先直接选课，稍后分配塾师</button>
     </view>
   </view>
 
@@ -326,7 +326,7 @@
         disabled="{{submittingEdit}}"
         loading="{{submittingEdit}}"
         bindtap="onConfirmEditCourse"
-      >保存修改</button>
+      >💾 保存修改</button>
     </view>
   </view>
 

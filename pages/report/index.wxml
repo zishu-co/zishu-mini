@@ -49,28 +49,28 @@
       bindtap="switchFilter"
       data-filter="all"
     >
-      全部
+      📋 全部
     </view>
     <view
       class="filter-tab {{activeFilter === 'excellent' ? 'active' : ''}}"
       bindtap="switchFilter"
       data-filter="excellent"
     >
-      优秀 ≥80%
+      🏆 优秀 ≥80%
     </view>
     <view
       class="filter-tab {{activeFilter === 'pass' ? 'active' : ''}}"
       bindtap="switchFilter"
       data-filter="pass"
     >
-      及格 ≥60%
+      ✅ 及格 ≥60%
     </view>
     <view
       class="filter-tab {{activeFilter === 'fail' ? 'active' : ''}}"
       bindtap="switchFilter"
       data-filter="fail"
     >
-      待提升 &lt;60%
+      💪 待提升 &lt;60%
     </view>
   </view>
 
@@ -126,7 +126,7 @@
             catchtap="onRetakePaper"
             data-paperid="{{item.testpaperid}}"
           >🔄 再刷本卷</text>
-          <text class="record-action">查看解析 ›</text>
+          <text class="record-action">📖 查看解析 ›</text>
         </view>
       </view>
     </view>
@@ -156,7 +156,7 @@
         <view class="record-title">{{item.target_title || '学时申报事项'}}</view>
         <view class="record-footer">
           <text class="record-meta">获批时间：{{item._grantTimeStr}}</text>
-          <text class="record-action" bindtap="goToLearn">继续共学 ›</text>
+          <text class="record-action" bindtap="goToLearn">🚀 继续共学 ›</text>
         </view>
       </view>
     </view>

@@ -33,17 +33,17 @@
       class="filter-pill {{activeFilter === 'all' ? 'filter-pill--active' : ''}}"
       data-filter="all"
       bindtap="onFilterChange"
-    >全部 ({{arkList.length}})</view>
+    >🚢 全部 ({{arkList.length}})</view>
     <view
       class="filter-pill {{activeFilter === 'open' ? 'filter-pill--active' : ''}}"
       data-filter="open"
       bindtap="onFilterChange"
-    >可加入 ({{openArkCount}})</view>
+    >🔥 可加入 ({{openArkCount}})</view>
     <view
       class="filter-pill {{activeFilter === 'ready' ? 'filter-pill--active' : ''}}"
       data-filter="ready"
       bindtap="onFilterChange"
-    >已成舟 ({{readyArkCount}})</view>
+    >⚓ 已成舟 ({{readyArkCount}})</view>
   </view>
 
   <!-- 加载中 -->
@@ -132,7 +132,7 @@
         <!-- 底部进入船舱栏 -->
         <view class="cabin-footer" bindtap="onGoDetail" data-arkid="{{ark.ark_id}}">
           <text class="cabin-footer__hint">查看船员进度与三会排期</text>
-          <text class="cabin-footer__btn">进入船舱 ›</text>
+          <text class="cabin-footer__btn">🚢 进入船舱 ›</text>
         </view>
       </view>
 

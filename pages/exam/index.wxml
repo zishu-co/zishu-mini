@@ -38,7 +38,7 @@
         class="exam-cat-pill {{categoryFilter === 'all' ? 'active' : ''}}"
         data-cat="all"
         bindtap="onCategoryChange"
-      >全部试卷 ({{papers.length}})</view>
+      >📑 全部试卷 ({{papers.length}})</view>
       <view
         class="exam-cat-pill {{categoryFilter === 'core' ? 'active' : ''}}"
         data-cat="core"
@@ -84,7 +84,7 @@
           <text class="paper-score-tag">💯 100分制</text>
         </view>
       </view>
-      <view class="paper-cta">立即挑战 ›</view>
+      <view class="paper-cta">⚡ 立即挑战 ›</view>
     </view>
   </view>
 
@@ -93,8 +93,8 @@
     <view class="empty-icon">{{searchKeyword ? '🔎' : '📑'}}</view>
     <view class="empty-title">{{searchKeyword ? '未找到匹配的试卷' : '暂无闯关试卷'}}</view>
     <view class="empty-desc">{{searchKeyword ? '试试其他关键词或清空搜索条件' : '题库正在更新中，请稍后下拉刷新'}}</view>
-    <view class="empty-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">清空搜索</view>
-    <view class="empty-btn" wx:else bindtap="loadPapers">重新加载</view>
+    <view class="empty-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">🧹 清空搜索</view>
+    <view class="empty-btn" wx:else bindtap="loadPapers">🔄 重新加载</view>
   </view>
 
   <!-- 102-add-ques.md: 共创出题弹窗 -->
@@ -120,7 +120,7 @@
           data-type="{{item}}"
           bindtap="onSelectQuesType"
           class="exam-type-pill {{newQuesForm.ques_type === item ? 'active' : ''}}"
-        >{{item}}</view>
+        >📝 {{item}}</view>
       </view>
 
       <view class="exam-form-group">
@@ -192,7 +192,7 @@
       <button
         class="exam-sheet-submit"
         bindtap="onSubmitNewQues"
-      >{{savingQues ? '提交中...' : '立即提交入库'}}</button>
+      >{{savingQues ? '⏳ 提交中...' : '🚀 立即提交入库'}}</button>
     </view>
   </view>
 
@@ -252,7 +252,7 @@
       <button
         class="exam-sheet-submit"
         bindtap="onSubmitAssemblePaper"
-      >{{savingPaper ? '组卷发布中...' : '确认组卷并发布'}}</button>
+      >{{savingPaper ? '⏳ 组卷发布中...' : '🚀 确认组卷并发布'}}</button>
     </view>
   </view>
 

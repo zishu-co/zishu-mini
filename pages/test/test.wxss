@@ -88,8 +88,12 @@ page {
 
 .post-filter-tabs {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
   margin: 20rpx 28rpx 0;
+  padding: 10rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  border-radius: 26rpx;
 }
 
 .post-filter-tab {
@@ -97,20 +101,20 @@ page {
   text-align: center;
   padding: 16rpx 12rpx;
   border-radius: 999rpx;
-  background: #ffffff;
-  color: #64748b;
-  font-size: 26rpx;
-  font-weight: 600;
-  border: 1rpx solid rgba(124, 58, 237, 0.1);
-  box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.03);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  font-size: 25rpx;
+  font-weight: 700;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
 }
 
 .post-filter-tab.active {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
-  font-weight: 700;
-  border-color: transparent;
-  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.25);
+  font-weight: 800;
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.32);
 }
 
 /* 成绩横幅 */
@@ -266,20 +270,23 @@ page {
   align-items: center;
   padding: 22rpx 24rpx;
   border-radius: 18rpx;
-  background: #fcfaff;
-  border: 2rpx solid rgba(124, 58, 237, 0.14);
+  background: #f5f0ff;
+  border: 2rpx solid rgba(109, 40, 217, 0.18);
+  border-left: 6rpx solid #a78bfa;
   transition: all 0.2s ease;
 }
 
 .checkitem:nth-child(even) {
-  background: #f2ecff;
+  background: #e2d9fe;
+  border-left: 6rpx solid #6366f1;
 }
 
 .checkitem:active,
 .checkitem.is-selected {
-  background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%) !important;
-  border-color: #7c3aed !important;
-  box-shadow: inset 8rpx 0 0 #7c3aed, 0 6rpx 18rpx rgba(124, 58, 237, 0.16);
+  background: linear-gradient(135deg, #fef08a 0%, #fde68a 55%, #ffedd5 100%) !important;
+  border-color: #d97706 !important;
+  border-left: 8rpx solid #d97706 !important;
+  box-shadow: 0 6rpx 18rpx rgba(217, 119, 6, 0.22);
 }
 
 .judge-item {
