@@ -17,7 +17,7 @@
       <text class="empty-logs-text">✨ 本地运行日志已清空或暂无记录</text>
     </view>
     <block wx:for="{{logs}}" wx:key="timeStamp" wx:for-item="log">
-      <view class="log-item zs-card">
+      <view class="log-item zs-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}">
         <text class="log-seq">#{{index + 1}}</text>
         <text class="log-date">{{log.date}}</text>
       </view>

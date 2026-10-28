@@ -94,7 +94,7 @@
   <!-- 成绩单列表 -->
   <view class="record-list" wx:if="{{!loading && filteredRecords.length > 0}}">
     <view
-      class="record-card"
+      class="record-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredRecords}}"
       wx:key="pperformid"
       data-pperformid="{{item.pperformid}}"
@@ -145,7 +145,7 @@
   <block wx:if="{{reportMode === 'hours'}}">
     <view class="record-list" wx:if="{{!loading && hourReports.length > 0}}">
       <view
-        class="record-card"
+        class="record-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{hourReports}}"
         wx:key="id"
       >

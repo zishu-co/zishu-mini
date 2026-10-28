@@ -74,7 +74,7 @@
     </view>
 
     <view
-      class="participant-card"
+      class="participant-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredParticipants}}"
       wx:key="id"
     >

@@ -62,7 +62,7 @@
       </view>
     </view>
     <view wx:else>
-      <view class="relation-card" wx:for="{{filteredList}}" wx:key="id">
+      <view class="relation-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{filteredList}}" wx:key="id">
         <view class="relation-top">
           <view
             class="person-info"

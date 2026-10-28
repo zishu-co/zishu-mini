@@ -92,7 +92,7 @@
     </view>
     <view wx:else>
       <view
-        class="favor-item"
+        class="favor-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{filteredItems}}"
         wx:key="favorid"
         bindtap="onItemTap"

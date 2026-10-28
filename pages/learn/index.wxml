@@ -62,7 +62,7 @@
       <text class="section-title">我的选课</text>
       <text class="section-tip">在学 {{myCourses.length}} 门</text>
     </view>
-    <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
+    <view class="course-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{myCourses}}" wx:key="sele_id">
       <view class="course-card-top">
         <view class="course-info" data-id="{{item.course_id}}" data-title="{{item.course_title}}" bindtap="onCourseItemTap">
           <view class="course-name">{{item.course_title}}</view>
@@ -139,7 +139,7 @@
       </view>
     </view>
 
-    <view class="course-item {{item.isSelected ? 'selected' : ''}}" wx:for="{{filteredCourses}}" wx:key="id">
+    <view class="course-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item.isSelected ? 'selected' : ''}}" wx:for="{{filteredCourses}}" wx:key="id">
       <view class="course-item-left" data-id="{{item.id}}" data-title="{{item.title}}" bindtap="onCourseItemTap">
         <view class="course-item-name">{{item.title}}</view>
         <view class="course-item-meta">
@@ -177,7 +177,7 @@
       <text class="modal-close" bindtap="onCloseMentorModal">✕</text>
     </view>
     <view class="modal-body">
-      <view class="mentor-item" wx:for="{{mentorList}}" wx:key="shushi_id">
+      <view class="mentor-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{mentorList}}" wx:key="shushi_id">
         <text class="mentor-name">{{item.shushi_name}}</text>
         <view
           class="mentor-select-btn"
@@ -322,7 +322,7 @@
         <view
           wx:for="{{courseForm.chapters}}"
           wx:key="index"
-          class="chapter-edit-card"
+          class="chapter-edit-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         >
           <view class="chapter-edit-badge">第 {{index + 1}} 章</view>
           <input

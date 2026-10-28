@@ -61,6 +61,8 @@ page {
   background-attachment: fixed;
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  line-height: 1.65;
+  letter-spacing: 0.4rpx;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
 }
@@ -71,6 +73,28 @@ page {
   background-color: var(--bg-page) !important;
   background-image: var(--bg-page-gradient) !important;
   background-attachment: fixed;
+}
+
+/* ── 全局图片、区域间隔与按钮组自适应防拥挤规范 ── */
+image,
+.t-image {
+  max-width: 100%;
+  border-radius: 16rpx;
+}
+
+.section + .section,
+.zs-card + .zs-card {
+  margin-top: 32rpx;
+}
+
+.card-actions,
+.action-row,
+.btn-row,
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16rpx;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

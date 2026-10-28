@@ -84,7 +84,7 @@
   <view class="article-list" wx:if="{{!zhuanlanLoading && hasLogin && articleTab === 'zhuanlan'}}">
     <block wx:if="{{!activeZhuanlan}}">
       <view
-        class="article-item zhuanlan-card"
+        class="article-item zhuanlan-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{zhuanlanList}}"
         wx:key="zhuanlanid"
         data-id="{{item.zhuanlanid}}"
@@ -111,7 +111,7 @@
         <text class="zhuanlan-active-title">📚 {{activeZhuanlan.zhuanlan_title || '专栏目录'}}</text>
       </view>
       <view
-        class="article-item"
+        class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{zhuanlanArticles}}"
         wx:key="articleid"
         bindtap="onViewArticle"
@@ -137,7 +137,7 @@
   <view class="article-list" wx:if="{{!videoLoading && hasLogin && articleTab === 'video'}}">
     <block wx:if="{{!activeAlbum}}">
       <view
-        class="article-item"
+        class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{videoAlbums}}"
         wx:key="album_id"
         data-id="{{item.album_id}}"
@@ -168,7 +168,7 @@
         <text>{{activeAlbum.album_intro}}</text>
       </view>
       <view
-        class="article-item"
+        class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{albumVideos}}"
         wx:key="video_id"
         data-id="{{item.video_id}}"
@@ -196,7 +196,7 @@
       <view wx:if="{{mapSearchResults.length > 0}}" class="map-search-results-box">
         <view class="map-search-results-header">🔍 脑图节点匹配结果 ({{mapSearchResults.length}})</view>
         <view
-          class="article-item"
+          class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
           wx:for="{{mapSearchResults}}"
           wx:key="index"
           data-id="{{item.map_id}}"
@@ -215,7 +215,7 @@
       </view>
 
       <view
-        class="article-item"
+        class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{mapList}}"
         wx:key="mapid"
         data-id="{{item.mapid}}"
@@ -248,7 +248,7 @@
       <view class="mindmap-outline-card">
         <view class="mindmap-outline-header">🌿 结构化脑图节点大纲 ({{activeMapNodes.length}} 个节点)</view>
         <view
-          class="mindmap-node-row depth-{{item.depth}}"
+          class="mindmap-node-row depth-{{item.depth}} {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
           wx:for="{{activeMapNodes}}"
           wx:key="id"
           style="{{item.indentStyle}}"
@@ -267,7 +267,7 @@
   <!-- 文章列表 -->
   <view class="article-list" wx:if="{{!loading && hasLogin && (articleTab === 'all' || articleTab === 'mine')}}">
     <view
-      class="article-item"
+      class="article-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{articles}}"
       wx:key="articleid"
       bindtap="onViewArticle"

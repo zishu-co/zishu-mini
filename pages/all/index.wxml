@@ -94,7 +94,7 @@
       <view class="empty-row"><text>暂无符合筛选条件的同路人，换个条件试试吧 ✨</text></view>
     </view>
     <view wx:else>
-      <view class="member-card" wx:for="{{members}}" wx:key="id">
+      <view class="member-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{members}}" wx:key="id">
         <view
           class="member-avatar {{item._genderClass}}"
           data-item="{{item}}"
@@ -162,7 +162,7 @@
     </view>
     <view class="topic-list">
       <view
-        class="topic-item {{selectedTopicIndex === index ? 'selected' : ''}}"
+        class="topic-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{selectedTopicIndex === index ? 'selected' : ''}}"
         wx:for="{{icebreakerTopics}}"
         wx:key="index"
         data-index="{{index}}"

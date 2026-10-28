@@ -78,7 +78,7 @@
     >
       <view class="section-title">🏕️ 训练营共学</view>
       <view
-        class="camp-card"
+        class="camp-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{data.camps}}"
         wx:key="id"
         wx:for-item="camp"
@@ -91,10 +91,11 @@
         <view class="camp-must" wx:if="{{camp.must_course}}">📌 必修核心：{{camp.must_course}}</view>
         <view class="course-list">
           <view
-            class="course-item"
+            class="course-item {{cIndex % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
             wx:for="{{camp.course_list}}"
             wx:key="course_id"
             wx:for-item="c"
+            wx:for-index="cIndex"
             bindtap="onGoCourse"
             data-id="{{c.course_id}}"
           >
@@ -118,7 +119,7 @@
     >
       <view class="section-title">📖 自主在修课程</view>
       <view
-        class="course-item standalone"
+        class="course-item standalone {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{data.other_learning}}"
         wx:key="course_id"
         wx:for-item="c"
@@ -143,7 +144,7 @@
     >
       <view class="section-title">🎓 已结课通关</view>
       <view
-        class="course-item standalone done"
+        class="course-item standalone done {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{data.other_learned}}"
         wx:key="course_id"
         wx:for-item="c"

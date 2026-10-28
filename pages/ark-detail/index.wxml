@@ -37,7 +37,7 @@
     <view class="section">
       <view class="section-title">🤝 同舟共学搭子（{{ark.members.length || 0}} / 4）</view>
       <view
-        class="member-card"
+        class="member-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{ark.members}}"
         wx:key="crew_id"
         wx:for-item="m"

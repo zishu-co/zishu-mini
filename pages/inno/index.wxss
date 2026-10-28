@@ -284,9 +284,9 @@ page {
 .status-filter-bar {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin: 0 0 8rpx;
-  padding: 10rpx 12rpx;
+  gap: 14rpx;
+  margin: 0 0 18rpx;
+  padding: 12rpx 14rpx;
   background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
   border: 2rpx solid rgba(124, 58, 237, 0.20);
   border-radius: 26rpx;

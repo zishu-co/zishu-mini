@@ -67,7 +67,7 @@
   <!-- 试卷卡片列表 -->
   <view class="paper-list" wx:if="{{!loading && filteredPapers.length > 0}}">
     <view
-      class="paper-card"
+      class="paper-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredPapers}}"
       wx:key="testpaperid"
       bindtap="onGoTest"
@@ -237,7 +237,7 @@
           wx:key="quesid"
           data-id="{{item.quesid}}"
           bindtap="onToggleSelectQues"
-          class="exam-bank-item {{item._selected ? 'selected' : ''}}"
+          class="exam-bank-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item._selected ? 'selected' : ''}}"
         >
           <view class="exam-bank-item-main">
             <text class="exam-bank-item-type">[{{item.ques_type || '题目'}}]</text>

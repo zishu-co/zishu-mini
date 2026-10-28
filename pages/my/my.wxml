@@ -113,7 +113,7 @@
     <!-- 有方舟 -->
     <view class="ark-list" wx:elif="{{arkList.length > 0}}">
       <view
-        class="ark-item"
+        class="ark-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{arkList}}"
         wx:key="ark_id"
         wx:for-item="ark"
@@ -319,7 +319,7 @@
           <view class="fb-empty" wx:if="{{myFeedbacks.length === 0}}">
             暂无历史反馈记录，快提交第一条共创建议赢取塾值吧！
           </view>
-          <view class="fb-item" wx:for="{{myFeedbacks}}" wx:key="id">
+          <view class="fb-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{myFeedbacks}}" wx:key="id">
             <view class="fb-item-top">
               <text class="fb-item-title">{{item.title}}</text>
               <text class="fb-item-status">{{item._statusText}}</text>
@@ -339,7 +339,7 @@
           <view class="fb-empty" wx:if="{{publicFeedbacks.length === 0}}">
             暂无公开采纳的共创建议，快来成为第一位上榜的共创官！
           </view>
-          <view class="fb-item" wx:for="{{publicFeedbacks}}" wx:key="id">
+          <view class="fb-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{publicFeedbacks}}" wx:key="id">
             <view class="fb-item-top">
               <text class="fb-item-title">🏆 {{item.title}}</text>
               <text class="fb-reward" wx:if="{{item.shuzhi_reward > 0}}">💎 +{{item.shuzhi_reward}} 塾值</text>

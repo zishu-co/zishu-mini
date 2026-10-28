@@ -62,7 +62,7 @@
   </view>
 
   <view class="question-list" wx:if="{{!loading && filteredQuestions.length > 0}}">
-    <view class="question-card {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{filteredQuestions}}" wx:key="quesid">
+    <view class="question-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{filteredQuestions}}" wx:key="quesid">
       <view class="question-header">
         <text class="question-num">第{{item._num}}题</text>
         <text class="question-type">{{item.ques_type}}</text>
@@ -149,7 +149,7 @@
       <view
         wx:for="{{jiandaList}}"
         wx:key="qperformid"
-        class="jianda-item-card"
+        class="jianda-item-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       >
         <view class="jianda-q-title">
           Q{{index + 1}}. {{item.ques_title}} (满分 {{item.fullscore}} 分)

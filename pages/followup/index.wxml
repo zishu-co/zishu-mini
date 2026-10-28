@@ -75,7 +75,7 @@
     </view>
     <view wx:else>
       <view
-        class="project-card"
+        class="project-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{filteredList}}"
         wx:key="id"
         bindtap="onProjectTap"

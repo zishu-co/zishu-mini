@@ -105,7 +105,7 @@
       <view class="empty-row"><text>暂无符合条件的塾值记录</text></view>
     </view>
     <view wx:else>
-      <view class="record-card" wx:for="{{filteredList}}" wx:key="index">
+      <view class="record-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{filteredList}}" wx:key="index">
         <view class="record-top">
           <view class="type-tag">{{item.target_type}}</view>
           <text class="{{item._isNeg ? 'amount-neg' : 'amount-pos'}}">{{item._amountStr}}</text>

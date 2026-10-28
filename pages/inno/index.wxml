@@ -123,7 +123,7 @@
 
       <!-- 项目卡片 -->
       <view
-        class="project-card"
+        class="project-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{filteredProjects}}"
         wx:key="id"
         bindtap="goToProjectDetail"
@@ -198,7 +198,7 @@
       </view>
 
       <view
-        class="group-card"
+        class="group-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{filteredGroups}}"
         wx:key="key"
         bindtap="onGroupCardTap"
@@ -458,7 +458,7 @@
       <view
         wx:for="{{groupDetailMembers}}"
         wx:key="id"
-        class="inno-list-row"
+        class="inno-list-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       >
         <text class="inno-list-row-main">👤 {{item.username}} ({{item.role || '成员'}})</text>
         <text class="inno-list-row-sub">入组：{{item.join_time || '近期'}}</text>
@@ -530,7 +530,7 @@
       <view
         wx:for="{{docketsList}}"
         wx:key="id"
-        class="inno-list-row"
+        class="inno-list-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       >
         <text class="inno-list-row-main">{{item.task_serial}} · {{item.title}}</text>
         <text class="inno-list-row-teal">{{item.total_hour || 0}}h ({{item.status}})</text>
@@ -543,7 +543,7 @@
       <view
         wx:for="{{timeRecordsList}}"
         wx:key="id"
-        class="inno-record-row"
+        class="inno-record-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       >
         <text>{{item.task_serial}} {{item.project}}</text>
         <text>{{item.duration || 0}} 分钟 · {{item.status}}</text>

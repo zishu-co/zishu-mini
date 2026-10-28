@@ -146,7 +146,7 @@
     <view class="tab-panel" wx:if="{{activeTab === 'chapters'}}">
       <view class="stepper-list" wx:if="{{courseDetail.chapters.length > 0}}">
         <view
-          class="chapter-card"
+          class="chapter-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
           wx:for="{{courseDetail.chapters}}"
           wx:key="id"
           data-url="{{item.url}}"
@@ -176,7 +176,7 @@
     <view class="tab-panel" wx:if="{{activeTab === 'current'}}">
       <view class="cohort-list" wx:if="{{courseDetail.current.length > 0}}">
         <view
-          class="cohort-card"
+          class="cohort-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
           wx:for="{{courseDetail.current}}"
           wx:key="user_id"
           data-userid="{{item.user_id}}"
@@ -209,7 +209,7 @@
     <view class="tab-panel" wx:if="{{activeTab === 'finish'}}">
       <view class="cohort-list" wx:if="{{courseDetail.finish.length > 0}}">
         <view
-          class="cohort-card cohort-card--finish"
+          class="cohort-card cohort-card--finish {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
           wx:for="{{courseDetail.finish}}"
           wx:key="user_id"
           data-userid="{{item.user_id}}"
@@ -253,7 +253,7 @@
 
     <view class="mentor-modal__body">
       <view
-        class="mentor-item"
+        class="mentor-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{mentorList}}"
         wx:key="shushi_id"
         data-shushiid="{{item.shushi_id}}"

@@ -69,7 +69,7 @@
     </view>
 
     <view
-      class="event-card"
+      class="event-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredCurrentEvents}}"
       wx:key="id"
       data-id="{{item.id}}"
@@ -131,7 +131,7 @@
     </view>
 
     <view
-      class="event-card"
+      class="event-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{myActivities}}"
       wx:key="id"
       data-id="{{item.id}}"
@@ -176,7 +176,7 @@
     </view>
 
     <view
-      class="event-card historical"
+      class="event-card historical {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredHistoricalEvents}}"
       wx:key="id"
       data-id="{{item.id}}"

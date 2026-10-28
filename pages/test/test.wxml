@@ -54,7 +54,7 @@
   <!-- 题目列表 -->
   <view class="quiz-list">
     <view
-      class="quizblock"
+      class="quizblock {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{checkData}}"
       wx:key="quesid"
       wx:if="{{!filterWrongOnly || !item.check}}"

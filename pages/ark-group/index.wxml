@@ -54,7 +54,7 @@
   <!-- 方舟列表 -->
   <view class="teacher-list" wx:else>
     <view
-      class="teacher-card"
+      class="teacher-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       wx:for="{{filteredArkList}}"
       wx:key="teacher_id"
       wx:for-item="ark"
@@ -115,10 +115,11 @@
       <view class="cabin-box" wx:if="{{ark.ark_id}}">
         <view class="cabin-grid">
           <view
-            class="seat-slot seat-slot--{{seat.genderType}} {{seat.occupied ? 'seat-slot--occupied' : 'seat-slot--empty'}}"
+            class="seat-slot seat-slot--{{seat.genderType}} {{seat.occupied ? 'seat-slot--occupied' : 'seat-slot--empty'}} {{seatIdx % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
             wx:for="{{ark._seats}}"
             wx:key="id"
             wx:for-item="seat"
+            wx:for-index="seatIdx"
           >
             <view class="seat-top">
               <text class="seat-tag">{{seat.seatLabel}}</text>
