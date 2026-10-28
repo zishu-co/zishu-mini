@@ -39,3 +39,13 @@
 - [x] in_progress
 - [x] done
 - [ ] shipped
+
+### 2026-10-28：课程详情同塾操作菜单样式适配
+
+- 范围：`pages/course-detail/index.{ts,wxml,wxss}`；将该页面的原生 `wx.showActionSheet` 替换为紫色主题底部面板。
+- [x] 保留共学破冰、查看学习单、组方舟三个操作；独立取消按钮、关闭按钮及遮罩关闭。
+- [x] 图标与主副标题分层，长昵称/课程名换行；窄屏、横屏可滚动，宽屏最大宽度 560px，预留底部及左右安全区。
+- [x] 点击后先清理菜单目标，避免同一面板连续点击重复提交。
+- 本地验证：微信原生 WXML/WXSS 编译、`node_modules/.bin/tsc --noEmit`、23 项模板/处理函数/浏览器布局与点击检查、`git diff --check` 均通过。
+- 验证边界：浏览器运行微信编译后的真实 WXML 树及页面样式；wx/API 边界使用测试替身，安全区用浏览器模拟。真实微信滚动、真机安全区及后端请求未验收；未上传预览或发布。
+- 原始证据：`/Users/stephen/.codex/visualizations/2026/10/28/01a1831d-ca0a-7661-ae2c-ba130386f3cf/course-menu/receipts.json`。

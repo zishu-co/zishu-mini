@@ -38,6 +38,9 @@ type IPageData = {
   editTitle: string;
   editDesc: string;
   submittingEdit: boolean;
+  showClassmateMenu: boolean;
+  classmateUserId: number;
+  classmateUserName: string;
 };
 
 Page<IPageData, IPageData>({
@@ -60,6 +63,9 @@ Page<IPageData, IPageData>({
     editTitle: '',
     editDesc: '',
     submittingEdit: false,
+    showClassmateMenu: false,
+    classmateUserId: 0,
+    classmateUserName: '',
   },
 
   courseId: 0,
@@ -525,50 +531,60 @@ Page<IPageData, IPageData>({
   onClassmateTap(e: any) {
     const userId = Number(e.currentTarget.dataset.userid || 0);
     const userName = e.currentTarget.dataset.username || '同塾伙伴';
-    const courseTitle = this.data.courseDetail?.course?.title || '自塾课程';
+    this.setData({ showClassmateMenu: true, classmateUserId: userId, classmateUserName: userName });
+  },
 
-    wx.showActionSheet({
-      itemList: [
-        `👋 约 ${userName} 15分钟共学破冰`,
-        `📋 查看 ${userName} 的学习单`,
-        `🚢 邀请共组「${courseTitle}」诺亚方舟`,
-      ],
-      success: async (res) => {
-        if (res.tapIndex === 0) {
-          if (!userId) {
-            wx.showToast({ title: `👋 已向 ${userName} 发送共学问候`, icon: 'none' });
-            return;
-          }
-          try {
-            const greetRes: any = await quickGreetPeer({
-              target_user_id: userId,
-              topic: `📚 同修《${courseTitle}》· 15分钟共学交流`,
-              planed_duration: 15,
-            });
-            wx.showModal({
-              title: '🎉 已发起同课共学约聊',
-              content: greetRes?.message || `已创建与 ${userName} 的15分钟目标面谈记录，快去目标面谈页查看吧！`,
-              confirmText: '去查看',
-              cancelText: '留在当前',
-              success: (m) => {
-                if (m.confirm) {
-                  wx.navigateTo({ url: '/pages/goaltalk/index' });
-                }
-              },
-            });
-          } catch (err) {
-            wx.showToast({ title: `👋 已向 ${userName} 发送同课问候`, icon: 'none' });
-          }
-        } else if (res.tapIndex === 1) {
-          if (userId) {
-            wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
-          } else {
-            wx.navigateTo({ url: '/pages/learn-sheet/index' });
-          }
-        } else if (res.tapIndex === 2) {
-          this.onGoArkGroup();
-        }
-      },
-    });
+  onCloseClassmateMenu() {
+    this.setData({ showClassmateMenu: false, classmateUserId: 0, classmateUserName: '' });
+  },
+
+  onClassmateTouchMove() {
+    // 配合遮罩 catchtouchmove 阻止触摸穿透，菜单内容由 scroll-view 滚动。
+    return false;
+  },
+
+  async onClassmateAction(e: any) {
+    if (!this.data.showClassmateMenu) return;
+    const action = e.currentTarget.dataset.action;
+    if (!['greet', 'sheet', 'ark'].includes(action)) return;
+    const userId = this.data.classmateUserId;
+    const userName = this.data.classmateUserName;
+    const courseTitle = this.data.courseDetail?.course?.title || '自塾课程';
+    // 先关闭并清理目标，避免连续点击重复提交或误用上一次的同塾。
+    this.onCloseClassmateMenu();
+    if (action === 'greet') {
+      if (!userId) {
+        wx.showToast({ title: `👋 已向 ${userName} 发送共学问候`, icon: 'none' });
+        return;
+      }
+      try {
+        const greetRes: any = await quickGreetPeer({
+          target_user_id: userId,
+          topic: `📚 同修《${courseTitle}》· 15分钟共学交流`,
+          planed_duration: 15,
+        });
+        wx.showModal({
+          title: '🎉 已发起同课共学约聊',
+          content: greetRes?.message || `已创建与 ${userName} 的15分钟目标面谈记录，快去目标面谈页查看吧！`,
+          confirmText: '去查看',
+          cancelText: '留在当前',
+          success: (m) => {
+            if (m.confirm) {
+              wx.navigateTo({ url: '/pages/goaltalk/index' });
+            }
+          },
+        });
+      } catch (err) {
+        wx.showToast({ title: `👋 已向 ${userName} 发送同课问候`, icon: 'none' });
+      }
+    } else if (action === 'sheet') {
+      if (userId) {
+        wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
+      } else {
+        wx.navigateTo({ url: '/pages/learn-sheet/index' });
+      }
+    } else if (action === 'ark') {
+      this.onGoArkGroup();
+    }
   },
 });

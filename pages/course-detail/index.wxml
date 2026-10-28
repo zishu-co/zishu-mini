@@ -240,6 +240,48 @@
 
   </view>
 
+  <!-- 同塾操作面板：自定义样式替代微信原生 action sheet -->
+  <view class="classmate-overlay" wx:if="{{showClassmateMenu}}" catchtouchmove="onClassmateTouchMove">
+    <view class="classmate-mask" bindtap="onCloseClassmateMenu" aria-label="关闭同塾操作菜单"></view>
+    <view class="classmate-sheet" aria-role="dialog" aria-label="同塾共学操作">
+      <view class="classmate-sheet__handle"></view>
+      <view class="classmate-sheet__header">
+        <view class="classmate-sheet__heading">
+          <view class="classmate-sheet__title">和 {{classmateUserName}} 一起共学</view>
+          <view class="classmate-sheet__subtitle">从一次交流，开启同塾同行</view>
+        </view>
+        <button class="classmate-sheet__close" bindtap="onCloseClassmateMenu" aria-label="关闭菜单">✕</button>
+      </view>
+      <scroll-view class="classmate-sheet__actions" scroll-y="{{true}}">
+        <button class="classmate-action classmate-action--greet" data-action="greet" bindtap="onClassmateAction" hover-class="classmate-action--pressed">
+          <text class="classmate-action__icon">👋</text>
+          <view class="classmate-action__content">
+            <view class="classmate-action__title">约 {{classmateUserName}} 共学破冰</view>
+            <view class="classmate-action__desc">15 分钟轻松交流，找到学习搭子</view>
+          </view>
+          <text class="classmate-action__arrow">›</text>
+        </button>
+        <button class="classmate-action classmate-action--sheet" data-action="sheet" bindtap="onClassmateAction" hover-class="classmate-action--pressed">
+          <text class="classmate-action__icon">📋</text>
+          <view class="classmate-action__content">
+            <view class="classmate-action__title">查看 {{classmateUserName}} 的学习单</view>
+            <view class="classmate-action__desc">看看学习进度，交流成长心得</view>
+          </view>
+          <text class="classmate-action__arrow">›</text>
+        </button>
+        <button class="classmate-action classmate-action--ark" data-action="ark" bindtap="onClassmateAction" hover-class="classmate-action--pressed">
+          <text class="classmate-action__icon">🚢</text>
+          <view class="classmate-action__content">
+            <view class="classmate-action__title">邀请共组诺亚方舟</view>
+            <view class="classmate-action__desc">一起修习「{{courseDetail.course.title || '自塾课程'}}」</view>
+          </view>
+          <text class="classmate-action__arrow">›</text>
+        </button>
+      </scroll-view>
+      <button class="classmate-sheet__cancel" bindtap="onCloseClassmateMenu" hover-class="classmate-action--pressed">取消</button>
+    </view>
+  </view>
+
   <!-- ========== 选择塾师弹窗 Modal ========== -->
   <view class="mentor-modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
   <view class="mentor-modal" wx:if="{{showMentorModal}}">
