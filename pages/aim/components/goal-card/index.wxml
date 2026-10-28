@@ -4,8 +4,8 @@
   <!-- 卡片头部 -->
   <view class="card-header">
     <view class="card-title">
-      <t-icon name="flag" size="40rpx" color="#a0f" />
-      <text style="color: #a0f;">当前阶段目标</text>
+      <t-icon name="flag" size="40rpx" color="#7c3aed" />
+      <text class="card-title-text">当前阶段目标</text>
     </view>
     <view class="card-actions">
       <view wx:if="{{goal}}" class="header-chip" bindtap="onCopyGoal">📋 复制</view>

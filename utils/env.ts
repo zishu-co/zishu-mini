@@ -37,7 +37,7 @@ export const isGuestMode = (): boolean => {
 /** 检查当前是否已登录（有有效token） */
 export const isLoggedIn = (): boolean => {
   try {
-    return !!wx.getStorageSync('refreshToken');
+    return !!(wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken'));
   } catch {
     return false;
   }

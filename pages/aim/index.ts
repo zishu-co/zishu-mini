@@ -257,11 +257,30 @@ Page<IAimPageData, IAimData>({
       this.setData({ recommendationLoading: true });
     }
 
+    if ((isDevMode() && isGuestMode()) || !http.isLoggedIn()) {
+      this.setData({
+        recommendations: fallbackRecommendations,
+        recommendationLoading: false,
+        recommendationRefreshing: false,
+        lastUpdated: formatTime(),
+      });
+      if (isRefresh) {
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: '已刷新今日推荐',
+          icon: 'check-circle',
+          duration: 1500,
+        });
+      }
+      return;
+    }
+
     const userId = this.getUserId();
     const query = userId ? `?user_id=${userId}` : '';
 
     http
-      .get(`/api/actions/recommendations${query}`)
+      .get(`/api/actions/recommendations${query}`, undefined, { silentAuthError: true })
       .then((res: any) => {
         const list =
           res && Array.isArray(res.recommendations) && res.recommendations.length > 0
@@ -315,7 +334,7 @@ Page<IAimPageData, IAimData>({
     }
 
     const userId = this.getUserId();
-    if (!userId) {
+    if (!userId || !http.isLoggedIn()) {
       this.applyGoalState(savedGoal);
       wx.stopPullDownRefresh();
       return;
@@ -325,6 +344,7 @@ Page<IAimPageData, IAimData>({
       .requestWithRefresh({
         url: `/api/users/fetch_goal/${userId}`,
         method: 'GET',
+        silentAuthError: true,
       })
       .then((res: any) => {
         const goal = res && Object.keys(res).length > 0 && res.content ? res : savedGoal;

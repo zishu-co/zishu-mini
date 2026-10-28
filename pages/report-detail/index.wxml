@@ -135,53 +135,53 @@
   <!-- 108-review-jianda.md: 简答题自评/导师批阅弹窗 -->
   <view
     wx:if="{{showJiandaModal}}"
-    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    class="jianda-sheet-mask"
     bindtap="onCloseJiandaModal"
   >
     <view
-      style="width:100%;max-height:84vh;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;overflow-y:auto;"
+      class="jianda-sheet-card"
       catchtap=""
     >
-      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
-        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">✍️ 简答题批阅与复盘 ({{jiandaList.length}}题)</text>
-        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseJiandaModal">✕</text>
+      <view class="jianda-sheet-header">
+        <text class="jianda-sheet-title">✍️ 简答题批阅与复盘 ({{jiandaList.length}}题)</text>
+        <text class="jianda-sheet-close" bindtap="onCloseJiandaModal">✕</text>
       </view>
       <view
         wx:for="{{jiandaList}}"
         wx:key="qperformid"
-        style="background:#f8fafc;border-radius:20rpx;padding:24rpx;margin-bottom:20rpx;border:2rpx solid #e2e8f0;"
+        class="jianda-item-card"
       >
-        <view style="font-size:28rpx;font-weight:700;color:#1e293b;margin-bottom:12rpx;">
+        <view class="jianda-q-title">
           Q{{index + 1}}. {{item.ques_title}} (满分 {{item.fullscore}} 分)
         </view>
-        <view style="font-size:24rpx;color:#475569;margin-bottom:8rpx;">
-          <text style="font-weight:700;color:#7c3aed;">考生作答：</text>{{item.reply || '未作答'}}
+        <view class="jianda-reply">
+          <text class="jianda-reply-label">考生作答：</text>{{item.reply || '未作答'}}
         </view>
-        <view wx:if="{{item.answer}}" style="font-size:24rpx;color:#059669;margin-bottom:12rpx;">
-          <text style="font-weight:700;">参考答案：</text>{{item.answer}}
+        <view wx:if="{{item.answer}}" class="jianda-ref">
+          <text class="jianda-ref-label">参考答案：</text>{{item.answer}}
         </view>
-        <view style="display:flex;align-items:center;gap:16rpx;margin-bottom:12rpx;">
-          <text style="font-size:24rpx;font-weight:700;color:#334155;">赋分 (0-{{item.fullscore}})：</text>
+        <view class="jianda-score-row">
+          <text class="jianda-score-label">赋分 (0-{{item.fullscore}})：</text>
           <input
+            class="jianda-score-input"
             type="number"
             value="{{item.getscore}}"
             data-index="{{index}}"
             bindinput="onJiandaScoreInput"
-            style="width:140rpx;height:60rpx;background:#fff;border:2rpx solid #cbd5e1;border-radius:12rpx;padding:0 16rpx;font-size:26rpx;"
           />
         </view>
         <view>
           <input
+            class="jianda-comment-input"
             placeholder="填写批阅评语或复盘心得..."
             value="{{item.comments}}"
             data-index="{{index}}"
             bindinput="onJiandaCommentInput"
-            style="width:100%;height:68rpx;background:#fff;border:2rpx solid #cbd5e1;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;box-sizing:border-box;"
           />
         </view>
       </view>
       <button
-        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;margin-top:12rpx;"
+        class="jianda-submit-btn"
         bindtap="onSubmitJiandaReview"
       >{{savingJianda ? '保存中...' : '保存简答题批阅得分'}}</button>
     </view>

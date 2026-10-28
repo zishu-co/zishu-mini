@@ -76,7 +76,19 @@ Page<ILoginPageData, ILoginPageData>({
     const devMode = isDevMode()
     this.setData({ isDev: devMode })
 
-    // Dev 模式下，如果已有 token 也算已登录，可以直接回跳
+    // 每次进入登录页都主动刷新一次微信登录 code 与 session_uuid，防止后端 TTLDict 过期
+    if (_appLogin && typeof _appLogin.checkLoginStatus === 'function') {
+      _appLogin.checkLoginStatus()
+    }
+
+    const hasValidToken = Boolean(wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken'))
+    if (!hasValidToken && _appLogin && _appLogin.globalData) {
+      // 清除内存中的残留过期 Token，防止 completeLogin 把旧 Token 写回 Storage 导致死循环
+      _appLogin.globalData.accessToken = null
+      _appLogin.globalData.refreshToken = null
+    }
+
+    // Dev 模式下，如果已有有效 token 也算已登录，可以直接回跳
     if (devMode && isLoggedIn()) {
       console.log('[Dev模式] 已登录，直接跳转')
       wx.switchTab({ url: '/pages/aim/index' })
@@ -90,25 +102,28 @@ Page<ILoginPageData, ILoginPageData>({
     }
 
     // 检查是否已有用户信息（兼容 globalData 与本地缓存，避免 completeLogin 覆盖为 null）
-    const cachedUserInfo = _appLogin.globalData.userInfo || wx.getStorageSync('userInfo')
+    const cachedUserInfo = _appLogin?.globalData?.userInfo || wx.getStorageSync('userInfo')
     if (cachedUserInfo) {
       const avatarUrl = cachedUserInfo.avatarUrl || null
-      const nickName = cachedUserInfo.nickName || null
+      const nickName = cachedUserInfo.nickName || cachedUserInfo.name || null
       this.setData({
         userInfo: cachedUserInfo,
         avatarUrl,
         nickName,
-        userId: cachedUserInfo.userId || _appLogin.globalData.userId || wx.getStorageSync('userId') || null,
+        userId: cachedUserInfo.userId || cachedUserInfo.id || _appLogin?.globalData?.userId || wx.getStorageSync('userId') || null,
         hasUserInfo: Boolean((nickName && String(nickName).trim().length > 0) || avatarUrl)
       })
     }
 
-    // 检查是否已有手机号
-    const cachedPhone = _appLogin.globalData.phoneNumber || wx.getStorageSync('phoneNumber')
+    // 检查是否已有手机号（注意：仅当本地已有有效 Token 时才标记 hasPhoneNumber=true；
+    // 若 Token 已过期被清除，必须保持 hasPhoneNumber=false 以展示「一键授权」重新换取 Token）
+    const cachedPhone = _appLogin?.globalData?.phoneNumber || wx.getStorageSync('phoneNumber')
     if (cachedPhone) {
       this.setData({
         phoneNumber: cachedPhone,
-        hasPhoneNumber: true
+        phoneInput: cachedPhone,
+        canDevLogin: String(cachedPhone).length >= 10 && String(this.data.pwdInput || '').length >= 4,
+        hasPhoneNumber: hasValidToken
       })
     }
   },
@@ -175,8 +190,11 @@ Page<ILoginPageData, ILoginPageData>({
     if (e.detail.errMsg === 'getPhoneNumber:ok') {
       const sessionkey = _appLogin.globalData.sessionkey
       if (!sessionkey) {
-        wx.showToast({ title: '授权凭证尚未就绪，请稍后再试', icon: 'none', duration: 2000 })
-        console.error('[login] sessionkey(UUID) 为空，可能 /openid 请求尚未返回')
+        if (typeof _appLogin.checkLoginStatus === 'function') {
+          _appLogin.checkLoginStatus()
+        }
+        wx.showToast({ title: '授权凭证初始化中，请再点一次', icon: 'none', duration: 2000 })
+        console.error('[login] sessionkey(UUID) 为空，已触发重新获取 /openid')
         return
       }
       // 后端 TokenRequest：sessionkey 字段现在传 UUID，后端从 dict 取出真实 session_key 解密
@@ -196,20 +214,46 @@ Page<ILoginPageData, ILoginPageData>({
         },
         success: (res: any) => {
           console.log(res.data)
-          if (res.statusCode === 200 && res.data && (res.data.atoken || res.data.phone)) {
+          if (res.statusCode === 200 && res.data && res.data.atoken) {
+            const resolvedName =
+              (that.data.nickName && that.data.nickName.trim()) ||
+              res.data.username ||
+              res.data.nickName ||
+              _appLogin.globalData.userInfo?.nickName ||
+              `用户${String(res.data.phone || '').slice(-4)}`
+            const nextUserInfo = {
+              ...(_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}),
+              userId: res.data.id,
+              id: res.data.id,
+              nickName: resolvedName,
+              name: resolvedName,
+              avatarUrl: that.data.avatarUrl || res.data.avatarUrl || _appLogin.globalData.userInfo?.avatarUrl || '',
+              phoneNumber: res.data.phone || ''
+            }
             _appLogin.globalData.phoneNumber = res.data.phone
             _appLogin.globalData.userId = res.data.id
             _appLogin.globalData.accessToken = res.data.atoken
             _appLogin.globalData.refreshToken = res.data.rtoken
             _appLogin.globalData.hasPhoneNumber = true
+            _appLogin.globalData.userInfo = nextUserInfo
+            _appLogin.globalData.hasUserInfo = true
             _appLogin.savePhoneNumber(res.data.phone)
-            _appLogin.saveUserId(res.data.id)  // 保存 userId 到本地存储
+            _appLogin.saveUserId(res.data.id)
+            // 立即写入 Storage，避免用户点击左上角返回时丢失 Token
+            wx.setStorageSync('accessToken', res.data.atoken)
+            wx.setStorageSync('refreshToken', res.data.rtoken || res.data.atoken)
             wx.setStorageSync('userId', res.data.id)
+            wx.setStorageSync('userInfo', nextUserInfo)
+            wx.removeStorageSync('guestMode')
+
             // 更新页面数据
             that.setData({
               phoneNumber: res.data.phone,
+              phoneInput: res.data.phone || that.data.phoneInput,
               hasPhoneNumber: true,
-              userId: res.data.id
+              userId: res.data.id,
+              nickName: that.data.nickName || resolvedName,
+              hasUserInfo: true
             })
 
             wx.showToast({
@@ -218,10 +262,18 @@ Page<ILoginPageData, ILoginPageData>({
               duration: 2000
             })
           } else {
+            // 若 sessionkey 在后端过期导致解密失败，自动刷新一次 sessionkey
+            if (typeof _appLogin.checkLoginStatus === 'function') {
+              _appLogin.checkLoginStatus()
+            }
+            const detailMsg =
+              typeof res.data?.detail === 'string'
+                ? res.data.detail
+                : res.data?.detail?.message || res.data?.message || '获取手机号失败，请重试或使用密码登录'
             wx.showToast({
-              title: res.data?.detail || res.data?.message || '获取手机号失败',
+              title: detailMsg,
               icon: 'none',
-              duration: 2000
+              duration: 2500
             })
           }
         },
@@ -254,6 +306,17 @@ Page<ILoginPageData, ILoginPageData>({
       })
       return
     }
+    const activeAccessToken = wx.getStorageSync('accessToken') || _appLogin.globalData.accessToken || ''
+    const activeRefreshToken = wx.getStorageSync('refreshToken') || _appLogin.globalData.refreshToken || ''
+    if (!activeAccessToken && !activeRefreshToken) {
+      this.setData({ hasPhoneNumber: false })
+      wx.showToast({
+        title: '请先点击手机号「一键授权」或使用密码登录',
+        icon: 'none',
+        duration: 2500
+      })
+      return
+    }
     if (this.data.hasUserInfo && this.data.hasPhoneNumber) {
       const prevInfo = _appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}
       const resolvedUserId = this.data.userId || _appLogin.globalData.userId || prevInfo.userId || wx.getStorageSync('userId')
@@ -270,12 +333,15 @@ Page<ILoginPageData, ILoginPageData>({
       if (resolvedUserId) {
         wx.setStorageSync('userId', resolvedUserId)
       }
-      if (_appLogin.globalData.accessToken) {
-        wx.setStorageSync('accessToken', _appLogin.globalData.accessToken)
+      if (activeAccessToken) {
+        wx.setStorageSync('accessToken', activeAccessToken)
+        _appLogin.globalData.accessToken = activeAccessToken
       }
-      if (_appLogin.globalData.refreshToken) {
-        wx.setStorageSync('refreshToken', _appLogin.globalData.refreshToken)
+      if (activeRefreshToken) {
+        wx.setStorageSync('refreshToken', activeRefreshToken)
+        _appLogin.globalData.refreshToken = activeRefreshToken
       }
+      wx.removeStorageSync('guestMode')
 
       // 跳转到首页
       wx.switchTab({

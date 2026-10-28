@@ -57,8 +57,8 @@ module.exports = {
   <!-- 卡片头部 -->
   <view class="card-header">
     <view class="card-title">
-      <t-icon name="aim" size="40rpx" color="#a0f" />
-      <text style="color: #a0f;">今日最值得做 (Top 3)</text>
+      <t-icon name="aim" size="40rpx" color="#7c3aed" />
+      <text class="card-title-text">今日最值得做 (Top 3)</text>
     </view>
     <view class="header-actions">
       <view class="header-pill" bindtap="showAlgorithmInfo">💡 算法</view>
@@ -90,12 +90,12 @@ module.exports = {
     >
       <!-- 推荐序号 -->
       <view class="item-index">
-        <text class="index-number" style="background: #a0f; color: #fff;">{{index + 1}}</text>
+        <text class="index-number">{{index + 1}}</text>
         <t-icon 
           name="{{recFmt.getTypeIcon(item.type)}}" 
           size="32rpx" 
           class="type-icon {{recFmt.getTypeIconClass(item.type)}}"
-          color="#a0f"
+          color="#7c3aed"
         />
       </view>
 

@@ -101,12 +101,7 @@ Page<IMyPageData, any>({
     const storedUserInfo = wx.getStorageSync('userInfo') || {}
     const storedPhoneNumber = wx.getStorageSync('phoneNumber') || ''
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken')
-    const isLoggedIn = !!(
-      globalData.hasUserInfo ||
-      storedUserInfo?.nickName ||
-      storedUserInfo?.name ||
-      token
-    )
+    const isLoggedIn = !!token
 
     // 同步 storedUserInfo 到 globalData
     if (

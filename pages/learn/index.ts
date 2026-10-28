@@ -189,8 +189,7 @@ Page<ILearnPageData, any>({
     } catch (e: any) {
       console.error('加载数据失败', e);
       if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
-        wx.removeStorageSync('accessToken');
-        wx.removeStorageSync('refreshToken');
+        base.clearTokens();
         this.setData({ hasLogin: false, loading: false, loadError: '' });
         wx.showToast({ title: '请先登录', icon: 'none' });
         setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);

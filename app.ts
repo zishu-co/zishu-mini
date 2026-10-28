@@ -56,7 +56,7 @@ App<IAppOption>({
   },
 
   // 检查登录状态
-  checkLoginStatus() {
+  checkLoginStatus(callback?: (uuid: string | null) => void) {
     // 登录
     wx.login({
       success: res => {
@@ -74,27 +74,33 @@ App<IAppOption>({
             header: {
               'content-type': 'application/json',
             },
-            timeout: 10000,
+            timeout: 60000,
             success: (openidRes: any) => {
               console.log('调用openid的返回结果为：', openidRes);
               // 后端直接返回 UUID 字符串，不是 JSON 对象，所以 res.data 就是 UUID 本身
-              const uuid = openidRes.data
+              const uuid = openidRes.data;
               console.log('session_uuid为：', uuid);
-              if (uuid) {
+              if (uuid && typeof uuid === 'string') {
                 that.globalData.sessionkey = uuid;
+                if (typeof callback === 'function') callback(uuid);
+              } else {
+                if (typeof callback === 'function') callback(null);
               }
               // 不再自动跳转登录页，用户可在"我的"页面点击"登录"按钮主动登录
             },
             fail: (err) => {
               console.error('获取openid失败', err);
+              if (typeof callback === 'function') callback(null);
             },
           });
         } else {
           console.error('登录失败', res);
+          if (typeof callback === 'function') callback(null);
         }
       },
       fail: err => {
         console.error('wx.login调用失败', err);
+        if (typeof callback === 'function') callback(null);
       },
     });
   },
@@ -153,7 +159,7 @@ App<IAppOption>({
 
 interface IAppOption {
   globalData: GlobalData;
-  checkLoginStatus(): void;
+  checkLoginStatus(callback?: (uuid: string | null) => void): void;
   checkNeedLogin(): void;
   saveUserInfo(userInfo: any): void;
   savePhoneNumber(phoneNumber: string): void;

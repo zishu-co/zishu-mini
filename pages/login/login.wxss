@@ -194,6 +194,14 @@ page {
   box-shadow: 0 3rpx 10rpx rgba(170, 0, 255, 0.22);
 }
 
+.auth-btn-sm {
+  margin-right: 12rpx;
+  font-size: 22rpx;
+  padding: 0 22rpx;
+  height: 52rpx;
+  line-height: 52rpx;
+}
+
 /* 获取头像按钮特殊样式 */
 .pop_avatar {
   background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
@@ -539,4 +547,131 @@ page {
   color: #a78bfa;
   margin-top: 24rpx;
   opacity: 0.8;
+}
+
+/* 注册与密码重置链接 & 底部抽屉弹窗 */
+.login-sub-links {
+  display: flex;
+  justify-content: center;
+  gap: 40rpx;
+  margin-top: 24rpx;
+  font-size: 25rpx;
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.login-sub-links-dev {
+  margin-top: 0;
+  margin-bottom: 24rpx;
+}
+
+.login-sub-link {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.login-sheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+.login-sheet-card {
+  width: 100%;
+  max-height: 85vh;
+  background: #ffffff;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 36rpx 36rpx calc(36rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow-y: auto;
+  box-shadow: 0 -16rpx 48rpx rgba(15, 23, 42, 0.16);
+}
+
+.login-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26rpx;
+}
+
+.login-sheet-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.login-sheet-close {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #f1f5f9;
+  font-size: 28rpx;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-sheet-field {
+  margin-bottom: 18rpx;
+}
+
+.login-sheet-field-last {
+  margin-bottom: 28rpx;
+}
+
+.login-sheet-input {
+  width: 100%;
+  height: 82rpx;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 20rpx;
+  padding: 0 24rpx;
+  font-size: 27rpx;
+  color: #0f172a;
+  box-sizing: border-box;
+}
+
+.login-gender-row {
+  display: flex;
+  gap: 18rpx;
+  margin-bottom: 18rpx;
+}
+
+.login-gender-pill {
+  flex: 1;
+  height: 74rpx;
+  line-height: 74rpx;
+  text-align: center;
+  border-radius: 18rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  transition: all 0.18s ease;
+}
+
+.login-gender-pill.active {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24);
+}
+
+.login-sheet-submit {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  margin: 0;
+  box-shadow: 0 10rpx 26rpx rgba(124, 58, 237, 0.3);
 }

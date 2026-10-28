@@ -6,37 +6,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 92rpx;
-  height: 92rpx;
+  width: 96rpx;
+  height: 96rpx;
 }
 
 .fab-btn {
-  width: 92rpx;
-  height: 92rpx;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
-  box-shadow: 0 8rpx 24rpx rgba(160, 0, 255, 0.35), 0 0 0 4rpx rgba(255, 255, 255, 0.85);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #5b21b6 100%);
+  box-shadow: 0 12rpx 32rpx rgba(124, 58, 237, 0.38), 0 0 0 6rpx rgba(255, 255, 255, 0.92);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2rpx;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
 .fab-btn.pressed {
-  transform: scale(0.91);
-  box-shadow: 0 4rpx 12rpx rgba(160, 0, 255, 0.25);
+  transform: scale(0.9);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.28), 0 0 0 4rpx rgba(255, 255, 255, 0.9);
 }
 
 .fab-icon {
-  font-size: 32rpx;
+  font-size: 34rpx;
   line-height: 1;
 }
 
 .fab-label {
   font-size: 18rpx;
-  font-weight: 700;
+  font-weight: 800;
   color: #ffffff;
   line-height: 1;
   letter-spacing: 1rpx;
@@ -44,28 +44,31 @@
 
 .fab-dot {
   position: absolute;
-  top: 6rpx;
-  right: 6rpx;
-  width: 16rpx;
-  height: 16rpx;
+  top: 4rpx;
+  right: 4rpx;
+  width: 18rpx;
+  height: 18rpx;
   border-radius: 50%;
   background: #ef4444;
-  border: 2rpx solid #fff;
+  border: 3rpx solid #ffffff;
+  box-shadow: 0 2rpx 6rpx rgba(239, 68, 68, 0.4);
 }
 
 .fab-badge {
   position: absolute;
-  top: 2rpx;
-  right: 2rpx;
-  min-width: 32rpx;
-  height: 32rpx;
-  border-radius: 16rpx;
+  top: 0;
+  right: 0;
+  min-width: 34rpx;
+  height: 34rpx;
+  border-radius: 999rpx;
   background: #ef4444;
-  color: #fff;
+  color: #ffffff;
   font-size: 20rpx;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6rpx;
-  border: 2rpx solid #fff;
+  padding: 0 8rpx;
+  border: 3rpx solid #ffffff;
+  box-shadow: 0 4rpx 10rpx rgba(239, 68, 68, 0.35);
 }

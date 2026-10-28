@@ -12,8 +12,8 @@
     </view>
   </view>
 
-  <!-- ====== Dev 模式：登录方式 radio 选择 ====== -->
-  <view class="login-method-selector" wx:if="{{isDev}}">
+  <!-- ====== 登录方式 radio 选择（支持微信授权与手机号密码双通道） ====== -->
+  <view class="login-method-selector">
     <radio-group bindchange="onLoginMethodChange">
       <view class="method-option {{loginMethod === 'wechat' ? 'selected' : ''}}" bindtap="selectWechat">
         <radio value="wechat" checked="{{loginMethod === 'wechat'}}" color="#7c3aed" />
@@ -27,7 +27,7 @@
   </view>
 
   <!-- ====== 微信授权登录 ====== -->
-  <block wx:if="{{!isDev || loginMethod === 'wechat'}}">
+  <block wx:if="{{loginMethod === 'wechat'}}">
     <view class="auth-section">
       <!-- 头像授权 -->
       <view class="auth-item">
@@ -71,10 +71,11 @@
           <view class="user-info">
             <view class="phone-info">{{phoneNumber}}</view>
           </view>
+          <button class="auth-btn auth-btn-sm" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">重新授权</button>
           <view class="auth-status success">已完成</view>
         </view>
         <view class="auth-content" wx:else>
-          <view class="auth-desc">用于接收订单通知</view>
+          <view class="auth-desc">{{phoneNumber ? ('当前号码 ' + phoneNumber + '，请点击授权刷新凭证') : '用于接收订单通知'}}</view>
           <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">一键授权</button>
           <view class="auth-status">待授权</view>
         </view>
@@ -96,15 +97,15 @@
       </view>
       
       <button class="complete-btn {{privacyAgreed ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed}}">完成授权并进入</button>
-      <view style="display:flex;justify-content:center;gap:36rpx;margin-top:24rpx;font-size:24rpx;color:#7c3aed;font-weight:600;">
-        <text bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
-        <text bindtap="onOpenResetModal">🔑 忘记密码重置</text>
+      <view class="login-sub-links">
+        <text class="login-sub-link" bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
+        <text class="login-sub-link" bindtap="onOpenResetModal">🔑 忘记密码重置</text>
       </view>
     </view>
   </block>
 
-  <!-- ====== Dev 模式：手机号+密码登录 ====== -->
-  <block wx:if="{{isDev && loginMethod === 'password'}}">
+  <!-- ====== 手机号+密码登录 ====== -->
+  <block wx:if="{{loginMethod === 'password'}}">
     <view class="dev-login-form">
       <view class="form-item">
         <input
@@ -148,12 +149,14 @@
       >{{submitting ? '登录中...' : '密码登录'}}</button>
 
       <view class="dev-hint">
-        <view style="display:flex;justify-content:center;gap:36rpx;margin-bottom:20rpx;font-size:24rpx;color:#7c3aed;font-weight:600;">
-          <text bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
-          <text bindtap="onOpenResetModal">🔑 忘记密码重置</text>
+        <view class="login-sub-links login-sub-links-dev">
+          <text class="login-sub-link" bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
+          <text class="login-sub-link" bindtap="onOpenResetModal">🔑 忘记密码重置</text>
         </view>
-        <button class="guest-btn" bindtap="enterAsGuest">以游客身份进入</button>
-        <view class="guest-desc">游客模式仅可查看演示数据</view>
+        <block wx:if="{{isDev}}">
+          <button class="guest-btn" bindtap="enterAsGuest">以游客身份进入</button>
+          <view class="guest-desc">游客模式仅可查看演示数据</view>
+        </block>
       </view>
     </view>
   </block>
@@ -161,76 +164,76 @@
   <!-- 101-regi.md: 新塾员注册申请弹窗 -->
   <view
     wx:if="{{showRegiModal}}"
-    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    class="login-sheet-mask"
     bindtap="onCloseRegiModal"
   >
     <view
-      style="width:100%;max-height:85vh;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;overflow-y:auto;"
+      class="login-sheet-card"
       catchtap=""
     >
-      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
-        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">🌱 新塾员入塾注册申请 (101-regi.md)</text>
-        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseRegiModal">✕</text>
+      <view class="login-sheet-header">
+        <text class="login-sheet-title">🌱 新塾员入塾注册申请</text>
+        <text class="login-sheet-close" bindtap="onCloseRegiModal">✕</text>
       </view>
-      <view style="margin-bottom:16rpx;">
+      <view class="login-sheet-field">
         <input
+          class="login-sheet-input"
           placeholder="姓名 / 昵称 *"
           value="{{regiForm.name}}"
           data-field="name"
           bindinput="onRegiFieldInput"
-          style="height:76rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
-      <view style="display:flex;gap:16rpx;margin-bottom:16rpx;">
+      <view class="login-gender-row">
         <view
           wx:for="{{['男','女']}}"
           wx:key="*this"
           data-gender="{{item}}"
           bindtap="onSelectRegiGender"
-          style="flex:1;height:68rpx;line-height:68rpx;text-align:center;border-radius:14rpx;font-size:26rpx;font-weight:700;{{regiForm.gender === item ? 'background:#7c3aed;color:#fff;' : 'background:#f1f5f9;color:#475569;'}}"
+          class="login-gender-pill {{regiForm.gender === item ? 'active' : ''}}"
         >{{item}}生</view>
       </view>
-      <view style="margin-bottom:16rpx;">
+      <view class="login-sheet-field">
         <input
+          class="login-sheet-input"
           type="number"
           maxlength="11"
           placeholder="11位手机号码 *"
           value="{{regiForm.phone}}"
           data-field="phone"
           bindinput="onRegiFieldInput"
-          style="height:76rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
-      <view style="margin-bottom:16rpx;">
+      <view class="login-sheet-field">
         <input
+          class="login-sheet-input"
           placeholder="常用邮箱（选填）"
           value="{{regiForm.email}}"
           data-field="email"
           bindinput="onRegiFieldInput"
-          style="height:76rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
-      <view style="margin-bottom:16rpx;">
+      <view class="login-sheet-field">
         <input
+          class="login-sheet-input"
           password="{{true}}"
           placeholder="设置登录密码（至少4位）*"
           value="{{regiForm.password}}"
           data-field="password"
           bindinput="onRegiFieldInput"
-          style="height:76rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
-      <view style="margin-bottom:24rpx;">
+      <view class="login-sheet-field login-sheet-field-last">
         <input
+          class="login-sheet-input"
           placeholder="入塾初心或共学期待（选填）"
           value="{{regiForm.notes}}"
           data-field="notes"
           bindinput="onRegiFieldInput"
-          style="height:76rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
       <button
-        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
+        class="login-sheet-submit"
         bindtap="onSubmitRegister"
       >{{submittingRegi ? '提交中...' : '提交入塾申请'}}</button>
     </view>
@@ -239,29 +242,29 @@
   <!-- 111-reset-pass.md: 忘记密码重置弹窗 -->
   <view
     wx:if="{{showResetModal}}"
-    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    class="login-sheet-mask"
     bindtap="onCloseResetModal"
   >
     <view
-      style="width:100%;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;"
+      class="login-sheet-card"
       catchtap=""
     >
-      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
-        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">🔑 申请重置密码 (111-reset-pass.md)</text>
-        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseResetModal">✕</text>
+      <view class="login-sheet-header">
+        <text class="login-sheet-title">🔑 申请重置密码</text>
+        <text class="login-sheet-close" bindtap="onCloseResetModal">✕</text>
       </view>
-      <view style="margin-bottom:24rpx;">
+      <view class="login-sheet-field login-sheet-field-last">
         <input
+          class="login-sheet-input"
           type="number"
           maxlength="11"
           placeholder="请输入注册时的11位手机号"
           value="{{resetPhone}}"
           bindinput="onResetPhoneInput"
-          style="height:80rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 20rpx;font-size:26rpx;"
         />
       </view>
       <button
-        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
+        class="login-sheet-submit"
         bindtap="onSubmitResetPass"
       >{{submittingReset ? '提交中...' : '提交密码重置申请'}}</button>
     </view>

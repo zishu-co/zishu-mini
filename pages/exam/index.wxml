@@ -100,97 +100,97 @@
   <!-- 102-add-ques.md: 共创出题弹窗 -->
   <view
     wx:if="{{showAddQuesModal}}"
-    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    class="exam-sheet-mask"
     bindtap="onCloseAddQuesModal"
   >
     <view
-      style="width:100%;max-height:85vh;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;overflow-y:auto;"
+      class="exam-sheet-card"
       catchtap=""
     >
-      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
-        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">✨ 共创出题 · 贡献题库题目</text>
-        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseAddQuesModal">✕</text>
+      <view class="exam-sheet-header">
+        <text class="exam-sheet-title">✨ 共创出题 · 贡献题库题目</text>
+        <text class="exam-sheet-close" bindtap="onCloseAddQuesModal">✕</text>
       </view>
 
       <!-- 题型切换 -->
-      <view style="display:flex;gap:14rpx;margin-bottom:20rpx;">
+      <view class="exam-type-pills">
         <view
           wx:for="{{['选择题','判断题','简答题']}}"
           wx:key="*this"
           data-type="{{item}}"
           bindtap="onSelectQuesType"
-          style="padding:10rpx 26rpx;border-radius:999rpx;font-size:24rpx;font-weight:700;{{newQuesForm.ques_type === item ? 'background:#7c3aed;color:#fff;' : 'background:#f1f5f9;color:#475569;'}}"
+          class="exam-type-pill {{newQuesForm.ques_type === item ? 'active' : ''}}"
         >{{item}}</view>
       </view>
 
-      <view style="margin-bottom:18rpx;">
-        <text style="font-size:24rpx;font-weight:700;color:#334155;">题干内容 *</text>
+      <view class="exam-form-group">
+        <text class="exam-form-label">题干内容 *</text>
         <textarea
+          class="exam-form-textarea"
           placeholder="请输入清晰准确的题目问题..."
           value="{{newQuesForm.ques_title}}"
           data-field="ques_title"
           bindinput="onQuesFormInput"
-          style="width:100%;height:140rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:16rpx;font-size:26rpx;margin-top:8rpx;box-sizing:border-box;"
         />
       </view>
 
       <block wx:if="{{newQuesForm.ques_type === '选择题'}}">
-        <view style="display:grid;grid-template-columns:1fr 1fr;gap:14rpx;margin-bottom:18rpx;">
+        <view class="exam-options-grid">
           <input
+            class="exam-option-input"
             placeholder="A 选项 *"
             value="{{newQuesForm.item_a}}"
             data-field="item_a"
             bindinput="onQuesFormInput"
-            style="height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;"
           />
           <input
+            class="exam-option-input"
             placeholder="B 选项 *"
             value="{{newQuesForm.item_b}}"
             data-field="item_b"
             bindinput="onQuesFormInput"
-            style="height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;"
           />
           <input
+            class="exam-option-input"
             placeholder="C 选项"
             value="{{newQuesForm.item_c}}"
             data-field="item_c"
             bindinput="onQuesFormInput"
-            style="height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;"
           />
           <input
+            class="exam-option-input"
             placeholder="D 选项"
             value="{{newQuesForm.item_d}}"
             data-field="item_d"
             bindinput="onQuesFormInput"
-            style="height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;"
           />
         </view>
       </block>
 
-      <view style="margin-bottom:18rpx;">
-        <text style="font-size:24rpx;font-weight:700;color:#334155;">标准答案 *</text>
+      <view class="exam-form-group">
+        <text class="exam-form-label">标准答案 *</text>
         <input
+          class="exam-form-input"
           placeholder="{{newQuesForm.ques_type === '选择题' ? '例如：A 或 AB' : newQuesForm.ques_type === '判断题' ? '正确 或 错误' : '请输入参考答案要点'}}"
           value="{{newQuesForm.answer}}"
           data-field="answer"
           bindinput="onQuesFormInput"
-          style="width:100%;height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;margin-top:8rpx;box-sizing:border-box;"
         />
       </view>
 
-      <view style="margin-bottom:24rpx;">
-        <text style="font-size:24rpx;font-weight:700;color:#334155;">答案解析（选填）</text>
+      <view class="exam-form-group exam-form-group-last">
+        <text class="exam-form-label">答案解析（选填）</text>
         <input
+          class="exam-form-input"
           placeholder="填写解题思路或知识点延伸..."
           value="{{newQuesForm.explain}}"
           data-field="explain"
           bindinput="onQuesFormInput"
-          style="width:100%;height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:12rpx;padding:0 16rpx;font-size:24rpx;margin-top:8rpx;box-sizing:border-box;"
         />
       </view>
 
       <button
-        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
+        class="exam-sheet-submit"
         bindtap="onSubmitNewQues"
       >{{savingQues ? '提交中...' : '立即提交入库'}}</button>
     </view>
@@ -199,58 +199,58 @@
   <!-- 101-edit-paper.md & 103-all-ques.md: 题库检索与组卷发布弹窗 -->
   <view
     wx:if="{{showAssemblePaperModal}}"
-    style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:999;display:flex;align-items:flex-end;"
+    class="exam-sheet-mask"
     bindtap="onCloseAddQuesModal"
   >
     <view
-      style="width:100%;max-height:85vh;background:#fff;border-radius:32rpx 32rpx 0 0;padding:32rpx;box-sizing:border-box;overflow-y:auto;"
+      class="exam-sheet-card"
       catchtap=""
     >
-      <view style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20rpx;">
-        <text style="font-size:32rpx;font-weight:700;color:#0f172a;">📑 题库组卷 · 发布闯关试卷</text>
-        <text style="font-size:32rpx;color:#64748b;padding:8rpx;" bindtap="onCloseAddQuesModal">✕</text>
+      <view class="exam-sheet-header">
+        <text class="exam-sheet-title">📑 题库组卷 · 发布闯关试卷</text>
+        <text class="exam-sheet-close" bindtap="onCloseAddQuesModal">✕</text>
       </view>
 
-      <view style="margin-bottom:16rpx;">
-        <text style="font-size:24rpx;font-weight:700;color:#334155;">试卷名称 *</text>
+      <view class="exam-form-group">
+        <text class="exam-form-label">试卷名称 *</text>
         <input
+          class="exam-form-input"
           placeholder="例如：AI 智能体工程核心闯关卷"
           value="{{paperTitle}}"
           bindinput="onPaperTitleInput"
-          style="width:100%;height:72rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 18rpx;font-size:26rpx;margin-top:8rpx;box-sizing:border-box;"
         />
       </view>
 
-      <view style="margin-bottom:16rpx;">
-        <text style="font-size:24rpx;font-weight:700;color:#334155;">题库检索 (已选 {{selectedQuesIds.length}} 题)</text>
+      <view class="exam-form-group">
+        <text class="exam-form-label">题库检索 (已选 {{selectedQuesIds.length}} 题)</text>
         <input
-          placeholder="输入题干关键词筛选题目 (103-all-ques)..."
+          class="exam-form-input"
+          placeholder="输入题干关键词筛选题目..."
           value="{{quesSearchKeyword}}"
           bindinput="onQuesSearchInput"
-          style="width:100%;height:68rpx;background:#f8fafc;border:2rpx solid #e2e8f0;border-radius:14rpx;padding:0 18rpx;font-size:24rpx;margin-top:8rpx;box-sizing:border-box;"
         />
       </view>
 
-      <scroll-view scroll-y="true" style="max-height:360rpx;margin-bottom:20rpx;border:1rpx solid #e2e8f0;border-radius:16rpx;padding:12rpx;box-sizing:border-box;">
+      <scroll-view scroll-y="true" class="exam-bank-scroll">
         <view
           wx:for="{{questionBankList}}"
           wx:key="quesid"
           data-id="{{item.quesid}}"
           bindtap="onToggleSelectQues"
-          style="display:flex;justify-content:space-between;align-items:center;padding:14rpx 12rpx;border-bottom:1rpx dashed #e2e8f0;border-radius:12rpx;{{item._selected ? 'background:rgba(124,58,237,0.08);' : ''}}"
+          class="exam-bank-item {{item._selected ? 'selected' : ''}}"
         >
-          <view style="flex:1;padding-right:16rpx;">
-            <text style="font-size:22rpx;color:#7c3aed;font-weight:700;margin-right:8rpx;">[{{item.ques_type || '题目'}}]</text>
-            <text style="font-size:25rpx;color:#0f172a;">{{item.ques_title}}</text>
+          <view class="exam-bank-item-main">
+            <text class="exam-bank-item-type">[{{item.ques_type || '题目'}}]</text>
+            <text class="exam-bank-item-title">{{item.ques_title}}</text>
           </view>
-          <text style="font-size:26rpx;font-weight:700;color:{{item._selected ? '#7c3aed' : '#94a3b8'}};">
+          <text class="exam-bank-item-check {{item._selected ? 'selected' : ''}}">
             {{item._selected ? '✓ 已选' : '＋ 选择'}}
           </text>
         </view>
       </scroll-view>
 
       <button
-        style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:999rpx;font-size:28rpx;font-weight:700;"
+        class="exam-sheet-submit"
         bindtap="onSubmitAssemblePaper"
       >{{savingPaper ? '组卷发布中...' : '确认组卷并发布'}}</button>
     </view>
