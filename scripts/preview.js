@@ -54,7 +54,8 @@ const { execSync } = require("child_process");
     appid,
     type: "miniProgram",
     projectPath,
-    privateKey: privateKeyPath,
+    privateKey,
+    privateKeyPath,
   });
 
   const qrcodeOutputPath = path.resolve(projectPath, "preview-qrcode.png");

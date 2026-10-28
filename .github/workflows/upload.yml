@@ -30,19 +30,12 @@ jobs:
         run: |
           npm install miniprogram-ci
 
-      - name: 生成私钥文件
+      - name: 编译并上传小程序到微信公众平台
         run: |
-          echo "${{ secrets.WX_MINI_PRIVATE_KEY }}" > private.key
-          chmod 600 private.key
-
-      - name: 上传小程序
-        run: |
-          npx miniprogram-ci upload --pp project.config.json --pk private.key --appid ${{ secrets.WX_MINI_APPID }} --version ${{ github.run_number }}.0.0 --desc "CI上传"
-
-      - name: 上传构建产物
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: .
-          retention-days: 3
+          node scripts/upload.js
+        env:
+          APPID: ${{ secrets.WX_MINI_APPID }}
+          PRIVATE_KEY: ${{ secrets.WX_MINI_PRIVATE_KEY }}
+          PROJECT_PATH: ${{ github.workspace }}
+          UPLOAD_VERSION: "1.4.${{ github.run_number }}"
+          UPLOAD_DESC: "momo分支 UI与交互全面升级 (CI #${{ github.run_number }})"
