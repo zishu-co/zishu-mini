@@ -408,6 +408,8 @@ button.submit-btn,
   right: 0;
   bottom: 0;
   background: rgba(15, 10, 30, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 100;
 }
 

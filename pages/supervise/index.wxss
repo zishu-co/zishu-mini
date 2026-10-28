@@ -1,17 +1,17 @@
 .page {
   min-height: 100vh;
   background: #f6f5fb;
-  padding-top: 24rpx;
+  padding-top: 0;
 }
 
 .hero-stats {
   position: relative;
   overflow: hidden;
-  margin: 0 24rpx 24rpx;
-  padding: 32rpx 28rpx;
+  margin: 0 0 24rpx;
+  padding: 36rpx 28rpx 40rpx;
   background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
-  border-radius: 32rpx;
-  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.25);
+  border-radius: 0 0 44rpx 44rpx;
+  box-shadow: 0 18rpx 44rpx rgba(91, 33, 182, 0.25);
 }
 
 .stats-row {
@@ -21,11 +21,14 @@
 
 .stat-card {
   flex: 1;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 22rpx;
   padding: 20rpx 10rpx;
   text-align: center;
   border: 2rpx solid transparent;
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.08), inset 0 2rpx 0 #ffffff;
   transition: all 0.2s ease;
 }
 
@@ -33,7 +36,7 @@
   background: #ffffff;
   border-color: #fde047;
   transform: translateY(-2rpx);
-  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.14);
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.16), inset 0 2rpx 0 #ffffff;
 }
 
 .stat-num {
@@ -186,10 +189,11 @@
   display: inline-block;
   padding: 12rpx 32rpx;
   border-radius: 999rpx;
-  background: rgba(160, 0, 255, 0.10);
-  color: #7c3aed;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 1.5rpx solid rgba(124, 58, 237, 0.22);
+  color: #6d28d9;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .record-actions {
@@ -205,12 +209,13 @@
   padding: 10rpx 24rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .action-pill.secondary {
-  background: #f5f3ff;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
   color: #6d28d9;
+  border: 1rpx solid rgba(124, 58, 237, 0.2);
 }
 
 .action-pill.danger {
@@ -220,6 +225,7 @@
 }
 
 .action-pill.primary {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #5b21b6 100%);
   color: #ffffff;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24), inset 0 2rpx 0 rgba(255, 255, 255, 0.32);
 }

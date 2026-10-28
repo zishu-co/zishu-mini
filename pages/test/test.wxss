@@ -266,15 +266,20 @@ page {
   align-items: center;
   padding: 22rpx 24rpx;
   border-radius: 18rpx;
-  background: #faf8ff;
-  border: 2rpx solid rgba(124, 58, 237, 0.12);
+  background: #fcfaff;
+  border: 2rpx solid rgba(124, 58, 237, 0.14);
   transition: all 0.2s ease;
+}
+
+.checkitem:nth-child(even) {
+  background: #f2ecff;
 }
 
 .checkitem:active,
 .checkitem.is-selected {
-  background: rgba(124, 58, 237, 0.1);
-  border-color: #7c3aed;
+  background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%) !important;
+  border-color: #7c3aed !important;
+  box-shadow: inset 8rpx 0 0 #7c3aed, 0 6rpx 18rpx rgba(124, 58, 237, 0.16);
 }
 
 .judge-item {

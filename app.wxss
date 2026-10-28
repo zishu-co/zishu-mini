@@ -18,15 +18,24 @@ page {
   --brand-gradient-hero: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   --brand-gradient-soft: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 
-  /* 背景与文字 */
+  /* 背景与文字（专业设计师多层薰衣草/靛蓝微光氛围与斑马纹行色系） */
   --bg-page: #f6f5fb;
+  --bg-page-gradient: linear-gradient(180deg, #ede9fe 0%, #f3f0ff 28%, #eef2ff 68%, #f6f5fb 100%);
   --bg-card: #ffffff;
   --bg-subtle: #f8fafc;
+  --row-odd-bg: #ffffff;
+  --row-even-bg: #f3effe;
+  --form-row-odd-bg: #fcfaff;
+  --form-row-even-bg: #f2ecff;
+  --row-hover-bg: #e9d5ff;
+  --row-selected-bg: #ddd6fe;
+  --row-selected-gradient: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%);
+  --row-selected-border: #7c3aed;
   --text-main: #0f172a;
   --text-sec: #475569;
   --text-muted: #94a3b8;
   --border-subtle: rgba(15, 23, 42, 0.06);
-  --border-card: rgba(147, 51, 234, 0.08);
+  --border-card: rgba(147, 51, 234, 0.12);
 
   /* 语义色 */
   --color-success: #10b981;
@@ -48,33 +57,33 @@ page {
   --shadow-brand-lg: 0 16rpx 44rpx rgba(124, 58, 237, 0.34);
 
   background-color: var(--bg-page);
+  background-image: var(--bg-page-gradient);
+  background-attachment: fixed;
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
 }
 
+.page,
+.container,
+.test-page {
+  background-color: var(--bg-page);
+  background-image: var(--bg-page-gradient);
+  background-attachment: fixed;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
-   1. 全局清除微信原生 <button> 毛坯默认样式（突破 button:not([size='mini']) 权重限制）
+   1. 全局清除微信原生 <button> 毛坯默认样式（保持 (0,0,1) 低权重，不覆盖页面 .btn 类）
    ══════════════════════════════════════════════════════════════════════════ */
-button,
-button:not([size='mini']),
-button[size='mini'] {
+button {
   margin: 0;
-  width: auto;
-  min-height: 0;
   padding: 0 32rpx;
-  line-height: 1.35;
   font-size: 27rpx;
   font-weight: 700;
   font-family: inherit;
   border-radius: 999rpx;
   box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10rpx;
-  vertical-align: middle;
   -webkit-tap-highlight-color: transparent;
   transition:
     transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
@@ -89,77 +98,49 @@ button::after {
 }
 
 button:active {
-  transform: scale(0.96);
-}
-
-/* 块级全宽主按钮权重对齐 */
-button.submit-btn,
-button.complete-btn,
-button.dev-login-btn,
-button.guest-btn,
-button.auth-btn:not(.auth-btn-sm),
-button.confirm-btn,
-button.exam-sheet-submit,
-button.edit-save-btn,
-button.direct-select-btn,
-button.jianda-submit-btn,
-button.btn-claim,
-button.btn-done {
-  width: 100%;
-  display: flex;
+  transform: scale(0.97);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   2. 商业级全局按钮视觉体系 (3D 渐变高光胶囊 / 轻奢描边胶囊 / 语义胶囊)
+   2. 商业级全局按钮视觉体系 (全量覆盖所有按钮类，支持内置图标对齐与高光立体感)
    ══════════════════════════════════════════════════════════════════════════ */
 .zs-btn-primary,
-button.btn-primary,
 .btn-primary,
-button.submit-btn,
-.submit-btn,
-button.confirm-btn,
 .confirm-btn,
-button.login-btn,
+.submit-btn,
+.save-btn,
 .login-btn,
-button.cta-btn,
 .cta-btn,
-button.user-card__login-btn,
 .user-card__login-btn,
-button.exam-sheet-submit,
 .exam-sheet-submit,
-button.edit-save-btn,
 .edit-save-btn,
-button.direct-select-btn,
 .direct-select-btn,
-button.jianda-submit-btn,
 .jianda-submit-btn,
-button.btn-claim,
 .btn-claim,
-button.action-btn.primary,
+.create-btn,
+.publish-btn,
 .action-btn.primary,
 .action-pill.primary,
 .action-chip.primary,
 .talk-action-btn.primary,
-button.policy-btn.primary,
 .policy-btn.primary,
 .paper-cta,
 .goal-adopt-btn,
 .empty-cta,
-button.retake-btn,
-.retake-btn,
-button.sheet-greet-btn,
-.sheet-greet-btn,
-button.empty-cta-btn:not(.ghost),
 .empty-cta-btn:not(.ghost) {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 52%, #6d28d9 100%) !important;
-  color: #ffffff !important;
-  border-radius: 999rpx !important;
-  font-weight: 700 !important;
-  border: 1rpx solid rgba(255, 255, 255, 0.22) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 52%, #5b21b6 100%);
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-weight: 700;
+  border: 1rpx solid rgba(255, 255, 255, 0.28);
   box-shadow:
-    0 10rpx 24rpx rgba(124, 58, 237, 0.28),
-    0 2rpx 6rpx rgba(91, 33, 182, 0.16),
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.32) !important;
+    0 10rpx 24rpx rgba(124, 58, 237, 0.30),
+    0 2rpx 6rpx rgba(91, 33, 182, 0.18),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.36);
   letter-spacing: 0.5rpx;
 }
 
@@ -167,6 +148,7 @@ button.empty-cta-btn:not(.ghost),
 .btn-primary:active,
 .submit-btn:active,
 .confirm-btn:active,
+.save-btn:active,
 .action-btn.primary:active,
 .action-pill.primary:active,
 .action-chip.primary:active,
@@ -177,179 +159,193 @@ button.empty-cta-btn:not(.ghost),
 }
 
 /* 次级轻奢薰衣草胶囊按钮 */
-button.btn-secondary,
 .btn-secondary,
-button.action-btn:not(.primary):not(.danger):not(.finish-btn),
+.cancel-btn,
+.zs-btn-cancel,
 .action-btn.secondary,
 .action-pill.secondary,
 .action-chip.secondary,
 .talk-action-btn.ghost,
 .peer-btn.ghost,
-button.policy-btn.ghost,
 .policy-btn.ghost,
-button.retry-btn.secondary,
-button.copy-notes-btn,
-.copy-notes-btn,
-button.empty-cta-btn.ghost,
+.retry-btn,
+.retry-btn.secondary,
 .empty-cta-btn.ghost,
 .goal-action-pill.ghost,
 .reset-btn,
 .reset-filter-btn,
-.empty-btn {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
-  color: #6d28d9 !important;
-  border: 1.5rpx solid rgba(124, 58, 237, 0.24) !important;
-  border-radius: 999rpx !important;
-  font-weight: 700 !important;
-  box-shadow:
-    0 4rpx 14rpx rgba(124, 58, 237, 0.08),
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.85) !important;
-}
-
-/* 语义绿：结课 / 完结 / 已签到 / 破冰致意 */
-.action-btn.finish-btn,
-.talk-action-btn.finish,
-button.signed-btn,
-.signed-btn,
-.action-chip.greet,
-button.download-btn,
-.download-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #ffffff !important;
-  border: 1rpx solid rgba(255, 255, 255, 0.24) !important;
-  border-radius: 999rpx !important;
-  font-weight: 700 !important;
-  box-shadow:
-    0 8rpx 20rpx rgba(16, 185, 129, 0.26),
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.3) !important;
-}
-
-/* 语义红：危险 / 退课 / 删除 */
-button.action-btn.danger,
-.action-btn.danger,
-.action-pill.danger,
-.action-chip.danger,
-.log-action-btn.danger,
-button.enroll-btn--quit,
-.enroll-btn--quit {
-  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-  color: #e11d48 !important;
-  border: 1.5rpx solid rgba(225, 29, 72, 0.24) !important;
-  border-radius: 999rpx !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4rpx 12rpx rgba(225, 29, 72, 0.08) !important;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   3. 商业级全局页面 Tab 导航栏与胶囊筛选器体系 (Segmented & Pill Tabs)
-   ══════════════════════════════════════════════════════════════════════════ */
-/* 3.1 槽位式分段控制器 (iOS / Linear Segmented Control) */
-.seg-tabs,
-.sheet-tabs,
-.tabs,
-.mode-switch-bar,
-.filter-bar,
-.post-filter-tabs,
-.zs-seg-tabs {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(180deg, #ede9fe 0%, #f3e8ff 100%) !important;
-  border: 1rpx solid rgba(124, 58, 237, 0.15) !important;
-  border-radius: 999rpx !important;
-  padding: 8rpx !important;
-  gap: 8rpx;
-  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.07) !important;
-  box-sizing: border-box;
-}
-
-.seg-tab,
-.sheet-tab,
-.tabs .tab,
-.mode-switch-btn,
-.filter-bar .filter-tab,
-.post-filter-tab,
-.zs-seg-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  min-height: 68rpx;
-  padding: 10rpx 20rpx;
-  border-radius: 999rpx !important;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #5b5470;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-}
-
-.seg-tab--active,
-.sheet-tab--active,
-.tabs .tab.tab-active,
-.mode-switch-btn.active,
-.filter-bar .filter-tab.active,
-.post-filter-tab.active,
-.zs-seg-tab.active {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
-  color: #6d28d9 !important;
-  font-weight: 800 !important;
-  box-shadow:
-    0 6rpx 18rpx rgba(124, 58, 237, 0.16),
-    0 2rpx 4rpx rgba(15, 23, 42, 0.04),
-    inset 0 2rpx 0 #ffffff !important;
-}
-
-/* 3.2 独立悬浮胶囊筛选栏 (Filter Pills / Category Tabs) */
-.filter-pill,
-.status-pill,
-.exam-cat-pill,
-.type-filter-pill,
-.folder-tab,
-.cat-tab,
-.article-tab,
-.gender-pill,
-button.filter-btn,
-.filter-btn,
-.filter-tabs .filter-tab {
+.mentor-select-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  padding: 14rpx 30rpx;
-  border-radius: 999rpx !important;
-  background: #ffffff;
-  color: #475569;
-  font-size: 25rpx;
-  font-weight: 600;
-  border: 1.5rpx solid rgba(148, 163, 184, 0.24);
+  background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+  color: #6d28d9;
+  border: 1.5rpx solid rgba(124, 58, 237, 0.28);
+  border-radius: 999rpx;
+  font-weight: 700;
   box-shadow:
-    0 4rpx 12rpx rgba(15, 23, 42, 0.03),
-    inset 0 1rpx 0 #ffffff;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
+    0 4rpx 14rpx rgba(124, 58, 237, 0.10),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.90);
 }
 
+/* 语义绿：结课 / 完结 / 已签到 */
+.action-btn.finish-btn,
+.talk-action-btn.finish,
+.signed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1rpx solid rgba(255, 255, 255, 0.28);
+  border-radius: 999rpx;
+  font-weight: 700;
+  box-shadow:
+    0 8rpx 20rpx rgba(16, 185, 129, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.34);
+}
+
+/* 语义红：危险 / 退课 / 删除 */
+.action-btn.danger,
+.action-pill.danger,
+.action-chip.danger,
+.log-action-btn.danger,
+.enroll-btn--quit,
+.unfavor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  color: #e11d48;
+  border: 1.5rpx solid rgba(225, 29, 72, 0.26);
+  border-radius: 999rpx;
+  font-weight: 700;
+  box-shadow: 0 4rpx 12rpx rgba(225, 29, 72, 0.10);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. 商业级全局页面 Tab 导航栏与胶囊筛选器统一规范
+      铁律：1) Tab 栏容器必有默认底色  2) 未选中 Tab 项必有默认底色  3) 选中 Tab 项必有鲜明选中色
+   ══════════════════════════════════════════════════════════════════════════ */
+/* 3.1 所有 Tab 栏容器轨道 —— 统一薰衣草紫晶槽位默认底色 */
+.seg-tabs,
+.sheet-tabs,
+.zs-seg-tabs,
+.tabs,
+.tab-bar,
+.mode-switch-bar,
+.filter-bar,
+.post-filter-tabs,
+.fb-tabs,
+.course-filter-pills,
+.inno-domain-tabs,
+.status-filter-bar,
+.category-tabs,
+.type-filter-bar,
+.filter-pills,
+.filter-tabs,
+.exam-cat-pills,
+.exam-type-pills,
+.article-tabs,
+.folder-tabs {
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%) !important;
+  border: 2rpx solid rgba(124, 58, 237, 0.22) !important;
+  border-radius: 28rpx !important;
+  padding: 10rpx 12rpx !important;
+  box-shadow:
+    inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10),
+    0 4rpx 14rpx rgba(124, 58, 237, 0.08) !important;
+  box-sizing: border-box;
+}
+
+/* 3.2 所有未选中 Tab 项 —— 统一珠光白/薰衣草微光默认底色（严禁透明无底色） */
+.seg-tab,
+.sheet-tab,
+.zs-seg-tab,
+.tab,
+.tab-item,
+.mode-switch-btn,
+.filter-tab,
+.post-tab,
+.fb-tab,
+.filter-pill,
+.domain-tab,
+.status-pill,
+.cat-tab,
+.type-filter-pill,
+.exam-pill,
+.article-tab,
+.folder-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%) !important;
+  color: #4c1d95 !important;
+  font-weight: 600;
+  border-radius: 999rpx !important;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22) !important;
+  box-shadow:
+    0 2rpx 8rpx rgba(15, 23, 42, 0.05),
+    inset 0 1rpx 0 #ffffff !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3.3 所有选中态 Tab 项 —— 统一皇家紫3D高光渐变选中底色与纯白文字 */
+.seg-tab--active,
+.seg-tab.active,
+.sheet-tab--active,
+.sheet-tab.active,
+.zs-seg-tab.active,
+.tab.active,
+.tab.tab-active,
+.tab-item.active,
+.mode-switch-btn.active,
+.filter-tab.active,
+.post-tab.active,
+.fb-tab.active,
 .filter-pill.active,
 .filter-pill--active,
+.domain-tab.active,
 .status-pill.active,
-.exam-cat-pill.active,
-.type-filter-pill.active,
-.folder-tab.active,
 .cat-tab.active,
+.type-filter-pill.active,
+.exam-pill.active,
 .article-tab.active,
-.gender-pill.active:not(.female):not(.male),
-button.filter-btn.active,
-.filter-btn.active,
-.filter-tabs .filter-tab.active {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%) !important;
+.folder-tab.active {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%) !important;
   color: #ffffff !important;
   font-weight: 800 !important;
-  border-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
   box-shadow:
-    0 8rpx 20rpx rgba(124, 58, 237, 0.28),
-    inset 0 2rpx 0 rgba(255, 255, 255, 0.32) !important;
+    0 8rpx 22rpx rgba(124, 58, 237, 0.36),
+    0 2rpx 6rpx rgba(91, 33, 182, 0.22),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.38) !important;
   transform: translateY(-1rpx);
+}
+
+.seg-tab--active text,
+.sheet-tab--active text,
+.tab.active text,
+.tab.tab-active text,
+.tab-item.active text,
+.mode-switch-btn.active text,
+.filter-tab.active text,
+.post-tab.active text,
+.fb-tab.active text,
+.filter-pill.active text,
+.filter-pill--active text,
+.domain-tab.active text,
+.status-pill.active text,
+.cat-tab.active text,
+.type-filter-pill.active text,
+.exam-pill.active text,
+.article-tab.active text,
+.folder-tab.active text {
+  color: #ffffff !important;
 }
 
 /* 自定义 tab-bar 选中态样式 - 兼容穿透 */
@@ -494,7 +490,112 @@ button.filter-btn.active,
 }
 
 .zs-form-group {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 22rpx;
+  border: 1.5rpx solid rgba(124, 58, 237, 0.12);
+  transition: all 0.2s ease;
+}
+
+.zs-form-group:nth-child(odd),
+.form-item:nth-child(odd),
+.slot-row:nth-child(odd),
+.field-row:nth-child(odd),
+.info-row:nth-child(odd) {
+  background: var(--form-row-odd-bg);
+}
+
+.zs-form-group:nth-child(even),
+.form-item:nth-child(even),
+.slot-row:nth-child(even),
+.field-row:nth-child(even),
+.info-row:nth-child(even) {
+  background: var(--form-row-even-bg);
+}
+
+.zs-form-group:focus-within,
+.form-item:focus-within,
+.slot-row:focus-within,
+.zs-form-group.selected,
+.form-item.selected,
+.form-item.active {
+  background: var(--row-selected-gradient) !important;
+  border-color: var(--row-selected-border) !important;
+  box-shadow: inset 6rpx 0 0 var(--row-selected-border), 0 6rpx 18rpx rgba(124, 58, 237, 0.14) !important;
+}
+
+/* ── 专业设计师级：全局列表 / 表格 / 选项 相邻行交替底色与选中行底色 ── */
+.menu-cell:nth-child(odd),
+.ark-item:nth-child(odd),
+.checkitem:nth-child(odd),
+.option-item:nth-child(odd),
+.member-card:nth-child(odd),
+.course-card:nth-child(odd),
+.paper-card:nth-child(odd),
+.record-card:nth-child(odd),
+.camp-card:nth-child(odd),
+.chapter-item:nth-child(odd),
+.chapter-row:nth-child(odd),
+.task-card:nth-child(odd),
+.project-card:nth-child(odd),
+.talk-card:nth-child(odd),
+.supervise-card:nth-child(odd),
+.mentor-card:nth-child(odd),
+.favor-item:nth-child(odd),
+.log-card:nth-child(odd),
+.event-card:nth-child(odd),
+.participant-card:nth-child(odd) {
+  background: linear-gradient(180deg, #ffffff 0%, #fcfaff 100%);
+}
+
+.menu-cell:nth-child(even),
+.ark-item:nth-child(even),
+.checkitem:nth-child(even),
+.option-item:nth-child(even),
+.member-card:nth-child(even),
+.course-card:nth-child(even),
+.paper-card:nth-child(even),
+.record-card:nth-child(even),
+.camp-card:nth-child(even),
+.chapter-item:nth-child(even),
+.chapter-row:nth-child(even),
+.task-card:nth-child(even),
+.project-card:nth-child(even),
+.talk-card:nth-child(even),
+.supervise-card:nth-child(even),
+.mentor-card:nth-child(even),
+.favor-item:nth-child(even),
+.log-card:nth-child(even),
+.event-card:nth-child(even),
+.participant-card:nth-child(even) {
+  background: linear-gradient(180deg, #f3effe 0%, #eef2ff 100%);
+}
+
+.checkitem.is-selected,
+.checkitem.selected,
+.checkitem:active,
+.radio-item.radio-checked,
+.option-item.selected,
+.option-item.active,
+.member-card.selected,
+.member-card.active,
+.course-card.selected,
+.course-card.enrolled,
+.paper-card.selected,
+.paper-card:active,
+.record-card.selected,
+.record-card:active,
+.task-card.selected,
+.project-card.selected,
+.talk-card.selected,
+.favor-item.selected,
+.chapter-item.active,
+.chapter-row.active,
+.menu-cell:active,
+.ark-item:active {
+  background: var(--row-selected-gradient) !important;
+  border-color: var(--row-selected-border) !important;
+  box-shadow: inset 8rpx 0 0 var(--row-selected-border), 0 8rpx 22rpx rgba(124, 58, 237, 0.16) !important;
 }
 
 .zs-form-label {

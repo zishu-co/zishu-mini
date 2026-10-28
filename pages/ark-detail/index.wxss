@@ -20,11 +20,12 @@
 .header-card {
   position: relative;
   overflow: hidden;
+  margin: -28rpx -28rpx 4rpx;
   background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
-  border-radius: 36rpx;
-  padding: 40rpx 34rpx;
+  border-radius: 0 0 44rpx 44rpx;
+  padding: 38rpx 34rpx 44rpx;
   color: #ffffff;
-  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.25);
+  box-shadow: 0 18rpx 44rpx rgba(91, 33, 182, 0.25);
 }
 
 .header-card::before {

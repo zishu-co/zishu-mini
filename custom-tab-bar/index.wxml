@@ -18,7 +18,7 @@
     <block wx:else>
       <view class="active-indicator" wx:if="{{active === index}}"></view>
       <view class="tab-icon-pill {{active === index ? 'tab-icon-pill--active' : ''}}">
-        <t-icon name="{{item.icon}}" size="40rpx" color="{{active === index ? '#7c3aed' : '#64748b'}}" />
+        <t-icon name="{{item.icon}}" size="38rpx" color="{{active === index ? '#ffffff' : '#6d28d9'}}" />
       </view>
       <view class="text">{{ item.text }}</view>
     </block>

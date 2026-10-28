@@ -19,11 +19,12 @@ page {
 .ark-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 32rpx;
-  padding: 40rpx 36rpx 34rpx;
+  margin: -24rpx -28rpx 4rpx;
+  border-radius: 0 0 44rpx 44rpx;
+  padding: 38rpx 36rpx 42rpx;
   background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   color: #ffffff;
-  box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.26);
+  box-shadow: 0 18rpx 44rpx rgba(91, 33, 182, 0.26);
 }
 
 .ark-hero__glow {
