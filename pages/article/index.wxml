@@ -204,7 +204,7 @@
           bindtap="onSelectMindMap"
         >
           <view class="article-header">
-            <text class="article-title">🧠 节点：{{item.node?.name || item.node?.title || '匹配节点'}}</text>
+            <text class="article-title">🧠 节点：{{(item.node && (item.node.name || item.node.title)) || '匹配节点'}}</text>
             <text class="article-arrow">打开脑图 ›</text>
           </view>
           <view class="article-meta">
