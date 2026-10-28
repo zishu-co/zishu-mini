@@ -1,20 +1,29 @@
-<t-tab-bar
-  value="{{active}}"
-  bindchange="onChange"
-  split="{{false}}"
->
-  <t-tab-bar-item
+<view class="zs-tabbar-dock" role="tablist">
+  <view
     wx:for="{{list}}"
     wx:for-item="item"
     wx:for-index="index"
     wx:key="index"
+    class="custom-tab-bar-wrapper {{active === index ? 'is-active' : ''}} {{index === 2 ? 'is-center-orb' : ''}}"
+    data-index="{{index}}"
+    bindtap="onChange"
   >
-    <view class="custom-tab-bar-wrapper {{active === index ? 'is-active' : ''}}">
-      <t-icon name="{{item.icon}}" size="44rpx" color="{{active === index ? '#a0f' : '#64748b'}}" />
+    <block wx:if="{{index === 2}}">
+      <view class="orb-halo"></view>
+      <view class="orb-badge {{active === index ? 'orb-badge--active' : ''}}">
+        <t-icon name="{{item.icon}}" size="44rpx" color="#ffffff" />
+      </view>
+      <view class="text orb-text">{{ item.text }}</view>
+    </block>
+    <block wx:else>
+      <view class="active-indicator" wx:if="{{active === index}}"></view>
+      <view class="tab-icon-pill {{active === index ? 'tab-icon-pill--active' : ''}}">
+        <t-icon name="{{item.icon}}" size="40rpx" color="{{active === index ? '#7c3aed' : '#64748b'}}" />
+      </view>
       <view class="text">{{ item.text }}</view>
-    </view>
-  </t-tab-bar-item>
-</t-tab-bar>
+    </block>
+  </view>
+</view>
 
 <!-- AI 助理悬浮按钮 -->
 <ai-assistant-btn />

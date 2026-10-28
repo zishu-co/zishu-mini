@@ -126,6 +126,11 @@ page {
   box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.1);
 }
 
+.score-banner__left {
+  display: flex;
+  flex-direction: column;
+}
+
 .score-banner__badge {
   display: inline-block;
   font-size: 24rpx;
@@ -212,7 +217,7 @@ page {
 .question-index {
   font-size: 26rpx;
   font-weight: 700;
-  color: #7c3aed;
+  color: #6d28d9;
 }
 
 .type-badge {
@@ -223,13 +228,13 @@ page {
 }
 
 .badge-single {
-  background: rgba(170, 0, 255, 0.1);
-  color: #aa00ff;
+  background: rgba(124, 58, 237, 0.1);
+  color: #6d28d9;
 }
 
 .badge-multi {
   background: rgba(124, 58, 237, 0.12);
-  color: #6d28d9;
+  color: #5b21b6;
 }
 
 .badge-slot {
@@ -239,8 +244,8 @@ page {
 
 .title {
   font-size: 32rpx;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-weight: 700;
+  color: #0f172a;
   line-height: 1.55;
   margin-bottom: 24rpx;
 }
@@ -260,16 +265,16 @@ page {
   display: flex;
   align-items: center;
   padding: 22rpx 24rpx;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   background: #faf8ff;
-  border: 2rpx solid rgba(170, 0, 255, 0.12);
+  border: 2rpx solid rgba(124, 58, 237, 0.12);
   transition: all 0.2s ease;
 }
 
 .checkitem:active,
 .checkitem.is-selected {
-  background: rgba(170, 0, 255, 0.1);
-  border-color: #aa00ff;
+  background: rgba(124, 58, 237, 0.1);
+  border-color: #7c3aed;
 }
 
 .judge-item {
@@ -280,13 +285,13 @@ page {
 .option-code {
   font-size: 28rpx;
   font-weight: 700;
-  color: #7c3aed;
+  color: #6d28d9;
   margin: 0 12rpx 0 8rpx;
 }
 
 .option-text {
   font-size: 28rpx;
-  color: #333344;
+  color: #1e293b;
   line-height: 1.45;
   flex: 1;
 }
@@ -301,7 +306,7 @@ page {
 .slot-label {
   font-size: 26rpx;
   font-weight: 600;
-  color: #7c3aed;
+  color: #6d28d9;
   width: 72rpx;
   flex-shrink: 0;
 }
@@ -311,18 +316,18 @@ page {
   height: 76rpx;
   line-height: 76rpx;
   background: #faf8ff;
-  border: 2rpx solid rgba(170, 0, 255, 0.2);
-  border-radius: 16rpx;
+  border: 2rpx solid rgba(124, 58, 237, 0.2);
+  border-radius: 18rpx;
   padding: 0 24rpx;
   font-size: 28rpx;
-  color: #1a1a2e;
+  color: #0f172a;
 }
 
 /* 判题结果反馈框 */
 .feedback-box {
   margin-top: 24rpx;
   padding: 20rpx 24rpx;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   font-size: 26rpx;
   line-height: 1.6;
 }
@@ -353,12 +358,12 @@ page {
 
 .answer-val {
   font-weight: 700;
-  color: #7c3aed;
+  color: #6d28d9;
 }
 
 .explain-line {
   margin-top: 6rpx;
-  color: #6b7280;
+  color: #64748b;
   font-size: 24rpx;
 }
 
@@ -374,8 +379,8 @@ page {
   bottom: 0;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 -4rpx 20rpx rgba(26, 26, 46, 0.06);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -8rpx 28rpx rgba(15, 23, 42, 0.06);
   z-index: 50;
 }
 
@@ -383,13 +388,13 @@ page {
   width: 100%;
   height: 92rpx;
   line-height: 92rpx;
-  border-radius: 46rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  font-size: 32rpx;
-  font-weight: 600;
+  font-size: 30rpx;
+  font-weight: 800;
   letter-spacing: 2rpx;
-  box-shadow: 0 8rpx 24rpx rgba(170, 0, 255, 0.32);
+  box-shadow: 0 10rpx 28rpx rgba(124, 58, 237, 0.28);
   border: none;
 }
 

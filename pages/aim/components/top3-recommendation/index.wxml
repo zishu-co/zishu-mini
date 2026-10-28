@@ -140,14 +140,14 @@ module.exports = {
 
       <!-- 操作按钮 -->
       <view class="item-actions">
-        <t-button 
-          size="small" 
-          theme="primary" 
-          variant="base"
-          color="#fff"
+        <view
+          class="rec-cta-btn"
           catchtap="onActionTap"
           data-item="{{item}}"
-        >{{item.action_text}}</t-button>
+        >
+          <text class="rec-cta-btn__text">{{item.action_text}}</text>
+          <text class="rec-cta-btn__arrow">›</text>
+        </view>
         <view class="micro-action-row">
           <view
             class="micro-btn finish"

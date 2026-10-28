@@ -399,7 +399,7 @@ Page<IAimPageData, IAimData>({
                   await http.requestWithRefresh({
                     url: `/api/actions/${item.action_id}/title`,
                     method: 'POST',
-                    data: { title: newTitle },
+                    data: { custom_title: newTitle, title: newTitle },
                   });
                 } catch {}
               }

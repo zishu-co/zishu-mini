@@ -1,29 +1,125 @@
+.zs-tabbar-dock {
+  position: fixed;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: calc(16rpx + env(safe-area-inset-bottom));
+  height: 116rpx;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1rpx solid rgba(147, 51, 234, 0.14);
+  border-radius: 999rpx;
+  box-shadow:
+    0 16rpx 44rpx rgba(15, 23, 42, 0.11),
+    0 4rpx 14rpx rgba(124, 58, 237, 0.08),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 12rpx;
+  box-sizing: border-box;
+  z-index: 990;
+}
+
 .custom-tab-bar-wrapper {
+  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 24rpx;
+  height: 96rpx;
+  border-radius: 999rpx;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.custom-tab-bar-wrapper:active {
+  transform: scale(0.94);
+}
+
+.active-indicator {
+  position: absolute;
+  top: 6rpx;
+  width: 28rpx;
+  height: 6rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #a855f7 0%, #7c3aed 100%);
+  box-shadow: 0 2rpx 8rpx rgba(124, 58, 237, 0.45);
+}
+
+.tab-icon-pill {
+  width: 68rpx;
+  height: 52rpx;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-icon-pill--active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.16) 0%, rgba(124, 58, 237, 0.08) 100%);
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.7);
+}
+
 .custom-tab-bar-wrapper .text {
-  font-size: 22rpx;
+  font-size: 21rpx;
   line-height: 1.15;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
+  margin-top: 2rpx;
   letter-spacing: 0.5rpx;
   transition: color 0.2s ease, font-weight 0.2s ease;
 }
 
-.custom-tab-bar-wrapper.is-active {
-  transform: translateY(-3rpx);
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(124, 58, 237, 0.06) 100%);
+.custom-tab-bar-wrapper.is-active .text {
+  color: #6d28d9;
+  font-weight: 800;
 }
 
-.custom-tab-bar-wrapper.is-active .text {
-  color: #7c3aed;
-  font-weight: 700;
+/* C位旗舰「目标」3D 悬浮球 */
+.custom-tab-bar-wrapper.is-center-orb {
+  margin-top: -28rpx;
+  height: 124rpx;
+}
+
+.orb-halo {
+  position: absolute;
+  top: 2rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(124, 58, 237, 0) 72%);
+  pointer-events: none;
+}
+
+.orb-badge {
+  position: relative;
+  width: 82rpx;
+  height: 82rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  border: 4rpx solid #ffffff;
+  box-shadow:
+    0 10rpx 24rpx rgba(15, 23, 42, 0.16),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.orb-badge--active {
+  background: linear-gradient(135deg, #c026d3 0%, #9333ea 45%, #6d28d9 100%);
+  box-shadow:
+    0 12rpx 28rpx rgba(124, 58, 237, 0.42),
+    0 4rpx 10rpx rgba(192, 38, 211, 0.28),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.45);
+  transform: translateY(-4rpx) scale(1.04);
+}
+
+.orb-text {
+  margin-top: 4rpx !important;
+  font-size: 22rpx !important;
+  font-weight: 800 !important;
 }

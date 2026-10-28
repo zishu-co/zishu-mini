@@ -36,7 +36,7 @@
   "tabBar": {
     "custom": true,
     "color": "#64748b",
-    "selectedColor": "#aa00ff",
+    "selectedColor": "#7c3aed",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
@@ -65,9 +65,9 @@
   "window": {
     "backgroundTextStyle": "dark",
     "backgroundColor": "#f6f5fb",
-    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarBackgroundColor": "#2e1065",
     "navigationBarTitleText": "学本领 上自塾",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "white"
   },
   "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"

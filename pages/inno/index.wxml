@@ -66,25 +66,21 @@
 
   <!-- 项目视图 -->
   <block wx:if="{{!pageLoading && viewMode === 'projects'}}">
-    <!-- 领域标签栏 -->
-    <view class="tab-bar">
-      <t-tabs
-        t-class="t-tabs"
-        t-class-active="tabs-external__active"
-        t-class-item="tabs-external__item"
-        defaultValue="{{0}}"
-        space-evenly="{{false}}"
-        bind:change="tabChangeHandle"
+    <!-- 领域标签栏（商业级胶囊分段栏） -->
+    <scroll-view class="inno-domain-tabs" scroll-x enable-flex>
+      <view
+        wx:for="{{tabList}}"
+        wx:for-index="index"
+        wx:key="index"
+        class="inno-domain-tab {{activeTab === (item.key || '') ? 'active' : ''}}"
+        data-index="{{index}}"
+        data-key="{{item.key || ''}}"
+        bindtap="tabChangeHandle"
       >
-        <t-tab-panel
-          wx:for="{{tabList}}"
-          wx:for-index="index"
-          wx:key="index"
-          label="{{item.text}}"
-          value="{{index}}"
-        />
-      </t-tabs>
-    </view>
+        <text class="inno-domain-tab__text">{{item.text}}</text>
+        <view class="inno-domain-tab__line" wx:if="{{activeTab === (item.key || '')}}"></view>
+      </view>
+    </scroll-view>
 
     <!-- 状态筛选胶囊 -->
     <view class="status-filter-bar">

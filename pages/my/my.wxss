@@ -508,6 +508,11 @@ page {
   letter-spacing: 1.5rpx;
 }
 
+.menu-group__list {
+  display: flex;
+  flex-direction: column;
+}
+
 .menu-cell {
   display: flex;
   align-items: center;

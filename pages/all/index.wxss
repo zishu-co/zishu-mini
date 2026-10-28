@@ -212,7 +212,7 @@
   width: 96rpx;
   height: 96rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,7 +265,7 @@
 .member-name {
   font-size: 31rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
 }
 
 .level-pill {
@@ -273,7 +273,7 @@
   border-radius: 999rpx;
   font-size: 21rpx;
   font-weight: 700;
-  background: #f3e8ff;
+  background: #f5f3ff;
   color: #6d28d9;
 }
 
@@ -290,8 +290,8 @@
   font-weight: 600;
 }
 .shuzhi-badge.active {
-  background: rgba(160, 0, 255, 0.1);
-  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  color: #6d28d9;
 }
 .shuzhi-badge.inactive {
   background: #f1f5f9;
@@ -331,7 +331,7 @@
 
 .goal-preview {
   background: #faf5ff;
-  border-left: 6rpx solid #a0f;
+  border-left: 6rpx solid #7c3aed;
   padding: 10rpx 16rpx;
   border-radius: 8rpx 14rpx 14rpx 8rpx;
   margin-bottom: 16rpx;
@@ -366,9 +366,9 @@
 }
 
 .peer-btn.primary {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
-  box-shadow: 0 4rpx 12rpx rgba(160, 0, 255, 0.22);
+  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.22);
 }
 
 /* 破冰约学弹窗 */
@@ -376,6 +376,7 @@
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
   z-index: 200;
 }
 
@@ -386,11 +387,15 @@
   transform: translate(-50%, -50%);
   width: 640rpx;
   background: #ffffff;
-  border-radius: 28rpx;
-  padding: 32rpx;
+  border-radius: 32rpx;
+  padding: 36rpx 32rpx;
   z-index: 201;
   box-sizing: border-box;
-  box-shadow: 0 20rpx 50rpx rgba(0, 0, 0, 0.2);
+  box-shadow: 0 24rpx 64rpx rgba(15, 23, 42, 0.22);
+}
+
+.profile-modal {
+  border-top: 6rpx solid #7c3aed;
 }
 
 .greet-header {
@@ -404,7 +409,7 @@
   display: block;
   font-size: 32rpx;
   font-weight: 800;
-  color: #1a1a2e;
+  color: #0f172a;
   margin-bottom: 6rpx;
 }
 
@@ -432,7 +437,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 18rpx 22rpx;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   background: #f8fafc;
   border: 2rpx solid transparent;
   font-size: 25rpx;
@@ -440,17 +445,17 @@
 }
 
 .topic-item.selected {
-  background: #faf5ff;
-  border-color: #a0f;
+  background: #f5f3ff;
+  border-color: #7c3aed;
   color: #6d28d9;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .custom-topic-input {
   width: 100%;
   height: 76rpx;
   padding: 0 20rpx;
-  border-radius: 14rpx;
+  border-radius: 18rpx;
   background: #f8fafc;
   border: 1rpx solid #e2e8f0;
   font-size: 26rpx;
@@ -479,8 +484,9 @@
 }
 
 .greet-btn.confirm {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
 }
 
 .profile-head {

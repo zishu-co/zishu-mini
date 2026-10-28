@@ -108,29 +108,36 @@ page {
 /* ========== 筛选胶囊栏 ========== */
 .filter-bar {
   display: flex;
-  gap: 16rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #f3e8ff 100%);
+  border: 1rpx solid rgba(124, 58, 237, 0.15);
+  border-radius: 999rpx;
+  padding: 8rpx;
+  gap: 8rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.06);
 }
 
 .filter-pill {
   flex: 1;
-  height: 72rpx;
-  line-height: 72rpx;
+  height: 68rpx;
+  line-height: 68rpx;
   text-align: center;
   border-radius: 999rpx;
-  background: #ffffff;
-  color: #64748b;
+  background: transparent;
+  color: #5b5470;
   font-size: 26rpx;
   font-weight: 600;
-  border: 1rpx solid rgba(124, 58, 237, 0.12);
-  box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.03);
-  transition: all 0.2s ease;
+  border: none;
+  box-shadow: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .filter-pill--active {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
   color: #ffffff;
-  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.26);
-  border-color: transparent;
+  font-weight: 800;
+  box-shadow:
+    0 6rpx 18rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
 }
 
 .loading {
@@ -226,8 +233,8 @@ page {
 }
 
 .badge-waiting {
-  background: rgba(170, 0, 255, 0.12);
-  color: #aa00ff;
+  background: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
 }
 
 .teacher-actions {
@@ -249,9 +256,9 @@ page {
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
-  box-shadow: 0 6rpx 16rpx rgba(170, 0, 255, 0.25);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.25);
 }
 
 .action-btn::after {
@@ -284,7 +291,7 @@ page {
   background: #faf8ff;
   border-radius: 20rpx;
   padding: 20rpx;
-  border: 1rpx solid rgba(170, 0, 255, 0.1);
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
 }
 
 .cabin-grid {
@@ -353,7 +360,7 @@ page {
 .seat-user {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -370,18 +377,18 @@ page {
   justify-content: space-between;
   margin-top: 18rpx;
   padding-top: 16rpx;
-  border-top: 1rpx solid rgba(170, 0, 255, 0.1);
+  border-top: 1rpx solid rgba(124, 58, 237, 0.1);
 }
 
 .cabin-footer__hint {
   font-size: 22rpx;
-  color: #8b859e;
+  color: #64748b;
 }
 
 .cabin-footer__btn {
   font-size: 24rpx;
   font-weight: 700;
-  color: #aa00ff;
+  color: #6d28d9;
 }
 
 .no-cabin-bar {

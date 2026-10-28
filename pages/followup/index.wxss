@@ -336,6 +336,6 @@
 }
 
 .action-chip.detail {
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
 }

@@ -13,8 +13,8 @@ page {
   --brand-deep: #5b21b6;
   --brand-light: #f3e8ff;
   --brand-lighter: #faf5ff;
-  --brand-border: rgba(147, 51, 234, 0.16);
-  --brand-gradient: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  --brand-border: rgba(124, 58, 237, 0.16);
+  --brand-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 55%, #5b21b6 100%);
   --brand-gradient-hero: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
   --brand-gradient-soft: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 
@@ -54,12 +54,305 @@ page {
   box-sizing: border-box;
 }
 
-/* 全局清除微信原生 button 灰框与伪元素边框 */
-button::after {
-  border: none !important;
+/* ══════════════════════════════════════════════════════════════════════════
+   1. 全局清除微信原生 <button> 毛坯默认样式（突破 button:not([size='mini']) 权重限制）
+   ══════════════════════════════════════════════════════════════════════════ */
+button,
+button:not([size='mini']),
+button[size='mini'] {
+  margin: 0;
+  width: auto;
+  min-height: 0;
+  padding: 0 32rpx;
+  line-height: 1.35;
+  font-size: 27rpx;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
 }
 
-/* 自定义 tab-bar 选中态样式 - 穿透 TDesign 组件 */
+button::after {
+  border: none !important;
+  display: none !important;
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+/* 块级全宽主按钮权重对齐 */
+button.submit-btn,
+button.complete-btn,
+button.dev-login-btn,
+button.guest-btn,
+button.auth-btn:not(.auth-btn-sm),
+button.confirm-btn,
+button.exam-sheet-submit,
+button.edit-save-btn,
+button.direct-select-btn,
+button.jianda-submit-btn,
+button.btn-claim,
+button.btn-done {
+  width: 100%;
+  display: flex;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. 商业级全局按钮视觉体系 (3D 渐变高光胶囊 / 轻奢描边胶囊 / 语义胶囊)
+   ══════════════════════════════════════════════════════════════════════════ */
+.zs-btn-primary,
+button.btn-primary,
+.btn-primary,
+button.submit-btn,
+.submit-btn,
+button.confirm-btn,
+.confirm-btn,
+button.login-btn,
+.login-btn,
+button.cta-btn,
+.cta-btn,
+button.user-card__login-btn,
+.user-card__login-btn,
+button.exam-sheet-submit,
+.exam-sheet-submit,
+button.edit-save-btn,
+.edit-save-btn,
+button.direct-select-btn,
+.direct-select-btn,
+button.jianda-submit-btn,
+.jianda-submit-btn,
+button.btn-claim,
+.btn-claim,
+button.action-btn.primary,
+.action-btn.primary,
+.action-pill.primary,
+.action-chip.primary,
+.talk-action-btn.primary,
+button.policy-btn.primary,
+.policy-btn.primary,
+.paper-cta,
+.goal-adopt-btn,
+.empty-cta,
+button.retake-btn,
+.retake-btn,
+button.sheet-greet-btn,
+.sheet-greet-btn,
+button.empty-cta-btn:not(.ghost),
+.empty-cta-btn:not(.ghost) {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 52%, #6d28d9 100%) !important;
+  color: #ffffff !important;
+  border-radius: 999rpx !important;
+  font-weight: 700 !important;
+  border: 1rpx solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow:
+    0 10rpx 24rpx rgba(124, 58, 237, 0.28),
+    0 2rpx 6rpx rgba(91, 33, 182, 0.16),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.32) !important;
+  letter-spacing: 0.5rpx;
+}
+
+.zs-btn-primary:active,
+.btn-primary:active,
+.submit-btn:active,
+.confirm-btn:active,
+.action-btn.primary:active,
+.action-pill.primary:active,
+.action-chip.primary:active,
+.talk-action-btn.primary:active,
+.paper-cta:active {
+  transform: scale(0.96);
+  opacity: 0.94;
+}
+
+/* 次级轻奢薰衣草胶囊按钮 */
+button.btn-secondary,
+.btn-secondary,
+button.action-btn:not(.primary):not(.danger):not(.finish-btn),
+.action-btn.secondary,
+.action-pill.secondary,
+.action-chip.secondary,
+.talk-action-btn.ghost,
+.peer-btn.ghost,
+button.policy-btn.ghost,
+.policy-btn.ghost,
+button.retry-btn.secondary,
+button.copy-notes-btn,
+.copy-notes-btn,
+button.empty-cta-btn.ghost,
+.empty-cta-btn.ghost,
+.goal-action-pill.ghost,
+.reset-btn,
+.reset-filter-btn,
+.empty-btn {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
+  color: #6d28d9 !important;
+  border: 1.5rpx solid rgba(124, 58, 237, 0.24) !important;
+  border-radius: 999rpx !important;
+  font-weight: 700 !important;
+  box-shadow:
+    0 4rpx 14rpx rgba(124, 58, 237, 0.08),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 语义绿：结课 / 完结 / 已签到 / 破冰致意 */
+.action-btn.finish-btn,
+.talk-action-btn.finish,
+button.signed-btn,
+.signed-btn,
+.action-chip.greet,
+button.download-btn,
+.download-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  border: 1rpx solid rgba(255, 255, 255, 0.24) !important;
+  border-radius: 999rpx !important;
+  font-weight: 700 !important;
+  box-shadow:
+    0 8rpx 20rpx rgba(16, 185, 129, 0.26),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 语义红：危险 / 退课 / 删除 */
+button.action-btn.danger,
+.action-btn.danger,
+.action-pill.danger,
+.action-chip.danger,
+.log-action-btn.danger,
+button.enroll-btn--quit,
+.enroll-btn--quit {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
+  color: #e11d48 !important;
+  border: 1.5rpx solid rgba(225, 29, 72, 0.24) !important;
+  border-radius: 999rpx !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4rpx 12rpx rgba(225, 29, 72, 0.08) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. 商业级全局页面 Tab 导航栏与胶囊筛选器体系 (Segmented & Pill Tabs)
+   ══════════════════════════════════════════════════════════════════════════ */
+/* 3.1 槽位式分段控制器 (iOS / Linear Segmented Control) */
+.seg-tabs,
+.sheet-tabs,
+.tabs,
+.mode-switch-bar,
+.filter-bar,
+.post-filter-tabs,
+.zs-seg-tabs {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #ede9fe 0%, #f3e8ff 100%) !important;
+  border: 1rpx solid rgba(124, 58, 237, 0.15) !important;
+  border-radius: 999rpx !important;
+  padding: 8rpx !important;
+  gap: 8rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.07) !important;
+  box-sizing: border-box;
+}
+
+.seg-tab,
+.sheet-tab,
+.tabs .tab,
+.mode-switch-btn,
+.filter-bar .filter-tab,
+.post-filter-tab,
+.zs-seg-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  min-height: 68rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx !important;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #5b5470;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.seg-tab--active,
+.sheet-tab--active,
+.tabs .tab.tab-active,
+.mode-switch-btn.active,
+.filter-bar .filter-tab.active,
+.post-filter-tab.active,
+.zs-seg-tab.active {
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%) !important;
+  color: #6d28d9 !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 6rpx 18rpx rgba(124, 58, 237, 0.16),
+    0 2rpx 4rpx rgba(15, 23, 42, 0.04),
+    inset 0 2rpx 0 #ffffff !important;
+}
+
+/* 3.2 独立悬浮胶囊筛选栏 (Filter Pills / Category Tabs) */
+.filter-pill,
+.status-pill,
+.exam-cat-pill,
+.type-filter-pill,
+.folder-tab,
+.cat-tab,
+.article-tab,
+.gender-pill,
+button.filter-btn,
+.filter-btn,
+.filter-tabs .filter-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 14rpx 30rpx;
+  border-radius: 999rpx !important;
+  background: #ffffff;
+  color: #475569;
+  font-size: 25rpx;
+  font-weight: 600;
+  border: 1.5rpx solid rgba(148, 163, 184, 0.24);
+  box-shadow:
+    0 4rpx 12rpx rgba(15, 23, 42, 0.03),
+    inset 0 1rpx 0 #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.filter-pill.active,
+.filter-pill--active,
+.status-pill.active,
+.exam-cat-pill.active,
+.type-filter-pill.active,
+.folder-tab.active,
+.cat-tab.active,
+.article-tab.active,
+.gender-pill.active:not(.female):not(.male),
+button.filter-btn.active,
+.filter-btn.active,
+.filter-tabs .filter-tab.active {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-color: transparent !important;
+  box-shadow:
+    0 8rpx 20rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.32) !important;
+  transform: translateY(-1rpx);
+}
+
+/* 自定义 tab-bar 选中态样式 - 兼容穿透 */
 .t-tab-bar {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -93,21 +386,6 @@ button::after {
   border: 1rpx solid var(--border-subtle);
   padding: 28rpx;
   margin-bottom: 24rpx;
-}
-
-.zs-btn-primary {
-  background: var(--brand-gradient);
-  color: #ffffff;
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  box-shadow: var(--shadow-brand);
-  border: none;
-  transition: opacity 0.2s ease, transform 0.15s ease;
-}
-
-.zs-btn-primary:active {
-  opacity: 0.92;
-  transform: scale(0.98);
 }
 
 /* ── 全局统一弹窗 / 底部抽屉组件库 (Modal & Bottom Sheet) ── */

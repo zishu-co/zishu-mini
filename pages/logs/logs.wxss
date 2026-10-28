@@ -18,6 +18,11 @@ page {
   box-shadow: 0 16rpx 40rpx rgba(91, 33, 182, 0.25);
 }
 
+.brand-header-top {
+  display: flex;
+  flex-direction: column;
+}
+
 .brand-title {
   display: block;
   font-size: 38rpx;
@@ -55,6 +60,11 @@ page {
   justify-content: center;
   padding: 48rpx 28rpx;
   color: #64748b;
+}
+
+.empty-logs-text {
+  font-size: 26rpx;
+  color: #94a3b8;
 }
 
 .log-list {

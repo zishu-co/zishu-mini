@@ -829,10 +829,19 @@ Page<IInnoPageData, any>({
 
   /** 标签切换 */
   tabChangeHandle(e: any) {
-    const val = e?.detail && typeof e.detail === 'object' ? e.detail.value : e?.detail;
+    const dsIndex = e?.currentTarget?.dataset?.index;
+    const val =
+      dsIndex !== undefined
+        ? dsIndex
+        : e?.detail && typeof e.detail === 'object'
+          ? e.detail.value
+          : e?.detail;
     const index = Number(val) || 0;
     const tab = this.data.tabList[index];
-    const key = tab?.key || '';
+    const key =
+      e?.currentTarget?.dataset?.key !== undefined
+        ? String(e.currentTarget.dataset.key || '')
+        : tab?.key || '';
     this.privateData.tabIndex = index;
     this.filterByTab(key);
   },

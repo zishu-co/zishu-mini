@@ -23,8 +23,8 @@
   <view wx:elif="{{!goal}}" class="empty-container">
     <t-icon name="flag" size="80rpx" class="empty-icon" />
     <text class="empty-text">暂无目标</text>
-    <text class="empty-subtext">点击右上角按钮设置你的目标</text>
-    <t-button size="small" theme="primary" color="#fff" bind:tap="onCreate">创建目标</t-button>
+    <text class="empty-subtext">点击下方按钮设定本阶段冲刺目标</text>
+    <view class="zs-goal-btn primary" bindtap="onCreate">✨ 立即创建目标</view>
   </view>
 
   <!-- 目标内容 -->
@@ -65,12 +65,7 @@
     <!-- 进度更新按钮 -->
     <view class="progress-actions">
       <view class="goal-action-pill ghost" bindtap="onEdit">✏️ 调整目标</view>
-      <t-button 
-        size="small" 
-        theme="primary"
-        color="#a0f"
-        bind:tap="onUpdateProgress"
-      >⚡ 推进 +10%</t-button>
+      <view class="zs-goal-btn primary" bindtap="onUpdateProgress">⚡ 推进 +10%</view>
     </view>
 
     <!-- 复盘/回顾 -->

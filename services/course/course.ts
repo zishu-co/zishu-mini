@@ -60,6 +60,8 @@ export interface CalMentorsResult {
 
 // ==================== 工具函数 ====================
 
+import base from '../base';
+
 function getBaseUrl(): string {
   try {
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
@@ -84,6 +86,7 @@ function request<T = any>(options: {
   data?: any;
   showLoading?: boolean;
   contentType?: string;
+  _isRetry?: boolean;
 }): Promise<T> {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -103,6 +106,13 @@ function request<T = any>(options: {
         if (options.showLoading) wx.hideLoading();
         // 检查 HTTP 状态码，401 需要鉴权
         if (res.statusCode === 401) {
+          if (!options._isRetry && wx.getStorageSync('refreshToken')) {
+            base.refreshToken()
+              .then(() => request<T>({ ...options, _isRetry: true, showLoading: false }))
+              .then(resolve)
+              .catch(() => reject({ statusCode: 401, errMsg: 'Unauthorized' }));
+            return;
+          }
           reject({ statusCode: 401, errMsg: 'Unauthorized' });
           return;
         }

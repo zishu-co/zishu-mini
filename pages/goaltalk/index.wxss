@@ -262,7 +262,7 @@
 }
 
 .talk-action-btn.primary {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
 }
 
@@ -427,7 +427,7 @@
 }
 
 .gt-chip.active {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
 }
 
@@ -476,6 +476,6 @@
 }
 
 .gt-modal-btn.confirm {
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
 }

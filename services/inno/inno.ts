@@ -1,5 +1,42 @@
 import { delay } from '../_utils/delay';
-import { getBaseUrl } from '../base';
+import base, { getBaseUrl } from '../base';
+
+function innoRequest(options: {
+  url: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  data?: any;
+  contentType?: string;
+  _isRetry?: boolean;
+}): Promise<any> {
+  const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: getBaseUrl() + options.url,
+      method: (options.method || 'GET') as any,
+      data: options.data,
+      header: {
+        token,
+        Authorization: token ? `Bearer ${token}` : '',
+        'content-type': options.contentType || 'application/json',
+      },
+      success: (res: any) => {
+        if (res.statusCode === 401) {
+          if (!options._isRetry && wx.getStorageSync('refreshToken')) {
+            base.refreshToken()
+              .then(() => innoRequest({ ...options, _isRetry: true }))
+              .then(resolve)
+              .catch(() => reject({ statusCode: 401, errMsg: 'Unauthorized' }));
+            return;
+          }
+          reject({ statusCode: 401, errMsg: 'Unauthorized' });
+          return;
+        }
+        resolve(res.data);
+      },
+      fail: (err) => reject(err),
+    });
+  });
+}
 
 const images = [
   'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131419.jpg',
@@ -95,39 +132,22 @@ function fetchProjectsFromApi(): Promise<Project[]> {
 
 /** 认领项目 */
 function claimProject(projectId: number): Promise<{ code: string }> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/edit_project/' + projectId,
-      method: 'PUT',
-      data: { 'params[action]': 'apply' },
-      header: { token, 'content-type': 'application/x-www-form-urlencoded' },
-      success: (res: any) => {
-        resolve(res.data);
-      },
-      fail: () => {
-        reject('请求失败');
-      },
-    });
+  return innoRequest({
+    url: '/api/inno/edit_project/' + projectId,
+    method: 'PUT',
+    data: { 'params[action]': 'apply' },
+    contentType: 'application/x-www-form-urlencoded',
   });
 }
 
 /** 获取指定类型的下一个课题编号 GET /api/inno/fetch_next_serial/{task_type} */
 export function fetchNextSerial(taskType: string): Promise<string> {
-  return new Promise((resolve) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/fetch_next_serial/' + encodeURIComponent(taskType || 'F'),
-      method: 'GET',
-      header: { token },
-      success: (res: any) => {
-        resolve(typeof res.data === 'string' ? res.data : `${taskType || 'F'}001`);
-      },
-      fail: () => {
-        resolve(`${taskType || 'F'}001`);
-      },
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/fetch_next_serial/' + encodeURIComponent(taskType || 'F'),
+    method: 'GET',
+  })
+    .then((data) => (typeof data === 'string' ? data : `${taskType || 'F'}001`))
+    .catch(() => `${taskType || 'F'}001`);
 }
 
 /** 发布新创新项目 POST /api/inno/add_project */
@@ -141,16 +161,10 @@ export function addInnoProject(data: {
   deadline: string;
   planed_hour: number;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/add_project',
-      method: 'POST',
-      data,
-      header: { token, 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/add_project',
+    method: 'POST',
+    data,
   });
 }
 
@@ -159,35 +173,24 @@ export function updateInnoProject(
   projectId: number,
   params: Record<string, any>
 ): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const payload: Record<string, any> = {};
-    Object.keys(params || {}).forEach((k) => {
-      payload[`params[${k}]`] = params[k];
-    });
-    wx.request({
-      url: getBaseUrl() + '/api/inno/edit_project/' + projectId,
-      method: 'PUT',
-      data: payload,
-      header: { token, 'content-type': 'application/x-www-form-urlencoded' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  const payload: Record<string, any> = {};
+  Object.keys(params || {}).forEach((k) => {
+    payload[`params[${k}]`] = params[k];
+  });
+  return innoRequest({
+    url: '/api/inno/edit_project/' + projectId,
+    method: 'PUT',
+    data: payload,
+    contentType: 'application/x-www-form-urlencoded',
   });
 }
 
 /** 获取单个创新任务详情 GET /api/inno/get_task/{task_id} */
 export function getInnoTaskDetail(taskId: number | string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/get_task/' + encodeURIComponent(String(taskId)),
-      method: 'GET',
-      header: { token },
-      success: (res: any) => resolve(res.data || {}),
-      fail: (err) => reject(err),
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/get_task/' + encodeURIComponent(String(taskId)),
+    method: 'GET',
+  }).then((data) => data || {});
 }
 
 /** 保存/提交创新任务方案与塾师点评 POST /api/inno/save_task */
@@ -199,40 +202,28 @@ export function saveInnoTask(data: {
   actual_hour?: number;
   reward?: number;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/save_task',
-      method: 'POST',
-      data: {
-        id: String(data.id),
-        action: data.action,
-        content: data.content || '',
-        title: data.title || '',
-        actual_hour: Number(data.actual_hour || 0),
-        reward: Number(data.reward || 0),
-      },
-      header: { token, 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/save_task',
+    method: 'POST',
+    data: {
+      id: String(data.id),
+      action: data.action,
+      content: data.content || '',
+      title: data.title || '',
+      actual_hour: Number(data.actual_hour || 0),
+      reward: Number(data.reward || 0),
+    },
   });
 }
 
 /** 获取全部共创小组列表 GET /api/inno/fetch_allgroup */
 export function fetchAllGroupsFromApi(): Promise<any[]> {
-  return new Promise((resolve) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/fetch_allgroup',
-      method: 'GET',
-      header: { token },
-      success: (res: any) => {
-        resolve(Array.isArray(res.data) ? res.data : []);
-      },
-      fail: () => resolve([]),
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/fetch_allgroup',
+    method: 'GET',
+  })
+    .then((data) => (Array.isArray(data) ? data : []))
+    .catch(() => []);
 }
 
 /** 申请加入创新共创小组 POST /api/inno/join_group */
@@ -241,35 +232,23 @@ export function joinInnoGroup(data: {
   groupname: string;
   reason: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/join_group',
-      method: 'POST',
-      data: {
-        info: JSON.stringify(data),
-      },
-      header: { token, 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/join_group',
+    method: 'POST',
+    data: {
+      info: JSON.stringify(data),
+    },
   });
 }
 
 /** 102-attend.md: 获取我的小组周报出席记录 GET /api/inno/fetch_myattend */
 export function fetchMyAttend(): Promise<any[]> {
-  return new Promise((resolve) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/fetch_myattend',
-      method: 'GET',
-      header: { token, Authorization: token ? `Bearer ${token}` : '' },
-      success: (res: any) => {
-        resolve(Array.isArray(res.data) ? res.data : []);
-      },
-      fail: () => resolve([]),
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/fetch_myattend',
+    method: 'GET',
+  })
+    .then((data) => (Array.isArray(data) ? data : []))
+    .catch(() => []);
 }
 
 /** 102-attend.md: 保存小组周报考勤汇报 POST /api/inno/save_attend_report */
@@ -281,38 +260,28 @@ export function saveAttendReport(data: {
   contrib: string;
   demand: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/save_attend_report',
-      method: 'POST',
-      data: {
-        attend_id: Number(data.attend_id || 0),
-        group_id: Number(data.group_id || 0),
-        member_id: Number(data.member_id || 0),
-        object: data.object || '',
-        contrib: data.contrib || '',
-        demand: data.demand || '',
-      },
-      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/save_attend_report',
+    method: 'POST',
+    data: {
+      attend_id: Number(data.attend_id || 0),
+      group_id: Number(data.group_id || 0),
+      member_id: Number(data.member_id || 0),
+      object: data.object || '',
+      contrib: data.contrib || '',
+      demand: data.demand || '',
+    },
   });
 }
 
 /** 101-group.md: 获取共创小组详情与成员列表 GET /api/inno/get_group/{groupid} */
 export function getInnoGroupDetail(groupId: number | string): Promise<any> {
-  return new Promise((resolve) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/get_group/' + encodeURIComponent(String(groupId)),
-      method: 'GET',
-      header: { token, Authorization: token ? `Bearer ${token}` : '' },
-      success: (res: any) => resolve(res.data || {}),
-      fail: () => resolve({}),
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/get_group/' + encodeURIComponent(String(groupId)),
+    method: 'GET',
+  })
+    .then((data) => data || {})
+    .catch(() => ({}));
 }
 
 /** 105-edit-group.md: 申请创建新共创小组 POST /api/inno/create_group */
@@ -321,16 +290,10 @@ export function createInnoGroup(data: {
   type: string;
   desc: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/create_group',
-      method: 'POST',
-      data: { info: JSON.stringify(data) },
-      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/create_group',
+    method: 'POST',
+    data: { info: JSON.stringify(data) },
   });
 }
 
@@ -343,31 +306,21 @@ export function saveInnoGroup(data: {
   desc: string;
   join_us?: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/save_group',
-      method: 'POST',
-      data: { info: JSON.stringify(data) },
-      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/save_group',
+    method: 'POST',
+    data: { info: JSON.stringify(data) },
   });
 }
 
 /** 107-attend-review.md: 获取全站各小组周报公开记录 GET /api/inno/fetch_allattend */
 export function fetchAllAttend(): Promise<any[]> {
-  return new Promise((resolve) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/fetch_allattend',
-      method: 'GET',
-      header: { token, Authorization: token ? `Bearer ${token}` : '' },
-      success: (res: any) => resolve(Array.isArray(res.data) ? res.data : []),
-      fail: () => resolve([]),
-    });
-  });
+  return innoRequest({
+    url: '/api/inno/fetch_allattend',
+    method: 'GET',
+  })
+    .then((data) => (Array.isArray(data) ? data : []))
+    .catch(() => []);
 }
 
 /** 107-attend-review.md: 提交同行周报互评建议 (Start/Stop/Continue) POST /api/inno/save_advice */
@@ -378,16 +331,10 @@ export function saveAttendAdvice(data: {
   stop: string;
   keepon: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/save_advice',
-      method: 'POST',
-      data,
-      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/save_advice',
+    method: 'POST',
+    data,
   });
 }
 
@@ -399,16 +346,10 @@ export function saveAttendFeedback(data: {
   manner: string;
   feedback: string;
 }): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    wx.request({
-      url: getBaseUrl() + '/api/inno/save_feedback',
-      method: 'POST',
-      data,
-      header: { token, Authorization: token ? `Bearer ${token}` : '', 'content-type': 'application/json' },
-      success: (res: any) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
+  return innoRequest({
+    url: '/api/inno/save_feedback',
+    method: 'POST',
+    data,
   });
 }
 

@@ -83,6 +83,15 @@
   opacity: 0.92;
 }
 
+.level-hint {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.level-pct {
+  font-weight: 700;
+  color: #fde047;
+}
+
 .earn-guide-card {
   margin: 0 24rpx 22rpx;
   padding: 28rpx;

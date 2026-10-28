@@ -40,6 +40,11 @@ page {
   font-size: 36rpx;
 }
 
+.agent-topbar-info {
+  display: flex;
+  flex-direction: column;
+}
+
 .agent-topbar-title {
   font-size: 30rpx;
   font-weight: 800;
@@ -183,7 +188,7 @@ page {
 
 .loading-dots {
   font-size: 28rpx;
-  color: #aa00ff;
+  color: #7c3aed;
   letter-spacing: 4rpx;
   animation: blink 1.2s ease-in-out infinite;
 }
@@ -237,11 +242,11 @@ page {
   flex-shrink: 0;
   padding: 12rpx 24rpx;
   border-radius: 999rpx;
-  background: linear-gradient(135deg, #aa00ff, #6c2aff);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 24rpx;
   font-weight: 700;
-  box-shadow: 0 4rpx 12rpx rgba(170, 0, 255, 0.25);
+  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.25);
 }
 
 /* 快捷气泡栏 */
@@ -250,7 +255,7 @@ page {
   white-space: nowrap;
   padding: 14rpx 24rpx;
   background: #faf8ff;
-  border-top: 1rpx solid rgba(170, 0, 255, 0.08);
+  border-top: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 
 .prompt-chip {
@@ -260,11 +265,11 @@ page {
   margin-right: 16rpx;
   border-radius: 30rpx;
   background: #ffffff;
-  border: 1rpx solid rgba(170, 0, 255, 0.22);
-  color: #7c3aed;
+  border: 1rpx solid rgba(124, 58, 237, 0.22);
+  color: #6d28d9;
   font-size: 24rpx;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(170, 0, 255, 0.06);
+  box-shadow: 0 2rpx 8rpx rgba(124, 58, 237, 0.06);
 }
 
 .prompt-chip:active {
@@ -277,7 +282,7 @@ page {
   align-items: center;
   padding: 16rpx 24rpx;
   background: #ffffff;
-  border-top: 1rpx solid #eee;
+  border-top: 1rpx solid #f1f5f9;
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
 }
 
@@ -285,7 +290,7 @@ page {
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
-  background: #f0f0f0;
+  background: #f1f5f9;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -295,7 +300,7 @@ page {
 }
 
 .voice-btn.recording {
-  background: #f8e6ff;
+  background: #ede9fe;
 }
 
 .voice-btn.cancel {
@@ -308,14 +313,15 @@ page {
 
 .voice-hint {
   font-size: 16rpx;
-  color: #aa00ff;
+  color: #6d28d9;
   margin-top: 2rpx;
 }
 
 .text-input {
   flex: 1;
   height: 80rpx;
-  background: #f5f5f5;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
   border-radius: 40rpx;
   padding: 0 32rpx;
   margin: 0 16rpx;
@@ -323,19 +329,21 @@ page {
 }
 
 .send-btn {
-  width: 100rpx;
+  width: 108rpx;
   height: 80rpx;
   border-radius: 40rpx;
-  background: #e0e0e0;
+  background: #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 28rpx;
-  color: #999;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
 .send-btn.active {
-  background: linear-gradient(135deg, #aa00ff, #6c2aff);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.25);
 }

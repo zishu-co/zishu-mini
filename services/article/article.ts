@@ -3,6 +3,8 @@
  * 文章相关 API
  */
 
+import base from '../base';
+
 function getBaseUrl(): string {
   try {
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
@@ -25,6 +27,7 @@ function request<T = any>(options: {
   url: string;
   method?: string;
   data?: any;
+  _isRetry?: boolean;
 }): Promise<T> {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -38,6 +41,17 @@ function request<T = any>(options: {
       },
       timeout: 80000,
       success: (res: any) => {
+        if (res.statusCode === 401) {
+          if (!options._isRetry && wx.getStorageSync('refreshToken')) {
+            base.refreshToken()
+              .then(() => request<T>({ ...options, _isRetry: true }))
+              .then(resolve)
+              .catch(() => reject({ statusCode: 401, errMsg: 'Unauthorized' }));
+            return;
+          }
+          reject({ statusCode: 401, errMsg: 'Unauthorized' });
+          return;
+        }
         resolve(res.data as T);
       },
       fail: (err) => {

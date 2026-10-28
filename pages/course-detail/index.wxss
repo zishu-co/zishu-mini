@@ -257,18 +257,36 @@ page {
   font-size: 26rpx;
 }
 
+.quick-pill__text {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
 .quick-pill__arrow {
   font-size: 26rpx;
   opacity: 0.85;
 }
 
+.detail-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ========== 分段标签栏 Segmented Tabs ========== */
 .seg-tabs {
   display: flex;
-  background: #ebe5f7;
-  border-radius: 22rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #f3e8ff 100%);
+  border: 1rpx solid rgba(124, 58, 237, 0.16);
+  border-radius: 999rpx;
   padding: 8rpx;
-  margin-bottom: 24rpx;
+  gap: 8rpx;
+  margin-bottom: 26rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.08);
 }
 
 .seg-tab {
@@ -278,25 +296,38 @@ page {
   justify-content: center;
   gap: 8rpx;
   height: 72rpx;
-  border-radius: 16rpx;
+  border-radius: 999rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: #6b6380;
-  transition: all 0.2s ease;
+  color: #5b5470;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seg-tab__label {
+  font-size: 26rpx;
 }
 
 .seg-tab--active {
-  background: #ffffff;
-  color: #7c3aed;
-  box-shadow: 0 4rpx 14rpx rgba(124, 58, 237, 0.12);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow:
+    0 6rpx 18rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
 }
 
 .seg-tab__count {
-  font-size: 22rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 20rpx;
-  background: rgba(124, 58, 237, 0.1);
-  color: #7c3aed;
+  font-size: 21rpx;
+  font-weight: 700;
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
+}
+
+.seg-tab--active .seg-tab__count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
 }
 
 /* ========== Tab 1: 纵向章节阶梯卡片 ========== */
@@ -311,10 +342,10 @@ page {
   align-items: center;
   gap: 22rpx;
   background: #ffffff;
-  border-radius: 22rpx;
-  padding: 28rpx 26rpx;
-  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.04);
-  border: 1rpx solid rgba(170, 0, 255, 0.08);
+  border-radius: 26rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -327,7 +358,7 @@ page {
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 28rpx;
   font-weight: 800;
@@ -335,7 +366,7 @@ page {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 6rpx 16rpx rgba(170, 0, 255, 0.22);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24);
 }
 
 .chapter-main {
@@ -346,7 +377,7 @@ page {
 .chapter-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
   line-height: 1.4;
   margin-bottom: 10rpx;
   word-break: break-word;
@@ -365,13 +396,13 @@ page {
 }
 
 .chapter-tag--author {
-  background: #f5f0ff;
-  color: #7c3aed;
+  background: #f5f3ff;
+  color: #6d28d9;
 }
 
 .chapter-tag--period {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f1f5f9;
+  color: #64748b;
 }
 
 .chapter-action {
@@ -380,11 +411,11 @@ page {
 
 .chapter-action__text {
   font-size: 24rpx;
-  font-weight: 600;
-  color: #aa00ff;
-  background: rgba(170, 0, 255, 0.08);
-  padding: 10rpx 20rpx;
-  border-radius: 24rpx;
+  font-weight: 700;
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.1);
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
 }
 
 /* ========== Tab 2 & 3: 同塾学员卡片 ========== */
@@ -399,17 +430,21 @@ page {
   align-items: center;
   gap: 22rpx;
   background: #ffffff;
-  border-radius: 22rpx;
-  padding: 26rpx;
-  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.04);
-  border: 1rpx solid rgba(170, 0, 255, 0.08);
+  border-radius: 26rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
+}
+
+.cohort-card--finish {
+  border-color: rgba(16, 185, 129, 0.14);
 }
 
 .cohort-avatar {
   width: 76rpx;
   height: 76rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 32rpx;
   font-weight: 700;
@@ -438,14 +473,14 @@ page {
 .cohort-name {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
 }
 
 .cohort-serial-pill {
   font-size: 22rpx;
   font-weight: 600;
-  color: #aa00ff;
-  background: rgba(170, 0, 255, 0.1);
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.1);
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
 }
@@ -465,10 +500,10 @@ page {
   font-size: 22rpx;
   font-weight: 700;
   color: #ffffff;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(170, 0, 255, 0.22);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  padding: 4rpx 18rpx;
+  border-radius: 999rpx;
+  box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.22);
 }
 
 .cohort-bottom-row {
@@ -603,21 +638,21 @@ page {
   align-items: center;
   gap: 20rpx;
   padding: 24rpx;
-  border-radius: 20rpx;
+  border-radius: 22rpx;
   background: #faf8ff;
-  border: 2rpx solid rgba(170, 0, 255, 0.14);
+  border: 2rpx solid rgba(124, 58, 237, 0.14);
 }
 
 .mentor-item:active {
-  background: #f3e8ff;
-  border-color: #aa00ff;
+  background: #f5f3ff;
+  border-color: #7c3aed;
 }
 
 .mentor-item__avatar {
   width: 72rpx;
   height: 72rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 700;
@@ -642,7 +677,7 @@ page {
 .mentor-item__name {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
 }
 
 .mentor-item__role {
@@ -655,42 +690,42 @@ page {
 }
 
 .mentor-item__role--mentor {
-  background: rgba(170, 0, 255, 0.1);
-  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+  color: #6d28d9;
 }
 
 .mentor-item__desc {
   font-size: 22rpx;
-  color: #8b859e;
+  color: #64748b;
 }
 
 .mentor-item__cta {
   font-size: 26rpx;
   font-weight: 700;
-  color: #aa00ff;
+  color: #6d28d9;
   flex-shrink: 0;
 }
 
 .mentor-empty {
   text-align: center;
   padding: 48rpx 0;
-  color: #9ca3af;
+  color: #94a3b8;
   font-size: 26rpx;
 }
 
 .mentor-modal__footer {
   margin-top: 24rpx;
   padding-top: 20rpx;
-  border-top: 1rpx solid #f0ecf9;
+  border-top: 1rpx solid #f1f5f9;
 }
 
 .direct-select-btn {
   width: 100%;
   height: 84rpx;
   line-height: 84rpx;
-  border-radius: 42rpx;
-  background: #f3e8ff;
-  color: #7c3aed;
+  border-radius: 999rpx;
+  background: #f5f3ff;
+  color: #6d28d9;
   font-size: 28rpx;
   font-weight: 700;
   border: none;
@@ -716,17 +751,17 @@ page {
 .edit-field__label {
   font-size: 26rpx;
   font-weight: 700;
-  color: #374151;
+  color: #334155;
 }
 
 .edit-field__input {
   height: 80rpx;
   padding: 0 24rpx;
-  border-radius: 16rpx;
-  background: #f9fafb;
-  border: 2rpx solid #e5e7eb;
+  border-radius: 18rpx;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
   font-size: 28rpx;
-  color: #111827;
+  color: #0f172a;
 }
 
 .edit-field__textarea {
@@ -734,24 +769,25 @@ page {
   height: 200rpx;
   padding: 20rpx 24rpx;
   box-sizing: border-box;
-  border-radius: 16rpx;
-  background: #f9fafb;
-  border: 2rpx solid #e5e7eb;
+  border-radius: 18rpx;
+  background: #f8fafc;
+  border: 2rpx solid #e2e8f0;
   font-size: 28rpx;
-  color: #111827;
+  color: #0f172a;
   line-height: 1.5;
 }
 
 .edit-save-btn {
   width: 100%;
-  height: 84rpx;
-  line-height: 84rpx;
-  border-radius: 42rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 28rpx;
   font-weight: 700;
   border: none;
+  box-shadow: 0 8rpx 22rpx rgba(124, 58, 237, 0.25);
 }
 
 .edit-save-btn::after {

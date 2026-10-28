@@ -161,29 +161,33 @@ page {
 /* ========== 分段筛选 Tabs ========== */
 .sheet-tabs {
   display: flex;
-  background: #ebe5f7;
-  border-radius: 22rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #f3e8ff 100%);
+  border: 1rpx solid rgba(124, 58, 237, 0.16);
+  border-radius: 999rpx;
   padding: 8rpx;
-  gap: 6rpx;
+  gap: 8rpx;
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.06);
 }
 
 .sheet-tab {
   flex: 1;
-  height: 66rpx;
-  line-height: 66rpx;
+  height: 68rpx;
+  line-height: 68rpx;
   text-align: center;
-  border-radius: 16rpx;
-  font-size: 24rpx;
+  border-radius: 999rpx;
+  font-size: 25rpx;
   font-weight: 600;
-  color: #6b6380;
-  transition: all 0.2s ease;
+  color: #5b5470;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sheet-tab--active {
-  background: #ffffff;
-  color: #7c3aed;
-  font-weight: 700;
-  box-shadow: 0 4rpx 14rpx rgba(124, 58, 237, 0.12);
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow:
+    0 6rpx 18rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
 }
 
 /* ========== 卡片区块 ========== */
@@ -192,7 +196,7 @@ page {
   border-radius: 24rpx;
   padding: 28rpx;
   box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.04);
-  border: 1rpx solid rgba(170, 0, 255, 0.08);
+  border: 1rpx solid rgba(124, 58, 237, 0.08);
 }
 
 .section-title {
@@ -209,7 +213,7 @@ page {
   padding: 20rpx;
   background: #faf8ff;
   border-radius: 18rpx;
-  border: 1rpx solid rgba(170, 0, 255, 0.1);
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
   margin-bottom: 18rpx;
 }
 
@@ -233,8 +237,8 @@ page {
 .camp-badge {
   font-size: 20rpx;
   font-weight: 700;
-  color: #aa00ff;
-  background: rgba(170, 0, 255, 0.1);
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.1);
   padding: 4rpx 14rpx;
   border-radius: 16rpx;
 }
@@ -242,13 +246,13 @@ page {
 .camp-meta,
 .camp-must {
   font-size: 24rpx;
-  color: #6b6380;
+  color: #64748b;
   margin-bottom: 6rpx;
 }
 
 .course-list {
   margin-top: 16rpx;
-  border-top: 1rpx solid rgba(170, 0, 255, 0.1);
+  border-top: 1rpx solid rgba(124, 58, 237, 0.1);
   padding-top: 8rpx;
 }
 
@@ -259,7 +263,7 @@ page {
   justify-content: space-between;
   gap: 16rpx;
   padding: 20rpx 4rpx;
-  border-bottom: 1rpx solid #f3f0fa;
+  border-bottom: 1rpx solid #f1f5f9;
 }
 
 .course-item:last-child {
@@ -292,7 +296,7 @@ page {
 .course-name {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #0f172a;
   margin-bottom: 10rpx;
 }
 
@@ -312,8 +316,8 @@ page {
 }
 
 .status-learning {
-  background: rgba(170, 0, 255, 0.12);
-  color: #aa00ff;
+  background: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
 }
 
 .status-done {
@@ -322,13 +326,13 @@ page {
 }
 
 .status-not-started {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f1f5f9;
+  color: #64748b;
 }
 
 .deadline {
   font-size: 22rpx;
-  color: #8b859e;
+  color: #64748b;
 }
 
 /* 空状态 */
@@ -340,7 +344,7 @@ page {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 6rpx 20rpx rgba(26, 26, 46, 0.04);
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
 }
 
 .empty-icon {
@@ -351,13 +355,13 @@ page {
 .empty-title {
   font-size: 32rpx;
   font-weight: 800;
-  color: #1a1a2e;
+  color: #0f172a;
   margin-bottom: 10rpx;
 }
 
 .empty-sub {
   font-size: 25rpx;
-  color: #8b859e;
+  color: #64748b;
   line-height: 1.5;
   margin-bottom: 32rpx;
 }
@@ -367,12 +371,12 @@ page {
   padding: 0 52rpx;
   height: 80rpx;
   line-height: 80rpx;
-  border-radius: 40rpx;
-  background: linear-gradient(135deg, #aa00ff 0%, #7c3aed 100%);
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 28rpx;
   font-weight: 700;
-  box-shadow: 0 8rpx 22rpx rgba(170, 0, 255, 0.28);
+  box-shadow: 0 8rpx 22rpx rgba(124, 58, 237, 0.26);
 }
 
 .empty-cta-btn::after {

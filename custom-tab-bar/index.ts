@@ -14,7 +14,11 @@ Component({
 
   methods: {
     onChange(event: any) {
-      const nextIndex = Number(event.detail.value);
+      const rawVal =
+        event?.detail?.value !== undefined
+          ? event.detail.value
+          : event?.currentTarget?.dataset?.index;
+      const nextIndex = Number(rawVal);
       if (isNaN(nextIndex) || !this.data.list[nextIndex]) return;
       if (nextIndex === this.data.active) return;
 

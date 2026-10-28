@@ -270,7 +270,7 @@ page {
 .progress-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(90deg, #7c3aed 0%, #5b21b6 100%);
 }
 
 .progress-fill.score-excellent {
@@ -357,7 +357,7 @@ page {
   width: 360rpx;
   height: 84rpx;
   line-height: 84rpx;
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   font-size: 28rpx;
   font-weight: 700;

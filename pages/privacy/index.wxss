@@ -128,7 +128,7 @@ page {
 }
 
 .policy-btn.primary {
-  background: linear-gradient(135deg, #a0f 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #ffffff;
   box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.24);
 }
