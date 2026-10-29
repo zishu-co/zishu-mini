@@ -19,7 +19,7 @@ function computeProfileMeta(form: any) {
 }
 
 const SOCIAL_TAG_PRESETS = [
-  '#寻找2男2女方舟搭子',
+  '#方舟小组共学',
   '#考研考公冲刺',
   '#AI与编程开发',
   '#英语听说突破',
@@ -57,8 +57,8 @@ Page({
   onShareAppMessage() {
     const name = this.data.form?.name || '自塾学友'
     return {
-      title: `👋 我是 ${name}，邀请你来同路人交友广场与我结伴共学！`,
-      path: '/pages/all/index',
+      title: `👋 我是 ${name}，邀请你来学本领、上自塾！`,
+      path: '/pages/learn/index',
     }
   },
 

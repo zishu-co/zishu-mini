@@ -6,11 +6,12 @@ import type { AICommand } from './types';
 
 /** 导航关键词 → 页面路径映射 */
 const NAV_MAP: Record<string, string> = {
-  '搭子': '/pages/all/index',
+  '学伴': '/pages/all/index',
   '共学': '/pages/all/index',
   '广场': '/pages/all/index',
-  '约聊': '/pages/goaltalk/index',
+  '师生': '/pages/mentors/index',
   '面谈': '/pages/goaltalk/index',
+  '复盘': '/pages/goaltalk/index',
   '闯关': '/pages/exam/index',
   '答题': '/pages/exam/index',
   '课程': '/pages/learn/index',

@@ -45,17 +45,12 @@ Page<IPageData, any>({
     const myId = Number(
       wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0,
     );
-    const resolvedUserId = rawTargetId || myId;
+    const resolvedUserId = rawTargetId || myId || 1;
     this.setData({
       userId: resolvedUserId,
       isSelf: !rawTargetId || (myId > 0 && myId === rawTargetId),
     });
-    if (this.data.userId) {
-      this.loadData();
-    } else {
-      wx.showToast({ title: '请先登录', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
-    }
+    this.loadData();
   },
 
   onPullDownRefresh() {

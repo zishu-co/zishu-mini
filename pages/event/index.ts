@@ -81,7 +81,7 @@ Page<IEventPageData, any>({
 
   onShareAppMessage() {
     return {
-      title: '🎉 自塾同城活动与共学聚会 · 快来报名寻找同频搭子！',
+      title: '🎉 自塾同城活动与线下共学 · 快来报名参与学习交流！',
       path: '/pages/event/index',
     };
   },
@@ -90,7 +90,7 @@ Page<IEventPageData, any>({
     const count = Number(ev?.participant_count || 0);
     return {
       ...ev,
-      _heatBadge: count >= 10 ? '🔥 热门同城局' : '✨ 搭子召集中',
+      _heatBadge: count >= 10 ? '🔥 热门共学活动' : '✨ 报名进行中',
       _startDateStr: ev?.start_time ? String(ev.start_time).slice(0, 16).replace('T', ' ') : '待定',
     };
   },

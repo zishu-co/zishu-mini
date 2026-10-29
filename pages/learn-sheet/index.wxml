@@ -42,8 +42,8 @@
       </view>
 
       <view class="sheet-buddy-bar" wx:if="{{!isSelf}}">
-        <text class="sheet-buddy-tip">💡 发现与 {{ownerName}} 志同道合的课程？</text>
-        <button class="sheet-greet-btn" bindtap="onGreetOwner">👋 约TA共学</button>
+        <text class="sheet-buddy-tip">💡 正在与 {{ownerName}} 修习相近的课程方向？</text>
+        <button class="sheet-greet-btn" bindtap="onGreetOwner">📚 交流学习</button>
       </view>
     </view>
 

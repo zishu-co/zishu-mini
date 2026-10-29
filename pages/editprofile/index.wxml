@@ -84,11 +84,11 @@
       />
     </view>
 
-    <!-- 知识资产与交友标签 -->
-    <view class="section-title section-title--spaced">共学交友标签 & 知识资产</view>
+    <!-- 知识资产与学习方向标签 -->
+    <view class="section-title section-title--spaced">学习方向标签 & 知识资产</view>
 
     <view class="social-tag-presets">
-      <text class="social-tag-hint">点击快捷添加共学兴趣标签（将在同路人广场展示）：</text>
+      <text class="social-tag-hint">点击快捷添加学习方向与专业技能标签：</text>
       <view class="social-tag-list">
         <view
           class="social-tag-chip {{item.active ? 'active' : ''}}"

@@ -42,3 +42,34 @@ export const isLoggedIn = (): boolean => {
     return false;
   }
 };
+
+/** 判断角色字符串或用户对象是否为管理员 */
+export const isAdminRole = (userOrRole: any): boolean => {
+  if (!userOrRole) return false;
+  if (typeof userOrRole === 'string') {
+    const r = userOrRole.trim().toLowerCase();
+    return r === 'admin' || r === '管理员' || r === 'superadmin' || r === '超级管理员';
+  }
+  if (typeof userOrRole === 'object') {
+    if (userOrRole.is_admin === true || userOrRole.isAdmin === true) return true;
+    const r = String(userOrRole.role || userOrRole.user_role || '').trim().toLowerCase();
+    return r === 'admin' || r === '管理员' || r === 'superadmin' || r === '超级管理员';
+  }
+  return false;
+};
+
+/** 检查当前本地缓存登录用户是否为管理员 */
+export const isCurrentUserAdmin = (): boolean => {
+  try {
+    if (!isLoggedIn()) return false;
+    const app = typeof getApp === 'function' ? getApp<any>() : null;
+    if (isAdminRole(app?.globalData?.userInfo)) return true;
+    const storedUser = wx.getStorageSync('userInfo');
+    if (isAdminRole(storedUser)) return true;
+    const storedRole = wx.getStorageSync('userRole');
+    if (isAdminRole(storedRole)) return true;
+    return false;
+  } catch {
+    return false;
+  }
+};

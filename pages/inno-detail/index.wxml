@@ -192,7 +192,7 @@
 
   <!-- 半程进度汇报弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showHalfModal}}" bindtap="onCloseTaskModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">📊 半程进度汇报</view>
       <view class="inno-preset-row">
         <view
@@ -229,7 +229,7 @@
 
   <!-- 提交/暂存解决方案弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showSlnModal}}" bindtap="onCloseTaskModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">📝 课题解决方案申报</view>
       <view class="inno-field-label">实际投入工时（小时）</view>
       <input
@@ -266,7 +266,7 @@
 
   <!-- 塾师点评 / 结项验收弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showReviewModal}}" bindtap="onCloseTaskModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">🎓 课题评审与结项验收</view>
       <view class="inno-field-label">额外红包激励（塾值，可选）</view>
       <input

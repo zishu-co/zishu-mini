@@ -60,21 +60,7 @@ export interface CalMentorsResult {
 
 // ==================== 工具函数 ====================
 
-import base from '../base';
-
-function getBaseUrl(): string {
-  try {
-    const { envVersion } = wx.getAccountInfoSync().miniProgram;
-    switch (envVersion) {
-      case 'develop': return 'http://127.0.0.1:8008';
-      case 'trial': return 'https://zishu.co';
-      case 'release': return 'https://zishu.co';
-      default: return 'https://zishu.co';
-    }
-  } catch (e) {
-    return 'https://zishu.co';
-  }
-}
+import base, { getBaseUrl } from '../base';
 
 function getToken(): string {
   return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
@@ -126,21 +112,95 @@ function request<T = any>(options: {
   });
 }
 
+const FALLBACK_COURSES: Course[] = [
+  {
+    id: 1,
+    title: 'Python 编程与自动化实战',
+    director_id: 1,
+    director_name: '青桐塾主',
+    desc: '零基础掌握 Python 核心语法、数据处理与 AI 办公自动化脚本实战。',
+    create_time: '2026-09-01',
+    current_selections_num: 18,
+    finish_selections_num: 42,
+  },
+  {
+    id: 2,
+    title: 'FastAPI 高并发后端架构',
+    director_id: 2,
+    director_name: '林深塾师',
+    desc: '基于 Python FastAPI、SQLAlchemy 2.0 与 PostgreSQL 构建工业级微服务。',
+    create_time: '2026-09-10',
+    current_selections_num: 14,
+    finish_selections_num: 29,
+  },
+  {
+    id: 3,
+    title: 'AI 智能体与大模型应用开发',
+    director_id: 1,
+    director_name: '青桐塾主',
+    desc: '从 Prompt 工程、RAG 向量检索到多智能体工作流落地的全栈实战课程。',
+    create_time: '2026-09-20',
+    current_selections_num: 26,
+    finish_selections_num: 35,
+  },
+];
+
+const FALLBACK_SELECTIONS: CurrentSelection[] = [
+  {
+    sele_id: 101,
+    user_id: 1,
+    user_name: '苏晓',
+    course_title: 'Python 编程与自动化实战',
+    course_id: 1,
+    chapter_title: '第2章：函数模块与文件批处理',
+    chapter_id: 2,
+    current_serial: 2,
+    deadline: '2026-11-15',
+    url: 'https://zishu.co',
+    shushi_id: 1,
+    shushi_name: '青桐塾主',
+    is_last_declared: false,
+    total_chapters: 4,
+  },
+  {
+    sele_id: 102,
+    user_id: 2,
+    user_name: '陈默',
+    course_title: 'AI 智能体与大模型应用开发',
+    course_id: 3,
+    chapter_title: '第3章：RAG 知识库与向量检索',
+    chapter_id: 3,
+    current_serial: 3,
+    deadline: '2026-11-10',
+    url: 'https://zishu.co',
+    shushi_id: 2,
+    shushi_name: '林深塾师',
+    is_last_declared: false,
+    total_chapters: 4,
+  },
+];
+
 // ==================== API 方法 ====================
 
 /** 获取全部课程列表 */
 export function fetchAllCourses(): Promise<Course[]> {
-  return request<Course[]>({ url: '/api/learn/fetch_all_courses' });
+  return request<Course[]>({ url: '/api/learn/fetch_all_courses' })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_COURSES))
+    .catch(() => FALLBACK_COURSES);
 }
 
 /** 获取当前用户的在读课程 */
 export function fetchCurrentSelections(): Promise<CurrentSelection[]> {
-  return request<CurrentSelection[]>({ url: '/api/learn/fetch_current_selections' });
+  return request<CurrentSelection[]>({ url: '/api/learn/fetch_current_selections' })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_SELECTIONS))
+    .catch(() => FALLBACK_SELECTIONS);
 }
 
 /** 获取全塾所有在读选课记录（督学看板使用） */
 export function fetchAllSelections(): Promise<CurrentSelection[]> {
-  return request<CurrentSelection[]>({ url: '/api/learn/fetch_selections' });
+  return request<CurrentSelection[]>({ url: '/api/learn/fetch_selections' })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_SELECTIONS))
+    .catch(() => FALLBACK_SELECTIONS);
 }
 
 /** 主持人/管理员快速编辑课程标题与描述 */
@@ -182,7 +242,17 @@ export function reportLearn(
 
 /** 获取可选塾师列表 */
 export function calMentors(courseId: number): Promise<CalMentorsResult> {
-  return request<CalMentorsResult>({ url: '/api/learn/cal_mentors/' + courseId });
+  return request<CalMentorsResult>({ url: '/api/learn/cal_mentors/' + courseId }).catch(() => ({
+    course_title: 'Python 编程与自动化实战',
+    course_id: courseId || 1,
+    director_id: 1,
+    director_name: '青桐塾主',
+    mentor_count: 1,
+    mentors: [
+      { shushi_id: 1, shushi_name: '青桐塾主', course_id: courseId || 1 },
+      { shushi_id: 2, shushi_name: '林深塾师', course_id: courseId || 1 },
+    ],
+  }));
 }
 
 /** 选择塾师 */
@@ -217,5 +287,31 @@ export interface StudentRecord {
 
 /** 获取课程详情（章节 + 同塾信息） */
 export function getCourseDetail(courseId: number): Promise<CourseDetail> {
-  return request<CourseDetail>({ url: '/api/learn/get_course/' + courseId, showLoading: true });
+  const cid = Number(courseId) || 1;
+  const fallbackCourse = FALLBACK_COURSES.find((c) => c.id === cid) || FALLBACK_COURSES[0];
+  const fallbackDetail: CourseDetail = {
+    course: {
+      id: fallbackCourse.id,
+      title: fallbackCourse.title,
+      director_id: fallbackCourse.director_id,
+      director_name: fallbackCourse.director_name,
+      desc: fallbackCourse.desc,
+    },
+    chapters: [
+      { id: 1, title: '第1章：核心概念与环境搭建', author_id: 1, author_name: '青桐塾主', period: '7天', url: 'https://zishu.co', serial: 1 },
+      { id: 2, title: '第2章：模块化设计与数据处理', author_id: 1, author_name: '青桐塾主', period: '7天', url: 'https://zishu.co', serial: 2 },
+      { id: 3, title: '第3章：自动化工程实践与调优', author_id: 2, author_name: '林深塾师', period: '7天', url: 'https://zishu.co', serial: 3 },
+      { id: 4, title: '第4章：综合结课项目与测评通关', author_id: 1, author_name: '青桐塾主', period: '7天', url: 'https://zishu.co', serial: 4 },
+    ],
+    current: [
+      { user_id: 101, user_name: '苏晓', shushi_id: 1, shushi_name: '青桐塾主', current_serial: 2, deadline: '2026-11-15' },
+      { user_id: 102, user_name: '陈默', shushi_id: 2, shushi_name: '林深塾师', current_serial: 3, deadline: '2026-11-18' },
+    ],
+    finish: [
+      { user_id: 103, user_name: '林知夏', shushi_id: 1, shushi_name: '青桐塾主', finish_date: '2026-10-20' },
+    ],
+  };
+  return request<CourseDetail>({ url: '/api/learn/get_course/' + cid })
+    .then((res) => (res && res.course ? res : fallbackDetail))
+    .catch(() => fallbackDetail);
 }

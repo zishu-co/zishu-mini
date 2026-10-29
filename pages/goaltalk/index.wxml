@@ -1,13 +1,13 @@
 <view class="page">
-  <!-- 顶部破冰约谈横幅 -->
+  <!-- 顶部目标面谈横幅 -->
   <view class="talk-banner">
     <view class="talk-banner-left">
       <text class="talk-banner-title">💬 目标约谈 · 1v1 共学室</text>
-      <text class="talk-banner-sub">与领航塾师或同频搭子深度复盘目标、碰撞灵感</text>
+      <text class="talk-banner-sub">与领航塾师或同塾学友深度复盘目标、校准方向</text>
     </view>
     <view class="talk-banner-actions">
       <view class="talk-banner-btn primary" bindtap="onOpenAddModal">＋ 发起面谈</view>
-      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">🤝 找搭子</view>
+      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">🤝 共学广场</view>
     </view>
   </view>
 
@@ -33,8 +33,8 @@
     <view wx:elif="{{scheduledData.length === 0}}">
       <view class="empty-row">
         <text class="empty-title">暂无预定面谈</text>
-        <text class="empty-desc">快去同路人广场向心仪的塾师或搭子发起 15 分钟破冰约聊吧</text>
-        <view class="empty-cta" bindtap="onGoSocialPlaza">👋 去广场发起约聊</view>
+        <text class="empty-desc">可前往共学广场向领航塾师或学伴发起 15 分钟目标复盘交流</text>
+        <view class="empty-cta" bindtap="onGoSocialPlaza">👋 去共学广场</view>
       </view>
     </view>
     <view wx:else>
@@ -160,7 +160,7 @@
 
   <!-- 新增 / 编辑目标面谈弹窗 -->
   <view class="gt-modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseModals">
-    <view class="gt-modal-card" catchtap="true">
+    <view class="gt-modal-card" catchtap="noop">
       <view class="gt-modal-title">{{editModalMode === 'add' ? '＋ 发起 1v1 目标面谈' : '✎ 编辑面谈排期与会议号'}}</view>
 
       <block wx:if="{{editModalMode === 'add'}}">
@@ -223,7 +223,7 @@
 
   <!-- 完结面谈并填写纪要弹窗 -->
   <view class="gt-modal-mask" wx:if="{{showFinishModal}}" bindtap="onCloseModals">
-    <view class="gt-modal-card" catchtap="true">
+    <view class="gt-modal-card" catchtap="noop">
       <view class="gt-modal-title">🏁 完结面谈 · 记录复盘纪要</view>
       <view class="gt-modal-sub">共学伙伴：{{finishForm.partnerName}}</view>
 

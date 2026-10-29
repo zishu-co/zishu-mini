@@ -1,13 +1,13 @@
 <!-- pages/ark-group/index.wxml -->
 <!-- spec: specs/miniprogram/active/003-complete-ark-group.md -->
 <view class="page">
-  <!-- 品牌紫诺亚方舟搭子舱 Hero Banner -->
+  <!-- 品牌紫诺亚方舟共学舱 Hero Banner -->
   <view class="ark-hero">
     <view class="ark-hero__glow ark-hero__glow--1"></view>
     <view class="ark-hero__glow ark-hero__glow--2"></view>
     <view class="ark-hero__tag">NOAH'S ARK CO-LEARNING</view>
-    <view class="ark-hero__title">🚢 2男2女诺亚方舟搭子舱</view>
-    <view class="ark-hero__rule">2男 + 2女 = 4人成舟 · 选出舟长 · 召集团队三会</view>
+    <view class="ark-hero__title">🚢 诺亚方舟共学舱</view>
+    <view class="ark-hero__rule">4人成舟 · 选出舟长 · 召集团队三会</view>
 
     <view class="ark-hero__stats">
       <view class="ark-stat">
@@ -69,7 +69,7 @@
               <text class="ark-badge {{ark._statusClass}}" wx:if="{{ark.ark_id}}">{{ark._statusText}}</text>
             </view>
             <view class="ark-subname" wx:if="{{ark.ark_id}}">
-              {{ark.arkname || '诺亚方舟筹建舱'}} · {{ark.male_count || 0}}男 {{ark.female_count || 0}}女
+              {{ark.arkname || '诺亚方舟筹建舱'}} · 船员 {{ark.members.length || 0}}/4 人
             </view>
             <view class="ark-subname" wx:else>暂未创建本课方舟</view>
           </view>
@@ -111,7 +111,7 @@
         </view>
       </view>
 
-      <!-- 第二行：可视化 4 席位船舱网格 (2男 + 2女) -->
+      <!-- 第二行：可视化 4 席位船舱网格 -->
       <view class="cabin-box" wx:if="{{ark.ark_id}}">
         <view class="cabin-grid">
           <view

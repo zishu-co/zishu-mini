@@ -81,7 +81,7 @@
       <view class="quick-pills">
         <view class="quick-pill" bindtap="onGoArkGroup">
           <text class="quick-pill__icon">🚢</text>
-          <text class="quick-pill__text">诺亚方舟搭子舱</text>
+          <text class="quick-pill__text">诺亚方舟共学舱</text>
           <text class="quick-pill__arrow">›</text>
         </view>
         <view
@@ -256,8 +256,8 @@
         <button class="classmate-action classmate-action--greet" data-action="greet" bindtap="onClassmateAction" hover-class="classmate-action--pressed">
           <text class="classmate-action__icon">👋</text>
           <view class="classmate-action__content">
-            <view class="classmate-action__title">约 {{classmateUserName}} 共学破冰</view>
-            <view class="classmate-action__desc">15 分钟轻松交流，找到学习搭子</view>
+            <view class="classmate-action__title">约 {{classmateUserName}} 交流学习</view>
+            <view class="classmate-action__desc">15 分钟课程学习讨论，共同推进进度</view>
           </view>
           <text class="classmate-action__arrow">›</text>
         </button>

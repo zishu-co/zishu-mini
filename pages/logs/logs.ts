@@ -16,7 +16,9 @@ Page({
     }
   },
   loadLogs() {
-    const rawLogs = ((wx.getStorageSync('logs') || []) as number[]).map(log => ({
+    const stored = (wx.getStorageSync('logs') || []) as number[]
+    const sourceLogs = stored.length > 0 ? stored : [Date.now()]
+    const rawLogs = sourceLogs.map(log => ({
       date: util.formatTime(new Date(log)),
       timeStamp: log,
     }))

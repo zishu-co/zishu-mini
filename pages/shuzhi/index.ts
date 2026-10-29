@@ -65,7 +65,7 @@ Page({
   onShareAppMessage() {
     return {
       title: `我在自塾已达到「${this.data.levelTitle}」，快来开启 AI 英语共学！`,
-      path: '/pages/all/index',
+      path: '/pages/learn/index',
     }
   },
 

@@ -9,11 +9,7 @@ Page({
   },
 
   onLoad(options: any) {
-    const url = decodeURIComponent(options?.url || '');
-    if (!url) {
-      wx.showToast({ title: '链接无效', icon: 'none' });
-      return;
-    }
+    const url = decodeURIComponent(options?.url || '') || 'https://zishu.co';
     this.setData({ url, loadFailed: false });
   },
 

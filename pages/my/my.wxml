@@ -25,7 +25,7 @@
             <text class="level-pill">{{levelBadge}}</text>
           </view>
           <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
-          <view class="phone" wx:else>点击编辑个人共学名片 ›</view>
+          <view class="phone" wx:else>点击编辑个人学习档案 ›</view>
         </view>
         <button class="sheet-quick-btn" catchtap="goToMyLearnSheet">📋 学习单</button>
       </block>
@@ -33,7 +33,7 @@
       <block wx:else>
         <view class="user-card__info" bindtap="goToLogin">
           <view class="nickname">欢迎来到自塾</view>
-          <view class="phone">登录解锁共学搭子、方舟与闯关勋章</view>
+          <view class="phone">登录解锁课程学习、方舟与闯关勋章</view>
         </view>
         <button class="user-card__login-btn" bindtap="goToLogin">🔑 登录</button>
       </block>
@@ -94,7 +94,7 @@
     <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/all/index">
       <text class="quick-nav-icon">🏫</text>
       <text class="quick-nav-title">全塾动态</text>
-      <text class="quick-nav-sub">实时共学广场</text>
+      <text class="quick-nav-sub">共学广场</text>
     </view>
   </view>
 
@@ -250,7 +250,7 @@
 
   <!-- 意见反馈与共创建议弹窗（111-feedback-mine） -->
   <view class="fb-modal-mask" wx:if="{{showFeedbackModal}}" bindtap="onCloseFeedbackModal">
-    <view class="fb-modal-card" catchtap="true">
+    <view class="fb-modal-card" catchtap="noop">
       <view class="fb-modal-header">
         <text class="fb-modal-title">💡 自塾共创反馈中心</text>
         <text class="fb-modal-close" bindtap="onCloseFeedbackModal">✕</text>

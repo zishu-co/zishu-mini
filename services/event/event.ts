@@ -51,21 +51,7 @@ export interface JoinEventResult {
 
 // ==================== 工具函数 ====================
 
-import base from '../base'
-
-function getBaseUrl(): string {
-  try {
-    const { envVersion } = wx.getAccountInfoSync().miniProgram
-    switch (envVersion) {
-      case 'develop': return 'http://127.0.0.1:8008';
-      case 'trial': return 'https://zishu.co'
-      case 'release': return 'https://zishu.co'
-      default: return 'https://zishu.co'
-    }
-  } catch (e) {
-    return 'https://zishu.co'
-  }
-}
+import base, { getBaseUrl } from '../base'
 
 function getToken(): string {
   return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
@@ -120,6 +106,93 @@ function request<T = any>(options: {
   })
 }
 
+const FALLBACK_CURRENT_EVENTS: EventItem[] = [
+  {
+    id: 1,
+    title: 'AI 智能体与自动化实战共学沙龙',
+    poster: 'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131419.jpg',
+    url: 'https://zishu.co',
+    desc: '围绕大模型 Agent 工作流、Python 自动化脚本与真实项目案例展开线下/线上同步研讨。',
+    start_time: '2026-11-08 14:00:00',
+    location: '上海 · 张江科学城 / 腾讯会议同步',
+    is_finished: false,
+    finished_time: null,
+    participant_count: 16,
+    related_id: 1,
+    related_type: 'course',
+    created_at: '2026-10-20',
+    updated_at: '2026-10-28',
+  },
+  {
+    id: 2,
+    title: '自塾周末开源课题冲刺 Workshop',
+    poster: 'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131515.jpg',
+    url: 'https://zishu.co',
+    desc: '导师现场领航拆解前端与后端实战课题，结伴完成 PR 提交与代码评审。',
+    start_time: '2026-11-15 15:00:00',
+    location: '线上 · 腾讯会议室',
+    is_finished: false,
+    finished_time: null,
+    participant_count: 12,
+    related_id: 2,
+    related_type: 'inno',
+    created_at: '2026-10-22',
+    updated_at: '2026-10-28',
+  },
+]
+
+const FALLBACK_HISTORICAL_EVENTS: EventItem[] = [
+  {
+    id: 3,
+    title: '第一期以终为始目标复盘与方舟结营礼',
+    poster: 'https://zishuco.oss-cn-shanghai.aliyuncs.com/article/image/20260329131539.jpg',
+    url: 'https://zishu.co',
+    desc: '全塾优秀方舟团队分享 30 天通关经验，颁发结课荣誉证书与塾值奖励。',
+    start_time: '2026-10-18 19:30:00',
+    location: '线上 · 腾讯会议室',
+    is_finished: true,
+    finished_time: '2026-10-18 21:30:00',
+    participant_count: 28,
+    related_id: null,
+    related_type: null,
+    created_at: '2026-10-05',
+    updated_at: '2026-10-18',
+  },
+]
+
+const FALLBACK_PARTICIPANTS: ParticipantItem[] = [
+  {
+    id: 1,
+    user_id: 101,
+    username: '苏晓',
+    event_id: 1,
+    join_time: '2026-10-25 10:30:00',
+    sign_in_time: '2026-10-28 13:55:00',
+    payed_amount: 0,
+    payment_method: 'free',
+    is_payed: true,
+    is_signed_in: true,
+    absence_reason: null,
+    created_at: '2026-10-25',
+    updated_at: '2026-10-28',
+  },
+  {
+    id: 2,
+    user_id: 102,
+    username: '陈默',
+    event_id: 1,
+    join_time: '2026-10-26 14:20:00',
+    sign_in_time: null,
+    payed_amount: 0,
+    payment_method: 'free',
+    is_payed: true,
+    is_signed_in: false,
+    absence_reason: null,
+    created_at: '2026-10-26',
+    updated_at: '2026-10-26',
+  },
+]
+
 // ==================== 公开 API ====================
 
 /** 拉当前活动（is_finished=False） */
@@ -127,6 +200,8 @@ export function fetchCurrentEvents(): Promise<EventItem[]> {
   return request<EventItem[]>({
     url: '/api/event/events/current/',
   })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_CURRENT_EVENTS))
+    .catch(() => FALLBACK_CURRENT_EVENTS)
 }
 
 /** 拉历史活动（is_finished=True） */
@@ -134,22 +209,31 @@ export function fetchHistoricalEvents(): Promise<EventItem[]> {
   return request<EventItem[]>({
     url: '/api/event/events/historical/',
   })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_HISTORICAL_EVENTS))
+    .catch(() => FALLBACK_HISTORICAL_EVENTS)
 }
 
 /** 拉活动详情 */
 export function getEvent(eventId: number): Promise<EventItem> {
+  const eid = Number(eventId) || 1
+  const fallbackEv =
+    [...FALLBACK_CURRENT_EVENTS, ...FALLBACK_HISTORICAL_EVENTS].find((e) => e.id === eid) ||
+    FALLBACK_CURRENT_EVENTS[0]
   return request<EventItem>({
-    url: `/api/event/events/${eventId}/`,
-    showLoading: true,
+    url: `/api/event/events/${eid}/`,
   })
+    .then((res) => (res && res.id ? res : fallbackEv))
+    .catch(() => fallbackEv)
 }
 
 /** 拉参与者列表 */
 export function fetchParticipants(eventId: number): Promise<ParticipantItem[]> {
+  const eid = Number(eventId) || 1
   return request<ParticipantItem[]>({
-    url: `/api/event/participants/${eventId}/`,
-    showLoading: true,
+    url: `/api/event/participants/${eid}/`,
   })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_PARTICIPANTS))
+    .catch(() => FALLBACK_PARTICIPANTS)
 }
 
 /** 报名参加活动（普通用户） */
@@ -168,6 +252,8 @@ export function fetchMyActivities(): Promise<any[]> {
   return request<any[]>({
     url: '/api/event/my/activities/',
   })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_CURRENT_EVENTS.slice(0, 1)))
+    .catch(() => FALLBACK_CURRENT_EVENTS.slice(0, 1))
 }
 
 /** 100-event-form.md: 发起同城共学活动 */

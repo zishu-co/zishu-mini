@@ -51,7 +51,7 @@
   <view class="section">
     <view class="section-header">
       <view class="section-title-row">
-        <text class="section-title">同城搭子名录</text>
+        <text class="section-title">活动参与者名录</text>
         <view class="count-badge">共 {{participants.length}} 人 · 已签到 {{signedInCount}} 人</view>
       </view>
 
@@ -90,7 +90,7 @@
           bindtap="onViewParticipantSheet"
         >
           <view class="name-line">
-            <text class="participant-name">{{item.username || '匿名搭子'}}</text>
+            <text class="participant-name">{{item.username || '参会塾员'}}</text>
             <text class="level-tag">{{item._levelTag}}</text>
             <text class="city-tag" wx:if="{{item._cityTag}}">📍 {{item._cityTag}}</text>
           </view>
@@ -102,7 +102,7 @@
           data-userid="{{item.user_id || item.id}}"
           data-name="{{item.username}}"
           bindtap="onGreetParticipant"
-        >{{item._greeted ? '✨ 已约结伴' : '👋 约TA结伴'}}</view>
+        >{{item._greeted ? '✨ 已发邀请' : '👋 学习交流'}}</view>
       </view>
 
       <view class="participant-badges">

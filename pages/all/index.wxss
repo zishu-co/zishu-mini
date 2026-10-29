@@ -429,7 +429,7 @@
   box-shadow: 0 4rpx 12rpx rgba(124, 58, 237, 0.22);
 }
 
-/* 破冰约学弹窗 — Candy Aurora 极光糖果卡片 */
+/* 督学沟通弹窗 — Candy Aurora 极光糖果卡片 */
 .greet-mask {
   position: fixed;
   inset: 0;
@@ -680,4 +680,15 @@
   font-size: 22rpx;
   font-weight: 600;
   color: #6d28d9;
+}
+
+.no-perm-desc {
+  margin: 16rpx 0 32rpx;
+  color: #64748b;
+  font-size: 26rpx;
+}
+
+.no-perm-btn {
+  width: 320rpx;
+  margin: 0 auto;
 }

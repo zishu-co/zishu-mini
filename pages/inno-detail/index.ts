@@ -69,17 +69,17 @@ Page<IInnoDetailPageData, any>({
   projectId: 0,
 
   onLoad(options: any) {
-    this.projectId = parseInt(options?.id || '0', 10);
+    this.projectId = parseInt(options?.id || '1', 10) || 1;
     const _appInno = getApp<any>();
     const storedUserInfo = wx.getStorageSync('userInfo') || {};
     const userInfo = _appInno?.globalData?.userInfo || storedUserInfo || {};
     const currentUserId =
       Number(wx.getStorageSync('userId') || userInfo.userId || userInfo.id || storedUserInfo.userId || storedUserInfo.id || 0);
     this.setData({ currentUserId });
-    if (this.projectId) {
-      this.loadProject();
-    }
+    this.loadProject();
   },
+
+  noop() {},
 
   onShow() {
     if (this.projectId && !this.data.project && !this.data.loading) {
@@ -372,7 +372,7 @@ Page<IInnoDetailPageData, any>({
 
     wx.showActionSheet({
       itemList: [
-        `👋 发起《${title}》15分钟协作约聊`,
+        `👋 发起《${title}》15分钟课题协作沟通`,
         `🔍 在共学广场查找「${peerName}」`,
       ],
       success: async (res) => {

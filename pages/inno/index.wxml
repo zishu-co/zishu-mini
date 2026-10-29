@@ -241,7 +241,7 @@
 
   <!-- 发布新课题弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showPublishModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">🚀 发布创新共创课题</view>
       <view class="inno-modal-sub">自动编号：{{publishForm.task_serial}}</view>
 
@@ -336,7 +336,7 @@
 
   <!-- 申请加入创新小组弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showJoinGroupModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">🤝 申请加入共创小组</view>
       <view class="inno-modal-sub">{{joinGroupForm.groupname}}</view>
 
@@ -360,7 +360,7 @@
 
   <!-- 102-attend.md: 小组周报考勤汇报弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showAttendModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">📅 小组周报考勤汇报</view>
       <view class="inno-modal-sub">{{attendForm.groupname}}</view>
 
@@ -439,7 +439,7 @@
 
   <!-- 101-group.md: 小组详情与成员看板弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showGroupDetailModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-top-row">
         <view class="inno-modal-title">🏛️ {{activeGroupDetail.groupname || '共创小组详情'}}</view>
         <view class="group-join-btn" bindtap="onOpenEditGroupModal">✏️ 编辑小组</view>
@@ -472,7 +472,7 @@
 
   <!-- 105-edit-group.md: 创建/编辑共创小组弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showCreateGroupModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">{{createGroupForm.isEdit ? '✏️ 编辑共创小组' : '🌱 申请创建共创小组'}}</view>
       <view class="inno-field-label">小组名称 *</view>
       <input
@@ -519,7 +519,7 @@
 
   <!-- 104-project.md: 个人工时清单与打卡明细弹窗 -->
   <view class="inno-modal-mask" wx:if="{{showTimeModal}}" bindtap="onCloseInnoModals">
-    <view class="inno-modal-card" catchtap="true">
+    <view class="inno-modal-card" catchtap="noop">
       <view class="inno-modal-title">⏱️ 我的创新工时清单</view>
       <view class="inno-modal-sub">累计课题投入与工时结算记录</view>
 

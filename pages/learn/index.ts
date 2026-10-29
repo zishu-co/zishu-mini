@@ -15,6 +15,8 @@ import {
   Mentor,
 } from '../../services/course/course';
 import base from '../../services/base';
+import { checkAndSyncAdminStatus } from '../../services/user/user';
+import { isCurrentUserAdmin } from '../../utils/env';
 
 const app = getApp();
 
@@ -46,6 +48,7 @@ interface ILearnPageData {
   loading: boolean;
   loadError: string;
   hasLogin: boolean;
+  isAdmin: boolean;
   showMentorModal: boolean;
   mentorList: Mentor[];
   currentMentorCourseId: number;
@@ -71,6 +74,7 @@ Page<ILearnPageData, any>({
     loading: true,
     loadError: '',
     hasLogin: false,
+    isAdmin: false,
     showMentorModal: false,
     mentorList: [],
     currentMentorCourseId: 0,
@@ -138,7 +142,7 @@ Page<ILearnPageData, any>({
 
   onShareAppMessage() {
     return {
-      title: '📚 自塾共学选课中心 · 选好课、拜塾师、组2男2女方舟结伴通关！',
+      title: '📚 自塾共学选课中心 · 选好课、拜塾师、组方舟结伴通关！',
       path: '/pages/learn/index',
     };
   },
@@ -157,21 +161,25 @@ Page<ILearnPageData, any>({
 
   checkLoginAndLoad() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
-    this.setData({ hasLogin: !!token });
+    const isAdmin = !!token && isCurrentUserAdmin();
+    this.setData({ hasLogin: !!token, isAdmin });
+    if (token) {
+      checkAndSyncAdminStatus(this.getUserId()).then((adminOk) => {
+        if (adminOk !== this.data.isAdmin) {
+          this.setData({ isAdmin: adminOk });
+        }
+      });
+    }
     this.loadData();
   },
 
   async loadData() {
     this.setData({ loading: true, loadError: '' });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
-    if (!token) {
-      this.setData({ loading: false });
-      return;
-    }
 
     try {
       const [myCourses, allCourses] = await Promise.all([
-        fetchCurrentSelections(),
+        token ? fetchCurrentSelections() : Promise.resolve([]),
         fetchAllCourses(),
       ]);
       const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
@@ -202,18 +210,10 @@ Page<ILearnPageData, any>({
       this.applyCourseFilters(this.data.courseFilter, this.data.searchKeyword, decoratedAllCourses);
     } catch (e: any) {
       console.error('加载数据失败', e);
-      if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
-        base.clearTokens();
-        this.setData({ hasLogin: false, loading: false, loadError: '' });
-        wx.showToast({ title: '请先登录', icon: 'none' });
-        setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
-        return;
-      }
       this.setData({
         loading: false,
-        loadError: '加载课程数据失败，请点击重试',
+        loadError: '',
       });
-      wx.showToast({ title: '加载课程失败，请重试', icon: 'none' });
     }
   },
 
@@ -522,6 +522,10 @@ Page<ILearnPageData, any>({
 
   onGotoSocialPlaza() {
     wx.navigateTo({ url: '/pages/all/index' });
+  },
+
+  onGotoMentors() {
+    wx.navigateTo({ url: '/pages/mentors/index' });
   },
 
   onGotoSupervise() {

@@ -7,7 +7,7 @@
         <view class="agent-topbar-title">自塾 AI 伴学教练</view>
         <view class="agent-topbar-status">
           <text class="status-dot">●</text>
-          <text>24h 智能目标规划 · 搭子匹配 · 语音领航</text>
+          <text>24h 智能目标规划 · 课程推荐 · 语音领航</text>
         </view>
       </view>
     </view>

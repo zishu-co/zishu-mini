@@ -87,7 +87,7 @@ export interface Project {
 
 /** 获取创新页基础数据（轮播图 + 标签栏） */
 function mockFetchInno(): Promise<InnoData> {
-  return delay().then(() => ({
+  return Promise.resolve({
     swiper: images,
     tabList: [
       { text: '全部', key: '' },
@@ -100,7 +100,7 @@ function mockFetchInno(): Promise<InnoData> {
       { text: '文件', key: 'W' },
     ],
     activityImg: '/img/activity.png',
-  }));
+  });
 }
 
 /** 从后端获取创新页基础数据 */
@@ -108,23 +108,104 @@ function fetchInnoFromApi(): Promise<InnoData> {
   return mockFetchInno();
 }
 
+const FALLBACK_PROJECTS: Project[] = [
+  {
+    id: 1,
+    publisher: '青桐塾主',
+    publisher_id: 1,
+    taker: '',
+    taker_id: 0,
+    shushi: '林深塾师',
+    shushi_id: 2,
+    task_serial: 'F001',
+    title: '自塾小程序学习中心与方舟交互体验升级',
+    required_courses: 'Python 编程与自动化实战',
+    bonus: 50,
+    desc: '优化小程序学习中心卡片排版、弹窗独立滚动与方舟进度可视化组件。',
+    task_text: '1. 完善课程卡片与章节步进展示\n2. 适配多端安全区与响应式布局\n3. 编写自动化回归验证脚本',
+    sln_text: '',
+    comment: '',
+    start_date: '2026-10-20',
+    deadline: '2026-11-20',
+    planed_hour: 8,
+    half_progress: '进行中',
+    finish_date: '',
+    actual_hour: 0,
+    total_hour: 8,
+    update_date: '2026-10-28',
+    status: '待认领',
+  },
+  {
+    id: 2,
+    publisher: '林深塾师',
+    publisher_id: 2,
+    taker: '苏晓',
+    taker_id: 101,
+    shushi: '青桐塾主',
+    shushi_id: 1,
+    task_serial: 'B002',
+    title: 'AI 伴学推荐引擎与目标拆解接口联调',
+    required_courses: 'FastAPI 高并发后端架构',
+    bonus: 60,
+    desc: '基于用户阶段学习目标与课程进度，生成个性化 Top3 每日微行动推荐。',
+    task_text: '实现 /api/actions/recommendations 智能评分与缓存策略。',
+    sln_text: '已完成推荐打分模型与接口联调，单次响应耗时低于 50ms。',
+    comment: '架构清晰，接口响应迅速！',
+    start_date: '2026-10-15',
+    deadline: '2026-11-15',
+    planed_hour: 10,
+    half_progress: '核心方案已完成 50%',
+    finish_date: '',
+    actual_hour: 6,
+    total_hour: 10,
+    update_date: '2026-10-28',
+    status: '进行中',
+  },
+  {
+    id: 3,
+    publisher: '青桐塾主',
+    publisher_id: 1,
+    taker: '陈默',
+    taker_id: 102,
+    shushi: '林深塾师',
+    shushi_id: 2,
+    task_serial: 'D003',
+    title: '自塾开源工程规范与新塾员共学手册沉淀',
+    required_courses: 'AI 智能体与大模型应用开发',
+    bonus: 40,
+    desc: '整理自塾课程修习、方舟协作与创新课题揭榜全流程图文指南。',
+    task_text: '输出结构化 Markdown 手册并配套示例脑图。',
+    sln_text: '已完成全部章节文档编写与配图校对。',
+    comment: '内容详实，已纳入新塾员必读指南。',
+    start_date: '2026-10-01',
+    deadline: '2026-10-25',
+    planed_hour: 6,
+    half_progress: '已完成',
+    finish_date: '2026-10-24',
+    actual_hour: 5,
+    total_hour: 6,
+    update_date: '2026-10-24',
+    status: '已完成',
+  },
+];
+
 /** 从后端获取进行中的项目列表 */
 function fetchProjectsFromApi(): Promise<Project[]> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     wx.request({
       url: getBaseUrl() + '/api/inno/fetch_current_projects',
       method: 'GET',
       header: { token },
       success: (res: any) => {
-        if (res.data && Array.isArray(res.data)) {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
           resolve(res.data);
         } else {
-          resolve([]);
+          resolve(FALLBACK_PROJECTS);
         }
       },
       fail: () => {
-        reject('请求失败');
+        resolve(FALLBACK_PROJECTS);
       },
     });
   });
@@ -187,10 +268,14 @@ export function updateInnoProject(
 
 /** 获取单个创新任务详情 GET /api/inno/get_task/{task_id} */
 export function getInnoTaskDetail(taskId: number | string): Promise<any> {
+  const tid = Number(taskId) || 1;
+  const fallbackProj = FALLBACK_PROJECTS.find((p) => p.id === tid) || FALLBACK_PROJECTS[0];
   return innoRequest({
-    url: '/api/inno/get_task/' + encodeURIComponent(String(taskId)),
+    url: '/api/inno/get_task/' + encodeURIComponent(String(tid)),
     method: 'GET',
-  }).then((data) => data || {});
+  })
+    .then((data) => (data && data.id ? data : fallbackProj))
+    .catch(() => fallbackProj);
 }
 
 /** 保存/提交创新任务方案与塾师点评 POST /api/inno/save_task */

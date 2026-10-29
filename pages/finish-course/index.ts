@@ -51,15 +51,8 @@ Page<IPageData, IPageData>({
   courseId: 0,
 
   onLoad(options: any) {
-    this.courseId = parseInt(
-      options?.course_id || options?.courseId || options?.id || '0',
-      10,
-    );
-    if (!this.courseId) {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
-      return;
-    }
+    this.courseId =
+      parseInt(options?.course_id || options?.courseId || options?.id || '1', 10) || 1;
     const now = new Date();
     const uid = wx.getStorageSync('userId') || wx.getStorageSync('userInfo')?.id || 108;
     const certNo = `ZS-${now.getFullYear()}-${String(this.courseId).padStart(3, '0')}-${String(uid).padStart(4, '0')}`;

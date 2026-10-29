@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * pages/ark-detail/index.ts
- * 方舟详情：2男2女搭子舱 / 船员进度PK / 三会排期 / 互动管理
+ * 方舟详情：诺亚方舟共学舱 / 船员进度 / 三会排期 / 互动管理
  * spec: specs/miniprogram/active/004-complete-ark-detail.md
  */
 import {
@@ -85,14 +85,10 @@ Page<IPageData, IPageData>({
   },
 
   onLoad(options: any) {
-    this.setData({ arkId: parseInt(options.arkId || options.id || '0', 10) });
+    const aid = parseInt(options?.arkId || options?.id || '1', 10) || 1;
+    this.setData({ arkId: aid });
     this.loadUserInfo();
-    if (this.data.arkId) {
-      this.loadData();
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
-    }
+    this.loadData();
   },
 
   onPullDownRefresh() {
@@ -102,7 +98,7 @@ Page<IPageData, IPageData>({
   onShareAppMessage() {
     const arkName = this.data.ark?.arkname || '诺亚方舟共学舱';
     return {
-      title: `🚢 邀请你加入自塾「${arkName}」2男2女共学搭子舱！`,
+      title: `🚢 邀请你加入自塾「${arkName}」诺亚方舟共学舱！`,
       path: `/pages/ark-detail/index?arkId=${this.data.arkId}`,
     };
   },
@@ -469,10 +465,10 @@ Page<IPageData, IPageData>({
     });
   },
 
-  /** 一键向同舟搭子打招呼约学 */
+  /** 一键向同舟成员发起共学打卡提醒 */
   async onGreetMember(e: any) {
     const userId = Number(e.currentTarget.dataset.userid || 0);
-    const username = e.currentTarget.dataset.username || '船员搭子';
+    const username = e.currentTarget.dataset.username || '同舟成员';
     if (!userId || userId === this.data.currentUserId) {
       wx.showToast({ title: '这是你自己哦 😊', icon: 'none' });
       return;
@@ -480,16 +476,16 @@ Page<IPageData, IPageData>({
     try {
       const res: any = await quickGreetPeer({
         target_user_id: userId,
-        topic: `《${this.data.ark.arkname || '诺亚方舟'}》同舟共学打卡约聊`,
+        topic: `《${this.data.ark.arkname || '诺亚方舟'}》同舟共学打卡推进`,
         planed_duration: 15,
       });
       wx.showToast({
-        title: res?.message || `已向 ${username} 发起共学约聊！`,
+        title: res?.message || `已向 ${username} 发送共学提醒！`,
         icon: 'none',
       });
     } catch (err: any) {
       wx.showToast({
-        title: `已向 ${username} 发送搭子招呼 👋`,
+        title: `已向 ${username} 发送共学提醒 👋`,
         icon: 'none',
       });
     }

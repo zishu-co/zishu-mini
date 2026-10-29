@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * pages/ark-group/index.ts
- * 组方舟页面：2男2女黄金共学搭子舱 · 列方舟 / 加入 / 创建
+ * 组方舟页面：诺亚方舟共学舱 · 列方舟 / 加入 / 创建
  * spec: specs/miniprogram/active/003-complete-ark-group.md
  */
 import {
@@ -60,16 +60,12 @@ Page<IPageData, IPageData>({
   hasLoadedOnce: false,
 
   onLoad(options: any) {
-    this.setData({ courseId: parseInt(options.courseId || options.id || '0', 10) });
+    const cid = parseInt(options?.courseId || options?.id || '1', 10) || 1;
+    this.setData({ courseId: cid });
     this.loadUserInfo();
-    if (this.data.courseId) {
-      this.loadData().then(() => {
-        this.hasLoadedOnce = true;
-      });
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
-    }
+    this.loadData().then(() => {
+      this.hasLoadedOnce = true;
+    });
   },
 
   onShow() {
@@ -85,7 +81,7 @@ Page<IPageData, IPageData>({
 
   onShareAppMessage() {
     return {
-      title: '🚢 2男2女诺亚方舟共学搭子舱 · 黄金4人组队，一起闯关结课！',
+      title: '🚢 诺亚方舟共学舱 · 4人小组共学，一起闯关结课！',
       path: `/pages/ark-group/index?courseId=${this.data.courseId}`,
     };
   },
@@ -120,54 +116,47 @@ Page<IPageData, IPageData>({
 
   buildCabinSeats(members: any[]): SeatSlot[] {
     const safeMembers = Array.isArray(members) ? members : [];
-    const males = safeMembers.filter((m) => m.gender === '男');
-    const females = safeMembers.filter((m) => m.gender === '女');
-    const others = safeMembers.filter((m) => m.gender !== '男' && m.gender !== '女');
-
-    const pickMale = (idx: number) => males[idx] || others.shift() || null;
-    const pickFemale = (idx: number) => females[idx] || others.shift() || null;
-
-    const m1 = pickMale(0);
-    const m2 = pickMale(1);
-    const f1 = pickFemale(0);
-    const f2 = pickFemale(1);
+    const m1 = safeMembers[0] || null;
+    const m2 = safeMembers[1] || null;
+    const f1 = safeMembers[2] || null;
+    const f2 = safeMembers[3] || null;
 
     return [
       {
-        id: 'male-1',
-        seatLabel: '♂ 男席 1',
+        id: 'seat-1',
+        seatLabel: '席位 1',
         genderType: 'male',
         occupied: Boolean(m1),
         username: m1?.username || '',
         isCaptain: Boolean(m1?.is_captain),
-        emptyText: '♂ 虚位以待',
+        emptyText: '虚位以待',
       },
       {
-        id: 'male-2',
-        seatLabel: '♂ 男席 2',
+        id: 'seat-2',
+        seatLabel: '席位 2',
         genderType: 'male',
         occupied: Boolean(m2),
         username: m2?.username || '',
         isCaptain: Boolean(m2?.is_captain),
-        emptyText: '♂ 虚位以待',
+        emptyText: '虚位以待',
       },
       {
-        id: 'female-1',
-        seatLabel: '♀ 女席 1',
+        id: 'seat-3',
+        seatLabel: '席位 3',
         genderType: 'female',
         occupied: Boolean(f1),
         username: f1?.username || '',
         isCaptain: Boolean(f1?.is_captain),
-        emptyText: '♀ 虚位以待',
+        emptyText: '虚位以待',
       },
       {
-        id: 'female-2',
-        seatLabel: '♀ 女席 2',
+        id: 'seat-4',
+        seatLabel: '席位 4',
         genderType: 'female',
         occupied: Boolean(f2),
         username: f2?.username || '',
         isCaptain: Boolean(f2?.is_captain),
-        emptyText: '♀ 虚位以待',
+        emptyText: '虚位以待',
       },
     ];
   },
@@ -257,7 +246,7 @@ Page<IPageData, IPageData>({
     try {
       const res: any = await arkJoin(arkId);
       if (res?.code === 200) {
-        wx.showToast({ title: '🎉 登船成功！快认识新搭子吧', icon: 'success' });
+        wx.showToast({ title: '🎉 登船成功！开启方舟共学吧', icon: 'success' });
         this.setData({ myArkId: arkId });
         await this.loadData();
       } else {
@@ -308,8 +297,8 @@ Page<IPageData, IPageData>({
   statusText(ark: TeacherArkItem): string {
     if (ark.finished) return '已成舟';
     if (ark.closed) return '已关闭';
-    if (ark.stage === '筹建中') return '招募搭子中';
-    return ark.stage || '招募搭子中';
+    if (ark.stage === '筹建中') return '招募船员中';
+    return ark.stage || '招募船员中';
   },
 
   statusClass(ark: TeacherArkItem): string {

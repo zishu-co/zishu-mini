@@ -28,7 +28,7 @@
       <view class="score-banner__title">答对 {{correctCount}} / {{checkData.length}} 题</view>
       <view class="score-banner__actions">
         <button class="score-mini-btn" bindtap="onRetryQuiz">🔄 再战一次</button>
-        <button class="score-mini-btn buddy" bindtap="onFindStudyBuddy">🤝 找同路搭子</button>
+        <button class="score-mini-btn buddy" bindtap="onFindStudyBuddy">🤝 找共学学伴</button>
       </view>
     </view>
     <view class="score-banner__right">

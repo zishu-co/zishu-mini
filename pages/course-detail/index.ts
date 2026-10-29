@@ -82,18 +82,13 @@ Page<IPageData, IPageData>({
   },
 
   onLoad(options: any) {
-    this.courseId = parseInt(options.id || options.courseId || '0', 10);
+    this.courseId = parseInt(options?.id || options?.courseId || '1', 10) || 1;
     const userId = this.resolveUserId();
     this.setData({ courseId: this.courseId, currentUserId: userId });
-    if (this.courseId) {
-      if (options.title) {
-        wx.setNavigationBarTitle({ title: decodeURIComponent(options.title) });
-      }
-      Promise.all([this.loadDetail(), this.loadSelections()]);
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
+    if (options?.title) {
+      wx.setNavigationBarTitle({ title: decodeURIComponent(options.title) });
     }
+    Promise.all([this.loadDetail(), this.loadSelections()]);
   },
 
   onShow() {
@@ -114,7 +109,7 @@ Page<IPageData, IPageData>({
   onShareAppMessage() {
     const title = this.data.courseDetail?.course_title || '自塾精品共学课程';
     return {
-      title: `📚 邀你一起修习《${title}》· 组2男2女方舟结伴通关！`,
+      title: `📚 邀你一起修习《${title}》· 组方舟结伴通关！`,
       path: `/pages/course-detail/index?id=${this.courseId}`,
     };
   },
@@ -421,7 +416,7 @@ Page<IPageData, IPageData>({
     return this.onQuitCourse();
   },
 
-  /** 快捷入口：组方舟搭子舱 */
+  /** 快捷入口：组方舟共学舱 */
   onGoArkGroup() {
     if (!this.courseId) return;
     wx.navigateTo({ url: `/pages/ark-group/index?courseId=${this.courseId}` });
@@ -527,7 +522,7 @@ Page<IPageData, IPageData>({
     }
   },
 
-  /** 点击在学同塾/结课校友卡片：发起共学约聊或查看学习单 */
+  /** 点击在学同塾/结课校友卡片：发起同课学习交流或查看学习单 */
   onClassmateTap(e: any) {
     const userId = Number(e.currentTarget.dataset.userid || 0);
     const userName = e.currentTarget.dataset.username || '同塾伙伴';
@@ -560,11 +555,11 @@ Page<IPageData, IPageData>({
       try {
         const greetRes: any = await quickGreetPeer({
           target_user_id: userId,
-          topic: `📚 同修《${courseTitle}》· 15分钟共学交流`,
+          topic: `📚 同修《${courseTitle}》· 15分钟课程学习交流`,
           planed_duration: 15,
         });
         wx.showModal({
-          title: '🎉 已发起同课共学约聊',
+          title: '🎉 已发起同课学习交流',
           content: greetRes?.message || `已创建与 ${userName} 的15分钟目标面谈记录，快去目标面谈页查看吧！`,
           confirmText: '去查看',
           cancelText: '留在当前',

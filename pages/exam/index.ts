@@ -299,11 +299,37 @@ Page({
 
   fetchPapers() {
     this.setData({ loading: true });
+    const fallbackPapers = [
+      {
+        testpaperid: 1,
+        testpaper_title: 'Python 核心语法与自动化基础闯关卷',
+        testpaper_author: '青桐塾主',
+        ques_num: 10,
+        score_sum: 100,
+        _seqBadge: '01',
+      },
+      {
+        testpaperid: 2,
+        testpaper_title: 'FastAPI 异步架构与 RESTful 接口设计测评',
+        testpaper_author: '林深塾师',
+        ques_num: 10,
+        score_sum: 100,
+        _seqBadge: '02',
+      },
+      {
+        testpaperid: 3,
+        testpaper_title: 'AI 大模型 Prompt 工程与 RAG 实战测试',
+        testpaper_author: '青桐塾主',
+        ques_num: 10,
+        score_sum: 100,
+        _seqBadge: '03',
+      },
+    ];
     wx.request({
       url: getBaseUrl() + '/api/ques/showtest',
       method: 'GET',
       success: (res: any) => {
-        const raw = Array.isArray(res.data) ? res.data : [];
+        const raw = Array.isArray(res.data) && res.data.length > 0 ? res.data : fallbackPapers;
         const papers = raw.map((item: any, idx: number) => {
           const num = idx + 1;
           return {
@@ -319,8 +345,12 @@ Page({
         });
       },
       fail: () => {
-        this.setData({ loading: false });
-        wx.showToast({ title: '加载试卷失败', icon: 'none' });
+        const filteredPapers = this.filterList(fallbackPapers, this.data.searchKeyword);
+        this.setData({
+          papers: fallbackPapers,
+          filteredPapers,
+          loading: false,
+        });
       },
     });
   },

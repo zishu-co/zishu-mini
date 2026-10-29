@@ -7,16 +7,16 @@ import type { MockReply } from './types';
 /** 预设问答规则 */
 const rules: Array<{ keywords: string[]; reply: MockReply }> = [
   {
-    keywords: ['搭子', '共学', '交友', '同路人', '广场'],
+    keywords: ['学伴', '共学', '同路人', '广场'],
     reply: {
-      content: '🤝 正在为你匹配全塾高活跃共学搭子！\n在「共学交友广场」你可以：\n• 按性别（女生/男生）与热力值筛选同路人\n• 一键发送 👋 破冰约聊邀请（15分钟线上破冰）\n• 查看对方的公开学习单\n\n这就带你前往全塾共学广场！✨',
+      content: '🤝 正在为你连接全塾高活跃共学伙伴！\n在「全塾动态 · 共学广场」你可以：\n• 按 7 日学霸榜与目标方向查找同路人\n• 一键发送 👋 共学交流邀请（15分钟线上共学讨论）\n• 查看对方的公开学习单\n\n这就带你前往全塾共学广场！✨',
       command: { type: 'navigate', params: { url: '/pages/all/index' } },
     },
   },
   {
-    keywords: ['方舟', '2男2女', '组队', 'ark'],
+    keywords: ['方舟', '组队', 'ark'],
     reply: {
-      content: '🚢 自塾「2男2女黄金搭子方舟」规则：\n• 选修任意课程后，可在课程页点击「🚢 方舟组」\n• 每个方舟满编 4 人（2男 2女），自动平衡搭配\n• 推选船长、约定 3 次线上/线下会面，4人全通关即成舟！\n\n带你去选课中心开启方舟之旅 🎯',
+      content: '🚢 自塾「诺亚方舟共学舱」规则：\n• 选修任意课程后，可在课程页点击「🚢 组方舟」\n• 每个方舟满编 4 人，结伴互助督学\n• 推选舟长、约定 3 次线上/线下研讨会，4人全通关即成舟！\n\n带你去选课中心开启方舟之旅 🎯',
       command: { type: 'navigate', params: { url: '/pages/learn/index' } },
     },
   },
@@ -28,9 +28,9 @@ const rules: Array<{ keywords: string[]; reply: MockReply }> = [
     },
   },
   {
-    keywords: ['约聊', '面谈', 'goaltalk'],
+    keywords: ['面谈', '复盘', 'goaltalk'],
     reply: {
-      content: '💬 在「1v1 目标约聊中心」你可以查看所有发起和收到的共学约聊，支持一键确认赴约与复制腾讯会议号！',
+      content: '💬 在「1v1 目标面谈中心」你可以查看所有发起和收到的目标复盘面谈，支持一键确认赴约与复制腾讯会议号！',
       command: { type: 'navigate', params: { url: '/pages/goaltalk/index' } },
     },
   },

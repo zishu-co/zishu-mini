@@ -1,10 +1,10 @@
 <view class="page">
-  <!-- 顶部交友广场品牌 Banner + 统计 -->
+  <!-- 顶部共学广场品牌 Banner + 统计 -->
   <view class="hero-stats">
     <view class="hero-header">
       <view>
-        <view class="hero-title">全塾同路人 · 共学交友广场</view>
-        <view class="hero-sub">遇见同频男女搭子 · 组方舟 · 约目标面谈</view>
+        <view class="hero-title">全塾动态  共学广场</view>
+        <view class="hero-sub">遇见同频共学伙伴 · 组方舟 · 约目标面谈</view>
       </view>
       <view class="hero-tag">🔥 {{hot7dCount}} 人本周打卡</view>
     </view>
@@ -54,35 +54,13 @@
         class="cat-tab {{activeCategory === 'buddy' ? 'active' : ''}}"
         data-cat="buddy"
         bindtap="onCategoryTap"
-      >🤝 找共学搭子</view>
+      >🤝 找共学学伴</view>
       <view
         class="cat-tab {{activeCategory === 'mentor' ? 'active' : ''}}"
         data-cat="mentor"
         bindtap="onCategoryTap"
       >💎 领航塾师</view>
     </scroll-view>
-
-    <!-- 性别快速筛选 -->
-    <view class="gender-filter-bar">
-      <text class="filter-hint">筛选搭子：</text>
-      <view class="gender-pills">
-        <view
-          class="gender-pill {{genderFilter === 'all' ? 'active' : ''}}"
-          data-gender="all"
-          bindtap="onGenderFilterTap"
-        >👥 全部</view>
-        <view
-          class="gender-pill {{genderFilter === '女' ? 'active female' : ''}}"
-          data-gender="女"
-          bindtap="onGenderFilterTap"
-        >🚺 女生搭子</view>
-        <view
-          class="gender-pill {{genderFilter === '男' ? 'active male' : ''}}"
-          data-gender="男"
-          bindtap="onGenderFilterTap"
-        >🚹 男生搭子</view>
-      </view>
-    </view>
   </view>
 
   <!-- 成员列表 -->
@@ -114,9 +92,8 @@
             </view>
           </view>
 
-          <!-- 社交与共学标签 -->
+          <!-- 共学标签 -->
           <view class="social-tags-row">
-            <text class="social-tag gender-{{item._genderClass}}" wx:if="{{item._genderLabel}}">{{item._genderLabel}}</text>
             <text class="social-tag" wx:if="{{item.location}}">📍 {{item.location}}</text>
             <text class="social-tag">📚 累计 {{item._learnHourStr}}h</text>
             <text class="social-tag hot" wx:if="{{item._hours7dStr}}">🔥 7日 {{item._hours7dStr}}h</text>
@@ -133,7 +110,7 @@
               class="peer-btn ghost"
               bindtap="onOpenPeerProfile"
               data-item="{{item}}"
-            >👤 社交名片</view>
+            >👤 学习名片</view>
             <view
               class="peer-btn ghost"
               bindtap="onViewLearnSheet"
@@ -143,20 +120,20 @@
               class="peer-btn primary"
               bindtap="onOpenGreetModal"
               data-item="{{item}}"
-            >👋 破冰约学</view>
+            >👋 共学交流</view>
           </view>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 破冰约学弹窗 -->
+  <!-- 共学交流弹窗 -->
   <view class="greet-mask" wx:if="{{showGreetModal}}" bindtap="onCloseGreetModal"></view>
   <view class="greet-modal" wx:if="{{showGreetModal && greetTarget}}">
     <view class="greet-header">
       <view>
-        <text class="greet-title">👋 向 {{greetTarget.username}} 发起破冰约学</text>
-        <text class="greet-sub">{{greetTarget._levelBadge}} {{greetTarget._levelTitle}} · 选择一个共学破冰话题</text>
+        <text class="greet-title">👋 向 {{greetTarget.username}} 发起共学交流</text>
+        <text class="greet-sub">{{greetTarget._levelBadge}} {{greetTarget._levelTitle}} · 选择一个共学交流话题</text>
       </view>
       <text class="greet-close" bindtap="onCloseGreetModal">✕</text>
     </view>
@@ -175,7 +152,7 @@
     <input
       class="custom-topic-input"
       type="text"
-      placeholder="或输入自定义破冰留言（选填）..."
+      placeholder="或输入自定义共学留言（选填）..."
       value="{{customTopic}}"
       bindinput="onCustomTopicInput"
     />
@@ -187,7 +164,7 @@
     </view>
   </view>
 
-  <!-- 101-profile.md: 同路人社交名片弹窗 -->
+  <!-- 101-profile.md: 同路人学习名片弹窗 -->
   <view class="greet-mask" wx:if="{{showProfileModal}}" bindtap="onClosePeerProfile"></view>
   <view class="greet-modal profile-modal" wx:if="{{showProfileModal && profilePeer}}">
     <view class="profile-head">
@@ -203,7 +180,7 @@
           </view>
         </view>
         <text class="greet-sub">
-          {{profilePeer._genderLabel || '同频搭子'}} · 📍 {{profilePeer.location || '同城/线上'}}
+          {{profilePeer.role || '共学同路人'}} · 📍 {{profilePeer.location || '线上'}}
         </text>
       </view>
       <text class="greet-close" bindtap="onClosePeerProfile">✕</text>
@@ -227,7 +204,7 @@
     <view class="profile-goal-box">
       <text class="profile-section-title">🎯 当前冲刺目标</text>
       <text class="profile-goal-text">
-        {{profileGoal ? profileGoal.content : (profilePeer.goal || profilePeer.desc || '正在寻找 2男2女诺亚方舟共学搭子，欢迎随时破冰约聊！')}}
+        {{profileGoal ? profileGoal.content : (profilePeer.goal || profilePeer.desc || '正在寻找诺亚方舟共学学伴，欢迎随时发起共学交流！')}}
       </text>
       <view wx:if="{{profileGoal && profileGoal.process !== undefined}}" class="profile-goal-progress">
         <text>当前进度：{{profileGoal.process || 0}}%</text>
@@ -240,7 +217,7 @@
         data-userid="{{profilePeer.id}}"
         bindtap="onViewLearnSheet"
       >📖 查看学习单</view>
-      <view class="greet-btn confirm" bindtap="onGreetFromProfile">👋 15分钟破冰约学</view>
+      <view class="greet-btn confirm" bindtap="onGreetFromProfile">👋 15分钟共学交流</view>
     </view>
   </view>
 </view>

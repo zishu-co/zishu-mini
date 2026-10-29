@@ -347,9 +347,10 @@ Page<IInnoPageData, any>({
         const groupList = this.buildGroups(this.data.projectList || []);
         this.setData({ listLoading: false, groupList, filteredGroups: groupList });
         wx.stopPullDownRefresh();
-        wx.showToast({ title: '加载项目失败，请稍后重试', icon: 'none' });
       });
   },
+
+  noop() {},
 
   async onOpenPublishModal() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');

@@ -23,11 +23,11 @@ interface Message {
 
 function resolveQuickAction(text: string): { actionLabel?: string; actionUrl?: string; actionIsTab?: boolean } {
   const t = String(text || '');
-  if (t.includes('方舟') || t.includes('2男2女')) {
-    return { actionLabel: '🚢 进入诺亚方舟搭子舱', actionUrl: '/pages/ark-group/index', actionIsTab: false };
+  if (t.includes('方舟')) {
+    return { actionLabel: '🚢 进入诺亚方舟共学舱', actionUrl: '/pages/ark-group/index', actionIsTab: false };
   }
-  if (t.includes('搭子') || t.includes('同路人') || t.includes('交友')) {
-    return { actionLabel: '🤝 前往全塾同路人交友广场', actionUrl: '/pages/all/index', actionIsTab: false };
+  if (t.includes('学伴') || t.includes('同路人') || t.includes('广场')) {
+    return { actionLabel: '🤝 前往全塾动态共学广场', actionUrl: '/pages/all/index', actionIsTab: false };
   }
   if (t.includes('目标')) {
     return { actionLabel: '🎯 打开以终为始目标页', actionUrl: '/pages/aim/index', actionIsTab: true };
@@ -62,8 +62,8 @@ Page<AgentPageData, any>({
   data: {
     messages: [],
     quickPrompts: [
-      '🤝 找共学搭子',
-      '🚢 怎么组2男2女方舟',
+      '🤝 找共学学伴',
+      '🚢 怎么加入共学方舟',
       '🎯 制定本周目标',
       '📚 推荐热门课程',
       '🏆 去闯关答题',
@@ -87,16 +87,16 @@ Page<AgentPageData, any>({
     this.setData({ messages: [], suggestedGoal: '' }, () => {
       this.addMessage(
         'assistant',
-        '你好！我是自塾 AI 伴学教练 🤖✨\n你可以直接点下方快捷气泡，或输入想聊的目标、课程、2男2女方舟搭子匹配需求，我还能直接带你去对应页面！',
+        '你好！我是自塾 AI 伴学教练 🤖✨\n你可以直接点下方快捷气泡，或输入想聊的学习目标、选修课程、诺亚方舟共学需求，我还能直接带你去对应页面！',
         undefined,
-        { actionLabel: '🤝 逛逛同路人交友广场', actionUrl: '/pages/all/index', actionIsTab: false }
+        { actionLabel: '🤝 逛逛全塾共学广场', actionUrl: '/pages/all/index', actionIsTab: false }
       );
     });
   },
 
   onShareAppMessage() {
     return {
-      title: '自塾 AI 伴学教练 🤖 定制学习目标 · 匹配 2男2女方舟共学搭子',
+      title: '自塾 AI 伴学教练 🤖 定制学习目标 · 智能规划共学路径',
       path: '/pages/agent/index',
     };
   },
@@ -212,7 +212,7 @@ Page<AgentPageData, any>({
       remoteCommand = fallback.command;
       if (text.includes('目标') || text.length >= 8) {
         suggestedGoal = text.includes('目标')
-          ? '30天内完成1门核心课程并结识3位共学搭子组成方舟通关'
+          ? '30天内完成1门核心课程并通过结课闯关测评'
           : text;
       }
     }

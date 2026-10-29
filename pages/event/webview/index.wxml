@@ -10,7 +10,7 @@
     <view wx:if="{{url}}" class="url-preview" bindtap="onCopyUrl">{{url}}</view>
     <view class="webview-actions">
       <button wx:if="{{url}}" class="copy-btn" bindtap="onCopyUrl">📋 复制活动链接</button>
-      <button class="plaza-btn" bindtap="onGoPlaza">🤝 去同路人广场</button>
+      <button class="plaza-btn" bindtap="onGoPlaza">🤝 去共学广场</button>
       <button class="back-btn" bindtap="onGoBack">返回活动列表</button>
     </view>
   </view>

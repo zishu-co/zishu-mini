@@ -101,7 +101,7 @@
         <view class="card-meta">
           <text class="meta-item">🕐 {{item._startDateStr || item.start_time}}</text>
           <text class="meta-item">📍 {{item.location || '线上/待定'}}</text>
-          <text class="meta-item">👥 {{item.participant_count}} 位搭子已报名（点卡片看名单）</text>
+          <text class="meta-item">👥 {{item.participant_count}} 位塾员已报名（点卡片看名单）</text>
         </view>
         <view class="card-desc" wx:if="{{item.desc}}">
           <text>{{item.desc}}</text>
@@ -115,7 +115,7 @@
             loading="{{joiningId === item.id}}"
             disabled="{{joiningId === item.id}}"
             catchtap="onJoinTap"
-          >{{joiningId === item.id ? '报名中...' : '✨ 报名结伴参加'}}</button>
+          >{{joiningId === item.id ? '报名中...' : '✨ 立即报名参加'}}</button>
         </view>
       </view>
     </view>
@@ -144,7 +144,7 @@
         <view class="card-meta">
           <text class="meta-item">🕐 活动时间：{{item._startDateStr || item.start_time}}</text>
           <text class="meta-item">📍 活动地点：{{item.location || '线上/待定'}}</text>
-          <text class="meta-item">👥 共 {{item.participant_count}} 位搭子参与</text>
+          <text class="meta-item">👥 共 {{item.participant_count}} 位塾员参与</text>
         </view>
         <view class="card-actions">
           <button
@@ -159,7 +159,7 @@
             class="btn-primary signed-btn"
             catchtap="onCardTap"
             data-id="{{item.id}}"
-          >✨ 已完成签到 · 查看搭子名单</button>
+          >✨ 已完成签到 · 查看参与名单</button>
         </view>
       </view>
     </view>
@@ -218,10 +218,10 @@
     </view>
   </block>
 
-  <!-- 100-event-form.md: 发起同城共学活动弹窗 -->
+  <!-- 100-event-form.md: 发起共学活动弹窗 -->
   <view class="event-modal-mask" wx:if="{{showCreateModal}}" bindtap="onCloseCreateModal">
     <view class="event-modal-card" catchtap="stopEventModalBubble">
-      <view class="event-modal-title">🎉 发起同城/线上共学活动</view>
+      <view class="event-modal-title">🎉 发起线下/线上共学活动</view>
       <view class="event-form-field">
         <text class="event-form-label">活动主题 *</text>
         <input
@@ -260,7 +260,7 @@
         <text class="event-form-label">活动亮点与说明</text>
         <textarea
           class="event-form-textarea"
-          placeholder="介绍活动流程、适合人群或破冰话题..."
+          placeholder="介绍活动流程、适合人群或交流主题..."
           value="{{createForm.desc}}"
           data-field="desc"
           bindinput="onCreateFormInput"

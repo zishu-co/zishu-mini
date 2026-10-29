@@ -35,20 +35,20 @@ const fallbackRecommendations: RecommendationItem[] = [
   {
     id: 'rec-ark',
     type: 'COURSE_URGENT',
-    title: '加入 2男2女「诺亚方舟」共学搭子舱',
-    description: '选定一门技能好课，与 3 位同频男女学伴结成方舟，一起开三会、拿满分结课证书',
-    action_text: '找搭子选课',
+    title: '加入「诺亚方舟」4人共学小组',
+    description: '选定一门技能好课，与 3 位同塾学员结成方舟，一起开三会、拿满分结课证书',
+    action_text: '去选课',
     action_url: '/pages/learn/index',
     score: 95,
     urgency_level: 'high',
     estimated_time: '25分钟',
     deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    reasons: ['2男2女黄金搭子机制', '共学通关率提升 300%'],
+    reasons: ['4人方舟督学机制', '共学通关率提升 300%'],
   },
   {
     id: 'rec-plaza',
     type: 'GOAL_TALK',
-    title: '去同路人广场邂逅学伴 & 发起 15 分钟破冰约聊',
+    title: '去共学广场结识学伴 & 发起 15 分钟共学交流',
     description: '查看全塾 7 日学霸热力榜与领航塾师，一键预约目标面谈或共学打卡',
     action_text: '去逛广场',
     action_url: '/pages/all/index',
@@ -56,7 +56,7 @@ const fallbackRecommendations: RecommendationItem[] = [
     urgency_level: 'medium',
     estimated_time: '15分钟',
     deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    reasons: ['找到同目标学习搭子', '1v1 目标面谈赋能'],
+    reasons: ['找到同目标共学学伴', '1v1 目标面谈赋能'],
   },
   {
     id: 'rec-inno',
@@ -75,11 +75,11 @@ const fallbackRecommendations: RecommendationItem[] = [
 const mockGoal: Goal = {
   id: 1,
   user_id: 1001,
-  content: '通过软考高级（系统架构设计师）考试并结识 3 位技术共学搭子\n\n关键里程碑：\n1. 完成核心章节学习并组方舟通关\n2. 完成历年真题闯关测验\n3. 每周与塾师/学伴完成 1 次目标复盘面谈',
+  content: '通过软考高级（系统架构设计师）考试并完成核心课程通关\n\n关键里程碑：\n1. 完成核心章节学习并组方舟通关\n2. 完成历年真题闯关测验\n3. 每周与塾师完成 1 次目标复盘面谈',
   start_time: '2026-10-01',
   deadline: '2026-12-31',
   process: 6,
-  review: '已完成第一轮教材精读，加入方舟与 3 位同伴结伴打卡中，本周冲刺真题满分！',
+  review: '已完成第一轮教材精读，加入方舟与 3 位同塾成员结伴打卡中，本周冲刺真题满分！',
 };
 
 const TAB_BAR_PAGES = [
@@ -139,23 +139,23 @@ const computeEnergyMeta = (goal: Goal | null) => {
   if (!goal) {
     return {
       goalProgressPercent: 0,
-      energyLevelText: '🌱 立下你的阶段目标，开启共学奇遇',
+      energyLevelText: '🌱 立下你的阶段目标，开启共学进阶之旅',
       energyBadge: '待启航',
       streakDays: 1,
     };
   }
   const raw = Number(goal.process) || 0;
   const pct = raw <= 10 ? Math.min(100, Math.max(0, raw * 10)) : Math.min(100, Math.max(0, raw));
-  let energyLevelText = '🌱 初露锋芒 · 邀请学伴一起监督吧';
+  let energyLevelText = '🌱 初露锋芒 · 按计划稳步推进学习吧';
   let energyBadge = '启航期';
   if (pct >= 100) {
-    energyLevelText = '👑 目标圆满达成 · 快去广场分享喜悦！';
+    energyLevelText = '👑 目标圆满达成 · 可归档并开启下一阶段目标！';
     energyBadge = '满级通关';
   } else if (pct >= 70) {
     energyLevelText = '🔥 终局冲刺中 · 距离满级仅一步之遥';
     energyBadge = '高燃冲刺';
   } else if (pct >= 40) {
-    energyLevelText = '⚡ 渐入佳境 · 保持节奏，方舟搭子与你同行';
+    energyLevelText = '⚡ 渐入佳境 · 保持节奏，稳步推进阶段目标';
     energyBadge = '稳步进阶';
   }
   let streakDays = 1;
@@ -533,7 +533,7 @@ Page<IAimPageData, IAimData>({
     }
   },
 
-  // 快捷入口：去同路人广场找共学搭子
+  // 快捷入口：去共学广场找共学学伴
   onFindGoalBuddy() {
     wx.navigateTo({ url: '/pages/all/index' });
   },
@@ -709,7 +709,7 @@ Page<IAimPageData, IAimData>({
 
     const msg =
       newProgress >= 10
-        ? '🎉 恭喜達成 100% 满级目标！快去同路人广场分享喜悦吧'
+        ? '🎉 恭喜达成 100% 满级目标！继续保持精进吧'
         : `⚡ 进度已推进至 ${newProgress * 10}%，继续加油！`;
 
     Toast({

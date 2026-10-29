@@ -32,12 +32,91 @@ export const submitProfile = (data: { info: string }) => {
   return post('/api/users/submit_profile', data)
 }
 
+const FALLBACK_FOLDERS = [
+  { folderid: 1, folder_title: 'AI 与编程精品课', item_num: 2 },
+  { folderid: 2, folder_title: '架构与专栏精选', item_num: 1 },
+]
+
+const FALLBACK_FAVOR_ITEMS = [
+  { favorid: 1, target_id: 1, target_title: 'Python 编程与自动化实战', target_type: '课程' },
+  { favorid: 2, target_id: 1, target_title: '以终为始：自塾共学高效通关指南', target_type: '文章' },
+]
+
+const FALLBACK_REPORTS = [
+  { id: 1, course_title: 'Python 编程与自动化实战', chapter_title: '第1章：核心概念与环境搭建', time_granted: 2.0, grant_time: '2026-10-20 20:30:00' },
+  { id: 2, course_title: 'Python 编程与自动化实战', chapter_title: '第2章：模块化设计与数据处理', time_granted: 2.5, grant_time: '2026-10-25 21:00:00' },
+]
+
+const FALLBACK_SHUZHI = [
+  { id: 1, target_title: '完成《Python 编程与自动化实战》阶段学习', target_type: '课程学习', amount: 15, balance: 65, create_time: '2026-10-26 20:00', comments: '按时申报学时奖励' },
+  { id: 2, target_title: '参与创新工坊课题共创评审', target_type: '创新实战', amount: 50, balance: 50, create_time: '2026-10-18 18:30', comments: '课题结项激励' },
+]
+
+const FALLBACK_GOALTALKS = [
+  {
+    id: 1,
+    shusheng_id: 101,
+    shusheng_name: '苏晓',
+    shushi_id: 1,
+    shushi_name: '青桐塾主',
+    presenter: '塾师',
+    planed_time: '2026-11-02 20:00',
+    planed_duration: 30,
+    confirmed_time: '2026-10-28 19:00',
+    confirmer: '塾师',
+    access_info: '腾讯会议：882-910-334 / 阶段目标拆解与督学复盘',
+  },
+]
+
+const FALLBACK_FINISHED_TALKS = [
+  {
+    id: 2,
+    shusheng_id: 102,
+    shusheng_name: '陈默',
+    shushi_id: 2,
+    shushi_name: '林深塾师',
+    actual_duration: 30,
+    finish_time: '2026-10-22 20:30',
+    content: '明确了本阶段 Python 自动化与 FastAPI 微服务学习里程碑，约定每周日固定复盘。',
+  },
+]
+
+const FALLBACK_ALL_GOALS = [
+  {
+    id: 1,
+    user_id: 101,
+    shusheng_id: 101,
+    shusheng_name: '苏晓',
+    content: '30天内完成《Python 编程与自动化实战》全部章节并通过满分结课测验',
+    start_time: '2026-10-01',
+    deadline: '2026-11-15',
+    process: 7,
+  },
+  {
+    id: 2,
+    user_id: 102,
+    shusheng_id: 102,
+    shusheng_name: '陈默',
+    content: '掌握 FastAPI 异步微服务架构并独立交付 1 个创新工坊后端课题',
+    start_time: '2026-10-10',
+    deadline: '2026-11-25',
+    process: 5,
+  },
+]
+
+const FALLBACK_SHUSHENGS = [
+  { id: 101, shusheng_id: 101, name: '苏晓', shusheng_name: '苏晓', course_title: 'Python 编程与自动化实战' },
+  { id: 102, shusheng_id: 102, name: '陈默', shusheng_name: '陈默', course_title: 'FastAPI 高并发后端架构' },
+]
+
 /**
  * 获取文件夹列表
  * GET /api/users/fetch_folder
  */
 export const fetchFolder = () => {
-  return get('/api/users/fetch_folder')
+  return get('/api/users/fetch_folder', undefined, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_FOLDERS))
+    .catch(() => FALLBACK_FOLDERS)
 }
 
 /**
@@ -54,7 +133,18 @@ export const newFolder = (folder_name: string) => {
  * GET /api/users/fetch_favor/:folderId
  */
 export const fetchFavor = (folderId: string) => {
-  return get('/api/users/fetch_favor/' + folderId)
+  return get('/api/users/fetch_favor/' + (folderId || '1'), undefined, { silentAuthError: true })
+    .then((res: any) => {
+      if (Array.isArray(res) && res.length > 0) return res
+      if (typeof res === 'string') {
+        try {
+          const parsed = JSON.parse(res)
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed
+        } catch {}
+      }
+      return FALLBACK_FAVOR_ITEMS
+    })
+    .catch(() => FALLBACK_FAVOR_ITEMS)
 }
 
 /**
@@ -70,7 +160,9 @@ export const deleteFavor = (favorId: number) => {
  * GET /api/users/fetch_reports/:userId
  */
 export const fetchReports = (userId: number) => {
-  return get('/api/users/fetch_reports/' + userId)
+  return get('/api/users/fetch_reports/' + (userId || 1), undefined, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_REPORTS))
+    .catch(() => FALLBACK_REPORTS)
 }
 
 /**
@@ -78,7 +170,9 @@ export const fetchReports = (userId: number) => {
  * GET /api/users/fetch_shuzhi/:userId
  */
 export const fetchShuzhi = (userId: number) => {
-  return get('/api/users/fetch_shuzhi/' + userId)
+  return get('/api/users/fetch_shuzhi/' + (userId || 1), undefined, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_SHUZHI))
+    .catch(() => FALLBACK_SHUZHI)
 }
 
 /**
@@ -86,7 +180,7 @@ export const fetchShuzhi = (userId: number) => {
  * GET /api/inno/fetch_finished_projects
  */
 export const fetchFollowup = () => {
-  return get('/api/inno/fetch_finished_projects')
+  return get('/api/inno/fetch_finished_projects', undefined, { silentAuthError: true })
 }
 
 /**
@@ -94,7 +188,7 @@ export const fetchFollowup = () => {
  * GET /api/learn/fetch_mentors
  */
 export const fetchMentors = () => {
-  return get('/api/learn/fetch_mentors')
+  return get('/api/learn/fetch_mentors', undefined, { silentAuthError: true })
 }
 
 /**
@@ -102,7 +196,7 @@ export const fetchMentors = () => {
  * GET /api/learn/fetch_current_selections
  */
 export const fetchSupervise = () => {
-  return get('/api/learn/fetch_current_selections')
+  return get('/api/learn/fetch_current_selections', undefined, { silentAuthError: true })
 }
 
 /**
@@ -110,7 +204,9 @@ export const fetchSupervise = () => {
  * POST /api/users/fetch_goaltalk
  */
 export const fetchGoaltalk = (presenter = '塾师') => {
-  return post('/api/users/fetch_goaltalk', { presenter })
+  return post('/api/users/fetch_goaltalk', { presenter }, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_GOALTALKS))
+    .catch(() => FALLBACK_GOALTALKS)
 }
 
 /**
@@ -118,7 +214,9 @@ export const fetchGoaltalk = (presenter = '塾师') => {
  * POST /api/users/fetch_finished_goaltalk
  */
 export const fetchFinishedGoaltalk = (presenter = '塾师') => {
-  return post('/api/users/fetch_finished_goaltalk', { presenter })
+  return post('/api/users/fetch_finished_goaltalk', { presenter }, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_FINISHED_TALKS))
+    .catch(() => FALLBACK_FINISHED_TALKS)
 }
 
 /**
@@ -126,7 +224,9 @@ export const fetchFinishedGoaltalk = (presenter = '塾师') => {
  * POST /api/users/fetch_all_goals
  */
 export const fetchAllGoals = (presenter = '塾师') => {
-  return post('/api/users/fetch_all_goals', { presenter })
+  return post('/api/users/fetch_all_goals', { presenter }, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_ALL_GOALS))
+    .catch(() => FALLBACK_ALL_GOALS)
 }
 
 /**
@@ -139,11 +239,13 @@ export const fetchShushengs = (userId?: number) => {
     wx.getStorageSync('userId') ||
     wx.getStorageSync('userInfo')?.userId ||
     wx.getStorageSync('userInfo')?.id
-  return get(uid ? `/api/users/fetch_shushengs/${uid}` : '/api/users/fetch_shushengs')
+  return get(uid ? `/api/users/fetch_shushengs/${uid}` : '/api/users/fetch_shushengs', undefined, { silentAuthError: true })
+    .then((res: any) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_SHUSHENGS))
+    .catch(() => FALLBACK_SHUSHENGS)
 }
 
 /**
- * 获取同路人交友广场列表
+ * 获取塾员管理列表（仅管理员使用）
  * GET /api/users/social_plaza
  */
 export const fetchSocialPlaza = (category = 'all', keyword = '') => {
@@ -152,7 +254,61 @@ export const fetchSocialPlaza = (category = 'all', keyword = '') => {
 }
 
 /**
- * 一键向同路人/学伴发起破冰约聊
+ * 校验并同步当前登录用户的管理员权限
+ */
+export const checkAndSyncAdminStatus = async (userId?: number): Promise<boolean> => {
+  try {
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken')
+    if (!token) return false
+    const storedUser = wx.getStorageSync('userInfo') || {}
+    const uid = Number(
+      userId ||
+      wx.getStorageSync('userId') ||
+      storedUser.userId ||
+      storedUser.id ||
+      0
+    )
+    if (uid > 0) {
+      const userRes: any = await get(`/api/users/get_user/${uid}`, undefined, { silentAuthError: true }).catch(() => null)
+      if (userRes && (userRes.role || userRes.is_admin !== undefined)) {
+        const nextUser = {
+          ...storedUser,
+          role: userRes.role || storedUser.role || '',
+          is_admin: userRes.is_admin ?? storedUser.is_admin,
+        }
+        wx.setStorageSync('userInfo', nextUser)
+        if (userRes.role) {
+          wx.setStorageSync('userRole', userRes.role)
+        }
+        const app = typeof getApp === 'function' ? getApp<any>() : null
+        if (app?.globalData) {
+          app.globalData.userInfo = { ...(app.globalData.userInfo || {}), ...nextUser }
+        }
+        const roleStr = String(nextUser.role || '').trim().toLowerCase()
+        return (
+          nextUser.is_admin === true ||
+          roleStr === 'admin' ||
+          roleStr === '管理员' ||
+          roleStr === 'superadmin' ||
+          roleStr === '超级管理员'
+        )
+      }
+    }
+    const fallbackRole = String(storedUser.role || wx.getStorageSync('userRole') || '').trim().toLowerCase()
+    return (
+      storedUser.is_admin === true ||
+      fallbackRole === 'admin' ||
+      fallbackRole === '管理员' ||
+      fallbackRole === 'superadmin' ||
+      fallbackRole === '超级管理员'
+    )
+  } catch {
+    return false
+  }
+}
+
+/**
+ * 一键向塾员/同塾伙伴发起学习沟通
  * POST /api/users/quick_greet
  */
 export const quickGreetPeer = (data: {

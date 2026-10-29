@@ -59,6 +59,8 @@ Page({
     this.loadShushengOptions()
   },
 
+  noop() {},
+
   onPullDownRefresh() {
     if (this.data.activeTab === 0) {
       this.fetchScheduled().finally(() => wx.stopPullDownRefresh())

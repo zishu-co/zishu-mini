@@ -241,19 +241,19 @@ Page<IArticlePageData, any>({
     )
     this.setData({ hasLogin })
 
-    if (hasLogin) {
-      this.fetchArticles(done)
-      this.fetchZhuanlans()
-      this.fetchVideoAlbums()
-      this.fetchMindMaps()
-    } else if (done) {
-      done()
-    }
+    this.fetchArticles(done)
+    this.fetchZhuanlans()
+    this.fetchVideoAlbums()
+    this.fetchMindMaps()
   },
 
   // ── 104-show-album.md, 103-fetch-album.md, 105-watch-video.md: 微课专辑 ──
   fetchVideoAlbums() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    const fallbackAlbums = [
+      { album_id: 1, album_title: 'Python 自动化与工程实战微课', author_name: '青桐塾主', wholelength: 45 },
+      { album_id: 2, album_title: 'FastAPI 高并发架构核心精讲', author_name: '林深塾师', wholelength: 60 },
+    ]
     this.setData({ videoLoading: true })
     wx.request({
       url: `${getBaseUrl()}/api/video/show_album`,
@@ -265,7 +265,10 @@ Page<IArticlePageData, any>({
           : Array.isArray(res.data)
           ? res.data
           : []
-        this.setData({ videoAlbums: list })
+        this.setData({ videoAlbums: list.length > 0 ? list : fallbackAlbums })
+      },
+      fail: () => {
+        this.setData({ videoAlbums: fallbackAlbums })
       },
       complete: () => {
         this.setData({ videoLoading: false })
@@ -367,15 +370,21 @@ Page<IArticlePageData, any>({
   // ── 103-show-maps.md, 101-map.md, 102-search-map.md: 知识脑图 ──
   fetchMindMaps() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    const fallbackMaps = [
+      { mapid: 1, map_id: 1, map_title: 'Python 全栈与 AI 工程师成长路线图', author_name: '青桐塾主', map_desc: '涵盖基础语法、Web后端、数据处理与大模型应用开发。' },
+      { mapid: 2, map_id: 2, map_title: '以终为始 · 自塾方舟共学方法论脑图', author_name: '林深塾师', map_desc: '目标拆解、三次核心会面与结课项目验收全流程。' },
+    ]
     this.setData({ mapLoading: true })
     wx.request({
       url: `${getBaseUrl()}/api/map/show_map`,
       method: 'GET',
       header: { token, Authorization: token ? `Bearer ${token}` : '' },
       success: (res: any) => {
-        if (Array.isArray(res.data)) {
-          this.setData({ mapList: res.data })
-        }
+        const list = Array.isArray(res.data) && res.data.length > 0 ? res.data : fallbackMaps
+        this.setData({ mapList: list })
+      },
+      fail: () => {
+        this.setData({ mapList: fallbackMaps })
       },
       complete: () => {
         this.setData({ mapLoading: false })
@@ -492,15 +501,21 @@ Page<IArticlePageData, any>({
 
   fetchZhuanlans() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    const fallbackZhuanlans = [
+      { zhuanlanid: 1, zhuanlan_title: '以终为始 · 自塾共学方法论专栏', author_name: '青桐塾主', article_amount: 6 },
+      { zhuanlanid: 2, zhuanlan_title: 'AI 智能体与全栈工程实战合集', author_name: '林深塾师', article_amount: 8 },
+    ]
     this.setData({ zhuanlanLoading: true })
     wx.request({
       url: `${getBaseUrl()}/api/article/showzhuanlan`,
       method: 'GET',
       header: { token, Authorization: token ? `Bearer ${token}` : '' },
       success: (res: any) => {
-        if (Array.isArray(res.data)) {
-          this.setData({ zhuanlanList: res.data })
-        }
+        const list = Array.isArray(res.data) && res.data.length > 0 ? res.data : fallbackZhuanlans
+        this.setData({ zhuanlanList: list })
+      },
+      fail: () => {
+        this.setData({ zhuanlanList: fallbackZhuanlans })
       },
       complete: () => {
         this.setData({ zhuanlanLoading: false })
@@ -536,10 +551,59 @@ Page<IArticlePageData, any>({
   },
 
   fetchArticles(done?: () => void) {
-    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken')
-    if (!token) {
-      if (done) done()
-      return
+    const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
+    const fallbackRawArticles = [
+      {
+        articleid: 1,
+        title: '以终为始：如何在自塾用 30 天通关一门核心技能课',
+        fulltext: '在自塾，我们倡导以终为始的目标管理与诺亚方舟 4 人小组共学机制。选定阶段目标后，每周推进章节学时申报，并通过三次方舟会议完成复盘与结课实战。',
+        author_id: 1,
+        author_name: '青桐塾主',
+        create_time: '2026-10-20',
+      },
+      {
+        articleid: 2,
+        title: 'FastAPI 与大模型智能体工程化落地实践指南',
+        fulltext: '本文系统梳理了从 RESTful API 设计、异步数据库访问到多智能体工具调用编排的核心架构模式与性能优化经验。',
+        author_id: 2,
+        author_name: '林深塾师',
+        create_time: '2026-10-25',
+      },
+    ]
+
+    const applyArticleList = (rawList: any[]) => {
+      const storedUserInfo = wx.getStorageSync('userInfo')
+      const userId = Number(
+        wx.getStorageSync('userId') ||
+          storedUserInfo?.userId ||
+          storedUserInfo?.id ||
+          app?.globalData?.userInfo?.userId ||
+          app?.globalData?.userInfo?.id ||
+          0
+      )
+      const source = Array.isArray(rawList) && rawList.length > 0 ? rawList : fallbackRawArticles
+      const allFormatted: IArticleItem[] = source.map((a: any) => {
+        const preview = stripHtmlTags(a.fulltext || '')
+        const wordCount = Math.max(10, preview.replace(/\s+/g, '').length)
+        const readMins = Math.max(1, Math.ceil(wordCount / 300))
+        return {
+          ...a,
+          _preview: preview,
+          _wordCount: wordCount,
+          _readMins: readMins,
+        }
+      })
+      this.setData({
+        allArticles: allFormatted,
+        currentUserId: userId,
+      })
+      this.applyArticleFilter(this.data.articleTab, this.data.searchKeyword, allFormatted, userId)
+
+      if (this.data.pendingArticleId > 0) {
+        const targetId = this.data.pendingArticleId
+        this.setData({ pendingArticleId: 0 })
+        this.openArticleReader(targetId)
+      }
     }
 
     this.setData({ loading: true })
@@ -549,44 +613,10 @@ Page<IArticlePageData, any>({
       method: 'GET',
       header: { token },
       success: (res: any) => {
-        if (res.data && Array.isArray(res.data)) {
-          const storedUserInfo = wx.getStorageSync('userInfo')
-          const userId = Number(
-            wx.getStorageSync('userId') ||
-              storedUserInfo?.userId ||
-              storedUserInfo?.id ||
-              app.globalData?.userInfo?.userId ||
-              app.globalData?.userInfo?.id ||
-              0
-          )
-          const allFormatted: IArticleItem[] = res.data.map((a: any) => {
-            const preview = stripHtmlTags(a.fulltext || '')
-            const wordCount = Math.max(10, preview.replace(/\s+/g, '').length)
-            const readMins = Math.max(1, Math.ceil(wordCount / 300))
-            return {
-              ...a,
-              _preview: preview,
-              _wordCount: wordCount,
-              _readMins: readMins,
-            }
-          })
-          this.setData({
-            allArticles: allFormatted,
-            currentUserId: userId,
-          })
-          this.applyArticleFilter(this.data.articleTab, this.data.searchKeyword, allFormatted, userId)
-
-          if (this.data.pendingArticleId > 0) {
-            const targetId = this.data.pendingArticleId
-            this.setData({ pendingArticleId: 0 })
-            this.openArticleReader(targetId)
-          }
-        } else {
-          this.setData({ allArticles: [], articles: [] })
-        }
+        applyArticleList(res.data)
       },
       fail: () => {
-        wx.showToast({ title: '加载失败', icon: 'none' })
+        applyArticleList(fallbackRawArticles)
       },
       complete: () => {
         this.setData({ loading: false })

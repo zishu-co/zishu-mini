@@ -25,20 +25,20 @@
     </view>
   </view>
 
-  <!-- 交友 & 伴学快捷矩阵 -->
+  <!-- 学习 & 伴学快捷矩阵 -->
   <view class="social-quick-bar">
     <view class="quick-pill" bindtap="onFindGoalBuddy">
       <view class="quick-pill-icon">🤝</view>
       <view class="quick-pill-info">
-        <text class="quick-pill-title">找共学搭子</text>
-        <text class="quick-pill-sub">邂逅同频伙伴</text>
+        <text class="quick-pill-title">找共学学伴</text>
+        <text class="quick-pill-sub">同频结伴共学</text>
       </view>
     </view>
     <view class="quick-pill" bindtap="onQuickGoaltalk">
       <view class="quick-pill-icon">💬</view>
       <view class="quick-pill-info">
-        <text class="quick-pill-title">目标约谈</text>
-        <text class="quick-pill-sub">塾师 1v1 赋能</text>
+        <text class="quick-pill-title">目标面谈</text>
+        <text class="quick-pill-sub">塾师 1v1 指导</text>
       </view>
     </view>
     <view class="quick-pill" bindtap="onOpenAiCoach">
@@ -131,10 +131,10 @@
         />
       </view>
       <view class="form-item">
-        <text class="form-label">复盘与共学寄语（选填）</text>
+        <text class="form-label">复盘与学习心得（选填）</text>
         <textarea
           class="form-textarea short"
-          placeholder="记录当前进展、下周计划或想对共学搭子说的话..."
+          placeholder="记录当前进展、下周计划或阶段复盘心得..."
           value="{{goalForm.review}}"
           maxlength="500"
           bindinput="onGoalReviewInput"

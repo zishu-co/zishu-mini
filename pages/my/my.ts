@@ -8,8 +8,9 @@
 
 import { getUserArkList, ArkItem } from '../../services/learn/learn'
 import { fetchCurrentSelections } from '../../services/course/course'
-import { submitFeedback, fetchMyFeedbacks, fetchPublicFeedbacks } from '../../services/user/user'
+import { submitFeedback, fetchMyFeedbacks, fetchPublicFeedbacks, checkAndSyncAdminStatus } from '../../services/user/user'
 import { getBaseUrl } from '../../services/base'
+import { isAdminRole, isCurrentUserAdmin } from '../../utils/env'
 
 const _appMy = getApp<any>()
 
@@ -21,6 +22,7 @@ interface IMyPageData {
     phoneNumber: string;
   };
   isLoggedIn: boolean;
+  isAdmin: boolean;
   levelBadge: string;
   levelScore: number;
   levelProgressPercent: number;
@@ -46,6 +48,7 @@ Page<IMyPageData, any>({
       phoneNumber: "",
     },
     isLoggedIn: false,
+    isAdmin: false,
     levelBadge: "🌱 LV.1 启航新星",
     levelScore: 0,
     levelProgressPercent: 15,
@@ -74,6 +77,8 @@ Page<IMyPageData, any>({
 
   onLoad() {},
 
+  noop() {},
+
   onShow() {
     this.init()
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
@@ -92,7 +97,7 @@ Page<IMyPageData, any>({
     const nickName = this.data.userInfo?.nickName || '自塾学友'
     return {
       title: `${nickName} 邀请你加入自塾 AI 英语共学，结伴闯关不孤单！`,
-      path: '/pages/all/index',
+      path: '/pages/learn/index',
     }
   },
 
@@ -127,6 +132,8 @@ Page<IMyPageData, any>({
       0
     )
 
+    const isAdmin = isLoggedIn && (isAdminRole(userInfo) || isCurrentUserAdmin())
+
     this.setData({
       userInfo: {
         userId: resolvedUserId,
@@ -135,11 +142,17 @@ Page<IMyPageData, any>({
         phoneNumber: phoneNumber,
       },
       isLoggedIn: isLoggedIn,
+      isAdmin: isAdmin,
     })
 
     if (isLoggedIn) {
       this.fetchStats()
       this.fetchArks()
+      checkAndSyncAdminStatus(resolvedUserId).then((adminOk) => {
+        if (adminOk !== this.data.isAdmin) {
+          this.setData({ isAdmin: adminOk })
+        }
+      })
     }
   },
 
@@ -451,6 +464,7 @@ Page<IMyPageData, any>({
           this.setData({
             userInfo: { avatarUrl: "", nickName: "", phoneNumber: "" },
             isLoggedIn: false,
+            isAdmin: false,
             stats: { reportCount: 0, shuzhiCount: 0, courseCount: 0, favCount: 0 },
             arkList: [],
             arkCount: 0,

@@ -12,8 +12,7 @@
       <view class="ark-name">🚢 {{ark.arkname || '诺亚方舟共学舱'}}</view>
       <view class="status-row">
         <text class="stage-badge {{stageClass}}">{{ark.stage || '筹建中'}}</text>
-        <text class="gender-tag gender-male">🚹 男生 {{maleCount}}/2</text>
-        <text class="gender-tag gender-female">🚺 女生 {{femaleCount}}/2</text>
+        <text class="stage-badge">👥 船员 {{ark.members.length || 0}}/4</text>
         <text class="finished-tag" wx:if="{{ark.finished}}">🏆 已圆满靠岸</text>
       </view>
       <view class="meta-row">
@@ -33,9 +32,9 @@
       </view>
     </view>
 
-    <!-- 成员列表（2男2女黄金搭子） -->
+    <!-- 成员列表 -->
     <view class="section">
-      <view class="section-title">🤝 同舟共学搭子（{{ark.members.length || 0}} / 4）</view>
+      <view class="section-title">🤝 同舟共学成员（{{ark.members.length || 0}} / 4）</view>
       <view
         class="member-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{ark.members}}"
@@ -46,7 +45,6 @@
           <view class="member-info">
             <text class="member-name">{{m.username}}</text>
             <text class="captain-tag" wx:if="{{m.is_captain}}">⭐ 舟长</text>
-            <text class="gender-tag {{m._genderClass}}" wx:if="{{m.gender}}">{{m.gender === '男' ? '🚹 男' : '🚺 女'}}</text>
           </view>
           <view class="member-progress">
             <text class="member-progress-text">第 {{m.current_serial}}/{{m.total_chapters}} 章 ({{m.progress_percent}}%)</text>
@@ -75,7 +73,7 @@
               bindtap="onGreetMember"
               data-userid="{{m.user_id}}"
               data-username="{{m.username}}"
-            >👋 约TA共学</view>
+            >⚡ 督学提醒</view>
           </view>
         </view>
       </view>

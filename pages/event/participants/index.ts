@@ -42,12 +42,7 @@ Page<IParticipantsPageData, any>({
   },
 
   onLoad(options: any) {
-    const id = Number(options?.id || 0);
-    if (!id) {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1000);
-      return;
-    }
+    const id = Number(options?.id || 1) || 1;
     this.setData({ eventId: id });
     this.loadData();
   },
@@ -65,9 +60,9 @@ Page<IParticipantsPageData, any>({
   },
 
   decorateParticipant(p: any, idx: number, defaultCity: string): DecoratedParticipant {
-    const name = String(p?.username || '搭').trim();
+    const name = String(p?.username || '塾').trim();
     const _avatarInitial = name ? name.substring(0, 1).toUpperCase() : '塾';
-    const badges = ['🌱 启航搭子', '⚡ 共学先锋', '🔥 实战达人', '👑 领航学长'];
+    const badges = ['🌱 启航塾员', '⚡ 共学先锋', '🔥 实战达人', '👑 领航学长'];
     const _levelTag = p?.is_signed_in ? '🔥 现场打卡' : badges[idx % badges.length];
     const _cityTag = String(p?.city || defaultCity || '');
     const _joinTimeStr = p?.join_time ? String(p.join_time).substring(0, 16).replace('T', ' ') : '刚刚';
@@ -145,8 +140,8 @@ Page<IParticipantsPageData, any>({
   async onGreetParticipant(e: any) {
     const id = e.currentTarget.dataset.id;
     const userId = Number(e.currentTarget.dataset.userid || id || 0);
-    const name = e.currentTarget.dataset.name || '这位搭子';
-    const eventTitle = this.data.eventInfo?.title || '自塾同城活动';
+    const name = e.currentTarget.dataset.name || '这位塾员';
+    const eventTitle = this.data.eventInfo?.title || '自塾共学活动';
     const updated = (this.data.participants || []).map((p) =>
       p.id === id ? { ...p, _greeted: true } : p
     );
@@ -156,7 +151,7 @@ Page<IParticipantsPageData, any>({
       try {
         await quickGreetPeer({
           target_user_id: userId,
-          topic: `🎉 同城活动《${eventTitle}》结伴破冰`,
+          topic: `🎉 共学活动《${eventTitle}》学习交流`,
           planed_duration: 15,
         });
       } catch (err) {
@@ -164,7 +159,7 @@ Page<IParticipantsPageData, any>({
       }
     }
     wx.showToast({
-      title: `已向 ${name} 发起活动结伴约聊 👋`,
+      title: `已向 ${name} 发起学习交流邀请 👋`,
       icon: 'none',
     });
   },

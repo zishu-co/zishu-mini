@@ -66,7 +66,7 @@ Page<ILoginPageData, ILoginPageData>({
 
   onShareAppMessage() {
     return {
-      title: '学本领，上自塾 · 2男2女诺亚方舟共学与 AI 伴学平台',
+      title: '学本领，上自塾 · 诺亚方舟共学与 AI 伴学平台',
       path: '/pages/login/login',
     }
   },
@@ -228,7 +228,9 @@ Page<ILoginPageData, ILoginPageData>({
               nickName: resolvedName,
               name: resolvedName,
               avatarUrl: that.data.avatarUrl || res.data.avatarUrl || _appLogin.globalData.userInfo?.avatarUrl || '',
-              phoneNumber: res.data.phone || ''
+              phoneNumber: res.data.phone || '',
+              role: res.data.role || (_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}).role || '',
+              is_admin: res.data.is_admin ?? (_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}).is_admin,
             }
             _appLogin.globalData.phoneNumber = res.data.phone
             _appLogin.globalData.userId = res.data.id
@@ -244,6 +246,9 @@ Page<ILoginPageData, ILoginPageData>({
             wx.setStorageSync('refreshToken', res.data.rtoken || res.data.atoken)
             wx.setStorageSync('userId', res.data.id)
             wx.setStorageSync('userInfo', nextUserInfo)
+            if (res.data.role) {
+              wx.setStorageSync('userRole', res.data.role)
+            }
             wx.removeStorageSync('guestMode')
 
             // 更新页面数据
@@ -419,14 +424,20 @@ Page<ILoginPageData, ILoginPageData>({
           // 登录成功，保存 token 和用户信息
           const userInfo: any = {
             userId: data.id,
+            id: data.id,
             nickName: data.username || data.nickName || `用户${phone.slice(-4)}`,
-            avatarUrl: data.avatarUrl || ''
+            avatarUrl: data.avatarUrl || '',
+            role: data.role || '',
+            is_admin: data.is_admin,
           }
           if (data.gender) {
             userInfo.gender = data.gender
           }
 
           wx.setStorageSync('userInfo', userInfo)
+          if (data.role) {
+            wx.setStorageSync('userRole', data.role)
+          }
           wx.setStorageSync('userId', data.id)
           wx.setStorageSync('accessToken', data.atoken)
           wx.setStorageSync('refreshToken', data.rtoken)

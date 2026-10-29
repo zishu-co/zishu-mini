@@ -14,24 +14,26 @@
 /**
  * 根据小程序环境自动获取 API 基础地址
  */
+const PROD_BASE_URL = 'https://zishu.co';
+
 const getBaseUrl = (): string => {
   try {
+    const customUrl = wx.getStorageSync('customBaseUrl');
+    if (customUrl && typeof customUrl === 'string' && customUrl.startsWith('http')) {
+      return customUrl.replace(/\/+$/, '');
+    }
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
     console.log('[base.ts] 当前环境:', envVersion);
     switch (envVersion) {
       case 'develop':
-        return 'http://127.0.0.1:8008';
       case 'trial':
-        // 体验版也使用生产环境地址
-        return 'https://zishu.co';
       case 'release':
-        return 'https://zishu.co';
       default:
-        return 'https://zishu.co';
+        return PROD_BASE_URL;
     }
   } catch (e) {
     console.error('[base.ts] 获取环境失败:', e);
-    return 'https://zishu.co';
+    return PROD_BASE_URL;
   }
 };
 
@@ -468,17 +470,45 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
       fail: (err) => {
         if (options.showLoading) wx.hideLoading();
 
-        // 详细错误日志
-        console.error('[requestWithRefresh] 请求失败:', {
+        // 若本地调试地址连接被拒绝，自动无缝回退生产环境重试一次
+        if (
+          !options._retried &&
+          fullUrl.includes('127.0.0.1') &&
+          PROD_BASE_URL &&
+          !fullUrl.startsWith(PROD_BASE_URL)
+        ) {
+          wx.removeStorageSync('customBaseUrl');
+          wx.request({
+            url: `${PROD_BASE_URL}${options.url}`,
+            method: options.method || 'GET',
+            data: options.data,
+            header,
+            timeout: options.timeout || TIMEOUT,
+            success: async (retryRes) => {
+              if (retryRes.statusCode >= 200 && retryRes.statusCode < 300) {
+                try {
+                  const result = await runResponseInterceptors(retryRes.data);
+                  resolve(result as T);
+                } catch (e) {
+                  reject(e);
+                }
+              } else {
+                reject(new ApiError(retryRes.statusCode, '请求失败', retryRes.data));
+              }
+            },
+            fail: (retryErr) => {
+              reject(new ApiError(-1, retryErr.errMsg || '网络请求失败', null, retryErr));
+            },
+          });
+          return;
+        }
+
+        // 详细错误日志（不在通用 GET 拉取失败时弹出底层 ERR_CONNECTION 英文报错 Toast）
+        console.warn('[requestWithRefresh] 请求失败:', {
           url: options.url,
           fullUrl,
           errMsg: err.errMsg,
-          err
         });
-
-        if (err.errMsg?.includes('request:fail')) {
-          wx.showToast({ title: '网络请求失败: ' + err.errMsg, icon: 'none' });
-        }
 
         reject(new ApiError(-1, err.errMsg || '网络请求失败', null, err));
       }

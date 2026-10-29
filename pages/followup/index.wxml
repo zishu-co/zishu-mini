@@ -131,7 +131,7 @@
               class="action-chip greet"
               catchtap="onGreetTaker"
               data-item="{{item}}"
-            >👋 约TA取经</view>
+            >💬 请教经验</view>
             <view class="action-chip detail">📖 详情 ›</view>
           </view>
         </view>

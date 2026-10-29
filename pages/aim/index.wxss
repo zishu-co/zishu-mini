@@ -135,7 +135,7 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
-/* 交友与伴学快捷入口 */
+/* 学习与伴学快捷入口 */
 .social-quick-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

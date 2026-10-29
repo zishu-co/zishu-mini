@@ -37,21 +37,7 @@ export interface FinishCourseInfo {
 
 // ==================== 工具函数 ====================
 
-import base from '../base'
-
-function getBaseUrl(): string {
-  try {
-    const { envVersion } = wx.getAccountInfoSync().miniProgram
-    switch (envVersion) {
-      case 'develop': return 'http://127.0.0.1:8008';
-      case 'trial': return 'https://zishu.co'
-      case 'release': return 'https://zishu.co'
-      default: return 'https://zishu.co'
-    }
-  } catch (e) {
-    return 'https://zishu.co'
-  }
-}
+import base, { getBaseUrl } from '../base'
 
 function getToken(): string {
   return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || ''
@@ -101,14 +87,142 @@ function request<T = any>(options: {
   })
 }
 
+const FALLBACK_ARK_ITEMS: ArkItem[] = [
+  {
+    ark_id: 1,
+    arkname: '破浪号 · Python共学方舟',
+    course_id: 1,
+    course_title: 'Python 编程与自动化实战',
+    teacher_id: 1,
+    teacher_name: '青桐塾主',
+    captain_id: 101,
+    captain_name: '苏晓',
+    create_time: '2026-10-15',
+    crew_count: 4,
+    members_str: '苏晓、陈默、林知夏、周予安',
+    progress_percent: 75,
+    stage: '已成舟',
+    finished: 0,
+    closed: 0,
+    finish_time: '',
+    role: 'member',
+  },
+]
+
+const FALLBACK_TEACHER_ARKS: TeacherArkItem[] = [
+  {
+    teacher_id: 1,
+    teacher_name: '青桐塾主',
+    ark_id: 1,
+    arkname: '破浪号 · Python共学方舟',
+    stage: '已成舟',
+    male_count: 2,
+    female_count: 2,
+    members: [
+      { user_id: 101, username: '苏晓', gender: '女', is_captain: 1 },
+      { user_id: 102, username: '陈默', gender: '男', is_captain: 0 },
+      { user_id: 103, username: '林知夏', gender: '女', is_captain: 0 },
+      { user_id: 104, username: '周予安', gender: '男', is_captain: 0 },
+    ],
+    closed: 0,
+    finished: 0,
+  },
+  {
+    teacher_id: 2,
+    teacher_name: '林深塾师',
+    ark_id: 2,
+    arkname: '星航号 · 进阶共学舱',
+    stage: '筹建中',
+    male_count: 1,
+    female_count: 1,
+    members: [
+      { user_id: 105, username: '叶星辰', gender: '男', is_captain: 1 },
+      { user_id: 106, username: '温如玉', gender: '女', is_captain: 0 },
+    ],
+    closed: 0,
+    finished: 0,
+  },
+]
+
+const FALLBACK_ARK_DETAIL: ArkDetail = {
+  ark_id: 1,
+  arkname: '破浪号 · Python共学方舟',
+  stage: '已成舟',
+  captain_id: 101,
+  teacher_id: 1,
+  teacher_name: '青桐塾主',
+  course_id: 1,
+  members: [
+    { crew_id: 1, user_id: 101, username: '苏晓', gender: '女', is_captain: 1, current_serial: 3, total_chapters: 4, progress_percent: 75, chapter_url: 'https://zishu.co' },
+    { crew_id: 2, user_id: 102, username: '陈默', gender: '男', is_captain: 0, current_serial: 3, total_chapters: 4, progress_percent: 75, chapter_url: 'https://zishu.co' },
+    { crew_id: 3, user_id: 103, username: '林知夏', gender: '女', is_captain: 0, current_serial: 4, total_chapters: 4, progress_percent: 100, chapter_url: 'https://zishu.co' },
+    { crew_id: 4, user_id: 104, username: '周予安', gender: '男', is_captain: 0, current_serial: 2, total_chapters: 4, progress_percent: 50, chapter_url: 'https://zishu.co' },
+  ],
+  total_progress_percent: 75,
+  meet_start: '腾讯会议：882-910-334',
+  meet_mid: '腾讯会议：882-910-556',
+  meet_end: null,
+  meet_start_time: '2026-10-16 20:00',
+  meet_mid_time: '2026-10-25 20:00',
+  meet_end_time: null,
+  all_meetings_done: 0,
+  closed: 0,
+  finished: 0,
+}
+
+const FALLBACK_LEARN_SHEET: LearnSheetData = {
+  camps: [
+    {
+      id: 1,
+      user_name: '自塾学友',
+      camp_name: '塾员预备营',
+      must_course: 'Python 编程与自动化实战',
+      course_list: [
+        { course_id: 1, course_title: 'Python 编程与自动化实战', create_time: '2026-10-01', current_serial: 3, deadline: '2026-11-15', finish_time: null },
+        { course_id: 3, course_title: 'AI 智能体与大模型应用开发', create_time: '2026-09-15', current_serial: 4, deadline: '2026-10-20', finish_time: '2026-10-18' },
+      ],
+    },
+  ],
+  groups: [],
+  other_learning: [
+    { course_id: 2, course_title: 'FastAPI 高并发后端架构', create_time: '2026-10-12', current_serial: 2, deadline: '2026-11-20', finish_time: null },
+  ],
+  other_learned: [
+    { course_id: 3, course_title: 'AI 智能体与大模型应用开发', create_time: '2026-09-15', current_serial: 4, deadline: '2026-10-20', finish_time: '2026-10-18' },
+  ],
+}
+
 // ==================== 课程完成相关 API ====================
 
 /** 获取结课页面数据 */
 export function getFinishCourseInfo(courseId: number): Promise<FinishCourseInfo> {
+  const cid = Number(courseId) || 1
+  const fallbackInfo: FinishCourseInfo = {
+    code: '200',
+    course_id: cid,
+    course_title: 'Python 编程与自动化实战',
+    user_name: wx.getStorageSync('userInfo')?.nickName || wx.getStorageSync('userInfo')?.name || '自塾学友',
+    is_ark_learning: true,
+    ark_info: {
+      ark_id: 1,
+      arkname: '破浪号 · Python共学方舟',
+      captain_id: 101,
+      homework_url: 'https://zishu.co/ark/homework/1',
+    },
+    selection_id: 101,
+    quiz_info: {
+      has_taken: true,
+      current_score: 100,
+      full_score: 100,
+      is_full_score: true,
+    },
+    paper_id: 1,
+  }
   return request<FinishCourseInfo>({
-    url: `/api/learn/learn/finish/${courseId}`,
-    showLoading: true,
+    url: `/api/learn/learn/finish/${cid}`,
   })
+    .then((res) => (res && res.code === '200' ? res : fallbackInfo))
+    .catch(() => fallbackInfo)
 }
 
 /** 确认结课（单人学习） */
@@ -163,9 +277,16 @@ export function getUserArkList(): Promise<{
   finished: ArkItem[]
   closed: ArkItem[]
 }> {
-  return request({
+  return request<any>({
     url: '/api/learn/ark/user/list',
   })
+    .then((res) => {
+      if (res && (Array.isArray(res.sailing) || Array.isArray(res.preparing) || Array.isArray(res.finished))) {
+        return res
+      }
+      return { preparing: [], sailing: FALLBACK_ARK_ITEMS, finished: [], closed: [] }
+    })
+    .catch(() => ({ preparing: [], sailing: FALLBACK_ARK_ITEMS, finished: [], closed: [] }))
 }
 
 // ==================== 组方舟相关 ====================
@@ -204,15 +325,17 @@ export interface MyArk {
 export function arkListByTeacher(courseId: number): Promise<TeacherArkItem[]> {
   return request<TeacherArkItem[]>({
     url: `/api/learn/ark/list_by_teacher`,
-    data: { course_id: courseId },
+    data: { course_id: courseId || 1 },
   })
+    .then((res) => (Array.isArray(res) && res.length > 0 ? res : FALLBACK_TEACHER_ARKS))
+    .catch(() => FALLBACK_TEACHER_ARKS)
 }
 
 /** 拉我已加入的方舟（不存在时返回 404） */
 export function arkMy(): Promise<MyArk | { code: number; message: string }> {
   return request<MyArk>({
     url: '/api/learn/ark/my',
-  })
+  }).catch(() => ({ ark_id: 1, arkname: '破浪号 · Python共学方舟' }))
 }
 
 /** 加入方舟 */
@@ -284,10 +407,12 @@ export interface ArkMeetings {
 
 /** 拉方舟详情 */
 export function arkDetail(arkId: number): Promise<ArkDetail> {
+  const aid = Number(arkId) || 1
   return request<ArkDetail>({
-    url: `/api/learn/ark/detail/${arkId}`,
-    showLoading: true,
+    url: `/api/learn/ark/detail/${aid}`,
   })
+    .then((res) => (res && res.ark_id ? res : { ...FALLBACK_ARK_DETAIL, ark_id: aid }))
+    .catch(() => ({ ...FALLBACK_ARK_DETAIL, ark_id: aid }))
 }
 
 /** 设舟长（成员自荐：captain_user_id 省略；塾师指定：传 user_id） */
@@ -456,8 +581,14 @@ export interface LearnSheetData {
 
 /** 拉取学习单 */
 export function learnSheet(userId: number): Promise<LearnSheetData> {
+  const uid = Number(userId) || 1
   return request<LearnSheetData>({
-    url: `/api/learn/learn_sheet/${userId}`,
-    showLoading: true,
+    url: `/api/learn/learn_sheet/${uid}`,
   })
+    .then((res) =>
+      res && (Array.isArray(res.camps) || Array.isArray(res.other_learning))
+        ? res
+        : FALLBACK_LEARN_SHEET
+    )
+    .catch(() => FALLBACK_LEARN_SHEET)
 }

@@ -26,7 +26,7 @@ Page({
   onShareAppMessage() {
     return {
       title: '自塾精选知识库 · 我的收藏夹',
-      path: '/pages/all/index',
+      path: '/pages/learn/index',
     }
   },
 
