@@ -1,4 +1,112 @@
 /* pages/event/webview/index.wxss */
 page {
-  background: #fff;
+  background: #f6f5fb;
+}
+
+.empty-webview {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.webview-card {
+  width: 100%;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%);
+  border-radius: 44rpx;
+  padding: 56rpx 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow:
+    0 24rpx 64rpx -12rpx rgba(109, 40, 217, 0.22),
+    0 8rpx 24rpx rgba(236, 72, 153, 0.12),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(244, 114, 182, 0.28);
+}
+
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 14rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 32rpx;
+  text-align: center;
+}
+
+.url-preview {
+  width: 100%;
+  padding: 20rpx 26rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%);
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #6d28d9;
+  word-break: break-all;
+  margin-bottom: 28rpx;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: inset 0 2rpx 0 #ffffff;
+}
+
+.webview-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.copy-btn,
+.plaza-btn,
+.back-btn {
+  width: 100%;
+  font-size: 28rpx;
+  font-weight: 700;
+  height: 82rpx;
+  line-height: 82rpx;
+  border-radius: 41rpx;
+  border: none;
+}
+
+.copy-btn::after,
+.plaza-btn::after,
+.back-btn::after {
+  border: none;
+}
+
+.copy-btn {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.plaza-btn {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  color: #4c1d95;
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow: inset 0 2rpx 0 #ffffff;
+}
+
+.back-btn {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.25), inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
 }

@@ -1,12 +1,54 @@
 <view class="agent-page">
+  <!-- 顶部 AI 伴学教练状态栏 -->
+  <view class="agent-topbar">
+    <view class="agent-topbar-left">
+      <view class="agent-topbar-avatar">🤖</view>
+      <view class="agent-topbar-info">
+        <view class="agent-topbar-title">自塾 AI 伴学教练</view>
+        <view class="agent-topbar-status">
+          <text class="status-dot">●</text>
+          <text>24h 智能目标规划 · 课程推荐 · 语音领航</text>
+        </view>
+      </view>
+    </view>
+    <view class="agent-clear-btn" bindtap="onClearChat">🗑️ 重置</view>
+  </view>
+
   <!-- 消息列表 -->
-  <scroll-view class="message-list" scroll-y="true" scroll-top="{{scrollTop}}">
-    <view wx:for="{{messages}}" wx:key="id" class="message-item {{item.role}}">
+  <scroll-view
+    class="message-list"
+    scroll-y="true"
+    scroll-with-animation="true"
+    scroll-top="{{scrollTop}}"
+    scroll-into-view="{{lastMessageId}}"
+  >
+    <view
+      wx:for="{{messages}}"
+      wx:key="id"
+      id="{{item.id}}"
+      class="message-item {{item.role}}"
+    >
       <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">🤖</view>
       <view wx:else class="avatar user-avatar">👤</view>
-      <view class="message-bubble {{item.role}}">
-        <text class="message-text">{{item.content}}</text>
-        <text wx:if="{{item.time}}" class="message-time">{{item.time}}</text>
+      <view
+        class="message-bubble {{item.role}}"
+        bindtap="onCopyMessage"
+        data-content="{{item.content}}"
+      >
+        <text class="message-text" user-select="true">{{item.content}}</text>
+        <view
+          wx:if="{{item.actionLabel && item.actionUrl}}"
+          class="bubble-action-btn"
+          catchtap="onBubbleAction"
+          data-url="{{item.actionUrl}}"
+          data-istab="{{item.actionIsTab}}"
+        >
+          <text>{{item.actionLabel}} ›</text>
+        </view>
+        <view class="message-meta-row">
+          <text wx:if="{{item.role === 'assistant'}}" class="copy-hint">点按复制</text>
+          <text wx:if="{{item.time}}" class="message-time">{{item.time}}</text>
+        </view>
       </view>
     </view>
 
@@ -16,6 +58,28 @@
       <view class="message-bubble assistant loading-bubble">
         <text class="loading-dots">●●●</text>
       </view>
+    </view>
+  </scroll-view>
+
+  <!-- AI 制定目标采纳浮条 -->
+  <view wx:if="{{suggestedGoal}}" class="goal-adopt-bar" bindtap="onAdoptGoal">
+    <view class="goal-adopt-left">
+      <text class="goal-adopt-badge">🎯 AI 目标提案</text>
+      <text class="goal-adopt-text">{{suggestedGoal}}</text>
+    </view>
+    <view class="goal-adopt-btn">⚡ 一键设为目标</view>
+  </view>
+
+  <!-- 快捷提示词气泡栏 -->
+  <scroll-view class="prompt-chips-bar" scroll-x="true" enable-flex="true">
+    <view
+      class="prompt-chip {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+      wx:for="{{quickPrompts}}"
+      wx:key="*this"
+      data-prompt="{{item}}"
+      bindtap="onQuickPrompt"
+    >
+      <text>{{item}}</text>
     </view>
   </scroll-view>
 
@@ -46,7 +110,7 @@
 
     <!-- 发送按钮 -->
     <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="onSend">
-      <text>发送</text>
+      <text>🚀 发送</text>
     </view>
   </view>
 </view>

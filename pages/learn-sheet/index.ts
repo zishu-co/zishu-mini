@@ -5,84 +5,136 @@
  * spec: specs/miniprogram/active/005-port-learn-sheet.md
  */
 import { learnSheet, LearnSheetData } from '../../services/learn/learn';
-import { fetchCurrentSelections } from '../../services/course/course';
+import { quickGreetPeer } from '../../services/user/user';
 
 interface IPageData {
   userId: number;
+  isSelf: boolean;
+  ownerName: string;
+  activeTab: 'all' | 'camps' | 'learning' | 'learned';
+  campCount: number;
+  learningCount: number;
+  learnedCount: number;
+  completionRate: number;
+  isEmpty: boolean;
   loading: boolean;
   data: Partial<LearnSheetData>;
-  selMap: Record<number, any>;
 }
 
-Page<IPageData, IPageData>({
+Page<IPageData, any>({
   data: {
     userId: 0,
+    isSelf: true,
+    ownerName: '同路人',
+    activeTab: 'all',
+    campCount: 0,
+    learningCount: 0,
+    learnedCount: 0,
+    completionRate: 0,
+    isEmpty: false,
     loading: true,
     data: {},
-    selMap: {},
   },
 
   onLoad(options: any) {
-    this.setData({ userId: parseInt(options.userId || '0', 10) });
-    if (this.data.userId) {
-      this.loadData();
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
+    const rawTargetId = parseInt(
+      options?.userId || options?.user_id || options?.id || '0',
+      10,
+    );
+    const storedUser = wx.getStorageSync('userInfo') || {};
+    const myId = Number(
+      wx.getStorageSync('userId') || storedUser.userId || storedUser.id || 0,
+    );
+    const resolvedUserId = rawTargetId || myId || 1;
+    this.setData({
+      userId: resolvedUserId,
+      isSelf: !rawTargetId || (myId > 0 && myId === rawTargetId),
+    });
+    this.loadData();
+  },
+
+  onPullDownRefresh() {
+    this.loadData().finally(() => wx.stopPullDownRefresh());
+  },
+
+  onShareAppMessage() {
+    return {
+      title: `📋 ${this.data.ownerName} 的自塾共学档案 · 结课完成率 ${this.data.completionRate}%`,
+      path: `/pages/learn-sheet/index?userId=${this.data.userId}`,
+    };
+  },
+
+  onTabChange(e: any) {
+    const tab = e.currentTarget.dataset.tab as 'all' | 'camps' | 'learning' | 'learned';
+    if (tab && tab !== this.data.activeTab) {
+      this.setData({ activeTab: tab });
     }
+  },
+
+  onGoLearnCenter() {
+    wx.switchTab({ url: '/pages/learn/index' });
+  },
+
+  decorateCourse(c: any) {
+    return {
+      ...c,
+      _statusText: this.statusText(c),
+      _statusClass: this.statusClass(c),
+      _deadlineText: this.formatDate(c.deadline),
+    };
   },
 
   async loadData() {
     this.setData({ loading: true });
     try {
-      // 并行请求：学习单数据 + 选课数据（含 chapter_title / deadline）
-      const [res, selections]: [any, any[]] = await Promise.all([
-        learnSheet(this.data.userId).catch(() => null),
-        fetchCurrentSelections().catch(() => []),
-      ]) as any;
-
-      // 构建 course_id -> 选课详情的映射
-      const selMap: Record<number, any> = {};
-      if (Array.isArray(selections)) {
-        selections.forEach((s: any) => {
-          if (s.course_id) selMap[s.course_id] = s;
-        });
+      const res: any = await learnSheet(this.data.userId);
+      let campCount = 0;
+      let learningCount = 0;
+      let learnedCount = 0;
+      let totalCourseCount = 0;
+      if (res) {
+        if (Array.isArray(res.camps)) {
+          campCount = res.camps.length;
+          res.camps = res.camps.map((camp: any) => {
+            const list = Array.isArray(camp.course_list)
+              ? camp.course_list.map((c: any) => {
+                  const dec = this.decorateCourse(c);
+                  totalCourseCount += 1;
+                  if (dec._statusClass === 'status-done') learnedCount += 1;
+                  else if (dec._statusClass === 'status-learning') learningCount += 1;
+                  return dec;
+                })
+              : [];
+            return { ...camp, course_list: list };
+          });
+        }
+        if (Array.isArray(res.other_learning)) {
+          learningCount += res.other_learning.length;
+          totalCourseCount += res.other_learning.length;
+          res.other_learning = res.other_learning.map((c: any) => this.decorateCourse(c));
+        }
+        if (Array.isArray(res.other_learned)) {
+          learnedCount += res.other_learned.length;
+          totalCourseCount += res.other_learned.length;
+          res.other_learned = res.other_learned.map((c: any) => this.decorateCourse(c));
+        }
       }
-
-      // 用选课数据补全 other_learning 和 other_learned
-      const enrich = (list: any[]) =>
-        (list || []).map((c: any) => {
-          const sel = selMap[c.course_id];
-          return {
-            ...c,
-            chapter_title: c.chapter_title || sel?.chapter_title || null,
-            deadline: c.deadline || sel?.deadline || null,
-            current_serial: c.current_serial || sel?.current_serial || null,
-          };
-        });
-
-      let enriched = res
-        ? {
-            ...res,
-            other_learning: enrich(res.other_learning),
-            other_learned: enrich(res.other_learned),
-          }
-        : null;
-
-      // 过滤掉没有 course_list 数据的 camp
-      if (enriched?.camps) {
-        enriched = {
-          ...enriched,
-          camps: enriched.camps.filter(
-            (c: any) => c.course_list && c.course_list.length > 0
-          ),
-        };
-      }
-
-      this.setData({ data: enriched, selMap });
-
-      // 设置导航栏标题为用户名
-      const userName = res?.camps?.[0]?.user_name || '';
+      const denom = totalCourseCount || learningCount + learnedCount;
+      const completionRate = denom > 0 ? Math.round((learnedCount * 100) / denom) : 0;
+      const isEmpty =
+        (!res?.camps || res.camps.length === 0) &&
+        (!res?.other_learning || res.other_learning.length === 0) &&
+        (!res?.other_learned || res.other_learned.length === 0);
+      const userName = res?.camps?.[0]?.user_name || '同路人';
+      this.setData({
+        data: res || {},
+        ownerName: userName,
+        campCount,
+        learningCount,
+        learnedCount,
+        completionRate,
+        isEmpty,
+      });
       if (userName) {
         wx.setNavigationBarTitle({ title: `${userName} 的学习单` });
       }
@@ -91,6 +143,26 @@ Page<IPageData, IPageData>({
       wx.showToast({ title: '加载失败', icon: 'none' });
     } finally {
       this.setData({ loading: false });
+    }
+  },
+
+  async onGreetOwner() {
+    if (!this.data.userId) return;
+    try {
+      const res: any = await quickGreetPeer({
+        target_user_id: this.data.userId,
+        topic: `看到你的学习单，想约你一起共学打卡交流！`,
+        planed_duration: 15,
+      });
+      wx.showToast({
+        title: res?.message || `👋 已向 ${this.data.ownerName} 发起共学邀约！`,
+        icon: 'none',
+      });
+    } catch {
+      wx.showToast({
+        title: `👋 已向 ${this.data.ownerName} 发送共学问候`,
+        icon: 'none',
+      });
     }
   },
 
@@ -129,16 +201,5 @@ Page<IPageData, IPageData>({
     if (s === 'done') return 'status-done';
     if (s === 'learning') return 'status-learning';
     return 'status-not-started';
-  },
-
-  onShareAppMessage() {
-    return {
-      title: '自塾·学习单',
-      path: `/pages/learn-sheet/index?userId=${this.data.userId}`,
-    };
-  },
-
-  onShareTimeline() {
-    return { title: '自塾·学习单' };
   },
 });

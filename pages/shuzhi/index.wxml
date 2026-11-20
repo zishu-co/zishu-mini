@@ -1,22 +1,99 @@
 <view class="page">
-  <view class="header">
-    <text class="title">塾值明细</text>
+  <!-- 品牌紫渐变汇总卡片 -->
+  <view class="hero-card">
+    <view class="hero-top">
+      <view>
+        <text class="hero-label">当前可用塾值</text>
+        <text class="hero-balance">{{currentBalance}}</text>
+      </view>
+      <view class="level-badge">{{levelTitle}}</view>
+    </view>
+
+    <!-- 段位成长进度条 -->
+    <view class="level-progress-wrap">
+      <view class="level-progress-bar">
+        <view class="level-progress-fill" style="width: {{levelProgress}}%"></view>
+      </view>
+      <view class="level-progress-meta">
+        <text class="level-hint">{{levelNextHint}}</text>
+        <text class="level-pct">{{levelProgress}}%</text>
+      </view>
+    </view>
+
+    <view class="stats-row">
+      <view class="stat-card">
+        <text class="stat-num">{{listData.length}}</text>
+        <text class="stat-label">记录条数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num accent">{{totalAmountStr}}</text>
+        <text class="stat-label">累计变动</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num brand">{{currentBalance}}</text>
+        <text class="stat-label">当前塾值</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 统计卡片 -->
-  <view class="stats-row">
-    <view class="stat-card">
-      <text class="stat-num">{{listData.length}}</text>
-      <text class="stat-label">记录条数</text>
+  <!-- 赚取塾值加速指南卡片 -->
+  <view class="earn-guide-card">
+    <view class="earn-guide-head">
+      <text class="earn-guide-title">⚡ 塾值赚取加速通道</text>
+      <text class="earn-guide-sub">完成共学挑战快速晋升段位</text>
     </view>
-    <view class="stat-card">
-      <text class="stat-num accent">+{{totalAmount}}</text>
-      <text class="stat-label">累计单值</text>
+    <view class="earn-task-grid">
+      <view
+        wx:for="{{earnTasks}}"
+        wx:key="id"
+        class="earn-task-pill"
+        data-url="{{item.url}}"
+        data-istab="{{item.isTab}}"
+        bindtap="onGoEarnTask"
+      >
+        <text class="earn-task-icon">{{item.icon}}</text>
+        <text class="earn-task-name">{{item.title}}</text>
+        <text class="earn-task-bonus">{{item.bonus}} ›</text>
+      </view>
     </view>
-    <view class="stat-card">
-      <text class="stat-num brand">{{currentBalance}}</text>
-      <text class="stat-label">当前塾值</text>
+  </view>
+
+  <!-- 明细筛选 Tab -->
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{activeTab === 'all' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="all"
+    >
+      📋 全部明细
     </view>
+    <view
+      class="filter-tab {{activeTab === 'income' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="income"
+    >
+      💎 获得 +
+    </view>
+    <view
+      class="filter-tab {{activeTab === 'expense' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="expense"
+    >
+      ⚡ 消耗 -
+    </view>
+  </view>
+
+  <!-- 关键词搜索栏 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索塾值变动项目、类型或备注..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
   </view>
 
   <!-- 列表 -->
@@ -24,14 +101,14 @@
     <view wx:if="{{loading}}">
       <view class="loading-row"><text>加载中...</text></view>
     </view>
-    <view wx:elif="{{listData.length === 0}}">
-      <view class="empty-row"><text>暂无塾值记录</text></view>
+    <view wx:elif="{{filteredList.length === 0}}">
+      <view class="empty-row"><text>暂无符合条件的塾值记录</text></view>
     </view>
     <view wx:else>
-      <view class="record-card" wx:for="{{listData}}" wx:key="index">
+      <view class="record-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{filteredList}}" wx:key="index">
         <view class="record-top">
           <view class="type-tag">{{item.target_type}}</view>
-          <text class="amount-pos">+{{item.amount}}</text>
+          <text class="{{item._isNeg ? 'amount-neg' : 'amount-pos'}}">{{item._amountStr}}</text>
         </view>
         <view class="record-title">{{item.target_title}}</view>
         <view class="record-bottom" wx:if="{{item.comments}}">

@@ -1,11 +1,12 @@
 <!--pages/agreement/index.wxml-->
 <view class="page">
-  <view class="header">
+  <view class="brand-header">
+    <view class="brand-badge">📜 自塾平台服务规范</view>
     <text class="title">用户服务协议</text>
-    <text class="update-date">更新日期：2024年1月1日</text>
+    <text class="update-date">生效与更新日期：2026年10月</text>
   </view>
 
-  <view class="content">
+  <view class="content zs-card">
     <view class="section">
       <view class="section-title">一、协议的接受</view>
       <view class="section-content">
@@ -90,10 +91,16 @@
       <view class="section-content">
         如您对本协议有任何疑问，请通过以下方式联系我们：
       </view>
-      <view class="section-content">
-        邮箱：service@zishu.co
+      <view class="section-content email-row" bindtap="onCopyEmail">
+        <text>邮箱：{{contactEmail}}</text>
+        <text class="copy-tag">点击复制</text>
       </view>
     </view>
+  </view>
+
+  <view class="policy-footer">
+    <button class="policy-btn ghost" bindtap="onCopyEmail">📋 复制客服邮箱</button>
+    <button class="policy-btn primary" bindtap="onConfirmBack">✓ 我已阅读并知晓</button>
   </view>
 
   <view class="bottom-safe"></view>

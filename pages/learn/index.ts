@@ -14,42 +14,122 @@ import {
   Course,
   Mentor,
 } from '../../services/course/course';
+import base from '../../services/base';
+import { checkAndSyncAdminStatus } from '../../services/user/user';
+import { isCurrentUserAdmin } from '../../utils/env';
 
 const app = getApp();
 
+const CAMP_COMMIT_EXAMPLES: Record<number, string> = {
+  1: '我志愿加入塾员预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾员预备营的微信群发30元红包。',
+  2: '我志愿加入塾师预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾师预备营的微信群发30元红包。',
+  3: '我志愿加入塾主预备营。每周保证至少两个小时的学习时间，并在三个月内学完必修课。如有懈怠，我愿意在塾主预备营的微信群发30元红包。',
+};
+
+type DecoratedSelection = CurrentSelection & {
+  deadlineClass: string;
+  deadlineDateStr: string;
+};
+
+type DecoratedCourse = Course & {
+  isSelected: boolean;
+};
+
 interface ILearnPageData {
-  myCourses: CurrentSelection[];
-  allCourses: Course[];
+  myCourses: DecoratedSelection[];
+  currentSelections: DecoratedSelection[];
+  allCourses: DecoratedCourse[];
+  tableData: DecoratedCourse[];
+  filteredCourses: DecoratedCourse[];
+  availableCount: number;
+  courseFilter: 'all' | 'selected' | 'available';
+  searchKeyword: string;
   selectedIds: number[];
   loading: boolean;
+  loadError: string;
   hasLogin: boolean;
+  isAdmin: boolean;
   showMentorModal: boolean;
   mentorList: Mentor[];
   currentMentorCourseId: number;
   showReportModal: boolean;
   reportCourse: CurrentSelection | null;
   reportHour: string;
+  submittingMentor: boolean;
+  submittingReport: boolean;
+  selectingCourseId: number;
 }
 
-Page<ILearnPageData, ILearnPageData>({
+Page<ILearnPageData, any>({
   data: {
     myCourses: [],
+    currentSelections: [],
     allCourses: [],
+    tableData: [],
+    filteredCourses: [],
+    availableCount: 0,
+    courseFilter: 'all',
+    searchKeyword: '',
     selectedIds: [],
     loading: true,
+    loadError: '',
     hasLogin: false,
+    isAdmin: false,
     showMentorModal: false,
     mentorList: [],
     currentMentorCourseId: 0,
     showReportModal: false,
     reportCourse: null,
     reportHour: '',
+    submittingMentor: false,
+    submittingReport: false,
+    selectingCourseId: 0,
+    // 102-camp.md: 进阶预备营（塾员营 / 塾师营 / 塾主营）
+    showCampModal: false,
+    activeCampId: 1,
+    campLoading: false,
+    submittingCamp: false,
+    campInfo: null as any,
+    campMembers: [] as any[],
+    campFinishs: [] as any[],
+    campWaitings: [] as any[],
+    campPledgeExample: CAMP_COMMIT_EXAMPLES[1],
+    campForm: {
+      commitment: '',
+      signature: '',
+    },
+    // 103-edit-course.md: 塾主/塾师共创课程与草稿保存
+    showEditCourseModal: false,
+    savingCourse: false,
+    courseForm: {
+      courseid: 0,
+      title: '',
+      desc: '',
+      paper_id: '',
+      chapters: [
+        { id: 0, serial: 1, title: '第1章：导论与核心概念', period: 7, url: '1', paper_id: '' },
+      ] as any[],
+    },
   },
 
   onLoad() {},
 
+  onModalTouchMove() {
+    // 遮罩、标题和操作区拦截触摸；内容区交给原生 scroll-view。
+    return false;
+  },
+
+  onCloseLearningModal() {
+    this.setData({
+      showMentorModal: false,
+      showReportModal: false,
+      showCampModal: false,
+      showEditCourseModal: false,
+    });
+  },
+
   onShow() {
-    if (typeof this.getTabBar === 'function') {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
     this.checkLoginAndLoad();
@@ -60,97 +140,89 @@ Page<ILearnPageData, ILearnPageData>({
     setTimeout(() => wx.stopPullDownRefresh(), 500);
   },
 
+  onShareAppMessage() {
+    return {
+      title: '📚 自塾共学选课中心 · 选好课、拜塾师、组方舟结伴通关！',
+      path: '/pages/learn/index',
+    };
+  },
+
+  getUserId() {
+    const storedUserInfo = wx.getStorageSync('userInfo') || {};
+    return (
+      app?.globalData?.userInfo?.userId ||
+      app?.globalData?.userId ||
+      storedUserInfo?.userId ||
+      storedUserInfo?.id ||
+      wx.getStorageSync('userId') ||
+      null
+    );
+  },
+
   checkLoginAndLoad() {
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
-    this.setData({ hasLogin: !!token });
+    const isAdmin = !!token && isCurrentUserAdmin();
+    this.setData({ hasLogin: !!token, isAdmin });
+    if (token) {
+      checkAndSyncAdminStatus(this.getUserId()).then((adminOk) => {
+        if (adminOk !== this.data.isAdmin) {
+          this.setData({ isAdmin: adminOk });
+        }
+      });
+    }
     this.loadData();
   },
 
   async loadData() {
-    this.setData({ loading: true });
+    this.setData({ loading: true, loadError: '' });
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken');
 
     try {
-      if (token) {
-        // 已登录：同时拉取我的选课 + 全部课程
-        const [myCourses, allCourses] = await Promise.all([
-          fetchCurrentSelections(),
-          fetchAllCourses(),
-        ]);
-        const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
-        const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
-        const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
-        // 预计算每门课的按钮状态，避免 WXML 嵌套三元表达式
-        const processedAll = safeAllCourses.map((c: any) => {
-          const isSelected = selectedIds.includes(c.id);
-          const isFull = !isSelected && selectedIds.length >= 3;
-          return {
-            ...c,
-            _btnClass: isSelected ? 'selected' : (isFull ? 'disabled' : ''),
-            _btnText: isSelected ? '退选' : (isFull ? '禁选' : '选课'),
-            _isSelected: isSelected,
-          };
-        });
-        // 按在学人数降序，相同则按学完人数降序
-        processedAll.sort((a: any, b: any) => {
-          const inStudyA = a.current_selections_num || 0;
-          const inStudyB = b.current_selections_num || 0;
-          if (inStudyA !== inStudyB) return inStudyB - inStudyA;
-          return (b.finish_selections_num || 0) - (a.finish_selections_num || 0);
-        });
-        this.setData({
-          myCourses: safeMyCourses,
-          allCourses: processedAll,
-          selectedIds,
-          loading: false,
-        });
-      } else {
-        // 未登录：只拉取全部课程，让访客也能浏览课程列表
-        const allCourses = await fetchAllCourses();
-        const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
-        const processedAll = safeAllCourses.map((c: any) => ({
-          ...c,
-          _btnClass: '',
-          _btnText: '选课',
-          _isSelected: false,
-        }));
-        // 按在学人数降序，相同则按学完人数降序
-        processedAll.sort((a: any, b: any) => {
-          const inStudyA = a.current_selections_num || 0;
-          const inStudyB = b.current_selections_num || 0;
-          if (inStudyA !== inStudyB) return inStudyB - inStudyA;
-          return (b.finish_selections_num || 0) - (a.finish_selections_num || 0);
-        });
-        this.setData({
-          allCourses: processedAll,
-          loading: false,
-        });
-      }
+      const [myCourses, allCourses] = await Promise.all([
+        token ? fetchCurrentSelections() : Promise.resolve([]),
+        fetchAllCourses(),
+      ]);
+      const safeMyCourses = Array.isArray(myCourses) ? myCourses : [];
+      const safeAllCourses = Array.isArray(allCourses) ? allCourses : [];
+      const selectedIds = safeMyCourses.map((c: CurrentSelection) => c.course_id);
+      const decoratedMyCourses: DecoratedSelection[] = safeMyCourses.map((c: CurrentSelection) => ({
+        ...c,
+        current_serial: Number(c.current_serial) || 1,
+        total_chapters: Number(c.total_chapters) || (Number(c.current_serial) > 1 ? Number(c.current_serial) - 1 : 1),
+        deadlineClass: this.getDeadlineClass(c.deadline),
+        deadlineDateStr: this.formatDateOnly(c.deadline),
+      }));
+      const decoratedAllCourses: DecoratedCourse[] = safeAllCourses.map((c: Course) => ({
+        ...c,
+        isSelected: selectedIds.includes(c.id),
+      }));
+      const availableCount = decoratedAllCourses.filter((c) => !c.isSelected).length;
+      this.setData({
+        myCourses: decoratedMyCourses,
+        currentSelections: decoratedMyCourses,
+        allCourses: decoratedAllCourses,
+        tableData: decoratedAllCourses,
+        availableCount,
+        selectedIds,
+        loading: false,
+        loadError: '',
+      });
+      this.applyCourseFilters(this.data.courseFilter, this.data.searchKeyword, decoratedAllCourses);
     } catch (e: any) {
       console.error('加载数据失败', e);
-      if (e?.statusCode === 401 || e?.errMsg?.includes('401')) {
-        // 只有登录态过期（之前有 token）才清空并引导重新登录
-        if (token) {
-          wx.removeStorageSync('accessToken');
-          wx.removeStorageSync('refreshToken');
-          this.setData({ hasLogin: false, loading: false });
-          wx.showToast({ title: '登录已过期，请重新登录', icon: 'none' });
-          setTimeout(() => wx.navigateTo({ url: '/pages/login/login' }), 1500);
-          return;
-        }
-        // 未登录访客 API 401：静默处理，不跳转
-        this.setData({ loading: false });
-        return;
-      }
-      this.setData({ loading: false });
+      this.setData({
+        loading: false,
+        loadError: '',
+      });
     }
   },
 
-  onSelectCourse(e: any) {
+  async onSelectCourse(e: any) {
     const courseId = e.currentTarget.dataset.id;
-    const title = e.currentTarget.dataset.title || '该课程';
+    if (!courseId || this.data.selectingCourseId === courseId) return;
+
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
-    const userId = app.globalData.userInfo?.userId;
+    const userId = this.getUserId();
 
     if (!token || userId == null) {
       wx.showToast({ title: '请先登录', icon: 'none' });
@@ -160,49 +232,42 @@ Page<ILearnPageData, ILearnPageData>({
 
     const isSelected = this.data.selectedIds.includes(courseId);
     if (isSelected) {
-      wx.showModal({
-        title: '确认退选',
-        content: `确定要退选「${title}」吗？`,
-        success: async (res) => {
-          if (!res.confirm) return;
-          try {
-            wx.showLoading({ title: '退选处理中...', mask: true });
-            await quitCourse(userId, courseId, '主动退选');
-            wx.hideLoading();
-            wx.showToast({ title: '已退选', icon: 'success' });
-            this.loadData();
-          } catch (e) {
-            wx.hideLoading();
-            wx.showToast({ title: '退选失败', icon: 'none' });
-          }
-        },
-      });
+      this.setData({ selectingCourseId: courseId });
+      try {
+        wx.showLoading({ title: '退选处理中...', mask: true });
+        await quitCourse(userId, courseId, '主动退选');
+        wx.hideLoading();
+        wx.showToast({ title: '已退选', icon: 'success' });
+        this.loadData();
+      } catch (e) {
+        wx.hideLoading();
+        wx.showToast({ title: '退选失败', icon: 'none' });
+      } finally {
+        this.setData({ selectingCourseId: 0 });
+      }
     } else {
       if (this.data.selectedIds.length >= 3) {
         wx.showToast({ title: '最多选3门课', icon: 'none' });
         return;
       }
-      wx.showModal({
-        title: '确认选课',
-        content: `确定要选择「${title}」吗？`,
-        success: async (res) => {
-          if (!res.confirm) return;
-          try {
-            wx.showLoading({ title: '选课中...', mask: true });
-            await selectCourse(userId, courseId);
-            wx.hideLoading();
-            wx.showToast({ title: '选课成功', icon: 'success' });
-            this.loadData();
-          } catch (e) {
-            wx.hideLoading();
-            wx.showToast({ title: '选课失败', icon: 'none' });
-          }
-        },
-      });
+      this.setData({ selectingCourseId: courseId });
+      try {
+        wx.showLoading({ title: '选课中...', mask: true });
+        await selectCourse(userId, courseId);
+        wx.hideLoading();
+        wx.showToast({ title: '选课成功', icon: 'success' });
+        this.loadData();
+      } catch (e) {
+        wx.hideLoading();
+        wx.showToast({ title: '选课失败', icon: 'none' });
+      } finally {
+        this.setData({ selectingCourseId: 0 });
+      }
     }
   },
 
   async onSelectMentor(e: any) {
+    if (this.data.submittingMentor) return;
     const courseId = e.currentTarget.dataset.courseid;
     const token = wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
     if (!token) {
@@ -210,6 +275,7 @@ Page<ILearnPageData, ILearnPageData>({
       return;
     }
 
+    this.setData({ submittingMentor: true });
     try {
       const res = await calMentors(courseId);
       const mentors: Mentor[] = [];
@@ -232,14 +298,18 @@ Page<ILearnPageData, ILearnPageData>({
       });
     } catch (e) {
       wx.showToast({ title: '加载失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingMentor: false });
     }
   },
 
   async onConfirmMentor(e: any) {
+    if (this.data.submittingMentor) return;
     const shushiId = e.currentTarget.dataset.shushiid;
     const shushiName = e.currentTarget.dataset.shushiname;
     const courseId = this.data.currentMentorCourseId;
 
+    this.setData({ submittingMentor: true });
     try {
       await selectMentor(shushiId, courseId);
       wx.showToast({ title: '已选择' + shushiName, icon: 'success' });
@@ -247,6 +317,8 @@ Page<ILearnPageData, ILearnPageData>({
       this.loadData();
     } catch (e) {
       wx.showToast({ title: '选择失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingMentor: false });
     }
   },
 
@@ -280,6 +352,7 @@ Page<ILearnPageData, ILearnPageData>({
   },
 
   async onConfirmReport() {
+    if (this.data.submittingReport) return;
     const { reportCourse, reportHour } = this.data;
     if (!reportCourse) return;
 
@@ -293,14 +366,15 @@ Page<ILearnPageData, ILearnPageData>({
       return;
     }
 
-    const userId = app.globalData.userInfo?.userId;
+    const userId = this.getUserId();
     if (userId == null) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
 
+    this.setData({ submittingReport: true });
     try {
-      const res: any = await reportLearn(
+      const res = await reportLearn(
         reportCourse.chapter_id,
         reportCourse.course_id,
         reportCourse.chapter_title,
@@ -308,46 +382,43 @@ Page<ILearnPageData, ILearnPageData>({
         reportHour,
       );
       this.setData({ showReportModal: false, reportHour: '' });
-
-      // 后端返回 is_last_lesson → 到最后一课，跳转结课页
+      this.loadData();
       if (res && res.is_last_lesson) {
-        wx.showToast({ title: '已完成全部课程', icon: 'success' });
-        setTimeout(() => {
-          wx.navigateTo({
-            url: `/pages/finish-course/index?course_id=${reportCourse.course_id}`,
-          });
-        }, 800);
+        wx.showModal({
+          title: '🎉 完成全部章节学习',
+          content: '恭喜你已完成本课程所有章节的学时申报！现在去提交结课作业即可解锁荣誉证书。',
+          confirmText: '去结课',
+          cancelText: '稍后',
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              wx.navigateTo({ url: `/pages/finish-course/index?course_id=${reportCourse.course_id}` });
+            }
+          },
+        });
       } else {
         wx.showToast({ title: '申报成功', icon: 'success' });
       }
-      this.loadData();
     } catch (e: any) {
       wx.showToast({ title: e?.message || '申报失败', icon: 'none' });
+    } finally {
+      this.setData({ submittingReport: false });
     }
+  },
+
+  onGoFinishCourse(e: any) {
+    const courseId = e.currentTarget.dataset.courseid;
+    if (!courseId) return;
+    wx.navigateTo({ url: `/pages/finish-course/index?course_id=${courseId}` });
   },
 
   onCloseReportModal() {
     this.setData({ showReportModal: false });
   },
 
-  /** 点击"结课"按钮 → 跳转结课页面 */
-  onFinishCourse(e: any) {
-    const courseId = e.currentTarget.dataset.courseid;
-    if (!courseId) return;
-    wx.navigateTo({ url: `/pages/finish-course/index?course_id=${courseId}` });
-  },
-
   onGoToChapter(e: any) {
     const url = e.currentTarget.dataset.url;
     if (!url) {
       wx.showToast({ title: '暂无学习链接', icon: 'none' });
-      return;
-    }
-    // 微信公众号文章直接在小程序内打开
-    if (url.startsWith('https://mp.weixin.qq.com/s/')) {
-      wx.navigateTo({
-        url: '/pages/event/webview/index?url=' + encodeURIComponent(url),
-      });
       return;
     }
     wx.setClipboardData({
@@ -360,6 +431,65 @@ Page<ILearnPageData, ILearnPageData>({
           confirmText: '知道了'
         });
       }
+    });
+  },
+
+  formatDateOnly(s: string): string {
+    if (!s) return '—';
+    const str = String(s);
+    if (str.length >= 10) return str.substring(0, 10);
+    return str;
+  },
+
+  onSearchInput(e: any) {
+    const kw = (e?.detail?.value ?? '').trim();
+    this.applyCourseFilters(this.data.courseFilter, kw);
+  },
+
+  onClearSearch() {
+    this.applyCourseFilters(this.data.courseFilter, '');
+  },
+
+  onFilterChange(e: any) {
+    const filter = e.currentTarget.dataset.filter || 'all';
+    if (filter === this.data.courseFilter) return;
+    this.applyCourseFilters(filter, this.data.searchKeyword);
+  },
+
+  onResetCourseFilter() {
+    this.applyCourseFilters('all', '');
+  },
+
+  applyCourseFilters(
+    courseFilter: 'all' | 'selected' | 'available' | 'hot',
+    searchKeyword: string,
+    sourceCourses = this.data.allCourses
+  ) {
+    const kw = (searchKeyword || '').toLowerCase();
+    let filteredCourses = (sourceCourses || []).filter((c) => {
+      if (courseFilter === 'selected' && !c.isSelected) return false;
+      if (courseFilter === 'available' && c.isSelected) return false;
+      if (courseFilter === 'hot' && (c.current_selections_num || 0) + (c.finish_selections_num || 0) <= 0) {
+        return false;
+      }
+      if (!kw) return true;
+      const title = String(c.title || '').toLowerCase();
+      const director = String(c.director_name || '').toLowerCase();
+      const desc = String(c.desc || '').toLowerCase();
+      return title.includes(kw) || director.includes(kw) || desc.includes(kw);
+    });
+    if (courseFilter === 'hot') {
+      filteredCourses = [...filteredCourses].sort(
+        (a, b) =>
+          (b.current_selections_num || 0) * 2 +
+          (b.finish_selections_num || 0) -
+          ((a.current_selections_num || 0) * 2 + (a.finish_selections_num || 0))
+      );
+    }
+    this.setData({
+      courseFilter,
+      searchKeyword,
+      filteredCourses,
     });
   },
 
@@ -382,15 +512,6 @@ Page<ILearnPageData, ILearnPageData>({
     wx.navigateTo({ url });
   },
 
-  onGotoLearnSheet() {
-    const userId = app.globalData.userId;
-    if (!userId) {
-      wx.showToast({ title: '请先登录', icon: 'none' });
-      return;
-    }
-    wx.navigateTo({ url: `/pages/learn-sheet/index?userId=${userId}` });
-  },
-
   onGotoExam() {
     wx.navigateTo({ url: '/pages/exam/index' });
   },
@@ -399,15 +520,226 @@ Page<ILearnPageData, ILearnPageData>({
     wx.navigateTo({ url: '/pages/report/index' });
   },
 
+  onGotoSocialPlaza() {
+    wx.navigateTo({ url: '/pages/all/index' });
+  },
+
+  onGotoMentors() {
+    wx.navigateTo({ url: '/pages/mentors/index' });
+  },
+
+  onGotoSupervise() {
+    wx.navigateTo({ url: '/pages/supervise/index' });
+  },
+
+  // ── 102-camp.md: 进阶预备营（塾员营 / 塾师营 / 塾主营） ──────────────
+  onOpenCampModal(e?: any) {
+    if (!this.data.hasLogin) {
+      this.goToLogin();
+      return;
+    }
+    const campid = Number(e?.currentTarget?.dataset?.campid || this.data.activeCampId || 1);
+    this.setData({
+      showCampModal: true,
+      activeCampId: campid,
+      campPledgeExample: CAMP_COMMIT_EXAMPLES[campid] || CAMP_COMMIT_EXAMPLES[1],
+      'campForm.commitment': '',
+      'campForm.signature': '',
+    });
+    this.loadCampDetail(campid);
+  },
+
+  onCloseCampModal() {
+    this.setData({ showCampModal: false });
+  },
+
+  onSwitchCampTab(e: any) {
+    const campid = Number(e.currentTarget.dataset.campid || 1);
+    if (campid === this.data.activeCampId) return;
+    this.setData({
+      activeCampId: campid,
+      campPledgeExample: CAMP_COMMIT_EXAMPLES[campid] || CAMP_COMMIT_EXAMPLES[1],
+      'campForm.commitment': '',
+    });
+    this.loadCampDetail(campid);
+  },
+
+  async loadCampDetail(campid: number) {
+    this.setData({ campLoading: true });
+    try {
+      const res: any = await base.get(`/api/learn/get_camp/${campid}`);
+      this.setData({
+        campInfo: res?.camp || { id: campid, camp_name: campid === 1 ? '塾员预备营' : campid === 2 ? '塾师预备营' : '塾主预备营' },
+        campMembers: Array.isArray(res?.members) ? res.members : [],
+        campFinishs: Array.isArray(res?.finishs) ? res.finishs : [],
+        campWaitings: Array.isArray(res?.waitings) ? res.waitings : [],
+        campLoading: false,
+      });
+    } catch {
+      this.setData({
+        campInfo: { id: campid, camp_name: campid === 1 ? '塾员预备营' : campid === 2 ? '塾师预备营' : '塾主预备营' },
+        campMembers: [],
+        campFinishs: [],
+        campWaitings: [],
+        campLoading: false,
+      });
+    }
+  },
+
+  onFillCampPledge() {
+    this.setData({
+      'campForm.commitment': this.data.campPledgeExample,
+    });
+    wx.showToast({ title: '已填入入营承诺书', icon: 'none' });
+  },
+
+  onCampFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [`campForm.${field}`]: e.detail.value });
+  },
+
+  async onSubmitJoinCamp() {
+    if (this.data.submittingCamp) return;
+    const { commitment, signature } = this.data.campForm;
+    if (!String(commitment || '').trim() || !String(signature || '').trim()) {
+      wx.showToast({ title: '请填写承诺书并输入真名签字', icon: 'none' });
+      return;
+    }
+    this.setData({ submittingCamp: true });
+    try {
+      const payload = {
+        campid: this.data.activeCampId,
+        commitment: String(commitment).trim(),
+        signature: String(signature).trim(),
+      };
+      await base.post('/api/learn/join_camp', { info: JSON.stringify(payload) });
+      wx.showToast({ title: '🏕️ 已提交入营申请！', icon: 'success' });
+      this.loadCampDetail(this.data.activeCampId);
+    } catch {
+      wx.showToast({ title: '提交失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ submittingCamp: false });
+    }
+  },
+
   goToLogin() {
     wx.navigateTo({ url: '/pages/login/login' });
   },
 
-  onShareAppMessage() {
-    return { title: '自塾·学习', path: '/pages/learn/index' };
+  // ── 103-edit-course.md: 共创课程（草稿加载/保存 + 正式发布课程） ──
+  async onOpenEditCourseModal() {
+    if (!this.data.hasLogin) {
+      this.goToLogin();
+      return;
+    }
+    this.setData({ showEditCourseModal: true });
+    try {
+      const drafts: any = await base.get('/api/learn/load_draft');
+      if (Array.isArray(drafts) && drafts.length > 0) {
+        const myDraft = drafts[drafts.length - 1];
+        if (myDraft && myDraft.course_title) {
+          let parsedChapters = [];
+          try {
+            parsedChapters =
+              typeof myDraft.course_chapters === 'string'
+                ? JSON.parse(myDraft.course_chapters)
+                : myDraft.course_chapters;
+          } catch {}
+          this.setData({
+            courseForm: {
+              courseid: 0,
+              title: myDraft.course_title || '',
+              desc: myDraft.course_desc || '',
+              paper_id: '',
+              chapters:
+                Array.isArray(parsedChapters) && parsedChapters.length > 0
+                  ? parsedChapters
+                  : this.data.courseForm.chapters,
+            },
+          });
+        }
+      }
+    } catch {}
   },
 
-  onShareTimeline() {
-    return { title: '自塾·学习' };
+  onCloseEditCourseModal() {
+    this.setData({ showEditCourseModal: false });
+  },
+
+  onCourseFormInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [`courseForm.${field}`]: e.detail.value });
+  },
+
+  onChapterFieldInput(e: any) {
+    const idx = Number(e.currentTarget.dataset.index);
+    const field = e.currentTarget.dataset.field;
+    const chapters = [...(this.data.courseForm.chapters || [])];
+    if (!chapters[idx] || !field) return;
+    chapters[idx][field] = field === 'period' ? Number(e.detail.value || 7) : e.detail.value;
+    this.setData({ 'courseForm.chapters': chapters });
+  },
+
+  onAddCourseChapter() {
+    const chapters = [...(this.data.courseForm.chapters || [])];
+    chapters.push({
+      id: 0,
+      serial: chapters.length + 1,
+      title: `第${chapters.length + 1}章：进阶实践`,
+      period: 7,
+      url: '1',
+      paper_id: '',
+    });
+    this.setData({ 'courseForm.chapters': chapters });
+  },
+
+  async onSaveCourseDraft() {
+    const f = this.data.courseForm;
+    if (!String(f.title || '').trim()) {
+      wx.showToast({ title: '请先填写课程名称', icon: 'none' });
+      return;
+    }
+    try {
+      await base.post('/api/learn/save_draft', {
+        title: f.title.trim(),
+        desc: (f.desc || '').trim(),
+        chapters: JSON.stringify(f.chapters || []),
+      });
+      wx.showToast({ title: '💾 课程草稿已保存', icon: 'none' });
+    } catch {
+      wx.showToast({ title: '草稿保存失败', icon: 'none' });
+    }
+  },
+
+  async onSubmitSaveCourse() {
+    if (this.data.savingCourse) return;
+    const f = this.data.courseForm;
+    if (!String(f.title || '').trim()) {
+      wx.showToast({ title: '请填写课程名称', icon: 'none' });
+      return;
+    }
+    if (!Array.isArray(f.chapters) || f.chapters.length === 0) {
+      wx.showToast({ title: '请至少添加 1 个章节', icon: 'none' });
+      return;
+    }
+    this.setData({ savingCourse: true });
+    try {
+      await base.post('/api/learn/save_course', {
+        courseid: Number(f.courseid || 0),
+        title: f.title.trim(),
+        desc: (f.desc || '自塾共创精品课').trim(),
+        paper_id: String(f.paper_id || ''),
+        chapters: JSON.stringify(f.chapters),
+      });
+      wx.showToast({ title: '🎉 课程已成功发布！', icon: 'success' });
+      this.setData({ showEditCourseModal: false });
+      this.loadData();
+    } catch {
+      wx.showToast({ title: '发布失败，请稍后重试', icon: 'none' });
+    } finally {
+      this.setData({ savingCourse: false });
+    }
   },
 });

@@ -3,6 +3,7 @@
   "usingComponents": {
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-progress": "tdesign-miniprogram/progress/progress",
-    "t-button": "tdesign-miniprogram/button/button"
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-loading": "tdesign-miniprogram/loading/loading"
   }
 }

@@ -20,55 +20,73 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.65);
+  background-color: rgba(36, 16, 68, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .city-picker-header {
   height: 100rpx;
   line-height: 100rpx;
   text-align: center;
   font-size: 32rpx;
-  color: #333333;
+  font-weight: 800;
+  color: #3b0764;
+  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24);
 }
 .city-picker-more {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+.city-picker-header .btn {
+  padding: 0 28rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+  color: #6d28d9;
+  border: 1.5rpx solid rgba(124, 58, 237, 0.24);
+}
+.city-picker-header .btn.primary {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.25);
+}
 .city-picker-footer {
-  height: 100rpx;
+  height: 112rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20rpx;
 }
 .city-picker-footer .btn {
-  width: 330rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  flex: 1;
+  height: 82rpx;
+  line-height: 82rpx;
   text-align: center;
-  color: #666666;
-  font-size: 32rpx;
+  color: #6d28d9;
+  background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+  border: 1.5rpx solid rgba(124, 58, 237, 0.28);
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
   position: relative;
+  box-shadow: 0 4rpx 14rpx rgba(124, 58, 237, 0.10), inset 0 2rpx 0 #ffffff;
 }
 .city-picker-footer .btn__active {
-  opacity: 0.5;
-}
-.city-picker-footer .btn::after {
-  display: block;
-  content: ' ';
-  position: absolute;
-  left: -50%;
-  right: -50%;
-  top: -50%;
-  bottom: -50%;
-  transform: scale(0.5);
-  border: 1rpx solid #999999;
-  border-radius: 16rpx;
+  transform: scale(0.96);
+  opacity: 0.9;
 }
 .city-picker-footer .btn.primary {
-  color: #fa550f;
-}
-.city-picker-footer .btn.primary::after {
-  border-color: #fa550f;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 10rpx 24rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.36);
 }
 .picker-column:not(:first-child) {
   margin-left: 40rpx;
@@ -80,23 +98,44 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: #fff;
-  padding: 0 30rpx;
-  color: #333333;
-  font-size: 34rpx;
-  border-radius: 20rpx 20rpx 0 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  background:
+    radial-gradient(circle at 15% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 85% 0%, rgba(129, 140, 248, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 40%, #f8f7ff 100%);
+  padding: 16rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  color: #1e1b4b;
+  font-size: 32rpx;
+  border-radius: 48rpx 48rpx 0 0;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 -20rpx 64rpx rgba(109, 40, 217, 0.22),
+    inset 0 3rpx 0 #ffffff;
 }
 .show .city-picker-shadow {
   display: block;
 }
 .picker {
-  height: 300rpx;
-  margin: 50rpx 0;
+  height: 320rpx;
+  margin: 32rpx 0;
   line-height: 88rpx;
   text-align: center;
+}
+.picker-row {
+  border-radius: 20rpx;
+  margin: 0 12rpx;
+  font-weight: 700;
+  color: #3b0764;
+}
+.picker-row.zs-row-odd {
+  background: rgba(255, 245, 250, 0.65);
+}
+.picker-row.zs-row-even {
+  background: rgba(238, 242, 255, 0.65);
 }
 /* 似乎小程序picker-view的bug，indicator-class仅height生效，其他诸如line-height、text-align等放到父class中设置 */
 .picker-center-row {
   height: 88rpx;
+  border-radius: 24rpx;
+  background: rgba(254, 240, 138, 0.28);
+  border: 2rpx solid rgba(251, 146, 60, 0.35);
 }

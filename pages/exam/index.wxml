@@ -1,25 +1,259 @@
 <view class="page">
+  <!-- 品牌紫闯关题库大厅 Hero Header -->
   <view class="header">
-    <text class="header-title">考试中心</text>
-    <text class="header-sub">选择试卷，开始练习</text>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
-  </view>
-
-  <view class="paper-list" wx:if="{{!loading}}">
-    <view class="paper-card" wx:for="{{papers}}" wx:key="testpaperid" bindtap="onGoTest" data-testid="{{item.testpaperid}}">
-      <view class="paper-title">{{item.testpaper_title}}</view>
-      <view class="paper-meta">
-        <text>作者：{{item.testpaper_author}}</text>
+    <view class="header-glow header-glow--1"></view>
+    <view class="header-glow header-glow--2"></view>
+    <view class="header-top">
+      <view>
+        <view class="header-badge">CHALLENGE ARENA</view>
+        <text class="header-title">🏆 闯关题库大厅</text>
+        <text class="header-sub">共 {{papers.length || 0}} 套精选试卷 · 测验巩固所学，解锁结课勋章</text>
       </view>
-      <view class="paper-arrow">›</view>
+      <view class="header-quick-btns">
+        <view class="header-quick-pill" bindtap="onRandomPaper">🎲 随机闯关</view>
+        <view class="header-quick-pill outline" bindtap="onOpenAddQuesModal">＋ 共创出题</view>
+        <view class="header-quick-pill outline" bindtap="onOpenAssemblePaperModal">📑 题库组卷</view>
+        <view class="header-quick-pill outline" bindtap="onGoReports">📊 成绩单</view>
+      </view>
+    </view>
+
+    <!-- 实时搜索栏 -->
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索试卷名称或出题塾师..."
+        placeholder-class="search-placeholder"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <view class="search-clear" wx:if="{{searchKeyword}}" catchtap="onClearSearch">✕</view>
+    </view>
+
+    <!-- 分类筛选胶囊 -->
+    <view class="exam-cat-pills">
+      <view
+        class="exam-cat-pill {{categoryFilter === 'all' ? 'active' : ''}}"
+        data-cat="all"
+        bindtap="onCategoryChange"
+      >📑 全部试卷 ({{papers.length}})</view>
+      <view
+        class="exam-cat-pill {{categoryFilter === 'core' ? 'active' : ''}}"
+        data-cat="core"
+        bindtap="onCategoryChange"
+      >🔥 核心必刷</view>
+      <view
+        class="exam-cat-pill {{categoryFilter === 'mentor' ? 'active' : ''}}"
+        data-cat="mentor"
+        bindtap="onCategoryChange"
+      >👨‍🏫 塾师精编</view>
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!loading && papers.length == 0}}">
-    <text>暂无试卷</text>
+  <!-- 骨架屏加载态 -->
+  <view class="paper-list" wx:if="{{loading}}">
+    <view class="skeleton-card" wx:for="{{skeletonList}}" wx:key="*this">
+      <view class="skeleton-badge"></view>
+      <view class="skeleton-body">
+        <view class="skeleton-line skeleton-line--title"></view>
+        <view class="skeleton-line skeleton-line--sub"></view>
+      </view>
+      <view class="skeleton-btn"></view>
+    </view>
+  </view>
+
+  <!-- 试卷卡片列表 -->
+  <view class="paper-list" wx:if="{{!loading && filteredPapers.length > 0}}">
+    <view
+      class="paper-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+      wx:for="{{filteredPapers}}"
+      wx:key="testpaperid"
+      bindtap="onGoTest"
+      data-testid="{{item.testpaperid}}"
+    >
+      <view class="paper-seq-badge">
+        <text class="paper-seq-bolt">⚡</text>
+        <text class="paper-seq-num">{{item._seqBadge}}</text>
+      </view>
+      <view class="paper-info">
+        <view class="paper-title">{{item.testpaper_title}}</view>
+        <view class="paper-tags">
+          <text class="paper-author-pill">👨‍🏫 出题塾师：{{item.testpaper_author || '自塾教研组'}}</text>
+          <text class="paper-score-tag">💯 100分制</text>
+        </view>
+      </view>
+      <view class="paper-cta">⚡ 立即挑战 ›</view>
+    </view>
+  </view>
+
+  <!-- 空状态：搜索无结果 或 题库为空 -->
+  <view class="empty-card" wx:if="{{!loading && filteredPapers.length === 0}}">
+    <view class="empty-icon">{{searchKeyword ? '🔎' : '📑'}}</view>
+    <view class="empty-title">{{searchKeyword ? '未找到匹配的试卷' : '暂无闯关试卷'}}</view>
+    <view class="empty-desc">{{searchKeyword ? '试试其他关键词或清空搜索条件' : '题库正在更新中，请稍后下拉刷新'}}</view>
+    <view class="empty-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">🧹 清空搜索</view>
+    <view class="empty-btn" wx:else bindtap="loadPapers">🔄 重新加载</view>
+  </view>
+
+  <!-- 102-add-ques.md: 共创出题弹窗 -->
+  <view
+    wx:if="{{showAddQuesModal}}"
+    class="exam-sheet-mask"
+    bindtap="onCloseAddQuesModal"
+  >
+    <view
+      class="exam-sheet-card"
+      catchtap=""
+    >
+      <view class="exam-sheet-header">
+        <text class="exam-sheet-title">✨ 共创出题 · 贡献题库题目</text>
+        <text class="exam-sheet-close" bindtap="onCloseAddQuesModal">✕</text>
+      </view>
+
+      <!-- 题型切换 -->
+      <view class="exam-type-pills">
+        <view
+          wx:for="{{['选择题','判断题','简答题']}}"
+          wx:key="*this"
+          data-type="{{item}}"
+          bindtap="onSelectQuesType"
+          class="exam-type-pill {{newQuesForm.ques_type === item ? 'active' : ''}}"
+        >📝 {{item}}</view>
+      </view>
+
+      <view class="exam-form-group">
+        <text class="exam-form-label">题干内容 *</text>
+        <textarea
+          class="exam-form-textarea"
+          placeholder="请输入清晰准确的题目问题..."
+          value="{{newQuesForm.ques_title}}"
+          data-field="ques_title"
+          bindinput="onQuesFormInput"
+        />
+      </view>
+
+      <block wx:if="{{newQuesForm.ques_type === '选择题'}}">
+        <view class="exam-options-grid">
+          <input
+            class="exam-option-input"
+            placeholder="A 选项 *"
+            value="{{newQuesForm.item_a}}"
+            data-field="item_a"
+            bindinput="onQuesFormInput"
+          />
+          <input
+            class="exam-option-input"
+            placeholder="B 选项 *"
+            value="{{newQuesForm.item_b}}"
+            data-field="item_b"
+            bindinput="onQuesFormInput"
+          />
+          <input
+            class="exam-option-input"
+            placeholder="C 选项"
+            value="{{newQuesForm.item_c}}"
+            data-field="item_c"
+            bindinput="onQuesFormInput"
+          />
+          <input
+            class="exam-option-input"
+            placeholder="D 选项"
+            value="{{newQuesForm.item_d}}"
+            data-field="item_d"
+            bindinput="onQuesFormInput"
+          />
+        </view>
+      </block>
+
+      <view class="exam-form-group">
+        <text class="exam-form-label">标准答案 *</text>
+        <input
+          class="exam-form-input"
+          placeholder="{{newQuesForm.ques_type === '选择题' ? '例如：A 或 AB' : newQuesForm.ques_type === '判断题' ? '正确 或 错误' : '请输入参考答案要点'}}"
+          value="{{newQuesForm.answer}}"
+          data-field="answer"
+          bindinput="onQuesFormInput"
+        />
+      </view>
+
+      <view class="exam-form-group exam-form-group-last">
+        <text class="exam-form-label">答案解析（选填）</text>
+        <input
+          class="exam-form-input"
+          placeholder="填写解题思路或知识点延伸..."
+          value="{{newQuesForm.explain}}"
+          data-field="explain"
+          bindinput="onQuesFormInput"
+        />
+      </view>
+
+      <button
+        class="exam-sheet-submit"
+        bindtap="onSubmitNewQues"
+      >{{savingQues ? '⏳ 提交中...' : '🚀 立即提交入库'}}</button>
+    </view>
+  </view>
+
+  <!-- 101-edit-paper.md & 103-all-ques.md: 题库检索与组卷发布弹窗 -->
+  <view
+    wx:if="{{showAssemblePaperModal}}"
+    class="exam-sheet-mask"
+    bindtap="onCloseAddQuesModal"
+  >
+    <view
+      class="exam-sheet-card"
+      catchtap=""
+    >
+      <view class="exam-sheet-header">
+        <text class="exam-sheet-title">📑 题库组卷 · 发布闯关试卷</text>
+        <text class="exam-sheet-close" bindtap="onCloseAddQuesModal">✕</text>
+      </view>
+
+      <view class="exam-form-group">
+        <text class="exam-form-label">试卷名称 *</text>
+        <input
+          class="exam-form-input"
+          placeholder="例如：AI 智能体工程核心闯关卷"
+          value="{{paperTitle}}"
+          bindinput="onPaperTitleInput"
+        />
+      </view>
+
+      <view class="exam-form-group">
+        <text class="exam-form-label">题库检索 (已选 {{selectedQuesIds.length}} 题)</text>
+        <input
+          class="exam-form-input"
+          placeholder="输入题干关键词筛选题目..."
+          value="{{quesSearchKeyword}}"
+          bindinput="onQuesSearchInput"
+        />
+      </view>
+
+      <scroll-view scroll-y="true" class="exam-bank-scroll">
+        <view
+          wx:for="{{questionBankList}}"
+          wx:key="quesid"
+          data-id="{{item.quesid}}"
+          bindtap="onToggleSelectQues"
+          class="exam-bank-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item._selected ? 'selected' : ''}}"
+        >
+          <view class="exam-bank-item-main">
+            <text class="exam-bank-item-type">[{{item.ques_type || '题目'}}]</text>
+            <text class="exam-bank-item-title">{{item.ques_title}}</text>
+          </view>
+          <text class="exam-bank-item-check {{item._selected ? 'selected' : ''}}">
+            {{item._selected ? '✓ 已选' : '＋ 选择'}}
+          </text>
+        </view>
+      </scroll-view>
+
+      <button
+        class="exam-sheet-submit"
+        bindtap="onSubmitAssemblePaper"
+      >{{savingPaper ? '⏳ 组卷发布中...' : '🚀 确认组卷并发布'}}</button>
+    </view>
   </view>
 
   <view class="safe-bottom"></view>

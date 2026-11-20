@@ -5,6 +5,7 @@
 const _appLogin = getApp<any>()
 import { isDevMode, isLoggedIn } from '../../utils/env'
 import { getBaseUrl } from '../../services/base'
+import { registerUser, resetPasswordApply } from '../../services/user/user'
 
 type ILoginPageData = {
   userInfo: any;
@@ -22,6 +23,7 @@ type ILoginPageData = {
   phoneInput: string;
   pwdInput: string;
   canDevLogin: boolean;
+  submitting: boolean;
   // 隐私政策勾选
   privacyAgreed: boolean;
 };
@@ -43,28 +45,30 @@ Page<ILoginPageData, ILoginPageData>({
     phoneInput: '',
     pwdInput: '',
     canDevLogin: false,
+    submitting: false,
     // 隐私政策勾选默认未勾选
     privacyAgreed: false,
-    // ========== v2 改造：注册模式字段 ==========
-    // mode: 'login' = 微信授权登录；'register' = 新用户注册模式
-    mode: 'login' as 'login' | 'register',
-    regName: '',         // 注册名字
-    regEmail: '',        // 注册邮箱
-    regGender: '' as '男' | '女' | '', // v2 改造：后端 RegiMiniRequest.gender = Literal["男","女"]
-    regNameError: '',    // 名字校验错误提示
-    regEmailError: '',   // 邮箱校验错误提示
-    regGenderError: '',  // 性别校验错误提示
-    editName: false,     // 名字是否处于编辑状态
-    editEmail: false,    // 邮箱是否处于编辑状态
-    editGender: false,   // 性别是否处于编辑状态
-    canRegister: false,  // 注册按钮是否可点
-    regSubmitting: false,// 注册请求进行中
-    regErrorMsg: '',     // 注册接口错误提示
-    // _pendingRegiData: token_miniprogram 404 时保存的 miniProgramToken，供注册时使用
-    _pendingRegiData: null as any,
-    // _encryptedData / _iv: getPhoneNumber 时保存的微信加密数据，注册时传给后端解密手机号
-    _encryptedData: '',
-    _iv: '',
+    // 101-regi.md & 111-reset-pass.md: 新塾员注册与忘记密码
+    showRegiModal: false,
+    submittingRegi: false,
+    regiForm: {
+      name: '',
+      phone: '',
+      email: '',
+      password: '',
+      gender: '男',
+      notes: '',
+    },
+    showResetModal: false,
+    resetPhone: '',
+    submittingReset: false,
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '学本领，上自塾 · 诺亚方舟共学与 AI 伴学平台',
+      path: '/pages/login/login',
+    }
   },
 
   onLoad() {
@@ -72,7 +76,19 @@ Page<ILoginPageData, ILoginPageData>({
     const devMode = isDevMode()
     this.setData({ isDev: devMode })
 
-    // Dev 模式下，如果已有 token 也算已登录，可以直接回跳
+    // 每次进入登录页都主动刷新一次微信登录 code 与 session_uuid，防止后端 TTLDict 过期
+    if (_appLogin && typeof _appLogin.checkLoginStatus === 'function') {
+      _appLogin.checkLoginStatus()
+    }
+
+    const hasValidToken = Boolean(wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken'))
+    if (!hasValidToken && _appLogin && _appLogin.globalData) {
+      // 清除内存中的残留过期 Token，防止 completeLogin 把旧 Token 写回 Storage 导致死循环
+      _appLogin.globalData.accessToken = null
+      _appLogin.globalData.refreshToken = null
+    }
+
+    // Dev 模式下，如果已有有效 token 也算已登录，可以直接回跳
     if (devMode && isLoggedIn()) {
       console.log('[Dev模式] 已登录，直接跳转')
       wx.switchTab({ url: '/pages/aim/index' })
@@ -85,22 +101,31 @@ Page<ILoginPageData, ILoginPageData>({
       })
     }
 
-    // 检查是否已有用户信息
-    if (_appLogin.globalData.userInfo) {
+    // 检查是否已有用户信息（兼容 globalData 与本地缓存，避免 completeLogin 覆盖为 null）
+    const cachedUserInfo = _appLogin?.globalData?.userInfo || wx.getStorageSync('userInfo')
+    if (cachedUserInfo) {
+      const avatarUrl = cachedUserInfo.avatarUrl || null
+      const nickName = cachedUserInfo.nickName || cachedUserInfo.name || null
       this.setData({
-        userInfo: _appLogin.globalData.userInfo,
-        hasUserInfo: true
+        userInfo: cachedUserInfo,
+        avatarUrl,
+        nickName,
+        userId: cachedUserInfo.userId || cachedUserInfo.id || _appLogin?.globalData?.userId || wx.getStorageSync('userId') || null,
+        hasUserInfo: Boolean((nickName && String(nickName).trim().length > 0) || avatarUrl)
       })
     }
 
-    // 检查是否已有手机号
-    if (_appLogin.globalData.phoneNumber) {
+    // 检查是否已有手机号（注意：仅当本地已有有效 Token 时才标记 hasPhoneNumber=true；
+    // 若 Token 已过期被清除，必须保持 hasPhoneNumber=false 以展示「一键授权」重新换取 Token）
+    const cachedPhone = _appLogin?.globalData?.phoneNumber || wx.getStorageSync('phoneNumber')
+    if (cachedPhone) {
       this.setData({
-        phoneNumber: _appLogin.globalData.phoneNumber,
-        hasPhoneNumber: true
+        phoneNumber: cachedPhone,
+        phoneInput: cachedPhone,
+        canDevLogin: String(cachedPhone).length >= 10 && String(this.data.pwdInput || '').length >= 4,
+        hasPhoneNumber: hasValidToken
       })
     }
-
   },
 
   // 获取用户信息
@@ -119,6 +144,8 @@ Page<ILoginPageData, ILoginPageData>({
         // 更新页面数据
         this.setData({
           userInfo: res.userInfo,
+          avatarUrl: res.userInfo.avatarUrl || this.data.avatarUrl,
+          nickName: res.userInfo.nickName || this.data.nickName,
           hasUserInfo: true
         })
 
@@ -139,143 +166,143 @@ Page<ILoginPageData, ILoginPageData>({
     })
   },
 
-  // 获取用户头像（v2 改造：chooseAvatar 后同步设 hasUserInfo，让 completeLogin 通过）
+  // 获取用户头像
   getAvatar(e: any) {
+    const avatarUrl = e.detail.avatarUrl
     this.setData({
-      avatarUrl: e.detail.avatarUrl,
-      hasUserInfo: true,
+      avatarUrl,
+      hasUserInfo: Boolean((this.data.nickName && this.data.nickName.trim().length > 0) || avatarUrl)
     })
   },
 
   getName(e: any) {
+    const rawName = e.detail.value || ''
+    const trimmed = rawName.trim()
     this.setData({
-      nickName: e.detail.value,
-      hasUserInfo: true
+      nickName: rawName,
+      hasUserInfo: trimmed.length > 0
     })
   },
 
   // 获取手机号
   getPhoneNumber(e: any) {
     const that = this
-    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
-      console.error('获取手机号失败', e.detail.errMsg)
-      wx.showToast({ title: '获取手机号失败', icon: 'none', duration: 2000 })
-      return
-    }
-
-    const sessionkey = _appLogin.globalData.sessionkey
-    if (!sessionkey) {
-      wx.showToast({ title: '授权凭证尚未就绪，请稍后再试', icon: 'none', duration: 2000 })
-      console.error('[login] sessionkey(UUID) 为空，可能 /openid 请求尚未返回')
-      return
-    }
-
-    console.log('=== getPhoneNumber 请求参数 ===', JSON.stringify({ sessionkey, encryptedData: '***', iv: e.detail.iv }))
-
-    // v2：保存加密数据，注册时需要用到
-    that.setData({
-      _encryptedData: e.detail.encryptedData,
-      _iv: e.detail.iv,
-    })
-
-    wx.showLoading({ title: '授权中...', mask: true })
-
-    wx.request({
-      url: getBaseUrl() + '/api/users/token_miniprogram',
-      data: {
-        sessionkey,
+    if (e.detail.errMsg === 'getPhoneNumber:ok') {
+      const sessionkey = _appLogin.globalData.sessionkey
+      if (!sessionkey) {
+        if (typeof _appLogin.checkLoginStatus === 'function') {
+          _appLogin.checkLoginStatus()
+        }
+        wx.showToast({ title: '授权凭证初始化中，请再点一次', icon: 'none', duration: 2000 })
+        console.error('[login] sessionkey(UUID) 为空，已触发重新获取 /openid')
+        return
+      }
+      // 后端 TokenRequest：sessionkey 字段现在传 UUID，后端从 dict 取出真实 session_key 解密
+      const telparam = {
+        sessionkey: sessionkey,
         encryptedData: e.detail.encryptedData,
         iv: e.detail.iv
-      },
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      success: (res: any) => {
-        wx.hideLoading()
-        console.log('=== token_miniprogram 返回 ===')
-        console.log('HTTP 状态码:', res.statusCode)
-        console.log('响应数据:', JSON.stringify(res.data))
-
-        // 用户不存在时后端返回 {detail: "用户不存在"} 或 {detail: {message: "用户不存在", phone: "xxx"}}
-        const detail = res.data && res.data.detail
-        const isUserNotFound = res.statusCode === 404 || (
-          typeof detail === 'string' && detail === '用户不存在'
-        ) || (
-          typeof detail === 'object' && detail.message === '用户不存在'
-        )
-
-        if (isUserNotFound) {
-          const phone = (typeof detail === 'object' && detail.phone) || ''
-          console.warn('[login] 用户不存在，切换到注册模式, 手机号:', phone)
-          that.setData({
-            mode: 'register',
-            regErrorMsg: '',
-            phoneNumber: phone,
-            hasPhoneNumber: true,
-            _pendingRegiData: res.data || null,
-          })
-          return
-        }
-
-        // 后端返回成功但缺少关键字段
-        if (!res.data || !res.data.phone) {
-          console.error('[login] 后端返回缺少 phone 字段:', res.data)
-          wx.showToast({
-            title: '获取手机号失败，后端返回数据异常',
-            icon: 'none',
-            duration: 2500
-          })
-          return
-        }
-
-        console.log('[login] 用户已存在，手机号:', res.data.phone, '用户ID:', res.data.id)
-
-        // 用户存在，保存信息
-        _appLogin.globalData.phoneNumber = res.data.phone
-        _appLogin.globalData.userId = res.data.id
-        _appLogin.globalData.accessToken = res.data.atoken
-        _appLogin.globalData.refreshToken = res.data.rtoken
-        _appLogin.globalData.hasPhoneNumber = true
-        _appLogin.savePhoneNumber(res.data.phone)
-        _appLogin.saveUserId(res.data.id)
-        wx.setStorageSync('accessToken', res.data.atoken)
-        wx.setStorageSync('refreshToken', res.data.rtoken)
-
-        if (res.data.username) {
-          _appLogin.globalData.userInfo = {
-            ...(_appLogin.globalData.userInfo || {}),
-            nickName: res.data.username,
-            userId: res.data.id,
-          }
-          wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
-        }
-
-        that.setData({
-          phoneNumber: res.data.phone,
-          hasPhoneNumber: true,
-          userId: res.data.id,
-          nickName: res.data.username || '',
-        })
-
-        wx.showToast({ title: '获取手机号成功', icon: 'success', duration: 2000 })
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('[login] token_miniprogram 网络请求失败:', err)
-        wx.showToast({ title: '网络错误，请重试', icon: 'none', duration: 2000 })
       }
-    })
+      console.log(telparam)
+      console.log('加密的手机号信息：', e.detail)
+      wx.request({
+        url: getBaseUrl() + '/api/users/token_miniprogram',
+        data: telparam,
+        method: 'POST',
+        header: {
+          'content-type': 'application/json'
+        },
+        success: (res: any) => {
+          console.log(res.data)
+          if (res.statusCode === 200 && res.data && res.data.atoken) {
+            const resolvedName =
+              (that.data.nickName && that.data.nickName.trim()) ||
+              res.data.username ||
+              res.data.nickName ||
+              _appLogin.globalData.userInfo?.nickName ||
+              `用户${String(res.data.phone || '').slice(-4)}`
+            const nextUserInfo = {
+              ...(_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}),
+              userId: res.data.id,
+              id: res.data.id,
+              nickName: resolvedName,
+              name: resolvedName,
+              avatarUrl: that.data.avatarUrl || res.data.avatarUrl || _appLogin.globalData.userInfo?.avatarUrl || '',
+              phoneNumber: res.data.phone || '',
+              role: res.data.role || (_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}).role || '',
+              is_admin: res.data.is_admin ?? (_appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}).is_admin,
+            }
+            _appLogin.globalData.phoneNumber = res.data.phone
+            _appLogin.globalData.userId = res.data.id
+            _appLogin.globalData.accessToken = res.data.atoken
+            _appLogin.globalData.refreshToken = res.data.rtoken
+            _appLogin.globalData.hasPhoneNumber = true
+            _appLogin.globalData.userInfo = nextUserInfo
+            _appLogin.globalData.hasUserInfo = true
+            _appLogin.savePhoneNumber(res.data.phone)
+            _appLogin.saveUserId(res.data.id)
+            // 立即写入 Storage，避免用户点击左上角返回时丢失 Token
+            wx.setStorageSync('accessToken', res.data.atoken)
+            wx.setStorageSync('refreshToken', res.data.rtoken || res.data.atoken)
+            wx.setStorageSync('userId', res.data.id)
+            wx.setStorageSync('userInfo', nextUserInfo)
+            if (res.data.role) {
+              wx.setStorageSync('userRole', res.data.role)
+            }
+            wx.removeStorageSync('guestMode')
+
+            // 更新页面数据
+            that.setData({
+              phoneNumber: res.data.phone,
+              phoneInput: res.data.phone || that.data.phoneInput,
+              hasPhoneNumber: true,
+              userId: res.data.id,
+              nickName: that.data.nickName || resolvedName,
+              hasUserInfo: true
+            })
+
+            wx.showToast({
+              title: '获取手机号成功',
+              icon: 'success',
+              duration: 2000
+            })
+          } else {
+            // 若 sessionkey 在后端过期导致解密失败，自动刷新一次 sessionkey
+            if (typeof _appLogin.checkLoginStatus === 'function') {
+              _appLogin.checkLoginStatus()
+            }
+            const detailMsg =
+              typeof res.data?.detail === 'string'
+                ? res.data.detail
+                : res.data?.detail?.message || res.data?.message || '获取手机号失败，请重试或使用密码登录'
+            wx.showToast({
+              title: detailMsg,
+              icon: 'none',
+              duration: 2500
+            })
+          }
+        },
+        fail: (err: any) => {
+          console.error('[login] token_miniprogram 请求失败', err)
+          wx.showToast({
+            title: '网络异常，获取手机号失败',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      })
+    } else {
+      console.error('获取手机号失败', e.detail.errMsg)
+      wx.showToast({
+        title: '获取手机号失败',
+        icon: 'none',
+        duration: 2000
+      })
+    }
   },
 
   // 完成登录，跳转到首页
   completeLogin() {
-    if (!this.data.hasPhoneNumber) {
-      wx.showToast({
-        title: '请先授权手机号',
-        icon: 'none',
-        duration: 2000
-      })
-      return
-    }
     if (!this.data.privacyAgreed) {
       wx.showToast({
         title: '请先阅读并同意用户协议和隐私政策',
@@ -284,14 +311,42 @@ Page<ILoginPageData, ILoginPageData>({
       })
       return
     }
+    const activeAccessToken = wx.getStorageSync('accessToken') || _appLogin.globalData.accessToken || ''
+    const activeRefreshToken = wx.getStorageSync('refreshToken') || _appLogin.globalData.refreshToken || ''
+    if (!activeAccessToken && !activeRefreshToken) {
+      this.setData({ hasPhoneNumber: false })
+      wx.showToast({
+        title: '请先点击手机号「一键授权」或使用密码登录',
+        icon: 'none',
+        duration: 2500
+      })
+      return
+    }
     if (this.data.hasUserInfo && this.data.hasPhoneNumber) {
+      const prevInfo = _appLogin.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+      const resolvedUserId = this.data.userId || _appLogin.globalData.userId || prevInfo.userId || wx.getStorageSync('userId')
       // 确保全局状态已更新
       _appLogin.globalData.hasUserInfo = true
       _appLogin.globalData.hasPhoneNumber = true
-      _appLogin.globalData.userInfo = { avatarUrl: this.data.avatarUrl, nickName: this.data.nickName, userId: _appLogin.globalData.userId}
+      _appLogin.globalData.userInfo = {
+        ...prevInfo,
+        avatarUrl: this.data.avatarUrl || prevInfo.avatarUrl || '',
+        nickName: (this.data.nickName && this.data.nickName.trim()) || prevInfo.nickName || '',
+        userId: resolvedUserId
+      }
       wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
-      wx.setStorageSync('accessToken', _appLogin.globalData.accessToken)
-      wx.setStorageSync('refreshToken', _appLogin.globalData.refreshToken)
+      if (resolvedUserId) {
+        wx.setStorageSync('userId', resolvedUserId)
+      }
+      if (activeAccessToken) {
+        wx.setStorageSync('accessToken', activeAccessToken)
+        _appLogin.globalData.accessToken = activeAccessToken
+      }
+      if (activeRefreshToken) {
+        wx.setStorageSync('refreshToken', activeRefreshToken)
+        _appLogin.globalData.refreshToken = activeRefreshToken
+      }
+      wx.removeStorageSync('guestMode')
 
       // 跳转到首页
       wx.switchTab({
@@ -299,7 +354,7 @@ Page<ILoginPageData, ILoginPageData>({
       })
     } else {
       wx.showToast({
-        title: '请先完成授权',
+        title: '请先完成昵称与手机号授权',
         icon: 'none',
         duration: 2000
       })
@@ -339,7 +394,7 @@ Page<ILoginPageData, ILoginPageData>({
 
   /** 手机号+密码登录（Dev 模式） */
   loginByPassword() {
-    if (!this.data.canDevLogin) return
+    if (!this.data.canDevLogin || this.data.submitting) return
     if (!this.data.privacyAgreed) {
       wx.showToast({
         title: '请先阅读并同意用户协议和隐私政策',
@@ -350,7 +405,7 @@ Page<ILoginPageData, ILoginPageData>({
     }
 
     const { phoneInput: phone, pwdInput: password } = this.data
-
+    this.setData({ submitting: true })
     wx.showLoading({ title: '登录中...', mask: true })
 
     // 调用后端密码登录接口
@@ -363,19 +418,33 @@ Page<ILoginPageData, ILoginPageData>({
       data: { phone, password },
       success: (res: any) => {
         wx.hideLoading()
+        this.setData({ submitting: false })
         const data = res.data
-        if (data && data.id > 0) {
+        if (res.statusCode === 200 && data && data.id > 0) {
           // 登录成功，保存 token 和用户信息
-          const userInfo = {
+          const userInfo: any = {
             userId: data.id,
+            id: data.id,
             nickName: data.username || data.nickName || `用户${phone.slice(-4)}`,
-            avatarUrl: ''
+            avatarUrl: data.avatarUrl || '',
+            role: data.role || '',
+            is_admin: data.is_admin,
+          }
+          if (data.gender) {
+            userInfo.gender = data.gender
           }
 
           wx.setStorageSync('userInfo', userInfo)
+          if (data.role) {
+            wx.setStorageSync('userRole', data.role)
+          }
+          wx.setStorageSync('userId', data.id)
           wx.setStorageSync('accessToken', data.atoken)
           wx.setStorageSync('refreshToken', data.rtoken)
           wx.setStorageSync('phoneNumber', data.phone || phone)
+          if (typeof _appLogin.saveUserId === 'function') {
+            _appLogin.saveUserId(data.id)
+          }
           // 清除游客标记
           wx.removeStorageSync('guestMode')
 
@@ -392,11 +461,12 @@ Page<ILoginPageData, ILoginPageData>({
             wx.switchTab({ url: '/pages/aim/index' })
           }, 1000)
         } else {
-          wx.showToast({ title: data.message || '用户名或密码错误', icon: 'none' })
+          wx.showToast({ title: data?.detail || data?.message || '用户名或密码错误', icon: 'none' })
         }
       },
       fail: () => {
         wx.hideLoading()
+        this.setData({ submitting: false })
         wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
@@ -408,6 +478,118 @@ Page<ILoginPageData, ILoginPageData>({
     wx.switchTab({ url: '/pages/aim/index' })
   },
 
+  // ── 101-regi.md: 新塾员入塾注册申请 (/api/users/register) ──
+  onOpenRegiModal() {
+    this.setData({
+      showRegiModal: true,
+      regiForm: {
+        name: this.data.nickName || '',
+        phone: this.data.phoneInput || this.data.phoneNumber || '',
+        email: '',
+        password: '',
+        gender: '男',
+        notes: '',
+      },
+    })
+  },
+
+  onCloseRegiModal() {
+    this.setData({ showRegiModal: false })
+  },
+
+  onRegiFieldInput(e: any) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    this.setData({
+      [`regiForm.${field}`]: e.detail.value,
+    })
+  },
+
+  onSelectRegiGender(e: any) {
+    const g = e.currentTarget.dataset.gender || '男'
+    this.setData({ 'regiForm.gender': g })
+  },
+
+  async onSubmitRegister() {
+    const f = this.data.regiForm
+    if (!String(f.name || '').trim()) {
+      wx.showToast({ title: '请输入真实姓名/昵称', icon: 'none' })
+      return
+    }
+    if (!/^1[3-9]\d{9}$/.test(String(f.phone || '').trim())) {
+      wx.showToast({ title: '请输入有效的11位手机号', icon: 'none' })
+      return
+    }
+    if (!String(f.password || '').trim() || String(f.password).length < 4) {
+      wx.showToast({ title: '请设置至少4位登录密码', icon: 'none' })
+      return
+    }
+    this.setData({ submittingRegi: true })
+    try {
+      const res: any = await registerUser({
+        name: f.name.trim(),
+        phone: f.phone.trim(),
+        email: (f.email || `${f.phone.trim()}@zishu.co`).trim(),
+        password: f.password.trim(),
+        gender: f.gender || '男',
+        notes: (f.notes || '小程序自主申请入塾').trim(),
+      })
+      if (res && (res.code === 200 || res.code === '200')) {
+        wx.showToast({ title: '🎉 入塾申请已提交！', icon: 'success' })
+        this.setData({
+          showRegiModal: false,
+          phoneInput: f.phone.trim(),
+          pwdInput: f.password.trim(),
+          canDevLogin: true,
+        })
+      } else {
+        wx.showToast({ title: res?.message || '该手机号已注册，请直接登录', icon: 'none' })
+      }
+    } catch (err) {
+      wx.showToast({ title: '提交注册申请失败', icon: 'none' })
+    } finally {
+      this.setData({ submittingRegi: false })
+    }
+  },
+
+  // ── 111-reset-pass.md: 申请重置密码 (/api/users/reset_pass) ──
+  onOpenResetModal() {
+    this.setData({
+      showResetModal: true,
+      resetPhone: this.data.phoneInput || this.data.phoneNumber || '',
+    })
+  },
+
+  onCloseResetModal() {
+    this.setData({ showResetModal: false })
+  },
+
+  onResetPhoneInput(e: any) {
+    this.setData({ resetPhone: e.detail.value })
+  },
+
+  async onSubmitResetPass() {
+    const phone = String(this.data.resetPhone || '').trim()
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
+      wx.showToast({ title: '请输入注册时的11位手机号', icon: 'none' })
+      return
+    }
+    this.setData({ submittingReset: true })
+    try {
+      const res: any = await resetPasswordApply(phone)
+      if (res && Number(res.code) === 200) {
+        wx.showToast({ title: `🔑 已提交重置申请（第${res.times || 1}次）`, icon: 'none' })
+        this.setData({ showResetModal: false })
+      } else {
+        wx.showToast({ title: '未找到该手机号对应的账号', icon: 'none' })
+      }
+    } catch (err) {
+      wx.showToast({ title: '提交申请失败', icon: 'none' })
+    } finally {
+      this.setData({ submittingReset: false })
+    }
+  },
+
   // ========== 隐私政策相关方法 ==========
 
   /** 切换隐私协议勾选状态 */
@@ -415,8 +597,6 @@ Page<ILoginPageData, ILoginPageData>({
     this.setData({
       privacyAgreed: !this.data.privacyAgreed
     })
-    // v2 改造：隐私协议变更后同步更新注册按钮可点状态
-    this._updateCanRegister()
   },
 
   /** 查看隐私政策 */
@@ -431,183 +611,5 @@ Page<ILoginPageData, ILoginPageData>({
     wx.navigateTo({
       url: '/pages/agreement/index'
     })
-  },
-
-  // ========== v2 改造：注册模式方法 ==========
-
-  /** 注册模式 → 返回登录模式 */
-  onBackToLogin() {
-    this.setData({
-      mode: 'login',
-      regName: '',
-      regEmail: '',
-      regGender: '',
-      regNameError: '',
-      regEmailError: '',
-      regGenderError: '',
-      editName: false,
-      editEmail: false,
-      editGender: false,
-      regErrorMsg: '',
-      canRegister: false,
-      hasPhoneNumber: false,
-      phoneNumber: '',
-      _pendingRegiData: null,
-      _encryptedData: '',
-      _iv: '',
-    })
-  },
-
-  /** 注册名字输入（2-5 字） */
-  onRegNameInput(e: any) {
-    const v = (e.detail.value || '').trim()
-    let err = ''
-    if (v.length === 0) err = '请输入名字'
-    else if (v.length < 2) err = '名字至少 2 个字'
-    else if (v.length > 5) err = '名字最多 5 个字'
-    this.setData({ regName: v, regNameError: err })
-    this._updateCanRegister()
-  },
-
-  /** 注册邮箱输入 */
-  onRegEmailInput(e: any) {
-    const v = (e.detail.value || '').trim()
-    const err = v.length === 0 ? '请输入邮箱' : (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '邮箱格式不正确' : '')
-    this.setData({ regEmail: v, regEmailError: err })
-    this._updateCanRegister()
-  },
-
-  /** 注册性别选择 */
-  onRegGenderChange(e: any) {
-    const v = e.detail.value || ''
-    const err = !v ? '请选择性别' : ''
-    this.setData({ regGender: v, regGenderError: err })
-    if (!err) this.setData({ editGender: false })
-    this._updateCanRegister()
-  },
-
-  /** 点击已完成项 → 进入编辑模式 */
-  onEditName() {
-    this.setData({ editName: true, regNameError: '' })
-  },
-  onEditEmail() {
-    this.setData({ editEmail: true, regEmailError: '' })
-  },
-  onEditGender() {
-    this.setData({ editGender: true, regGenderError: '' })
-  },
-
-  /** 名字失焦 → 校验通过则退出编辑模式 */
-  onNameBlur(e: any) {
-    const v = (e.detail.value || '').trim()
-    let err = ''
-    if (v.length === 0) err = '请输入名字'
-    else if (v.length < 2) err = '名字至少 2 个字'
-    else if (v.length > 5) err = '名字最多 5 个字'
-    this.setData({ regName: v, regNameError: err })
-    if (!err) this.setData({ editName: false })
-    this._updateCanRegister()
-  },
-
-  /** 邮箱失焦 → 校验通过则退出编辑模式 */
-  onEmailBlur(e: any) {
-    const v = (e.detail.value || '').trim()
-    const err = v.length === 0 ? '请输入邮箱' : (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '邮箱格式不正确' : '')
-    this.setData({ regEmail: v, regEmailError: err })
-    if (!err) this.setData({ editEmail: false })
-    this._updateCanRegister()
-  },
-
-  /** 性别变更 → 校验通过则退出编辑模式 */
-  onGenderBlur(e: any) {
-    const v = e.detail.value || ''
-    const err = !v ? '请选择性别' : ''
-    this.setData({ regGender: v, regGenderError: err })
-    if (!err) this.setData({ editGender: false })
-    this._updateCanRegister()
-  },
-
-  /** 更新注册按钮可点状态 */
-  _updateCanRegister() {
-    const d: any = this.data
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.regEmail)
-    const ok = d.regName.length > 0
-      && d.regNameError === ''
-      && emailOk
-      && d.regGender !== ''
-      && d.privacyAgreed
-      && !d.regSubmitting
-    this.setData({ canRegister: ok })
-  },
-
-  /** 提交注册 */
-  submitRegister() {
-    if (!this.data.canRegister) return
-    if (!_appLogin.globalData.sessionkey) {
-      wx.showToast({ title: '授权凭证失效，请返回重试', icon: 'none' })
-      return
-    }
-    if (!this.data._encryptedData || !this.data._iv) {
-      wx.showToast({ title: '手机号加密数据缺失，请返回重新授权', icon: 'none' })
-      return
-    }
-    const body = {
-      sessionkey: _appLogin.globalData.sessionkey,
-      encryptedData: this.data._encryptedData,
-      iv: this.data._iv,
-      name: this.data.regName,
-      email: this.data.regEmail,
-      gender: this.data.regGender,
-    }
-    this.setData({ regSubmitting: true, regErrorMsg: '' })
-    wx.showLoading({ title: '注册中...', mask: true })
-    wx.request({
-      url: getBaseUrl() + '/api/users/regi_miniprogram',
-      method: 'POST',
-      header: { 'content-type': 'application/json' },
-      data: body,
-      success: (res: any) => {
-        wx.hideLoading()
-        this.setData({ regSubmitting: false })
-        if (res.statusCode >= 200 && res.statusCode < 300 && res.data && res.data.id) {
-          // 注册成功：直接保存信息并跳转首页，无需再走登录流程
-          _appLogin.globalData.phoneNumber = res.data.phone || this.data.phoneNumber || ''
-          _appLogin.globalData.userId = res.data.id
-          _appLogin.globalData.accessToken = res.data.atoken
-          _appLogin.globalData.refreshToken = res.data.rtoken
-          _appLogin.globalData.hasPhoneNumber = true
-          _appLogin.globalData.hasUserInfo = true
-          // 保存注册用户信息
-          _appLogin.globalData.userInfo = {
-            avatarUrl: this.data.avatarUrl || '',
-            nickName: res.data.username || this.data.regName || '',
-            userId: res.data.id,
-          }
-          _appLogin.savePhoneNumber(res.data.phone || this.data.phoneNumber || '')
-          _appLogin.saveUserId(res.data.id)
-          wx.setStorageSync('accessToken', res.data.atoken)
-          wx.setStorageSync('refreshToken', res.data.rtoken)
-          wx.setStorageSync('userInfo', _appLogin.globalData.userInfo)
-          // 清除游客标记
-          wx.removeStorageSync('guestMode')
-          this.setData({
-            phoneNumber: res.data.phone || this.data.phoneNumber || '',
-            hasPhoneNumber: true,
-            userId: res.data.id,
-          })
-          wx.showToast({ title: '注册成功', icon: 'success', duration: 1500 })
-          // 注册成功后直接跳转首页
-          setTimeout(() => {
-            wx.switchTab({ url: '/pages/aim/index' })
-          }, 1200)
-        } else {
-          this.setData({ regErrorMsg: (res.data && (res.data.detail || res.data.message)) || '注册失败，请重试' })
-        }
-      },
-      fail: () => {
-        wx.hideLoading()
-        this.setData({ regSubmitting: false, regErrorMsg: '网络错误，请重试' })
-      },
-    })
-  },
+  }
 })

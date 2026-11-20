@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * pages/ark-group/index.ts
- * 组方舟页面：列方舟 / 加入 / 创建
+ * 组方舟页面：诺亚方舟共学舱 · 列方舟 / 加入 / 创建
  * spec: specs/miniprogram/active/003-complete-ark-group.md
  */
 import {
@@ -14,106 +14,220 @@ import {
 
 const app = getApp<any>();
 
+interface SeatSlot {
+  id: string;
+  seatLabel: string;
+  genderType: 'male' | 'female';
+  occupied: boolean;
+  username: string;
+  isCaptain: boolean;
+  emptyText: string;
+}
+
 interface IPageData {
   courseId: number;
   loading: boolean;
+  activeFilter: 'all' | 'open' | 'ready';
   arkList: TeacherArkItem[];
+  filteredArkList: TeacherArkItem[];
+  openArkCount: number;
+  readyArkCount: number;
   myArkId: number | null;
   currentUserId: number;
   currentGender: string | null;
   joiningArkId: number | null;
   creating: boolean;
+  submitting: boolean;
 }
 
 Page<IPageData, IPageData>({
   data: {
     courseId: 0,
     loading: true,
+    activeFilter: 'all',
     arkList: [],
+    filteredArkList: [],
+    openArkCount: 0,
+    readyArkCount: 0,
     myArkId: null,
     currentUserId: 0,
     currentGender: null,
     joiningArkId: null,
     creating: false,
+    submitting: false,
   },
 
+  hasLoadedOnce: false,
+
   onLoad(options: any) {
-    this.setData({ courseId: parseInt(options.courseId || '0', 10) });
+    const cid = parseInt(options?.courseId || options?.id || '1', 10) || 1;
+    this.setData({ courseId: cid });
     this.loadUserInfo();
-    if (this.data.courseId) {
+    this.loadData().then(() => {
+      this.hasLoadedOnce = true;
+    });
+  },
+
+  onShow() {
+    this.loadUserInfo();
+    if (this.hasLoadedOnce && this.data.courseId) {
       this.loadData();
-    } else {
-      wx.showToast({ title: '参数错误', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 1500);
     }
+  },
+
+  onPullDownRefresh() {
+    this.loadData().then(() => wx.stopPullDownRefresh());
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '🚢 诺亚方舟共学舱 · 4人小组共学，一起闯关结课！',
+      path: `/pages/ark-group/index?courseId=${this.data.courseId}`,
+    };
   },
 
   loadUserInfo() {
     const userInfo = app.globalData?.userInfo || wx.getStorageSync('userInfo') || {};
-    const gender = userInfo.gender || null;
-    console.log('[ark-group] loadUserInfo userId:', userInfo.userId, 'gender:', gender, 'userInfo keys:', Object.keys(userInfo));
     this.setData({
-      currentUserId: userInfo.userId || 0,
-      currentGender: gender,
+      currentUserId: Number(userInfo.userId || userInfo.id || wx.getStorageSync('userId') || 0),
+      currentGender: userInfo.gender || null,
     });
+  },
+
+  onFilterChange(e: any) {
+    const filter = e.currentTarget.dataset.filter as 'all' | 'open' | 'ready';
+    if (!filter || filter === this.data.activeFilter) return;
+    const filteredArkList = this.applyFilter(this.data.arkList, filter);
+    this.setData({
+      activeFilter: filter,
+      filteredArkList,
+    });
+  },
+
+  applyFilter(list: any[], filter: 'all' | 'open' | 'ready') {
+    if (filter === 'open') {
+      return list.filter((ark: any) => Boolean(ark.ark_id && !ark.closed && !ark.finished && ark.stage !== '已成舟'));
+    }
+    if (filter === 'ready') {
+      return list.filter((ark: any) => Boolean(ark.ark_id && (ark.stage === '已成舟' || ark.finished)));
+    }
+    return list;
+  },
+
+  buildCabinSeats(members: any[]): SeatSlot[] {
+    const safeMembers = Array.isArray(members) ? members : [];
+    const m1 = safeMembers[0] || null;
+    const m2 = safeMembers[1] || null;
+    const f1 = safeMembers[2] || null;
+    const f2 = safeMembers[3] || null;
+
+    return [
+      {
+        id: 'seat-1',
+        seatLabel: '席位 1',
+        genderType: 'male',
+        occupied: Boolean(m1),
+        username: m1?.username || '',
+        isCaptain: Boolean(m1?.is_captain),
+        emptyText: '虚位以待',
+      },
+      {
+        id: 'seat-2',
+        seatLabel: '席位 2',
+        genderType: 'male',
+        occupied: Boolean(m2),
+        username: m2?.username || '',
+        isCaptain: Boolean(m2?.is_captain),
+        emptyText: '虚位以待',
+      },
+      {
+        id: 'seat-3',
+        seatLabel: '席位 3',
+        genderType: 'female',
+        occupied: Boolean(f1),
+        username: f1?.username || '',
+        isCaptain: Boolean(f1?.is_captain),
+        emptyText: '虚位以待',
+      },
+      {
+        id: 'seat-4',
+        seatLabel: '席位 4',
+        genderType: 'female',
+        occupied: Boolean(f2),
+        username: f2?.username || '',
+        isCaptain: Boolean(f2?.is_captain),
+        emptyText: '虚位以待',
+      },
+    ];
   },
 
   async loadData() {
     this.setData({ loading: true });
-
-    // 先拉我已加入的方舟，确保判断 isMyArk 时 myArkId 已就绪
-    let myArkId: number | null = null;
-    try {
-      const my: any = await arkMy();
-      if (my && my.ark_id) {
-        myArkId = my.ark_id;
-      }
-    } catch (e) {
-      // 404 = 不在任何方舟中，正常情况
-    }
+    let rawList: TeacherArkItem[] = [];
+    let myArkId: number | null = this.data.myArkId;
 
     try {
-      const list = await arkListByTeacher(this.data.courseId);
-      const safeList = Array.isArray(list) ? list : [];
-      // 预计算每个方舟的状态字段，避免 WXML 方法调用求值不确定性
-      const processedList = safeList.map(ark => {
-        const canJoin = this.calcCanJoin(ark, myArkId);
-        console.log('[ark-group] ark:', ark.teacher_name, 'ark_id:', ark.ark_id,
-          'male:', ark.male_count, 'female:', ark.female_count,
-          'closed:', ark.closed, 'finished:', ark.finished,
-          'canJoin:', canJoin, 'isMyArk:', !!ark.ark_id && ark.ark_id === myArkId);
-        return {
-          ...ark,
-          _canJoin: canJoin,
-          _isMyArk: !!ark.ark_id && ark.ark_id === myArkId,
-        };
-      });
-      this.setData({ arkList: processedList, myArkId });
+      const [listRes, myRes] = await Promise.all([
+        arkListByTeacher(this.data.courseId).catch(() => []),
+        arkMy().catch(() => null),
+      ]);
+      rawList = Array.isArray(listRes) ? listRes : [];
+      myArkId = myRes && myRes.ark_id ? Number(myRes.ark_id) : null;
     } catch (e) {
       console.error('[ark-group] loadData error:', e);
       wx.showToast({ title: '加载失败', icon: 'none' });
-    } finally {
-      this.setData({ loading: false });
     }
+
+    const decorated = this.decorateArkList(rawList, myArkId);
+    const openArkCount = decorated.filter(
+      (a: any) => Boolean(a.ark_id && !a.closed && !a.finished && a.stage !== '已成舟')
+    ).length;
+    const readyArkCount = decorated.filter(
+      (a: any) => Boolean(a.ark_id && (a.stage === '已成舟' || a.finished))
+    ).length;
+    const filteredArkList = this.applyFilter(decorated, this.data.activeFilter);
+
+    this.setData({
+      arkList: decorated,
+      filteredArkList,
+      openArkCount,
+      readyArkCount,
+      myArkId,
+      loading: false,
+    });
   },
 
-  /** 判断是否可加入（已加入的方舟不可再加入） */
-  calcCanJoin(ark: TeacherArkItem, myArkId: number | null = null): boolean {
-    if (!ark.ark_id) return false;
-    // 已在其中，不可再加入
-    if (myArkId != null && ark.ark_id === myArkId) return false;
-    if (typeof ark.closed === 'number' ? ark.closed !== 0 : !!ark.closed) return false;
-    if (typeof ark.finished === 'number' ? ark.finished !== 0 : !!ark.finished) return false;
-    const g = this.data.currentGender;
-    if (g === '男') return ark.male_count < 2;
-    if (g === '女') return ark.female_count < 2;
-    // 性别未知时，按总人数判断（最多 4 人）
-    return (ark.male_count + ark.female_count) < 4;
+  decorateArkList(list: TeacherArkItem[], myArkId: number | null) {
+    return (list || []).map((ark: any) => {
+      const members = Array.isArray(ark.members)
+        ? ark.members.map((m: any) => ({
+            ...m,
+            _genderClass: this.genderClass(m.gender),
+          }))
+        : [];
+      const isMyArk = !!ark.ark_id && Number(ark.ark_id) === Number(myArkId);
+      const teacherName = (ark.teacher_name || '师').trim();
+      return {
+        ...ark,
+        members,
+        _teacherInitial: teacherName ? teacherName.charAt(0) : '师',
+        _seats: this.buildCabinSeats(members),
+        _isMyArk: isMyArk,
+        _canJoin: !isMyArk && this.canJoin(ark),
+        _statusText: this.statusText(ark),
+        _statusClass: this.statusClass(ark),
+      };
+    });
   },
 
-  /** 模板中调用，直接从预计算字段读取 */
+  /** 是否能加入该方舟（2男2女黄金配比校验） */
   canJoin(ark: TeacherArkItem): boolean {
-    return !!(ark as any)._canJoin;
+    if (!ark.ark_id || ark.closed || ark.finished) return false;
+    const g = this.data.currentGender;
+    if (g === '男') return (ark.male_count || 0) < 2;
+    if (g === '女') return (ark.female_count || 0) < 2;
+    // 未设置性别时允许点击并在服务端提示完善性别或按余量判断
+    return (ark.male_count || 0) + (ark.female_count || 0) < 4;
   },
 
   /** 是否已加入该方舟 */
@@ -122,16 +236,17 @@ Page<IPageData, IPageData>({
   },
 
   async onJoinArk(e: any) {
+    if (this.data.submitting) return;
     const arkId = e.currentTarget.dataset.arkid;
     if (!arkId) {
       wx.showToast({ title: '该塾师尚未创建方舟', icon: 'none' });
       return;
     }
-    this.setData({ joiningArkId: arkId });
+    this.setData({ joiningArkId: arkId, submitting: true });
     try {
       const res: any = await arkJoin(arkId);
       if (res?.code === 200) {
-        wx.showToast({ title: '加入成功！', icon: 'success' });
+        wx.showToast({ title: '🎉 登船成功！开启方舟共学吧', icon: 'success' });
         this.setData({ myArkId: arkId });
         await this.loadData();
       } else {
@@ -141,18 +256,19 @@ Page<IPageData, IPageData>({
       console.error('[ark-group] join error:', err);
       wx.showToast({ title: err?.message || '加入失败', icon: 'none' });
     } finally {
-      this.setData({ joiningArkId: null });
+      this.setData({ joiningArkId: null, submitting: false });
     }
   },
 
   async onCreateArk(e: any) {
+    if (this.data.submitting) return;
     const teacherId = e.currentTarget.dataset.teacherid;
     if (this.data.currentUserId !== teacherId) return;
-    this.setData({ creating: true });
+    this.setData({ creating: true, submitting: true });
     try {
       const res: any = await arkCreate(this.data.courseId);
       if (res?.code === 200) {
-        wx.showToast({ title: '方舟创建成功！', icon: 'success' });
+        wx.showToast({ title: '🚢 方舟创建成功！', icon: 'success' });
         await this.loadData();
       } else {
         wx.showToast({ title: res?.message || '创建失败', icon: 'none' });
@@ -161,7 +277,7 @@ Page<IPageData, IPageData>({
       console.error('[ark-group] create error:', err);
       wx.showToast({ title: err?.message || '创建失败', icon: 'none' });
     } finally {
-      this.setData({ creating: false });
+      this.setData({ creating: false, submitting: false });
     }
   },
 
@@ -181,12 +297,12 @@ Page<IPageData, IPageData>({
   statusText(ark: TeacherArkItem): string {
     if (ark.finished) return '已成舟';
     if (ark.closed) return '已关闭';
-    if (ark.stage === '筹建中') return '筹建中';
-    return ark.stage || '筹建中';
+    if (ark.stage === '筹建中') return '招募船员中';
+    return ark.stage || '招募船员中';
   },
 
   statusClass(ark: TeacherArkItem): string {
-    if (ark.finished) return 'badge-success';
+    if (ark.finished || ark.stage === '已成舟') return 'badge-success';
     return 'badge-waiting';
   },
 });

@@ -1,57 +1,122 @@
 <view class="page">
-  <view class="header">
-    <text class="title">学习监督</text>
+  <!-- 品牌紫统计看板（支持点击筛选） -->
+  <view class="hero-stats">
+    <view class="stats-row">
+      <view
+        class="stat-card {{statusFilter === 'all' ? 'stat-card-active' : ''}}"
+        bindtap="onSelectStatus"
+        data-status="all"
+      >
+        <text class="stat-num">{{listData.length}}</text>
+        <text class="stat-label">全部在修</text>
+      </view>
+      <view
+        class="stat-card {{statusFilter === 'overdue' ? 'stat-card-active' : ''}}"
+        bindtap="onSelectStatus"
+        data-status="overdue"
+      >
+        <text class="stat-num danger">{{overdueCount}}</text>
+        <text class="stat-label">已逾期</text>
+      </view>
+      <view
+        class="stat-card {{statusFilter === 'near' ? 'stat-card-active' : ''}}"
+        bindtap="onSelectStatus"
+        data-status="near"
+      >
+        <text class="stat-num warning">{{nearCount}}</text>
+        <text class="stat-label">即将到期</text>
+      </view>
+      <view
+        class="stat-card {{statusFilter === 'normal' ? 'stat-card-active' : ''}}"
+        bindtap="onSelectStatus"
+        data-status="normal"
+      >
+        <text class="stat-num success">{{normalCount}}</text>
+        <text class="stat-label">正常推进</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 统计 -->
-  <view class="stats-row">
-    <view class="stat-card">
-      <text class="stat-num">{{listData.length}}</text>
-      <text class="stat-label">总记录</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-num danger">{{overdueCount}}</text>
-      <text class="stat-label">已逾期</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-num warning">{{nearCount}}</text>
-      <text class="stat-label">即将到期</text>
-    </view>
+  <!-- 实时关键词搜索 -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索塾生、塾师、课程或章节名称..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+    <text class="search-clear" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 重置</text>
   </view>
 
   <!-- 列表 -->
   <view class="list-area">
     <view wx:if="{{loading}}">
-      <view class="loading-row"><text>加载中...</text></view>
+      <view class="loading-row"><text>正在同步全塾学习监督看板...</text></view>
     </view>
-    <view wx:elif="{{listData.length === 0}}">
-      <view class="empty-row"><text>暂无学习记录</text></view>
+    <view wx:elif="{{filteredList.length === 0}}">
+      <view class="empty-row">
+        <text class="empty-text">{{searchKeyword || statusFilter !== 'all' ? '未找到匹配的学习监督记录' : '暂无学习监督记录'}}</text>
+        <view class="reset-btn" wx:if="{{searchKeyword || statusFilter !== 'all'}}" bindtap="clearSearch">🔄 查看全部记录</view>
+      </view>
     </view>
     <view wx:else>
-      <view class="record-card" wx:for="{{listData}}" wx:key="id">
+      <view class="record-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{filteredList}}" wx:key="sele_id">
         <view class="record-top">
           <view class="persons">
-            <view class="person-tag">
-              <text class="role">塾生</text>
+            <view
+              class="person-tag"
+              bindtap="onGoLearnSheet"
+              data-userid="{{item.user_id}}"
+            >
+              <text class="role">🌱 塾生</text>
               <text class="name">{{item.user_name}}</text>
             </view>
             <text class="arrow">›</text>
             <view class="person-tag">
-              <text class="role">塾师</text>
-              <text class="name">{{item.shushi_name}}</text>
+              <text class="role">💎 督学塾师</text>
+              <text class="name">{{item.shushi_name || '待分配'}}</text>
             </view>
           </view>
-          <view class="deadline-badge {{getDeadlineClass(item.deadline)}}">
-            <text>{{item.deadline ? item.deadline.slice(0,10) : '-'}}</text>
+          <view class="deadline-badge {{item._deadlineClass}}">
+            <text>{{item._statusLabel}} · {{item._deadlineStr}}</text>
           </view>
         </view>
-        <view class="record-course">
-          <text class="course-title">{{item.course_title}}</text>
+        <view
+          class="record-course"
+          bindtap="onGoCourse"
+          data-courseid="{{item.course_id}}"
+        >
+          <text class="course-title">📖 《{{item.course_title}}》 ›</text>
         </view>
         <view class="record-chapter">
-          <text class="chapter-label">章节：</text>
-          <text class="chapter-title">{{item.chapter_title}}</text>
-          <text class="serial">第{{item.current_serial}}次</text>
+          <text class="chapter-label">当前章节：</text>
+          <text class="chapter-title">{{item.chapter_title || '第 1 节'}}</text>
+          <text class="serial">第 {{item.current_serial || 1}} 课</text>
+        </view>
+        <view class="record-actions">
+          <view
+            class="action-pill secondary"
+            bindtap="onGoLearnSheet"
+            data-userid="{{item.user_id}}"
+          >📋 查看学习单</view>
+          <view
+            wx:if="{{item._deadlineClass === 'red'}}"
+            class="action-pill danger"
+            bindtap="onCleanseSelection"
+            data-userid="{{item.user_id}}"
+            data-courseid="{{item.course_id}}"
+            data-username="{{item.user_name}}"
+            data-course="{{item.course_title}}"
+          >🧹 清理逾期</view>
+          <view
+            class="action-pill primary"
+            bindtap="onNudgePeer"
+            data-userid="{{item.user_id}}"
+            data-username="{{item.user_name}}"
+            data-course="{{item.course_title}}"
+          >⚡ 共学加油鼓励</view>
         </view>
       </view>
     </view>

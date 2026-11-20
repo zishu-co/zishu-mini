@@ -1,53 +1,96 @@
 <view class="page">
-  <view class="header">
-    <text class="title">目标面谈</text>
+  <!-- 顶部目标面谈横幅 -->
+  <view class="talk-banner">
+    <view class="talk-banner-left">
+      <text class="talk-banner-title">💬 目标约谈 · 1v1 共学室</text>
+      <text class="talk-banner-sub">与领航塾师或同塾学友深度复盘目标、校准方向</text>
+    </view>
+    <view class="talk-banner-actions">
+      <view class="talk-banner-btn primary" bindtap="onOpenAddModal">＋ 发起面谈</view>
+      <view class="talk-banner-btn" bindtap="onGoSocialPlaza">🤝 共学广场</view>
+    </view>
   </view>
 
   <!-- Tab 切换 -->
   <view class="tab-bar">
     <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">
-      <text>预定面谈</text>
+      <text>📅 预定面谈</text>
       <view class="tab-badge" wx:if="{{scheduledData.length > 0}}">{{scheduledData.length}}</view>
     </view>
     <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">
-      <text>塾生目标</text>
+      <text>🎯 塾生目标</text>
     </view>
     <view class="tab-item {{activeTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">
-      <text>历史面谈</text>
+      <text>🏛️ 历史面谈</text>
     </view>
   </view>
 
   <!-- Tab 0: 预定面谈 -->
   <view class="tab-content" wx:if="{{activeTab === 0}}">
     <view wx:if="{{loading}}">
-      <view class="loading-row"><text>加载中...</text></view>
+      <view class="loading-row"><text>正在同步约谈日程...</text></view>
     </view>
     <view wx:elif="{{scheduledData.length === 0}}">
-      <view class="empty-row"><text>暂无预定面谈</text></view>
+      <view class="empty-row">
+        <text class="empty-title">暂无预定面谈</text>
+        <text class="empty-desc">可前往共学广场向领航塾师或学伴发起 15 分钟目标复盘交流</text>
+        <view class="empty-cta" bindtap="onGoSocialPlaza">👋 去共学广场</view>
+      </view>
     </view>
     <view wx:else>
-      <view class="talk-card" wx:for="{{scheduledData}}" wx:key="id" bindtap="viewDetail" data-item="{{item}}" data-type="scheduled">
+      <view class="talk-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{scheduledData}}" wx:key="id" bindtap="viewDetail" data-item="{{item}}" data-type="scheduled">
         <view class="talk-top">
-          <view class="person-badge {{item.shusheng_id ? 'person' : 'group'}}">
-            <text>{{item.shusheng_name || '群发'}}</text>
+          <view class="talk-person-wrap">
+            <view class="person-badge {{item.shusheng_id ? 'person' : 'group'}}">
+              <text>🤝 {{item._partnerName}}</text>
+            </view>
+            <text class="role-chip">{{item._roleTag}}</text>
           </view>
-          <view class="status-badge {{getStatusClass(item)}}">
-            <text>{{getStatusText(item)}}</text>
+          <view class="status-badge {{item._statusClass}}">
+            <text>{{item._statusText}}</text>
           </view>
         </view>
         <view class="talk-info">
-          <view class="info-row" wx:if="{{item.planed_time}}">
-            <text class="info-label">预定时间</text>
-            <text class="info-value">{{item.planed_time}}</text>
+          <view class="info-row">
+            <text class="info-label">🕐 预定时间</text>
+            <text class="info-value">{{item._planedTimeStr}}</text>
           </view>
           <view class="info-row">
-            <text class="info-label">计划时长</text>
-            <text class="info-value">{{item.planed_duration || 10}} 分钟</text>
+            <text class="info-label">⏱️ 计划时长</text>
+            <text class="info-value">{{item.planed_duration || 15}} 分钟</text>
           </view>
-          <view class="info-row" wx:if="{{item.confirmed_time}}">
-            <text class="info-label">确认时间</text>
-            <text class="info-value success">{{item.confirmed_time}}</text>
+          <view class="info-row" wx:if="{{item.access_info}}">
+            <text class="info-label">📌 主题/入口</text>
+            <text class="info-value topic">{{item.access_info}}</text>
           </view>
+          <view class="info-row" wx:if="{{item._confirmedTimeStr}}">
+            <text class="info-label">✅ 确认时间</text>
+            <text class="info-value success">{{item._confirmedTimeStr}}</text>
+          </view>
+        </view>
+        <view class="talk-actions">
+          <view
+            class="talk-action-btn ghost"
+            wx:if="{{item.access_info}}"
+            catchtap="onCopyAccess"
+            data-info="{{item.access_info}}"
+          >📋 复制入口</view>
+          <view
+            class="talk-action-btn ghost"
+            catchtap="onOpenEditModal"
+            data-item="{{item}}"
+          >✎ 编辑排期</view>
+          <view
+            class="talk-action-btn primary"
+            wx:if="{{item._canConfirm}}"
+            catchtap="onConfirmTalk"
+            data-item="{{item}}"
+          >{{confirmingId === item.id ? '⏳ 确认中...' : '✓ 确认赴约'}}</view>
+          <view
+            class="talk-action-btn finish"
+            catchtap="onOpenFinishModal"
+            data-item="{{item}}"
+          >🏁 完结纪要</view>
         </view>
       </view>
     </view>
@@ -59,17 +102,33 @@
       <view class="loading-row"><text>加载中...</text></view>
     </view>
     <view wx:elif="{{goalsData.length === 0}}">
-      <view class="empty-row"><text>暂无目标记录</text></view>
+      <view class="empty-row"><text>暂无关联塾生目标记录</text></view>
     </view>
     <view wx:else>
-      <view class="goal-card" wx:for="{{goalsData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="目标内容">
+      <view class="goal-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{goalsData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="目标内容">
         <view class="goal-top">
-          <text class="goal-student">{{item.shusheng_name}}</text>
-          <text class="goal-progress">{{item.process || '进行中'}}</text>
+          <text class="goal-student">🎯 {{item.shusheng_name}}</text>
+          <text class="goal-progress">{{item._progressText}}</text>
+        </view>
+        <view class="goal-body-preview" wx:if="{{item._shortContent}}">
+          <text>{{item._shortContent}}</text>
         </view>
         <view class="goal-dates">
-          <text wx:if="{{item.start_time}}">开始: {{item.start_time.slice(0,10)}}</text>
-          <text wx:if="{{item.deadline}}">截止: {{item.deadline.slice(0,10)}}</text>
+          <text wx:if="{{item._startDate}}">开始: {{item._startDate}}</text>
+          <text wx:if="{{item._deadline}}">截止: {{item._deadline}}</text>
+        </view>
+        <view class="talk-actions">
+          <view
+            class="talk-action-btn ghost"
+            wx:if="{{item._studentId}}"
+            catchtap="onViewStudentSheet"
+            data-userid="{{item._studentId}}"
+          >📋 查看学习单</view>
+          <view
+            class="talk-action-btn primary"
+            catchtap="onScheduleWithStudent"
+            data-item="{{item}}"
+          >💬 约TA面谈</view>
         </view>
       </view>
     </view>
@@ -81,16 +140,117 @@
       <view class="loading-row"><text>加载中...</text></view>
     </view>
     <view wx:elif="{{historyData.length === 0}}">
-      <view class="empty-row"><text>暂无历史面谈</text></view>
+      <view class="empty-row"><text>暂无历史面谈记录</text></view>
     </view>
     <view wx:else>
-      <view class="history-card" wx:for="{{historyData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="面谈内容">
+      <view class="history-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{historyData}}" wx:key="id" bindtap="viewContent" data-content="{{item.content}}" data-title="面谈纪要">
         <view class="history-top">
-          <text class="history-student">{{item.shusheng_name || '未知'}}</text>
-          <text class="history-duration">{{item.actual_duration || 0}}分钟</text>
+          <text class="history-student">🤝 {{item._partnerName}}</text>
+          <text class="history-duration">⏱️ {{item.actual_duration || 15}} 分钟</text>
         </view>
-        <view class="history-time" wx:if="{{item.finish_time}}">
-          {{item.finish_time}}
+        <view class="goal-body-preview" wx:if="{{item._summary}}">
+          <text>{{item._summary}}</text>
+        </view>
+        <view class="history-time" wx:if="{{item._finishTimeStr}}">
+          完成于 {{item._finishTimeStr}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增 / 编辑目标面谈弹窗 -->
+  <view class="gt-modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseModals">
+    <view class="gt-modal-card" catchtap="noop">
+      <view class="gt-modal-title">{{editModalMode === 'add' ? '＋ 发起 1v1 目标面谈' : '✎ 编辑面谈排期与会议号'}}</view>
+
+      <block wx:if="{{editModalMode === 'add'}}">
+        <view class="gt-field-label">选择面谈对象</view>
+        <view class="gt-chip-list">
+          <view
+            class="gt-chip {{editForm.counter_part_id === 0 ? 'active' : ''}}"
+            data-id="0"
+            data-name="公开招募/任意塾生"
+            bindtap="onSelectStudentChip"
+          >🌟 公开招募</view>
+          <view
+            class="gt-chip {{editForm.counter_part_id === item.id ? 'active' : ''}}"
+            wx:for="{{shushengList}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}"
+            bindtap="onSelectStudentChip"
+          >🎓 {{item.name}}</view>
+        </view>
+      </block>
+
+      <view class="gt-field-label">预定时间（YYYY-MM-DD HH:MM）</view>
+      <input
+        class="gt-input"
+        value="{{editForm.planed_time}}"
+        placeholder="例如 2026-10-28 20:00"
+        data-field="planed_time"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-field-label">计划时长（分钟）</view>
+      <input
+        class="gt-input"
+        type="number"
+        value="{{editForm.planed_duration}}"
+        placeholder="30"
+        data-field="planed_duration"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-field-label">会议号 / 面谈主题入口</view>
+      <textarea
+        class="gt-textarea"
+        value="{{editForm.access_info}}"
+        placeholder="填写腾讯会议号、飞书链接或本次目标复盘议题..."
+        maxlength="300"
+        data-field="access_info"
+        bindinput="onEditFormInput"
+      />
+
+      <view class="gt-modal-actions">
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">✕ 取消</view>
+        <view class="gt-modal-btn confirm" bindtap="onSubmitEditTalk">
+          {{submittingModal ? '⏳ 保存中...' : '💾 确认保存'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 完结面谈并填写纪要弹窗 -->
+  <view class="gt-modal-mask" wx:if="{{showFinishModal}}" bindtap="onCloseModals">
+    <view class="gt-modal-card" catchtap="noop">
+      <view class="gt-modal-title">🏁 完结面谈 · 记录复盘纪要</view>
+      <view class="gt-modal-sub">共学伙伴：{{finishForm.partnerName}}</view>
+
+      <view class="gt-field-label">实际用时（分钟）</view>
+      <input
+        class="gt-input"
+        type="number"
+        value="{{finishForm.actual_duration}}"
+        placeholder="30"
+        data-field="actual_duration"
+        bindinput="onFinishFormInput"
+      />
+
+      <view class="gt-field-label">面谈复盘纪要（必填）</view>
+      <textarea
+        class="gt-textarea"
+        value="{{finishForm.content}}"
+        placeholder="记录本次面谈的核心收获、阶段目标校准结论与下一步微行动..."
+        maxlength="1500"
+        data-field="content"
+        bindinput="onFinishFormInput"
+      />
+
+      <view class="gt-modal-actions">
+        <view class="gt-modal-btn cancel" bindtap="onCloseModals">✕ 取消</view>
+        <view class="gt-modal-btn confirm" bindtap="onSubmitFinishTalk">
+          {{submittingModal ? '⏳ 归档中...' : '🏁 确认完结归档'}}
         </view>
       </view>
     </view>

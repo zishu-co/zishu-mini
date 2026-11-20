@@ -3,19 +3,7 @@
  * 文章相关 API
  */
 
-function getBaseUrl(): string {
-  try {
-    const { envVersion } = wx.getAccountInfoSync().miniProgram;
-    switch (envVersion) {
-      case 'develop': return 'http://127.0.0.1:8008';
-      case 'trial': return 'https://zishu.co';
-      case 'release': return 'https://zishu.co';
-      default: return 'https://zishu.co';
-    }
-  } catch (e) {
-    return 'https://zishu.co';
-  }
-}
+import base, { getBaseUrl } from '../base';
 
 function getToken(): string {
   return wx.getStorageSync('accessToken') || wx.getStorageSync('refreshToken') || '';
@@ -25,6 +13,7 @@ function request<T = any>(options: {
   url: string;
   method?: string;
   data?: any;
+  _isRetry?: boolean;
 }): Promise<T> {
   const token = getToken();
   return new Promise((resolve, reject) => {
@@ -33,11 +22,22 @@ function request<T = any>(options: {
       method: (options.method || 'GET') as any,
       data: options.data,
       header: {
-        'content-type': 'application/x-www-form-urlencoded',
+        'content-type': 'application/json',
         'token': token,
       },
       timeout: 80000,
       success: (res: any) => {
+        if (res.statusCode === 401) {
+          if (!options._isRetry && wx.getStorageSync('refreshToken')) {
+            base.refreshToken()
+              .then(() => request<T>({ ...options, _isRetry: true }))
+              .then(resolve)
+              .catch(() => reject({ statusCode: 401, errMsg: 'Unauthorized' }));
+            return;
+          }
+          reject({ statusCode: 401, errMsg: 'Unauthorized' });
+          return;
+        }
         resolve(res.data as T);
       },
       fail: (err) => {

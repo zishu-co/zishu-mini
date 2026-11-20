@@ -1,63 +1,151 @@
-.page { min-height: 100vh; background: #faf9f7; }
-
-.header {
-  padding: 32rpx;
-  background: #c6f;
+.page {
+  min-height: 100vh;
+  background: #f6f5fb;
+  padding-top: 0;
 }
-.title { font-size: 36rpx; color: #fff; font-weight: bold; }
+
+.hero-stats {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 24rpx;
+  padding: 36rpx 28rpx 40rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 0 0 44rpx 44rpx;
+  box-shadow: 0 18rpx 44rpx rgba(91, 33, 182, 0.25);
+}
 
 .stats-row {
   display: flex;
-  gap: 12rpx;
-  padding: 24rpx;
-  background: #faf9f7;
+  gap: 16rpx;
 }
 
 .stat-card {
   flex: 1;
-  background: #fff;
-  border: 1rpx solid rgba(0,0,0,0.06);
-  border-radius: 12rpx;
-  padding: 24rpx 16rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #fff7fb 100%);
+  border-radius: 26rpx;
+  padding: 22rpx 14rpx;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10rpx 24rpx rgba(15, 23, 42, 0.10), inset 0 3rpx 0 #ffffff;
+}
+
+.stat-card:nth-child(even) {
+  background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
 }
 
 .stat-num {
   display: block;
   font-size: 36rpx;
-  font-weight: 700;
-  color: #8800cc;
+  font-weight: 800;
+  color: #6d28d9;
   line-height: 1.2;
   margin-bottom: 6rpx;
 }
 
 .stat-label {
   font-size: 22rpx;
-  color: #9a9ab0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 10rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 10rpx;
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 28rpx;
+  border: 2rpx solid rgba(124, 58, 237, 0.22);
+  box-shadow: inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10);
+}
+
+.filter-pill {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 10rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  color: #4c1d95;
+  font-size: 23rpx;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.04);
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filter-pill.active {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  font-weight: 800;
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8rpx 20rpx rgba(124, 58, 237, 0.34), inset 0 2rpx 0 rgba(255, 255, 255, 0.38);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 18rpx 28rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
+}
+
+.search-icon {
+  font-size: 28rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1e293b;
+}
+
+.search-clear {
+  font-size: 24rpx;
+  color: #94a3b8;
+  padding: 4rpx 10rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .list-area {
-  padding: 0 24rpx 40rpx;
+  padding: 0 24rpx 48rpx;
 }
 
 .loading-row,
 .empty-row {
   text-align: center;
   padding: 80rpx 0;
-  color: #9a9ab0;
+  color: #94a3b8;
   font-size: 28rpx;
 }
 
 .relation-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 12rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+}
+
+.relation-card:nth-child(even),
+.relation-card.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .relation-top {
@@ -76,6 +164,7 @@
   font-size: 22rpx;
   color: #9a9ab0;
   margin-bottom: 4rpx;
+  white-space: nowrap;
 }
 
 .person-name {
@@ -86,7 +175,7 @@
 
 .arrow {
   font-size: 36rpx;
-  color: #c6f;
+  color: #a78bfa;
   flex-shrink: 0;
 }
 
@@ -97,36 +186,99 @@
 .course-label {
   font-size: 24rpx;
   color: #9a9ab0;
+  white-space: nowrap;
 }
 
 .course-title {
   font-size: 24rpx;
-  color: #8800cc;
+  color: #7c3aed;
   font-weight: 500;
 }
 
 .relation-meta {
   display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #f1f5f9;
+}
+
+.relation-meta-info {
+  display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12rpx;
-  padding-top: 12rpx;
-  border-top: 1rpx solid #f0f0f0;
 }
 
 .status-tag {
-  font-size: 22rpx;
+  font-size: 21rpx;
   padding: 4rpx 16rpx;
   border-radius: 100rpx;
-  background: #f5f5f5;
-  color: #9a9ab0;
+  background: #f1f5f9;
+  color: #64748b;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .status-tag.active {
   background: rgba(34,197,94,0.10);
-  color: #22c55e;
+  color: #16a34a;
 }
 
 .meta-text {
+  font-size: 22rpx;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.empty-text {
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.reset-btn {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 1.5rpx solid rgba(124, 58, 237, 0.22);
+  color: #6d28d9;
   font-size: 24rpx;
-  color: #9a9ab0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.relation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12rpx;
+  width: 100%;
+}
+
+.action-chip {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action-chip.secondary {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  color: #6d28d9;
+  border: 1rpx solid rgba(124, 58, 237, 0.2);
+}
+
+.action-chip.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1rpx solid #fecaca;
+}
+
+.action-chip.primary {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24), inset 0 2rpx 0 rgba(255, 255, 255, 0.32);
 }

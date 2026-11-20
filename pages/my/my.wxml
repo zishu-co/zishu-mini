@@ -1,25 +1,54 @@
 <view class="page">
+  <!-- 顶部背景 -->
+  <view class="top-bg">
+    <view class="top-bg-header">
+      <text class="top-bg-title">个人中心</text>
+      <text class="top-bg-sub">共学成长档案 · 见证每一次进阶</text>
+    </view>
+  </view>
+
   <!-- 用户卡片 -->
   <view class="user-card">
-    <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
-      <image
-        class="avatar-img"
-        src="{{userInfo.avatarUrl || '/img/logo.png'}}"
-        mode="aspectFill"
-      />
+    <view class="user-card__top">
+      <view class="user-card__avatar" bindtap="{{isLoggedIn ? 'goToEditProfile' : 'goToLogin'}}">
+        <image
+          class="avatar-img"
+          src="{{userInfo.avatarUrl || '/img/logo.png'}}"
+          mode="aspectFill"
+        />
+      </view>
+      <!-- 已登录：显示昵称 + 段位徽章 + 学习单按钮 -->
+      <block wx:if="{{isLoggedIn}}">
+        <view class="user-card__info" bindtap="goToEditProfile">
+          <view class="nickname-row">
+            <text class="nickname">{{userInfo.nickName}}</text>
+            <text class="level-pill">{{levelBadge}}</text>
+          </view>
+          <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+          <view class="phone" wx:else>点击编辑个人学习档案 ›</view>
+        </view>
+        <button class="sheet-quick-btn" catchtap="goToMyLearnSheet">📋 学习单</button>
+      </block>
+      <!-- 未登录：显示欢迎文案 + 登录按钮 -->
+      <block wx:else>
+        <view class="user-card__info" bindtap="goToLogin">
+          <view class="nickname">欢迎来到自塾</view>
+          <view class="phone">登录解锁课程学习、方舟与闯关勋章</view>
+        </view>
+        <button class="user-card__login-btn" bindtap="goToLogin">🔑 登录</button>
+      </block>
     </view>
-    <!-- 已登录：显示昵称 + 箭头 -->
-    <block wx:if="{{isLoggedIn}}">
-      <view class="user-card__info" bindtap="goToEditProfile">
-        <view class="nickname">{{userInfo.nickName}}</view>
-        <view class="phone" wx:if="{{userInfo.phoneNumber}}">{{userInfo.phoneNumber}}</view>
+
+    <!-- 段位成长进度条（已登录显示） -->
+    <view class="level-progress-box" wx:if="{{isLoggedIn}}">
+      <view class="level-progress-header">
+        <text class="level-score-text">成长积分 {{levelScore}} 分</text>
+        <text class="level-next-hint">{{nextLevelHint}}</text>
       </view>
-      <view class="user-card__arrow" bindtap="goToEditProfile">
-        <text class="arrow-icon">›</text>
+      <view class="level-track">
+        <view class="level-fill" style="width: {{levelProgressPercent}}%;"></view>
       </view>
-    </block>
-    <!-- 未登录：显示登录按钮 -->
-    <button wx:else class="user-card__login-btn" bindtap="goToLogin">登 录</button>
+    </view>
   </view>
 
   <!-- 学习数据统计条（已登录时显示） -->
@@ -45,6 +74,30 @@
     </view>
   </view>
 
+  <!-- 金刚区快捷导航卡片 -->
+  <view class="quick-nav-grid">
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/goaltalk/index">
+      <text class="quick-nav-icon">🎯</text>
+      <text class="quick-nav-title">目标面谈</text>
+      <text class="quick-nav-sub">导师1v1对齐</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/mentors/index">
+      <text class="quick-nav-icon">🤝</text>
+      <text class="quick-nav-title">师生关系</text>
+      <text class="quick-nav-sub">塾师带教记录</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/followup/index">
+      <text class="quick-nav-icon">🚀</text>
+      <text class="quick-nav-title">创新跟进</text>
+      <text class="quick-nav-sub">项目实战进度</text>
+    </view>
+    <view class="quick-nav-card" bindtap="navigateTo" data-url="/pages/all/index">
+      <text class="quick-nav-icon">🏫</text>
+      <text class="quick-nav-title">全塾动态</text>
+      <text class="quick-nav-sub">共学广场</text>
+    </view>
+  </view>
+
   <!-- 我的方舟区块（spec 002） -->
   <view class="ark-block" wx:if="{{isLoggedIn}}">
     <view class="ark-block__header">
@@ -60,7 +113,7 @@
     <!-- 有方舟 -->
     <view class="ark-list" wx:elif="{{arkList.length > 0}}">
       <view
-        class="ark-item"
+        class="ark-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
         wx:for="{{arkList}}"
         wx:key="ark_id"
         wx:for-item="ark"
@@ -87,7 +140,7 @@
     <!-- 空状态 -->
     <view class="ark-empty" wx:else>
       <text class="ark-empty__icon">🛶</text>
-      <text class="ark-empty__text">您还没有加入任何方舟</text>
+      <text class="ark-empty__text">暂未加入任何方舟</text>
       <text class="ark-empty__tip">在"学习"页选课后可创建或加入方舟</text>
     </view>
   </view>
@@ -170,6 +223,11 @@
     <view class="menu-group">
       <view class="menu-group__title">账户管理</view>
       <view class="menu-group__list">
+        <view class="menu-cell" bindtap="onOpenFeedbackModal">
+          <text class="cell-icon">💡</text>
+          <text class="cell-text">意见反馈与共创建议（赢塾值）</text>
+          <text class="cell-arrow">›</text>
+        </view>
         <view class="menu-cell" bindtap="navigateTo" data-url="/pages/editprofile/index">
           <text class="cell-icon">✏️</text>
           <text class="cell-text">编辑信息</text>
@@ -188,6 +246,113 @@
       </view>
     </view>
 
+  </view>
+
+  <!-- 意见反馈与共创建议弹窗（111-feedback-mine） -->
+  <view class="fb-modal-mask" wx:if="{{showFeedbackModal}}" bindtap="onCloseFeedbackModal">
+    <view class="fb-modal-card" catchtap="noop">
+      <view class="fb-modal-header">
+        <text class="fb-modal-title">💡 自塾共创反馈中心</text>
+        <text class="fb-modal-close" bindtap="onCloseFeedbackModal">✕</text>
+      </view>
+      <view class="fb-tabs">
+        <view
+          class="fb-tab {{feedbackTab === 'submit' ? 'active' : ''}}"
+          data-tab="submit"
+          bindtap="onSwitchFeedbackTab"
+        >📝 提交建议</view>
+        <view
+          class="fb-tab {{feedbackTab === 'mine' ? 'active' : ''}}"
+          data-tab="mine"
+          bindtap="onSwitchFeedbackTab"
+        >📋 我的 ({{myFeedbacks.length}})</view>
+        <view
+          class="fb-tab {{feedbackTab === 'public' ? 'active' : ''}}"
+          data-tab="public"
+          bindtap="onSwitchFeedbackTab"
+        >🏆 共创墙 ({{publicFeedbacks.length}})</view>
+      </view>
+
+      <block wx:if="{{feedbackTab === 'submit'}}">
+        <view class="fb-type-row">
+          <view
+            class="fb-type-chip {{feedbackForm.type === 'feature' ? 'active' : ''}}"
+            data-type="feature"
+            bindtap="onSelectFeedbackType"
+          >✨ 功能建议</view>
+          <view
+            class="fb-type-chip {{feedbackForm.type === 'ux' ? 'active' : ''}}"
+            data-type="ux"
+            bindtap="onSelectFeedbackType"
+          >🎨 体验优化</view>
+          <view
+            class="fb-type-chip {{feedbackForm.type === 'bug' ? 'active' : ''}}"
+            data-type="bug"
+            bindtap="onSelectFeedbackType"
+          >🐞 Bug 反馈</view>
+        </view>
+        <input
+          class="fb-input"
+          value="{{feedbackForm.title}}"
+          placeholder="反馈标题（如：希望方舟增加语音打卡）"
+          data-field="title"
+          bindinput="onFeedbackInput"
+        />
+        <textarea
+          class="fb-textarea"
+          value="{{feedbackForm.content}}"
+          placeholder="详细描述您的功能想法或遇到的问题，建议被采纳落地后将直接获赠塾值奖励！"
+          maxlength="1000"
+          data-field="content"
+          bindinput="onFeedbackInput"
+        />
+        <view class="fb-actions">
+          <view class="fb-btn cancel" bindtap="onCloseFeedbackModal">✕ 取消</view>
+          <view class="fb-btn confirm" bindtap="onSubmitFeedback">
+            {{submittingFeedback ? '⏳ 提交中...' : '🚀 提交共创反馈'}}
+          </view>
+        </view>
+      </block>
+
+      <block wx:elif="{{feedbackTab === 'mine'}}">
+        <view class="fb-list">
+          <view class="fb-empty" wx:if="{{myFeedbacks.length === 0}}">
+            暂无历史反馈记录，快提交第一条共创建议赢取塾值吧！
+          </view>
+          <view class="fb-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{myFeedbacks}}" wx:key="id">
+            <view class="fb-item-top">
+              <text class="fb-item-title">{{item.title}}</text>
+              <text class="fb-item-status">{{item._statusText}}</text>
+            </view>
+            <view class="fb-item-content">{{item.content}}</view>
+            <view class="fb-item-meta">
+              <text>{{item._dateStr}}</text>
+              <text wx:if="{{item.shuzhi_reward > 0}}" class="fb-reward">💰 +{{item.shuzhi_reward}} 塾值</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 100-public.md: 公开共创荣誉墙 -->
+      <block wx:else>
+        <view class="fb-list">
+          <view class="fb-empty" wx:if="{{publicFeedbacks.length === 0}}">
+            暂无公开采纳的共创建议，快来成为第一位上榜的共创官！
+          </view>
+          <view class="fb-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{publicFeedbacks}}" wx:key="id">
+            <view class="fb-item-top">
+              <text class="fb-item-title">🏆 {{item.title}}</text>
+              <text class="fb-reward" wx:if="{{item.shuzhi_reward > 0}}">💎 +{{item.shuzhi_reward}} 塾值</text>
+            </view>
+            <view class="fb-item-content">{{item.content}}</view>
+            <view class="fb-item-meta">
+              <text>共创人：{{item.username || '自塾学友'}}</text>
+              <text>{{item._dateStr}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
   </view>
 
   <!-- 底部安全区 -->

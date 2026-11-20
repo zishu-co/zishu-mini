@@ -96,6 +96,18 @@ Component({
     onActionTap(e: any) {
       const { item } = e.currentTarget.dataset;
       this.triggerEvent('actiontap', { item });
+    },
+
+    // 标记动作已完成
+    onFinishTap(e: any) {
+      const { item, index } = e.currentTarget.dataset;
+      this.triggerEvent('finishtap', { item, index });
+    },
+
+    // 跳过/丢弃动作（触发原因选择）
+    onSkipTap(e: any) {
+      const { item, index } = e.currentTarget.dataset;
+      this.triggerEvent('skiptap', { item, index });
     }
   }
 });

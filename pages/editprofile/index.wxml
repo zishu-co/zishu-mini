@@ -1,6 +1,29 @@
 <view class="page">
-  <view class="header">
-    <text class="title">编辑信息</text>
+  <!-- 交互式名片实时预览卡片 -->
+  <view class="preview-card">
+    <view class="preview-top">
+      <view class="preview-avatar">
+        <text class="preview-avatar-text">{{avatarInitial}}</text>
+      </view>
+      <view class="preview-info">
+        <view class="preview-name-row">
+          <text class="preview-name">{{form.name || '自塾学友'}}</text>
+          <text class="preview-gender-pill" wx:if="{{form.gender}}">{{form.gender}}</text>
+          <text class="preview-region-tag" wx:if="{{form.region}}">📍 {{form.region}}</text>
+        </view>
+        <text class="preview-goal">{{form.goal || '设定个人成长目标，开启进阶之旅'}}</text>
+      </view>
+    </view>
+
+    <view class="completeness-row">
+      <view class="completeness-meta">
+        <text>资料完善度</text>
+        <text class="completeness-pct">{{completenessPercent}}%</text>
+      </view>
+      <view class="completeness-track">
+        <view class="completeness-fill" style="width: {{completenessPercent}}%"></view>
+      </view>
+    </view>
   </view>
 
   <view class="form-card">
@@ -22,10 +45,10 @@
       <text class="form-label">性别</text>
       <view class="radio-group">
         <view class="radio-item {{form.gender === '男' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="男">
-          <text>男</text>
+          <text>🚹 男</text>
         </view>
         <view class="radio-item {{form.gender === '女' ? 'radio-checked' : ''}}" bindtap="onGenderSelect" data-gender="女">
-          <text>女</text>
+          <text>🚺 女</text>
         </view>
       </view>
     </view>
@@ -35,14 +58,47 @@
       <input
         class="form-input"
         type="text"
-        placeholder="请输入居住地"
+        placeholder="请输入居住地（如：上海）"
         value="{{form.region}}"
         bindinput="onRegionInput"
       />
+      <view class="city-preset-row">
+        <view
+          wx:for="{{cityPresets}}"
+          wx:key="*this"
+          class="city-chip {{form.region === item ? 'active' : ''}}"
+          data-city="{{item}}"
+          bindtap="onSelectCity"
+        >📍 {{item}}</view>
+      </view>
     </view>
 
-    <!-- 知识资产 -->
-    <view class="section-title" style="margin-top: 48rpx;">知识资产</view>
+    <view class="form-item">
+      <text class="form-label">个人目标</text>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="写下一句话近期学习目标..."
+        value="{{form.goal}}"
+        bindinput="onGoalInput"
+      />
+    </view>
+
+    <!-- 知识资产与学习方向标签 -->
+    <view class="section-title section-title--spaced">学习方向标签 & 知识资产</view>
+
+    <view class="social-tag-presets">
+      <text class="social-tag-hint">点击快捷添加学习方向与专业技能标签：</text>
+      <view class="social-tag-list">
+        <view
+          class="social-tag-chip {{item.active ? 'active' : ''}}"
+          wx:for="{{socialTagItems}}"
+          wx:key="text"
+          data-tag="{{item.text}}"
+          bindtap="onToggleSocialTag"
+        >{{item.text}}</view>
+      </view>
+    </view>
 
     <view class="form-item">
       <textarea
@@ -55,10 +111,37 @@
       <text class="char-count">{{form.desc.length}}/500</text>
     </view>
 
+    <!-- 109-edit-profile.md: 个人风采照片墙 (save_profile / delete_profile) -->
+    <view class="section-title section-title--photo">📸 个人风采照片墙 ({{profiles.length}}/5)</view>
+    <view class="photo-wall-grid">
+      <view
+        wx:for="{{profiles}}"
+        wx:key="name"
+        class="photo-wall-item"
+      >
+        <image src="{{item._fullUrl}}" mode="aspectFill" class="photo-wall-img" />
+        <view
+          data-name="{{item.name}}"
+          bindtap="onDeletePhoto"
+          class="photo-wall-del"
+        >✕</view>
+      </view>
+      <view
+        wx:if="{{profiles.length < 5}}"
+        bindtap="onChooseAndUploadPhoto"
+        class="photo-wall-upload"
+      >
+        <text class="photo-wall-plus">＋</text>
+        <text class="photo-wall-upload-text">{{uploadingPhoto ? '上传中' : '上传照片'}}</text>
+      </view>
+    </view>
+
     <view class="error-tip" wx:if="{{errorMsg}}">
       <text>{{errorMsg}}</text>
     </view>
 
-    <button class="submit-btn" bindtap="submitForm">保存修改</button>
+    <button class="submit-btn" disabled="{{submitting}}" bindtap="submitForm">
+      {{submitting ? '⏳ 保存中...' : '💾 保存个人档案'}}
+    </button>
   </view>
 </view>

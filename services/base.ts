@@ -14,24 +14,26 @@
 /**
  * 根据小程序环境自动获取 API 基础地址
  */
+const PROD_BASE_URL = 'https://zishu.co';
+
 const getBaseUrl = (): string => {
   try {
+    const customUrl = wx.getStorageSync('customBaseUrl');
+    if (customUrl && typeof customUrl === 'string' && customUrl.startsWith('http')) {
+      return customUrl.replace(/\/+$/, '');
+    }
     const { envVersion } = wx.getAccountInfoSync().miniProgram;
     console.log('[base.ts] 当前环境:', envVersion);
     switch (envVersion) {
       case 'develop':
-        return 'http://127.0.0.1:8008';
       case 'trial':
-        // 体验版也使用生产环境地址
-        return 'https://zishu.co';
       case 'release':
-        return 'https://zishu.co';
       default:
-        return 'https://zishu.co';
+        return PROD_BASE_URL;
     }
   } catch (e) {
     console.error('[base.ts] 获取环境失败:', e);
-    return 'https://zishu.co';
+    return PROD_BASE_URL;
   }
 };
 
@@ -43,12 +45,37 @@ const TIMEOUT = 80000;
 const getAccessToken = (): string => (wx.getStorageSync('accessToken') as string) || '';
 const getRefreshToken = (): string => (wx.getStorageSync('refreshToken') as string) || '';
 const setTokens = (accessToken: string, refreshToken: string): void => {
-  wx.setStorageSync('accessToken', accessToken);
-  wx.setStorageSync('refreshToken', refreshToken);
+  if (accessToken) {
+    wx.setStorageSync('accessToken', accessToken);
+  }
+  if (refreshToken) {
+    wx.setStorageSync('refreshToken', refreshToken);
+  }
+  try {
+    const app = typeof getApp === 'function' ? getApp<any>() : null;
+    if (app && app.globalData) {
+      if (accessToken) app.globalData.accessToken = accessToken;
+      if (refreshToken) app.globalData.refreshToken = refreshToken;
+    }
+  } catch {}
+};
+
+const clearAuthTokens = (): void => {
+  wx.removeStorageSync('accessToken');
+  wx.removeStorageSync('refreshToken');
+  try {
+    const app = typeof getApp === 'function' ? getApp<any>() : null;
+    if (app && app.globalData) {
+      app.globalData.accessToken = null;
+      app.globalData.refreshToken = null;
+    }
+  } catch {}
 };
 
 // 是否正在刷新的标记
 let isRefreshing = false;
+// 是否正在跳转登录页（防止并发 401 循环重复弹窗与重复跳转）
+let isRedirectingToLogin = false;
 // 重试请求队列
 let refreshSubscribers: ((token: string) => void)[] = [];
 
@@ -76,6 +103,10 @@ interface RequestOptions {
   showLoading?: boolean;
   /** 加载提示文字 */
   loadingText?: string;
+  /** 鉴权失败时静默拒绝，不弹“登录已过期”且不强制跳转登录页（用于带本地兜底的公共/推荐接口） */
+  silentAuthError?: boolean;
+  /** 内部标记：是否已完成过一次 Token 刷新重试 */
+  _retried?: boolean;
 }
 
 /**
@@ -206,20 +237,25 @@ const runErrorInterceptors = async (error: ApiError): Promise<any> => {
  */
 const refreshToken = (): Promise<any> => {
   return new Promise((resolve, reject) => {
+    const rToken = getRefreshToken();
     wx.removeStorageSync('accessToken');
+    if (!rToken) {
+      reject(new ApiError(401, '缺少 RefreshToken'));
+      return;
+    }
 
     wx.request({
       url: `${BASE_URL}/api/users/refresh`,
       method: 'GET',
       header: {
-        'token': getRefreshToken(),
+        'token': rToken,
         'content-type': 'application/x-www-form-urlencoded'
       },
       timeout: TIMEOUT,
       success: (res) => {
         const data = res.data as any;
-        if (data && data.id > 0) {
-          setTokens(data.atoken, data.rtoken);
+        if (res.statusCode >= 200 && res.statusCode < 300 && data && data.id > 0 && data.atoken) {
+          setTokens(data.atoken, data.rtoken || rToken);
           resolve(data);
         } else {
           reject(new ApiError(401, '刷新 Token 失败', data));
@@ -240,18 +276,43 @@ const handleUnauthorized = <T = any>(
   _resolve: (value: T) => void,
   reject: (reason?: any) => void
 ): void => {
-  wx.removeStorageSync('accessToken');
-  wx.removeStorageSync('refreshToken');
+  const hadToken = Boolean(getAccessToken() || getRefreshToken());
+  clearAuthTokens();
   if (options.showLoading) wx.hideLoading();
 
-  wx.showToast({
-    title: '登录已过期，请重新登录',
-    icon: 'none'
-  });
+  // 静默鉴权接口或原本就是未登录游客态：只拒绝 Promise，不弹窗、不强跳登录页
+  if (options.silentAuthError || !hadToken) {
+    reject(new ApiError(401, '未授权'));
+    return;
+  }
 
-  setTimeout(() => {
-    wx.navigateTo({ url: '/pages/login/login' });
-  }, 1500);
+  // 检查是否已经在登录页或正在跳转登录页，避免并发请求重复弹窗和死循环跳转
+  let alreadyOnLogin = false;
+  try {
+    const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+    const currentRoute = pages.length > 0 ? (pages[pages.length - 1] as any)?.route || '' : '';
+    if (currentRoute.includes('pages/login/login')) {
+      alreadyOnLogin = true;
+    }
+  } catch {}
+
+  if (!alreadyOnLogin && !isRedirectingToLogin) {
+    isRedirectingToLogin = true;
+    wx.showToast({
+      title: '登录已过期，请重新登录',
+      icon: 'none'
+    });
+
+    setTimeout(() => {
+      isRedirectingToLogin = false;
+      wx.navigateTo({
+        url: '/pages/login/login',
+        fail: () => {
+          isRedirectingToLogin = false;
+        }
+      });
+    }, 1500);
+  }
 
   reject(new ApiError(401, '未授权'));
 };
@@ -267,9 +328,11 @@ const handleTokenExpired = <T = any>(
   wx.removeStorageSync('accessToken');
   if (options.showLoading) wx.hideLoading();
 
+  const retryOptions: RequestOptions = { ...options, _retried: true };
+
   if (isRefreshing) {
     return subscribeTokenRefresh(() => {
-      requestWithRefresh<T>(options).then(resolve).catch(reject);
+      requestWithRefresh<T>(retryOptions).then(resolve).catch(reject);
     });
   }
 
@@ -279,7 +342,7 @@ const handleTokenExpired = <T = any>(
     .then((res) => {
       isRefreshing = false;
       onTokenRefreshed(res.atoken);
-      requestWithRefresh<T>(options).then(resolve).catch(reject);
+      requestWithRefresh<T>(retryOptions).then(resolve).catch(reject);
     })
     .catch(() => {
       isRefreshing = false;
@@ -293,7 +356,7 @@ const handleTokenExpired = <T = any>(
  */
 const buildHeaders = (options: RequestOptions): Record<string, string> => {
   const header: Record<string, string> = {
-    'content-type': 'application/x-www-form-urlencoded',
+    'content-type': 'application/json',
     ...options.header
   };
 
@@ -377,16 +440,19 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
           return;
         }
 
-        // 5000 业务错误码（Token 过期）：优先判断，触发无感刷新并重试
-        // 注意：后端对过期 token 返回 HTTP 401 + detail.code 5000，
-        // 因此必须先于 401 分支判断，否则永远不会走到刷新逻辑
-        if (responseData.detail?.code === 5000 && !options.url.includes('/refresh')) {
+        // 5000 业务错误码（Token 过期，HTTP 状态码同样为 401，因此必须在通用 401 之前判断）
+        if (
+          !options._retried &&
+          !options.url.includes('/refresh') &&
+          (responseData?.detail?.code === 5000 ||
+            (statusCode === 401 && !!getRefreshToken() && responseData?.detail?.code !== 5001))
+        ) {
           if (options.showLoading) wx.hideLoading();
           handleTokenExpired(options, resolve, reject);
           return;
         }
 
-        // 401 未授权（非 token 过期场景：如未登录、无权限等）
+        // 401 未授权
         if (statusCode === 401) {
           if (options.showLoading) wx.hideLoading();
           handleUnauthorized(options, resolve, reject);
@@ -404,17 +470,45 @@ const requestWithRefresh = <T = any>(options: RequestOptions): Promise<T> => {
       fail: (err) => {
         if (options.showLoading) wx.hideLoading();
 
-        // 详细错误日志
-        console.error('[requestWithRefresh] 请求失败:', {
+        // 若本地调试地址连接被拒绝，自动无缝回退生产环境重试一次
+        if (
+          !options._retried &&
+          fullUrl.includes('127.0.0.1') &&
+          PROD_BASE_URL &&
+          !fullUrl.startsWith(PROD_BASE_URL)
+        ) {
+          wx.removeStorageSync('customBaseUrl');
+          wx.request({
+            url: `${PROD_BASE_URL}${options.url}`,
+            method: options.method || 'GET',
+            data: options.data,
+            header,
+            timeout: options.timeout || TIMEOUT,
+            success: async (retryRes) => {
+              if (retryRes.statusCode >= 200 && retryRes.statusCode < 300) {
+                try {
+                  const result = await runResponseInterceptors(retryRes.data);
+                  resolve(result as T);
+                } catch (e) {
+                  reject(e);
+                }
+              } else {
+                reject(new ApiError(retryRes.statusCode, '请求失败', retryRes.data));
+              }
+            },
+            fail: (retryErr) => {
+              reject(new ApiError(-1, retryErr.errMsg || '网络请求失败', null, retryErr));
+            },
+          });
+          return;
+        }
+
+        // 详细错误日志（不在通用 GET 拉取失败时弹出底层 ERR_CONNECTION 英文报错 Toast）
+        console.warn('[requestWithRefresh] 请求失败:', {
           url: options.url,
           fullUrl,
           errMsg: err.errMsg,
-          err
         });
-
-        if (err.errMsg?.includes('request:fail')) {
-          wx.showToast({ title: '网络请求失败: ' + err.errMsg, icon: 'none' });
-        }
 
         reject(new ApiError(-1, err.errMsg || '网络请求失败', null, err));
       }
@@ -513,11 +607,8 @@ export default {
   setTokens,
   getAccessToken,
   getRefreshToken,
-  clearTokens: (): void => {
-    wx.removeStorageSync('accessToken');
-    wx.removeStorageSync('refreshToken');
-  },
-  isLoggedIn: (): boolean => !!getRefreshToken(),
+  clearTokens: clearAuthTokens,
+  isLoggedIn: (): boolean => !!(getAccessToken() || getRefreshToken()),
 
   // 工具
   getBaseUrl: () => BASE_URL

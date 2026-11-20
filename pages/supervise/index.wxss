@@ -1,66 +1,132 @@
-.page { min-height: 100vh; background: #faf9f7; }
+.page {
+  min-height: 100vh;
+  background: #f6f5fb;
+  padding-top: 0;
+}
 
-.header { padding: 32rpx; background: #c6f; }
-.title { font-size: 36rpx; color: #fff; font-weight: bold; }
+.hero-stats {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 24rpx;
+  padding: 36rpx 28rpx 40rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  border-radius: 0 0 44rpx 44rpx;
+  box-shadow: 0 18rpx 44rpx rgba(91, 33, 182, 0.25);
+}
 
 .stats-row {
   display: flex;
-  gap: 12rpx;
-  padding: 24rpx;
-  background: #faf9f7;
+  gap: 16rpx;
 }
 
 .stat-card {
   flex: 1;
-  background: #fff;
-  border: 1rpx solid rgba(0,0,0,0.06);
-  border-radius: 12rpx;
-  padding: 24rpx 16rpx;
+  background: linear-gradient(180deg, #ffffff 0%, #fff7fb 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 26rpx;
+  padding: 20rpx 10rpx;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.10), inset 0 3rpx 0 #ffffff;
+  transition: all 0.2s ease;
+}
+
+.stat-card:nth-child(even) {
+  background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+}
+
+.stat-card-active {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 52%, #ffe4e6 100%) !important;
+  border-color: #fb923c !important;
+  transform: translateY(-2rpx);
+  box-shadow: 0 12rpx 28rpx rgba(251, 146, 60, 0.24), inset 0 3rpx 0 #ffffff;
 }
 
 .stat-num {
   display: block;
   font-size: 36rpx;
-  font-weight: 700;
-  color: #8800cc;
+  font-weight: 800;
+  color: #6d28d9;
   line-height: 1.2;
   margin-bottom: 6rpx;
 }
 .stat-num.danger { color: #e94560; }
 .stat-num.warning { color: #f97316; }
+.stat-num.success { color: #16a34a; }
 
 .stat-label {
-  font-size: 22rpx;
-  color: #9a9ab0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 21rpx;
+  color: #64748b;
+  white-space: nowrap;
 }
 
-.list-area { padding: 0 24rpx 40rpx; }
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin: 0 24rpx 20rpx;
+  padding: 18rpx 28rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4rpx 14rpx rgba(15, 23, 42, 0.04);
+}
+
+.search-icon {
+  font-size: 28rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #1e293b;
+}
+
+.search-clear {
+  font-size: 24rpx;
+  color: #94a3b8;
+  padding: 4rpx 10rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.list-area { padding: 0 24rpx 48rpx; }
 
 .loading-row, .empty-row {
   text-align: center;
   padding: 80rpx 0;
-  color: #9a9ab0;
+  color: #94a3b8;
   font-size: 28rpx;
 }
 
 .record-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 12rpx;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  border: 1rpx solid rgba(0,0,0,0.06);
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border-radius: 32rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(244, 114, 182, 0.26);
+}
+
+.record-card:nth-child(even),
+.record-card.zs-row-even {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border: 2rpx solid rgba(129, 140, 248, 0.30);
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94);
 }
 
 .record-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 .persons {
@@ -77,28 +143,32 @@
 .role {
   font-size: 22rpx;
   color: #9a9ab0;
+  white-space: nowrap;
 }
 
 .name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #8800cc;
+  color: #7c3aed;
 }
 
 .arrow {
   font-size: 32rpx;
-  color: #c6f;
+  color: #a78bfa;
+  flex-shrink: 0;
 }
 
 .deadline-badge {
-  padding: 6rpx 20rpx;
+  padding: 6rpx 18rpx;
   border-radius: 100rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .deadline-badge.blue { background: rgba(59,130,246,0.10); color: #3b82f6; }
 .deadline-badge.orange { background: rgba(249,115,22,0.10); color: #f97316; }
-.deadline-badge.purple { background: rgba(160,0,255,0.10); color: #8800cc; }
+.deadline-badge.purple { background: rgba(124,58,237,0.12); color: #7c3aed; }
 .deadline-badge.red { background: rgba(233,69,96,0.10); color: #e94560; }
 
 .record-course {
@@ -120,6 +190,8 @@
 .chapter-label {
   font-size: 24rpx;
   color: #9a9ab0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .chapter-title {
@@ -129,7 +201,63 @@
 }
 
 .serial {
-  font-size: 24rpx;
-  color: #22c55e;
+  font-size: 23rpx;
+  color: #16a34a;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.empty-text {
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.reset-btn {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 1.5rpx solid rgba(124, 58, 237, 0.22);
+  color: #6d28d9;
+  font-size: 24rpx;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.record-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f1f5f9;
+  flex-wrap: nowrap;
+}
+
+.action-pill {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 23rpx;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action-pill.secondary {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  color: #6d28d9;
+  border: 1rpx solid rgba(124, 58, 237, 0.2);
+}
+
+.action-pill.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1rpx solid #fecaca;
+}
+
+.action-pill.primary {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #5b21b6 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.24), inset 0 2rpx 0 rgba(255, 255, 255, 0.32);
 }

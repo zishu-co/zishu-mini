@@ -1,37 +1,49 @@
-<wxs module="fmt">
-function dateOnly(s) {
-  if (!s) return '';
-  var d = getDate(s);
-  var y = d.getFullYear();
-  var m = d.getMonth() + 1;
-  var day = d.getDate();
-  return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
-}
-module.exports = { dateOnly: dateOnly };
-</wxs>
-
+<page-meta page-style="{{showMentorModal || showReportModal || showCampModal || showEditCourseModal ? 'overflow: hidden;' : ''}}" />
 <view class="page">
 
-  <!-- 快速入口 -->
-  <view class="quick-btns">
-    <view class="quick-btn" bindtap="onGotoLearnSheet">
-      <text class="quick-icon">📋</text>
-      <text class="quick-text">学习单</text>
-    </view>
-    <view class="quick-btn primary" bindtap="onGotoExam">
-      <text class="quick-icon">📝</text>
-      <text class="quick-text">考试</text>
-    </view>
-    <view class="quick-btn" bindtap="onGotoReport">
-      <text class="quick-icon">📊</text>
-      <text class="quick-text">成绩单</text>
+  <!-- 顶部 Banner -->
+  <view class="banner">
+    <view class="banner-top">
+      <view>
+        <view class="banner-title">学习中心</view>
+        <view class="banner-sub">学本领 上自塾 · 以终为始闯关共学</view>
+      </view>
+      <view class="banner-stat-pill">已选 {{currentSelections.length}} / 3 门</view>
     </view>
   </view>
 
-  <!-- 未登录提示：访客可浏览课程，登录后才能选课学习 -->
+  <!-- 快捷入口 -->
+  <view class="quick-btns">
+    <view class="quick-btn primary quick-btn--exam" bindtap="onGotoExam">
+      <text class="quick-icon">📝</text>
+      <text class="quick-text">闯关考试</text>
+    </view>
+    <view class="quick-btn quick-btn--report" bindtap="onGotoReport">
+      <text class="quick-icon">📊</text>
+      <text class="quick-text">成绩单学时</text>
+    </view>
+    <view class="quick-btn quick-btn--social" bindtap="onGotoSocialPlaza">
+      <text class="quick-icon">🏫</text>
+      <text class="quick-text">共学广场</text>
+    </view>
+    <view class="quick-btn quick-btn--supervise" bindtap="onGotoSupervise">
+      <text class="quick-icon">👀</text>
+      <text class="quick-text">督学看板</text>
+    </view>
+    <view class="quick-btn quick-btn--camp" bindtap="onOpenCampModal">
+      <text class="quick-icon">🏕️</text>
+      <text class="quick-text">进阶预备营</text>
+    </view>
+    <view class="quick-btn quick-btn--create" bindtap="onOpenEditCourseModal">
+      <text class="quick-icon">🛠️</text>
+      <text class="quick-text">共创课程</text>
+    </view>
+  </view>
+
+  <!-- 未登录提示 -->
   <view class="login-tip" wx:if="{{!hasLogin}}">
-    <text class="login-tip-text">登录后开启成长之旅 🚀</text>
-    <button class="login-btn" bindtap="goToLogin">去登录</button>
+    <text>登录后可使用选课、组方舟与学时申报功能</text>
+    <button class="login-btn" bindtap="goToLogin">🔑 去登录</button>
   </view>
 
   <!-- 加载状态 -->
@@ -39,108 +51,161 @@ module.exports = { dateOnly: dateOnly };
     <text>加载中...</text>
   </view>
 
+  <!-- 加载失败状态 -->
+  <view class="error-state" wx:if="{{!loading && loadError}}">
+    <text class="error-text">{{loadError}}</text>
+    <view class="retry-btn" bindtap="loadData">🔄 重新加载</view>
+  </view>
+
   <!-- 我的选课 -->
   <view class="section" wx:if="{{!loading && myCourses.length > 0}}">
     <view class="section-header">
       <text class="section-title">我的选课</text>
+      <text class="section-tip">在学 {{myCourses.length}} 门</text>
     </view>
-    <view class="course-card" wx:for="{{myCourses}}" wx:key="sele_id">
-      <view class="course-info">
-        <view class="course-name">{{item.course_title}}</view>
-        <view class="course-meta">
-          <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
+    <view class="course-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{myCourses}}" wx:key="sele_id">
+      <view class="course-card-top">
+        <view class="course-info" data-id="{{item.course_id}}" data-title="{{item.course_title}}" bindtap="onCourseItemTap">
+          <view class="course-name">{{item.course_title}}</view>
+          <view class="course-meta" wx:if="{{item.is_last_declared}}">
+            <text class="chapter-label finish-ready">🎉 已完成全部 {{item.total_chapters || 1}} 章学时申报，可申请结课</text>
+          </view>
+          <view class="course-meta" wx:else>
+            <text class="chapter-label">第{{item.current_serial}}章：{{item.chapter_title}}</text>
+          </view>
+          <view class="course-meta">
+            <text class="deadline {{item.deadlineClass}}">截止：{{item.deadlineDateStr}}</text>
+          </view>
         </view>
-        <view class="course-meta">
-          <text class="deadline {{getDeadlineClass(item.deadline)}}">截止：{{fmt.dateOnly(item.deadline)}}</text>
+        <view class="course-actions">
+          <text class="mentor-tag" wx:if="{{item.shushi_name}}">🎓 {{item.shushi_name}}</text>
+          <text class="no-mentor" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">🎓 选塾师</text>
+          <text class="ark-link" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
         </view>
       </view>
-      <view class="course-actions">
-        <text class="mentor-tag" wx:if="{{item.shushi_name}}">{{item.shushi_name}}</text>
-        <text class="action-btn outline" wx:else bindtap="onSelectMentor" data-courseid="{{item.course_id}}">选塾师</text>
-        <text class="action-btn ark" bindtap="onJoinArk" data-courseid="{{item.course_id}}">🚢 组方舟</text>
-        <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">去学习</view>
-        <view
-          class="action-btn primary"
-          wx:if="{{item.current_serial < item.total_chapters}}"
-          data-course="{{item}}"
-          bindtap="onReportLearn"
-        >申报学时</view>
-        <view
-          class="action-btn finish"
-          wx:else
-          data-courseid="{{item.course_id}}"
-          bindtap="onFinishCourse"
-        >结课</view>
+      <view class="course-card-bottom">
+        <block wx:if="{{item.is_last_declared}}">
+          <view class="action-btn secondary" data-id="{{item.course_id}}" data-title="{{item.course_title}}" bindtap="onCourseItemTap">📖 课程详情</view>
+          <view class="action-btn finish-btn" data-courseid="{{item.course_id}}" bindtap="onGoFinishCourse">🎓 去结课领证</view>
+        </block>
+        <block wx:else>
+          <view class="action-btn secondary" data-url="{{item.url}}" bindtap="onGoToChapter">📖 去学习</view>
+          <view class="action-btn primary" data-course="{{item}}" bindtap="onReportLearn">⏱️ 申报学时</view>
+        </block>
       </view>
     </view>
   </view>
 
   <!-- 全部课程 -->
-  <view class="section" wx:if="{{!loading}}">
+  <view class="section" wx:if="{{!loading && !loadError}}">
     <view class="section-header">
       <text class="section-title">全部课程</text>
-      <text class="section-tip">最多选3门课</text>
+      <text class="section-tip">最多同时选修 3 门课</text>
     </view>
-    <view class="course-item {{item._isSelected ? 'selected' : ''}}" wx:for="{{allCourses}}" wx:key="id">
+
+    <!-- 搜索框 + 筛选胶囊 -->
+    <view class="course-filter-panel">
+      <view class="course-search-box">
+        <text class="search-icon">🔍</text>
+        <input
+          class="course-search-input"
+          placeholder="搜索课程名称或塾主姓名..."
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+        />
+        <text wx:if="{{searchKeyword}}" class="search-clear" bindtap="onClearSearch">✕</text>
+      </view>
+
+      <view class="course-filter-pills">
+        <view
+          class="filter-pill {{courseFilter === 'all' ? 'active' : ''}}"
+          data-filter="all"
+          bindtap="onFilterChange"
+        >📚 全部 ({{tableData.length}})</view>
+        <view
+          class="filter-pill {{courseFilter === 'hot' ? 'active' : ''}}"
+          data-filter="hot"
+          bindtap="onFilterChange"
+        >🔥 热门共修</view>
+        <view
+          class="filter-pill {{courseFilter === 'selected' ? 'active' : ''}}"
+          data-filter="selected"
+          bindtap="onFilterChange"
+        >✅ 我已选 ({{currentSelections.length}})</view>
+        <view
+          class="filter-pill {{courseFilter === 'available' ? 'active' : ''}}"
+          data-filter="available"
+          bindtap="onFilterChange"
+        >✨ 可报名 ({{availableCount}})</view>
+      </view>
+    </view>
+
+    <view class="course-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item.isSelected ? 'selected' : ''}}" wx:for="{{filteredCourses}}" wx:key="id">
       <view class="course-item-left" data-id="{{item.id}}" data-title="{{item.title}}" bindtap="onCourseItemTap">
         <view class="course-item-name">{{item.title}}</view>
         <view class="course-item-meta">
-          <text>塾主：{{item.director_name}}</text>
-          <text>在学：{{item.current_selections_num}} | 学完：{{item.finish_selections_num}}</text>
+          <text>🎓 塾主：{{item.director_name || '自塾教研组'}}</text>
+          <text>🔥 在学 {{item.current_selections_num || 0}} 人 · 🎓 学完 {{item.finish_selections_num || 0}} 人</text>
         </view>
       </view>
       <view class="course-item-right">
         <view
-          class="select-btn {{item._btnClass}}"
+          class="select-btn {{item.isSelected ? 'selected' : ''}}"
           data-id="{{item.id}}"
           data-title="{{item.title}}"
           bindtap="onSelectCourse"
         >
-          {{item._btnText}}
+          {{item.isSelected ? '✕ 退选' : '＋ 选课'}}
         </view>
       </view>
     </view>
-  </view>
 
-  <!-- 空状态 -->
-  <view class="empty" wx:if="{{!loading && allCourses.length == 0}}">
-    <text>暂无课程</text>
+    <!-- 筛选为空状态 -->
+    <view class="empty" wx:if="{{filteredCourses.length === 0}}">
+      <text>{{searchKeyword || courseFilter !== 'all' ? '未找到符合筛选条件的课程' : '暂无课程'}}</text>
+      <view wx:if="{{searchKeyword || courseFilter !== 'all'}}" class="reset-course-filter" bindtap="onResetCourseFilter">🔄 重置筛选</view>
+    </view>
   </view>
 
   <!-- 底部安全区 -->
   <view class="safe-bottom"></view>
 
+  <!-- 弹窗共用遮罩；page-meta 随四个可见状态锁定/恢复底层页面滚动。 -->
+  <view class="learn-modal-layer" wx:if="{{showMentorModal || showReportModal || showCampModal || showEditCourseModal}}">
+    <view class="learn-modal-backdrop" bindtap="onCloseLearningModal" catchtouchmove="onModalTouchMove"></view>
+
   <!-- 选塾师弹窗 -->
-  <view class="modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
-  <view class="modal" wx:if="{{showMentorModal}}">
-    <view class="modal-header">
+  <view class="learn-dialog" wx:if="{{showMentorModal}}" aria-role="dialog" aria-label="选择塾师">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">选择塾师</text>
-      <text class="modal-close" bindtap="onCloseMentorModal">✕</text>
+      <button class="modal-close" bindtap="onCloseMentorModal" aria-label="关闭选择塾师">✕</button>
     </view>
-    <view class="modal-body">
-      <view class="mentor-item" wx:for="{{mentorList}}" wx:key="shushi_id">
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
+      <view class="mentor-item {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}" wx:for="{{mentorList}}" wx:key="shushi_id">
         <text class="mentor-name">{{item.shushi_name}}</text>
         <view
           class="mentor-select-btn"
           data-shushiid="{{item.shushi_id}}"
           data-shushiname="{{item.shushi_name}}"
           bindtap="onConfirmMentor"
-        >选择</view>
+        >✓ 选择</view>
       </view>
       <view class="mentor-empty" wx:if="{{mentorList.length == 0}}">
         <text>暂无可选塾师</text>
       </view>
-    </view>
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 申报学时弹窗 -->
-  <view class="modal-mask" wx:if="{{showReportModal}}" bindtap="onCloseReportModal"></view>
-  <view class="modal" wx:if="{{showReportModal}}">
-    <view class="modal-header">
+  <view class="learn-dialog learn-dialog--report" wx:elif="{{showReportModal}}" aria-role="dialog" aria-label="申报学时">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">申报学时</text>
-      <text class="modal-close" bindtap="onCloseReportModal">✕</text>
+      <button class="modal-close" bindtap="onCloseReportModal" aria-label="关闭申报学时">✕</button>
     </view>
-    <view class="modal-body">
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
       <view class="report-info" wx:if="{{reportCourse}}">
         <text>课程：{{reportCourse.course_title}}</text>
         <text>章节：{{reportCourse.chapter_title}}</text>
@@ -156,9 +221,156 @@ module.exports = { dateOnly: dateOnly };
         />
         <text class="input-tip">最多申报5小时</text>
       </view>
-      <view class="modal-actions">
-        <view class="action-btn secondary" bindtap="onCloseReportModal">取消</view>
-        <view class="action-btn primary" bindtap="onConfirmReport">确认申报</view>
+      </view>
+    </scroll-view>
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
+        <view class="action-btn secondary" bindtap="onCloseReportModal">✕ 取消</view>
+        <view class="action-btn primary" bindtap="onConfirmReport">✅ 确认申报</view>
+      </view>
+  </view>
+
+  <!-- 102-camp.md: 进阶预备营弹窗（塾员预备营 / 塾师预备营 / 塾主预备营） -->
+  <view class="learn-dialog learn-dialog--camp" wx:elif="{{showCampModal}}" aria-role="dialog" aria-label="进阶预备营">
+    <view class="modal-header" catchtouchmove="onModalTouchMove">
+      <view class="learn-dialog__heading">
+        <view class="modal-title">🏕️ 进阶预备营</view>
+        <view class="learn-dialog__subtitle">{{campInfo ? campInfo.camp_name : '选择适合你的成长阶段'}}</view>
+      </view>
+      <button class="modal-close" bindtap="onCloseCampModal" aria-label="关闭预备营">✕</button>
+    </view>
+      <view class="course-filter-pills camp-filter-pills" catchtouchmove="onModalTouchMove">
+        <view
+          class="filter-pill {{activeCampId === 1 ? 'active' : ''}}"
+          data-campid="1"
+          bindtap="onSwitchCampTab"
+        >🌱 塾员营</view>
+        <view
+          class="filter-pill {{activeCampId === 2 ? 'active' : ''}}"
+          data-campid="2"
+          bindtap="onSwitchCampTab"
+        >🎓 塾师营</view>
+        <view
+          class="filter-pill {{activeCampId === 3 ? 'active' : ''}}"
+          data-campid="3"
+          bindtap="onSwitchCampTab"
+        >👑 塾主营</view>
+      </view>
+
+    <scroll-view class="learn-dialog__body" scroll-y="{{true}}" enhanced="{{true}}" bounces="{{false}}">
+      <view class="learn-dialog__content">
+      <view class="report-info" wx:if="{{campInfo}}">
+        <text>营主理人：{{campInfo.admin_name || '自塾教务处'}} · 必修课程号：{{campInfo.must_course || '1、2'}}</text>
+        <text>在营成员 {{campMembers.length}} 人 · 已毕业 {{campFinishs.length}} 人 · 排队审核 {{campWaitings.length}} 人</text>
+      </view>
+
+      <view class="input-row">
+        <view class="label-row">
+          <text class="input-label">入营承诺书 *</text>
+          <text class="fill-pledge-link" bindtap="onFillCampPledge">📋 一键填入标准誓词</text>
+        </view>
+        <textarea
+          class="input-field input-textarea"
+          placeholder="{{campPledgeExample}}"
+          value="{{campForm.commitment}}"
+          data-field="commitment"
+          bindinput="onCampFormInput"
+        />
+      </view>
+
+      <view class="input-row">
+        <text class="input-label">本人真名签字 *</text>
+        <input
+          class="input-field"
+          placeholder="请输入您的真实姓名确认承诺"
+          value="{{campForm.signature}}"
+          data-field="signature"
+          bindinput="onCampFormInput"
+        />
+      </view>
+
+      </view>
+    </scroll-view>
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
+        <view class="action-btn secondary" bindtap="onCloseCampModal">✕ 关闭</view>
+        <button class="action-btn primary camp-submit" bindtap="onSubmitJoinCamp" disabled="{{submittingCamp}}" loading="{{submittingCamp}}">
+          {{submittingCamp ? '⏳ 提交中...' : '🚀 申请加入预备营'}}
+        </button>
+      </view>
+  </view>
+
+  <!-- 103-edit-course.md: 塾主/塾师共创课程弹窗 -->
+    <view class="learn-dialog" wx:elif="{{showEditCourseModal}}" aria-role="dialog" aria-label="共创课程">
+      <view class="modal-header" catchtouchmove="onModalTouchMove">
+        <text class="modal-title">🛠️ 共创与发布自塾课程</text>
+        <button class="modal-close" bindtap="onCloseEditCourseModal" aria-label="关闭共创课程">✕</button>
+      </view>
+      <scroll-view scroll-y="{{true}}" class="learn-dialog__body" enhanced="{{true}}" bounces="{{false}}">
+        <view class="learn-dialog__content">
+        <view class="input-row">
+          <text class="input-label">课程名称 *</text>
+          <input
+            class="input-field"
+            placeholder="例如：AI 智能体实战与产品创新"
+            value="{{courseForm.title}}"
+            data-field="title"
+            bindinput="onCourseFormInput"
+          />
+        </view>
+        <view class="input-row">
+          <text class="input-label">课程简介 *</text>
+          <textarea
+            class="input-field input-textarea-sm"
+            placeholder="简述课程核心目标、收获与适用人群..."
+            value="{{courseForm.desc}}"
+            data-field="desc"
+            bindinput="onCourseFormInput"
+          />
+        </view>
+        <view class="chapter-outline-header">
+          <text class="chapter-outline-title">课程章节大纲 ({{courseForm.chapters.length}} 章)</text>
+          <text class="chapter-add-btn" bindtap="onAddCourseChapter">＋ 新增章节</text>
+        </view>
+        <view
+          wx:for="{{courseForm.chapters}}"
+          wx:key="index"
+          class="chapter-edit-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+        >
+          <view class="chapter-edit-badge">第 {{index + 1}} 章</view>
+          <input
+            class="chapter-edit-input"
+            placeholder="章节标题"
+            value="{{item.title}}"
+            data-index="{{index}}"
+            data-field="title"
+            bindinput="onChapterFieldInput"
+          />
+          <view class="chapter-edit-row">
+            <input
+              class="chapter-edit-subinput"
+              type="number"
+              placeholder="建议天数(如7)"
+              value="{{item.period}}"
+              data-index="{{index}}"
+              data-field="period"
+              bindinput="onChapterFieldInput"
+            />
+            <input
+              class="chapter-edit-subinput"
+              placeholder="关联文章/视频ID"
+              value="{{item.url}}"
+              data-index="{{index}}"
+              data-field="url"
+              bindinput="onChapterFieldInput"
+            />
+          </view>
+        </view>
+        </view>
+      </scroll-view>
+      <view class="modal-actions modal-actions-footer" catchtouchmove="onModalTouchMove">
+        <view class="action-btn secondary" bindtap="onSaveCourseDraft">💾 存草稿</view>
+        <view class="action-btn primary" bindtap="onSubmitSaveCourse">
+          {{savingCourse ? '发布中...' : '🚀 立即发布课程'}}
+        </view>
       </view>
     </view>
   </view>

@@ -34,22 +34,21 @@ App<IAppOption>({
       this.globalData.hasPhoneNumber = true;
     }
 
-    // 获取本地存储的用户ID
-    const userId = wx.getStorageSync('userId');
+    // 获取本地存储的用户ID（兼容 userInfo.userId / userInfo.id 回退）
+    const userId = wx.getStorageSync('userId') || userInfo?.userId || userInfo?.id || null;
     if (userId) {
-      this.globalData.userId = userId;
+      this.globalData.userId = Number(userId);
+      wx.setStorageSync('userId', Number(userId));
     }
 
-    // 注册隐私授权监听（兼容基础库 2.32.3+），确保新用户点击 chooseAvatar/getPhoneNumber 等 open-type 按钮时能弹出授权弹窗
-    if (wx.onNeedPrivacyAuthorization) {
-      wx.onNeedPrivacyAuthorization((resolve: any) => {
-        console.log('[privacy] 触发隐私授权流程, event:', resolve);
-        if (typeof resolve === 'function') {
-          resolve({ event: 'agree' });
-        } else if (resolve && resolve.resolve) {
-          resolve.resolve({ event: 'agree' });
-        }
-      });
+    // 恢复本地缓存的 Token
+    const accessToken = wx.getStorageSync('accessToken');
+    const refreshToken = wx.getStorageSync('refreshToken');
+    if (accessToken) {
+      this.globalData.accessToken = accessToken;
+    }
+    if (refreshToken) {
+      this.globalData.refreshToken = refreshToken;
     }
 
     // 检查登录状态
@@ -57,7 +56,7 @@ App<IAppOption>({
   },
 
   // 检查登录状态
-  checkLoginStatus() {
+  checkLoginStatus(callback?: (uuid: string | null) => void) {
     // 登录
     wx.login({
       success: res => {
@@ -68,32 +67,40 @@ App<IAppOption>({
           // 立即发起请求，不再用 setTimeout 延迟
           const that = this;
           wx.request({
-            url: getBaseUrl() + '/api/users/openid?code=' + res.code,
-            method: 'GET',
+            url: getBaseUrl() + '/api/users/openid',
+            data: {
+              code: res.code,
+            },
             header: {
               'content-type': 'application/json',
             },
-            timeout: 10000,
+            timeout: 60000,
             success: (openidRes: any) => {
               console.log('调用openid的返回结果为：', openidRes);
               // 后端直接返回 UUID 字符串，不是 JSON 对象，所以 res.data 就是 UUID 本身
-              const uuid = openidRes.data
+              const uuid = openidRes.data;
               console.log('session_uuid为：', uuid);
-              if (uuid) {
+              if (uuid && typeof uuid === 'string') {
                 that.globalData.sessionkey = uuid;
+                if (typeof callback === 'function') callback(uuid);
+              } else {
+                if (typeof callback === 'function') callback(null);
               }
               // 不再自动跳转登录页，用户可在"我的"页面点击"登录"按钮主动登录
             },
             fail: (err) => {
               console.error('获取openid失败', err);
+              if (typeof callback === 'function') callback(null);
             },
           });
         } else {
           console.error('登录失败', res);
+          if (typeof callback === 'function') callback(null);
         }
       },
       fail: err => {
         console.error('wx.login调用失败', err);
+        if (typeof callback === 'function') callback(null);
       },
     });
   },
@@ -152,7 +159,7 @@ App<IAppOption>({
 
 interface IAppOption {
   globalData: GlobalData;
-  checkLoginStatus(): void;
+  checkLoginStatus(callback?: (uuid: string | null) => void): void;
   checkNeedLogin(): void;
   saveUserInfo(userInfo: any): void;
   savePhoneNumber(phoneNumber: string): void;

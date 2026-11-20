@@ -1,15 +1,59 @@
 <view class="page">
   <view class="header-card">
-    <view class="paper-title">{{papertitle}}</view>
+    <view class="header-top">
+      <view class="paper-title">{{papertitle}}</view>
+      <view class="header-btn-group">
+        <button wx:if="{{jiandaList.length > 0}}" class="copy-notes-btn" bindtap="onOpenJiandaModal">
+          ✍️ {{jiandaReviewed ? '已批阅简答' : '批阅简答题'}} ({{jiandaList.length}})
+        </button>
+        <button wx:if="{{wrongCount > 0}}" class="copy-notes-btn" bindtap="onCopyWrongNotes">📋 复制错题</button>
+        <button class="retake-btn" bindtap="retakePaper">🔄 重刷本卷</button>
+      </view>
+    </view>
+
     <view class="score-row">
       <text class="score-label">得分</text>
       <text class="score-value {{test_score >= full_score * 0.6 ? 'pass' : 'fail'}}">
         {{test_score}}/{{full_score}}
       </text>
-      <text class="score-percent">({{full_score > 0 ? Math.ceil(test_score * 100 / full_score) : 0}}%)</text>
+      <text class="score-percent">({{scorePercent}}%)</text>
     </view>
+
+    <view class="accuracy-row">
+      <view class="acc-pill">答对 {{correctCount}} 题</view>
+      <view class="acc-pill wrong">答错 {{wrongCount}} 题</view>
+      <view class="acc-pill">正确率 {{scorePercent}}%</view>
+    </view>
+
+    <!-- 题号对错矩阵条 -->
+    <scroll-view class="report-dots-bar" scroll-x="true" enable-flex="true" wx:if="{{questions.length > 0}}">
+      <view
+        wx:for="{{questions}}"
+        wx:key="quesid"
+        class="report-dot {{item.is_correct ? 'is-ok' : 'is-err'}}"
+      >{{item._num}}</view>
+    </scroll-view>
+
     <view class="test-time" wx:if="{{test_time}}">
       <text>考试时间：{{test_time}}</text>
+    </view>
+  </view>
+
+  <!-- 题目筛选切换栏 -->
+  <view class="filter-bar" wx:if="{{!loading && questions.length > 0}}">
+    <view
+      class="filter-tab {{filterMode === 'all' ? 'active' : ''}}"
+      bindtap="switchFilterMode"
+      data-mode="all"
+    >
+      📋 全部题目 ({{questions.length}})
+    </view>
+    <view
+      class="filter-tab {{filterMode === 'wrong' ? 'active' : ''}}"
+      bindtap="switchFilterMode"
+      data-mode="wrong"
+    >
+      🔥 仅看错题 ({{wrongCount}})
     </view>
   </view>
 
@@ -17,10 +61,10 @@
     <text>加载中...</text>
   </view>
 
-  <view class="question-list" wx:if="{{!loading && questions.length > 0}}">
-    <view class="question-card {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{questions}}" wx:key="quesid">
+  <view class="question-list" wx:if="{{!loading && filteredQuestions.length > 0}}">
+    <view class="question-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}} {{item.is_correct ? 'correct' : 'wrong'}}" wx:for="{{filteredQuestions}}" wx:key="quesid">
       <view class="question-header">
-        <text class="question-num">第{{index + 1}}题</text>
+        <text class="question-num">第{{item._num}}题</text>
         <text class="question-type">{{item.ques_type}}</text>
         <text class="question-result {{item.is_correct ? 'result-correct' : 'result-wrong'}}">
           {{item.is_correct ? '✓ 正确' : '✗ 错误'}}
@@ -30,25 +74,25 @@
 
       <!-- 选择题选项 -->
       <view class="options" wx:if="{{item.ques_type == '选择题'}}">
-        <view class="option {{item.user_answer.includes('A') ? 'user-selected' : ''}} {{item.answer.includes('A') ? 'correct-answer' : ''}}">
+        <view class="option {{item.userHasA ? 'user-selected' : ''}} {{item.ansHasA ? 'correct-answer' : ''}}">
           <text>A. {{item.item_a}}</text>
-          <text wx:if="{{item.answer.includes('A')}}" class="tag-correct">正确答案</text>
-          <text wx:if="{{item.user_answer.includes('A') && !item.answer.includes('A')}}" class="tag-wrong">你的选择</text>
+          <text wx:if="{{item.ansHasA}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.userHasA && !item.ansHasA}}" class="tag-wrong">你的选择</text>
         </view>
-        <view class="option {{item.user_answer.includes('B') ? 'user-selected' : ''}} {{item.answer.includes('B') ? 'correct-answer' : ''}}">
+        <view class="option {{item.userHasB ? 'user-selected' : ''}} {{item.ansHasB ? 'correct-answer' : ''}}">
           <text>B. {{item.item_b}}</text>
-          <text wx:if="{{item.answer.includes('B')}}" class="tag-correct">正确答案</text>
-          <text wx:if="{{item.user_answer.includes('B') && !item.answer.includes('B')}}" class="tag-wrong">你的选择</text>
+          <text wx:if="{{item.ansHasB}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.userHasB && !item.ansHasB}}" class="tag-wrong">你的选择</text>
         </view>
-        <view class="option {{item.item_c ? 'has-content' : ''}} {{item.user_answer.includes('C') ? 'user-selected' : ''}} {{item.answer.includes('C') ? 'correct-answer' : ''}}" wx:if="{{item.item_c}}">
+        <view class="option {{item.item_c ? 'has-content' : ''}} {{item.userHasC ? 'user-selected' : ''}} {{item.ansHasC ? 'correct-answer' : ''}}" wx:if="{{item.item_c}}">
           <text>C. {{item.item_c}}</text>
-          <text wx:if="{{item.answer.includes('C')}}" class="tag-correct">正确答案</text>
-          <text wx:if="{{item.user_answer.includes('C') && !item.answer.includes('C')}}" class="tag-wrong">你的选择</text>
+          <text wx:if="{{item.ansHasC}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.userHasC && !item.ansHasC}}" class="tag-wrong">你的选择</text>
         </view>
-        <view class="option {{item.item_d ? 'has-content' : ''}} {{item.user_answer.includes('D') ? 'user-selected' : ''}} {{item.answer.includes('D') ? 'correct-answer' : ''}}" wx:if="{{item.item_d}}">
+        <view class="option {{item.item_d ? 'has-content' : ''}} {{item.userHasD ? 'user-selected' : ''}} {{item.ansHasD ? 'correct-answer' : ''}}" wx:if="{{item.item_d}}">
           <text>D. {{item.item_d}}</text>
-          <text wx:if="{{item.answer.includes('D')}}" class="tag-correct">正确答案</text>
-          <text wx:if="{{item.user_answer.includes('D') && !item.answer.includes('D')}}" class="tag-wrong">你的选择</text>
+          <text wx:if="{{item.ansHasD}}" class="tag-correct">正确答案</text>
+          <text wx:if="{{item.userHasD && !item.ansHasD}}" class="tag-wrong">你的选择</text>
         </view>
       </view>
 
@@ -84,8 +128,63 @@
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!loading && questions.length == 0}}">
-    <text>暂无答题详情</text>
+  <view class="empty" wx:if="{{!loading && filteredQuestions.length == 0}}">
+    <text>{{filterMode === 'wrong' ? '🎉 恭喜！本卷没有错题' : '暂无答题详情'}}</text>
+  </view>
+
+  <!-- 108-review-jianda.md: 简答题自评/导师批阅弹窗 -->
+  <view
+    wx:if="{{showJiandaModal}}"
+    class="jianda-sheet-mask"
+    bindtap="onCloseJiandaModal"
+  >
+    <view
+      class="jianda-sheet-card"
+      catchtap=""
+    >
+      <view class="jianda-sheet-header">
+        <text class="jianda-sheet-title">✍️ 简答题批阅与复盘 ({{jiandaList.length}}题)</text>
+        <text class="jianda-sheet-close" bindtap="onCloseJiandaModal">✕</text>
+      </view>
+      <view
+        wx:for="{{jiandaList}}"
+        wx:key="qperformid"
+        class="jianda-item-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+      >
+        <view class="jianda-q-title">
+          Q{{index + 1}}. {{item.ques_title}} (满分 {{item.fullscore}} 分)
+        </view>
+        <view class="jianda-reply">
+          <text class="jianda-reply-label">考生作答：</text>{{item.reply || '未作答'}}
+        </view>
+        <view wx:if="{{item.answer}}" class="jianda-ref">
+          <text class="jianda-ref-label">参考答案：</text>{{item.answer}}
+        </view>
+        <view class="jianda-score-row">
+          <text class="jianda-score-label">赋分 (0-{{item.fullscore}})：</text>
+          <input
+            class="jianda-score-input"
+            type="number"
+            value="{{item.getscore}}"
+            data-index="{{index}}"
+            bindinput="onJiandaScoreInput"
+          />
+        </view>
+        <view>
+          <input
+            class="jianda-comment-input"
+            placeholder="填写批阅评语或复盘心得..."
+            value="{{item.comments}}"
+            data-index="{{index}}"
+            bindinput="onJiandaCommentInput"
+          />
+        </view>
+      </view>
+      <button
+        class="jianda-submit-btn"
+        bindtap="onSubmitJiandaReview"
+      >{{savingJianda ? '⏳ 保存中...' : '💾 保存简答题批阅得分'}}</button>
+    </view>
   </view>
 
   <view class="safe-bottom"></view>

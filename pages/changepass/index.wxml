@@ -1,39 +1,101 @@
 <view class="page">
-  <view class="header">
-    <text class="title">修改密码</text>
+  <!-- 安全横幅卡片 -->
+  <view class="security-banner">
+    <view class="security-icon">🛡️</view>
+    <view class="security-text">
+      <text class="security-title">账号安全中心</text>
+      <text class="security-sub">定期更换高强度密码，保护您的自塾学习资产</text>
+    </view>
   </view>
 
   <view class="form-card">
     <view class="form-item">
-      <text class="form-label">新密码</text>
+      <text class="form-label">用户名</text>
       <input
         class="form-input"
-        type="password"
-        password
-        placeholder="请输入新密码（至少6位）"
-        value="{{password}}"
-        bindinput="onPasswordInput"
-        maxlength="20"
+        type="text"
+        placeholder="请输入用户名"
+        value="{{name}}"
+        bindinput="onNameInput"
+        maxlength="40"
       />
     </view>
 
     <view class="form-item">
+      <text class="form-label">当前密码</text>
+      <view class="input-wrap">
+        <input
+          class="form-input with-toggle"
+          type="text"
+          password="{{!showOld}}"
+          placeholder="请输入当前密码"
+          value="{{oldPass}}"
+          bindinput="onOldPassInput"
+          maxlength="20"
+        />
+        <text class="eye-toggle" bindtap="toggleShowOld">{{showOld ? '🙈 隐藏' : '👁️ 显示'}}</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label-row">
+        <text class="form-label">新密码</text>
+        <text class="gen-pass-chip" bindtap="onGenerateStrongPass">🎲 生成高强密码</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input with-toggle"
+          type="text"
+          password="{{!showNew}}"
+          placeholder="请输入新密码（至少6位）"
+          value="{{newPass}}"
+          bindinput="onPasswordInput"
+          maxlength="20"
+        />
+        <text class="eye-toggle" bindtap="toggleShowNew">{{showNew ? '🙈 隐藏' : '👁️ 显示'}}</text>
+      </view>
+
+      <!-- 实时密码强度指示器 -->
+      <view class="strength-meter" wx:if="{{strengthLevel}}">
+        <view class="strength-bar">
+          <view class="strength-fill {{strengthClass}}" style="width: {{strengthPercent}}%"></view>
+        </view>
+        <text class="strength-label {{strengthClass}}">密码强度：{{strengthLevel}}</text>
+      </view>
+    </view>
+
+    <view class="form-item">
       <text class="form-label">确认密码</text>
-      <input
-        class="form-input"
-        type="password"
-        password
-        placeholder="请再次输入新密码"
-        value="{{checkpass}}"
-        bindinput="onCheckpassInput"
-        maxlength="20"
-      />
+      <view class="input-wrap">
+        <input
+          class="form-input with-toggle"
+          type="text"
+          password="{{!showConfirm}}"
+          placeholder="请再次输入新密码"
+          value="{{confirmPass}}"
+          bindinput="onCheckpassInput"
+          maxlength="20"
+        />
+        <text class="eye-toggle" bindtap="toggleShowConfirm">{{showConfirm ? '🙈 隐藏' : '👁️ 显示'}}</text>
+      </view>
+      <view class="match-hint {{matchStatus}}" wx:if="{{matchStatus}}">
+        {{matchStatus === 'match' ? '✓ 两次输入的新密码一致' : '✕ 两次输入的新密码不一致'}}
+      </view>
     </view>
 
     <view class="error-tip" wx:if="{{errorMsg}}">
       <text>{{errorMsg}}</text>
     </view>
 
-    <button class="submit-btn" bindtap="submitForm">确认修改</button>
+    <button class="submit-btn" disabled="{{submitting}}" bindtap="submitForm">
+      {{submitting ? '⏳ 提交中...' : '🔑 确认修改'}}
+    </button>
+  </view>
+
+  <!-- 密码安全建议卡片 -->
+  <view class="tips-card">
+    <text class="tips-title">💡 密码安全建议</text>
+    <text class="tips-item">• 建议使用 8 位以上字母、数字与符号组合</text>
+    <text class="tips-item">• 避免使用生日、连续数字或与用户名相同的密码</text>
   </view>
 </view>

@@ -1,28 +1,1089 @@
-/**app.wxss**/
-/* TDesign 主题色覆盖 */
+/**app.wxss — 自塾小程序全局旗舰设计系统 (Flagship Design System Tokens & Utilities)**/
 page {
-  --td-tab-bar-active-color: #a0f;
-  --td-tab-bar-color: #666666;
+  /* TDesign 主题色覆盖 */
+  --td-brand-color: #9333ea;
+  --td-tab-bar-active-color: #9333ea;
+  --td-tab-bar-color: #64748b;
+  --td-tab-bar-bg-color: rgba(255, 255, 255, 0.94);
+
+  /* 自塾品牌与视觉 Token */
+  --brand-primary: #9333ea;
+  --brand-vivid: #a0f;
+  --brand-dark: #7c3aed;
+  --brand-deep: #5b21b6;
+  --brand-light: #f3e8ff;
+  --brand-lighter: #faf5ff;
+  --brand-border: rgba(124, 58, 237, 0.16);
+  --brand-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 55%, #5b21b6 100%);
+  --brand-gradient-hero: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  --brand-gradient-soft: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+
+  /* 背景与文字（新潮多巴胺马卡龙轻甜微光氛围 + 樱花奶昔/苏打蓝紫相间色系 + 蜜桃柠檬选中色） */
+  --bg-page: #f8f5ff;
+  --bg-page-gradient: linear-gradient(165deg, #fdf2f8 0%, #f3e8ff 38%, #eef2ff 72%, #f0f9ff 100%);
+  --bg-card: #ffffff;
+  --bg-subtle: #f5f3ff;
+  --row-odd-bg: #fff7fb;
+  --row-even-bg: #eef2ff;
+  --form-row-odd-bg: #fff7fb;
+  --form-row-even-bg: #eef2ff;
+  --row-hover-bg: #f5d0fe;
+  --row-selected-bg: #fef08a;
+  --row-selected-gradient: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #ffe4e6 100%);
+  --row-selected-border: #fb923c;
+  --text-main: #0f172a;
+  --text-sec: #475569;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(109, 40, 217, 0.14);
+  --border-card: rgba(109, 40, 217, 0.18);
+
+  /* 语义色 */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* 圆角与多级立体阴影 */
+  --radius-sm: 14rpx;
+  --radius-md: 24rpx;
+  --radius-lg: 32rpx;
+  --radius-xl: 40rpx;
+  --radius-full: 9999rpx;
+  --shadow-xs: 0 2rpx 8rpx rgba(15, 23, 42, 0.03);
+  --shadow-sm: 0 6rpx 20rpx rgba(15, 23, 42, 0.05), 0 2rpx 6rpx rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 12rpx 36rpx rgba(15, 23, 42, 0.08), 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 24rpx 60rpx rgba(15, 23, 42, 0.14);
+  --shadow-brand: 0 10rpx 28rpx rgba(124, 58, 237, 0.26);
+  --shadow-brand-lg: 0 16rpx 44rpx rgba(124, 58, 237, 0.34);
+
+  background-color: var(--bg-page);
+  background-image: var(--bg-page-gradient);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  line-height: 1.65;
+  letter-spacing: 0.4rpx;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
 }
 
-/* 自定义 tab-bar 选中态样式 - 穿透 TDesign 组件 */
+.page,
+.container,
+.test-page {
+  background-color: var(--bg-page) !important;
+  background-image: var(--bg-page-gradient) !important;
+  background-attachment: fixed;
+}
+
+/* ── 全局图片、区域间隔与按钮组自适应防拥挤规范 ── */
+image,
+.t-image {
+  max-width: 100%;
+  border-radius: 16rpx;
+}
+
+.section + .section,
+.zs-card + .zs-card {
+  margin-top: 32rpx;
+}
+
+.card-actions,
+.action-row,
+.btn-row,
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16rpx;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. 全局清除微信原生 <button> 毛坯默认样式（保持 (0,0,1) 低权重，不覆盖页面 .btn 类）
+   ══════════════════════════════════════════════════════════════════════════ */
+button {
+  margin: 0;
+  padding: 0 32rpx;
+  font-size: 27rpx;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+button::after {
+  border: none !important;
+  display: none !important;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. 商业级全局按钮视觉体系 (全量覆盖所有按钮类，支持内置图标对齐与高光立体感)
+   ══════════════════════════════════════════════════════════════════════════ */
+.zs-btn-primary,
+.btn-primary,
+.confirm-btn,
+.submit-btn,
+.save-btn,
+.login-btn,
+.cta-btn,
+.user-card__login-btn,
+.exam-sheet-submit,
+.edit-save-btn,
+.direct-select-btn,
+.jianda-submit-btn,
+.btn-claim,
+.create-btn,
+.publish-btn,
+.action-btn.primary,
+.action-pill.primary,
+.action-chip.primary,
+.talk-action-btn.primary,
+.policy-btn.primary,
+.paper-cta,
+.goal-adopt-btn,
+.empty-cta,
+.empty-cta-btn:not(.ghost) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 52%, #5b21b6 100%);
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-weight: 700;
+  border: 1rpx solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 10rpx 24rpx rgba(124, 58, 237, 0.30),
+    0 2rpx 6rpx rgba(91, 33, 182, 0.18),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.36);
+  letter-spacing: 0.5rpx;
+}
+
+.zs-btn-primary:active,
+.btn-primary:active,
+.submit-btn:active,
+.confirm-btn:active,
+.save-btn:active,
+.action-btn.primary:active,
+.action-pill.primary:active,
+.action-chip.primary:active,
+.talk-action-btn.primary:active,
+.paper-cta:active {
+  transform: scale(0.96);
+  opacity: 0.94;
+}
+
+/* 次级轻奢薰衣草胶囊按钮 */
+.btn-secondary,
+.cancel-btn,
+.zs-btn-cancel,
+.action-btn.secondary,
+.action-pill.secondary,
+.action-chip.secondary,
+.talk-action-btn.ghost,
+.peer-btn.ghost,
+.policy-btn.ghost,
+.retry-btn,
+.retry-btn.secondary,
+.empty-cta-btn.ghost,
+.goal-action-pill.ghost,
+.reset-btn,
+.reset-filter-btn,
+.mentor-select-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
+  color: #6d28d9;
+  border: 1.5rpx solid rgba(124, 58, 237, 0.28);
+  border-radius: 999rpx;
+  font-weight: 700;
+  box-shadow:
+    0 4rpx 14rpx rgba(124, 58, 237, 0.10),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.90);
+}
+
+/* 语义绿：结课 / 完结 / 已签到 */
+.action-btn.finish-btn,
+.talk-action-btn.finish,
+.signed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1rpx solid rgba(255, 255, 255, 0.28);
+  border-radius: 999rpx;
+  font-weight: 700;
+  box-shadow:
+    0 8rpx 20rpx rgba(16, 185, 129, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.34);
+}
+
+/* 语义红：危险 / 退课 / 删除 */
+.action-btn.danger,
+.action-pill.danger,
+.action-chip.danger,
+.log-action-btn.danger,
+.enroll-btn--quit,
+.unfavor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  color: #e11d48;
+  border: 1.5rpx solid rgba(225, 29, 72, 0.26);
+  border-radius: 999rpx;
+  font-weight: 700;
+  box-shadow: 0 4rpx 12rpx rgba(225, 29, 72, 0.10);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. 商业级全局页面 Tab 导航栏与胶囊筛选器统一规范
+      铁律：1) Tab 栏容器必有默认底色  2) 未选中 Tab 项必有默认底色  3) 选中 Tab 项必有鲜明选中色
+   ══════════════════════════════════════════════════════════════════════════ */
+/* 3.1 所有 Tab 栏容器轨道 —— 统一薰衣草紫晶槽位默认底色 */
+.seg-tabs,
+.sheet-tabs,
+.zs-seg-tabs,
+.tabs,
+.tab-bar,
+.mode-switch-bar,
+.filter-bar,
+.post-filter-tabs,
+.fb-tabs,
+.course-filter-pills,
+.inno-domain-tabs-box,
+.status-filter-bar,
+.category-tabs,
+.type-filter-bar,
+.filter-pills,
+.filter-tabs,
+.exam-cat-pills,
+.exam-type-pills,
+.article-tabs,
+.folder-tabs {
+  background: linear-gradient(180deg, #ede9fe 0%, #e4d4fc 100%) !important;
+  border: 2rpx solid rgba(124, 58, 237, 0.22) !important;
+  border-radius: 28rpx !important;
+  padding: 10rpx 12rpx !important;
+  box-shadow:
+    inset 0 2rpx 6rpx rgba(91, 33, 182, 0.10),
+    0 4rpx 14rpx rgba(124, 58, 237, 0.08) !important;
+  box-sizing: border-box;
+}
+
+/* 3.2 所有未选中 Tab 项 —— 统一珠光白/薰衣草微光默认底色（严禁透明无底色） */
+.seg-tab,
+.sheet-tab,
+.zs-seg-tab,
+.tab,
+.tab-item,
+.mode-switch-btn,
+.filter-tab,
+.post-tab,
+.fb-tab,
+.filter-pill,
+.domain-tab,
+.inno-domain-tab,
+.status-pill,
+.cat-tab,
+.type-filter-pill,
+.exam-pill,
+.article-tab,
+.folder-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%) !important;
+  color: #4c1d95 !important;
+  font-weight: 600;
+  border-radius: 999rpx !important;
+  border: 1.5rpx solid rgba(139, 92, 246, 0.22) !important;
+  box-shadow:
+    0 2rpx 8rpx rgba(15, 23, 42, 0.05),
+    inset 0 1rpx 0 #ffffff !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3.3 所有选中态 Tab 项 —— 统一皇家紫3D高光渐变选中底色与纯白文字 */
+.seg-tab--active,
+.seg-tab.active,
+.sheet-tab--active,
+.sheet-tab.active,
+.zs-seg-tab.active,
+.tab.active,
+.tab.tab-active,
+.tab-item.active,
+.mode-switch-btn.active,
+.filter-tab.active,
+.post-tab.active,
+.fb-tab.active,
+.filter-pill.active,
+.filter-pill--active,
+.domain-tab.active,
+.inno-domain-tab.active,
+.status-pill.active,
+.cat-tab.active,
+.type-filter-pill.active,
+.exam-pill.active,
+.article-tab.active,
+.folder-tab.active {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 55%, #5b21b6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow:
+    0 8rpx 22rpx rgba(124, 58, 237, 0.36),
+    0 2rpx 6rpx rgba(91, 33, 182, 0.22),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.38) !important;
+  transform: translateY(-1rpx);
+}
+
+.seg-tab--active text,
+.sheet-tab--active text,
+.tab.active text,
+.tab.tab-active text,
+.tab-item.active text,
+.mode-switch-btn.active text,
+.filter-tab.active text,
+.post-tab.active text,
+.fb-tab.active text,
+.filter-pill.active text,
+.filter-pill--active text,
+.domain-tab.active text,
+.inno-domain-tab.active text,
+.status-pill.active text,
+.cat-tab.active text,
+.type-filter-pill.active text,
+.exam-pill.active text,
+.article-tab.active text,
+.folder-tab.active text {
+  color: #ffffff !important;
+}
+
+/* 自定义 tab-bar 选中态样式 - 兼容穿透 */
+.t-tab-bar {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
 .t-tab-bar-item--selected .t-tab-bar-item__icon,
 .t-tab-bar-item--selected .t-tab-bar-item__text,
 .t-tab-bar-item--selected .t-icon,
 .t-tab-bar-item--selected .custom-tab-bar-wrapper .text {
-  color: #a0f !important;
+  color: #7c3aed !important;
+  font-weight: 700;
 }
 
 .t-tab-bar__active-line {
-  background-color: #a0f !important;
+  background: linear-gradient(90deg, #a855f7, #7c3aed) !important;
 }
 
+/* 兼容旧页面 .container，不再加 200rpx 上下内边距破坏布局 */
 .container {
-  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ── 通用卡片与状态样式 ── */
+.zs-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1rpx solid var(--border-subtle);
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+/* ── 全局统一弹窗 / 底部抽屉组件库 (Modal & Bottom Sheet) ── */
+@keyframes zsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zsSlideUp {
+  from { transform: translateY(48rpx); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes zsPopIn {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.zs-modal-mask,
+.modal-mask,
+.mentor-modal-mask,
+.goal-modal-mask,
+.inno-modal-mask,
+.gt-modal-mask,
+.fb-modal-mask,
+.event-modal-mask,
+.exam-sheet-mask,
+.reader-mask,
+.greet-mask,
+.jianda-sheet-mask,
+.cert-modal-mask,
+.login-sheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 16, 68, 0.42) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  box-sizing: border-box;
+  animation: zsFadeIn 0.22s ease-out;
+}
+
+.zs-modal-mask--bottom,
+.login-sheet-mask,
+.jianda-sheet-mask,
+.exam-sheet-mask {
+  align-items: flex-end;
+  padding: 0;
+}
+
+.zs-modal-card,
+.modal,
+.modal-card,
+.goal-modal,
+.inno-modal-card,
+.gt-modal-card,
+.fb-modal-card,
+.event-modal-card,
+.greet-modal,
+.cert-modal-card {
+  width: 100%;
+  max-width: 670rpx;
+  max-height: 84vh;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 88% 0%, rgba(168, 85, 247, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%) !important;
+  border-radius: 44rpx !important;
+  padding: 28rpx 34rpx 36rpx !important;
+  box-sizing: border-box;
+  box-shadow:
+    0 28rpx 72rpx -12rpx rgba(109, 40, 217, 0.26),
+    0 10rpx 28rpx -6rpx rgba(236, 72, 153, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.96) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: zsPopIn 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.zs-modal-sheet,
+.mentor-modal,
+.exam-sheet-card,
+.reader-sheet,
+.jianda-sheet-card,
+.login-sheet-card {
+  width: 100%;
+  max-height: 86vh;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(244, 114, 182, 0.18) 0%, transparent 48%),
+    radial-gradient(circle at 85% 0%, rgba(129, 140, 248, 0.20) 0%, transparent 52%),
+    linear-gradient(180deg, #fffafe 0%, #ffffff 40%, #f8f7ff 100%) !important;
+  border-radius: 48rpx 48rpx 0 0 !important;
+  padding: 26rpx 34rpx calc(36rpx + env(safe-area-inset-bottom)) !important;
+  box-sizing: border-box;
+  box-shadow:
+    0 -20rpx 64rpx rgba(109, 40, 217, 0.22),
+    inset 0 3rpx 0 #ffffff !important;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.98) !important;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: zsSlideUp 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 新潮移动端弹窗顶部马卡龙灵动拖拽胶囊条 */
+.zs-modal-card::before,
+.zs-modal-sheet::before,
+.modal::before,
+.modal-card::before,
+.mentor-modal::before,
+.goal-modal::before,
+.inno-modal-card::before,
+.gt-modal-card::before,
+.fb-modal-card::before,
+.event-modal-card::before,
+.exam-sheet-card::before,
+.reader-sheet::before,
+.greet-modal::before,
+.jianda-sheet-card::before,
+.cert-modal-card::before,
+.login-sheet-card::before {
+  content: '';
+  display: block;
+  width: 78rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #f9a8d4 0%, #c084fc 50%, #818cf8 100%);
+  margin: 0 auto 20rpx;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.zs-modal-header,
+.modal-header,
+.mentor-modal__header,
+.goal-modal-header,
+.exam-sheet-header,
+.jianda-sheet-header,
+.fb-modal-header,
+.greet-header,
+.login-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 24rpx;
+  padding-bottom: 18rpx;
+  border-bottom: 2rpx dashed rgba(192, 132, 252, 0.24) !important;
+}
+
+.zs-modal-title,
+.modal-title,
+.mentor-modal__title,
+.goal-modal-title,
+.inno-modal-title,
+.gt-modal-title,
+.fb-modal-title,
+.event-modal-title,
+.exam-sheet-title,
+.jianda-sheet-title,
+.greet-title,
+.login-sheet-title {
+  font-size: 33rpx !important;
+  font-weight: 800 !important;
+  color: #3b0764 !important;
+  line-height: 1.35;
+  letter-spacing: 0.4rpx;
+}
+
+.zs-modal-sub,
+.mentor-modal__sub,
+.inno-modal-sub,
+.gt-modal-sub,
+.greet-sub {
+  font-size: 24rpx;
+  color: #7c3aed;
+  margin-top: 8rpx;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* 可爱果冻感圆形关闭按钮 */
+.zs-modal-close,
+.modal-close,
+.mentor-modal__close,
+.goal-modal-close,
+.exam-sheet-close,
+.reader-close,
+.greet-close,
+.fb-modal-close,
+.jianda-sheet-close,
+.login-sheet-close {
+  width: 58rpx !important;
+  height: 58rpx !important;
+  border-radius: 999rpx !important;
+  background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%) !important;
+  color: #9333ea !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.30) !important;
+  box-shadow: 0 6rpx 16rpx rgba(147, 51, 234, 0.12), inset 0 2rpx 0 #ffffff !important;
+  font-size: 26rpx !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.zs-modal-close:active,
+.modal-close:active,
+.mentor-modal__close:active,
+.goal-modal-close:active,
+.exam-sheet-close:active,
+.reader-close:active,
+.greet-close:active,
+.fb-modal-close:active,
+.jianda-sheet-close:active,
+.login-sheet-close:active {
+  transform: scale(0.88) rotate(8deg);
+}
+
+/* ── 新潮移动互联网软糖胶囊表单项 (Candy Bento Form Pods) ── */
+.zs-form-group,
+.form-item,
+.form-row,
+.input-row,
+.edit-field,
+.editor-field,
+.event-form-field,
+.exam-form-group,
+.slot-row,
+.field-row,
+.info-row,
+.meeting-item,
+.login-sheet-field {
+  margin-bottom: 20rpx;
+  padding: 22rpx 26rpx;
+  border-radius: 30rpx !important;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.zs-form-group:nth-child(odd),
+.form-item:nth-child(odd),
+.form-row:nth-child(odd),
+.input-row:nth-child(odd),
+.edit-field:nth-child(odd),
+.editor-field:nth-child(odd),
+.event-form-field:nth-child(odd),
+.exam-form-group:nth-child(odd),
+.slot-row:nth-child(odd),
+.field-row:nth-child(odd),
+.info-row:nth-child(odd),
+.meeting-item:nth-child(odd),
+.login-sheet-field:nth-child(odd),
+.content > .section:nth-child(odd) {
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 52%, #faf5ff 100%) !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(236, 72, 153, 0.10), inset 0 3rpx 0 #ffffff !important;
+}
+
+.zs-form-group:nth-child(even),
+.form-item:nth-child(even),
+.form-row:nth-child(even),
+.input-row:nth-child(even),
+.edit-field:nth-child(even),
+.editor-field:nth-child(even),
+.event-form-field:nth-child(even),
+.exam-form-group:nth-child(even),
+.slot-row:nth-child(even),
+.field-row:nth-child(even),
+.info-row:nth-child(even),
+.meeting-item:nth-child(even),
+.login-sheet-field:nth-child(even),
+.content > .section:nth-child(even) {
+  background: linear-gradient(145deg, #f5f3ff 0%, #eef2ff 52%, #ecfeff 100%) !important;
+  border: 2rpx solid rgba(129, 140, 248, 0.28) !important;
+  box-shadow: 0 10rpx 26rpx -8rpx rgba(99, 102, 241, 0.12), inset 0 3rpx 0 rgba(255, 255, 255, 0.94) !important;
+}
+
+.zs-form-group:focus-within,
+.form-item:focus-within,
+.form-row:focus-within,
+.input-row:focus-within,
+.edit-field:focus-within,
+.editor-field:focus-within,
+.event-form-field:focus-within,
+.exam-form-group:focus-within,
+.slot-row:focus-within,
+.login-sheet-field:focus-within,
+.zs-form-group.selected,
+.form-item.selected,
+.form-item.active {
+  background: var(--row-selected-gradient) !important;
+  border: 2.5rpx solid #fb923c !important;
+  box-shadow:
+    0 14rpx 32rpx -8rpx rgba(251, 146, 60, 0.24),
+    0 0 0 6rpx rgba(251, 146, 60, 0.12),
+    inset 0 3rpx 0 #ffffff !important;
+  transform: translateY(-2rpx);
+}
+
+/* ── 新潮移动互联网：全局列表 / 卡片 轻甜马卡龙果冻感奇偶相间与蜜桃柠檬选中态（彻底告别老式Web左粗线） ── */
+.zs-row-odd,
+.menu-cell:nth-child(odd),
+.ark-item:nth-child(odd),
+.checkitem:nth-child(odd),
+.option-item:nth-child(odd),
+.option:nth-child(odd),
+.member-card:nth-child(odd),
+.course-card:nth-child(odd),
+.course-item:nth-child(odd),
+.mentor-item:nth-child(odd),
+.chapter-edit-card:nth-child(odd),
+.chapter-card:nth-child(odd),
+.cohort-card:nth-child(odd),
+.teacher-card:nth-child(odd),
+.seat-slot:nth-child(odd),
+.topic-item:nth-child(odd),
+.article-item:nth-child(odd),
+.zhuanlan-card:nth-child(odd),
+.mindmap-node-row:nth-child(odd),
+.paper-card:nth-child(odd),
+.exam-bank-item:nth-child(odd),
+.favor-item:nth-child(odd),
+.project-card:nth-child(odd),
+.group-card:nth-child(odd),
+.inno-list-row:nth-child(odd),
+.inno-record-row:nth-child(odd),
+.talk-card:nth-child(odd),
+.goal-card:nth-child(odd),
+.history-card:nth-child(odd),
+.camp-card:nth-child(odd),
+.relation-card:nth-child(odd),
+.fb-item:nth-child(odd),
+.record-card:nth-child(odd),
+.question-card:nth-child(odd),
+.jianda-item-card:nth-child(odd),
+.quizblock:nth-child(odd),
+.log-item:nth-child(odd),
+.log-card:nth-child(odd),
+.event-card:nth-child(odd),
+.participant-card:nth-child(odd),
+.recommendation-item:nth-child(odd),
+.chapter-item:nth-child(odd),
+.chapter-row:nth-child(odd),
+.task-card:nth-child(odd),
+.supervise-card:nth-child(odd),
+.mentor-card:nth-child(odd),
+.auth-item:nth-child(odd),
+.method-option:nth-child(odd),
+.quick-nav-card:nth-child(odd),
+.earn-task-pill:nth-child(odd) {
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%) !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.26) !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(236, 72, 153, 0.11),
+    0 4rpx 12rpx rgba(147, 51, 234, 0.05),
+    inset 0 3rpx 0 #ffffff !important;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+}
+
+.zs-row-even,
+.menu-cell:nth-child(even),
+.ark-item:nth-child(even),
+.checkitem:nth-child(even),
+.option-item:nth-child(even),
+.option:nth-child(even),
+.member-card:nth-child(even),
+.course-card:nth-child(even),
+.course-item:nth-child(even),
+.mentor-item:nth-child(even),
+.chapter-edit-card:nth-child(even),
+.chapter-card:nth-child(even),
+.cohort-card:nth-child(even),
+.teacher-card:nth-child(even),
+.seat-slot:nth-child(even),
+.topic-item:nth-child(even),
+.article-item:nth-child(even),
+.zhuanlan-card:nth-child(even),
+.mindmap-node-row:nth-child(even),
+.paper-card:nth-child(even),
+.exam-bank-item:nth-child(even),
+.favor-item:nth-child(even),
+.project-card:nth-child(even),
+.group-card:nth-child(even),
+.inno-list-row:nth-child(even),
+.inno-record-row:nth-child(even),
+.talk-card:nth-child(even),
+.goal-card:nth-child(even),
+.history-card:nth-child(even),
+.camp-card:nth-child(even),
+.relation-card:nth-child(even),
+.fb-item:nth-child(even),
+.record-card:nth-child(even),
+.question-card:nth-child(even),
+.jianda-item-card:nth-child(even),
+.quizblock:nth-child(even),
+.log-item:nth-child(even),
+.log-card:nth-child(even),
+.event-card:nth-child(even),
+.participant-card:nth-child(even),
+.recommendation-item:nth-child(even),
+.chapter-item:nth-child(even),
+.chapter-row:nth-child(even),
+.task-card:nth-child(even),
+.supervise-card:nth-child(even),
+.mentor-card:nth-child(even),
+.auth-item:nth-child(even),
+.method-option:nth-child(even),
+.quick-nav-card:nth-child(even),
+.earn-task-pill:nth-child(even) {
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%) !important;
+  border: 2rpx solid rgba(129, 140, 248, 0.30) !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 12rpx 30rpx -8rpx rgba(99, 102, 241, 0.13),
+    0 4rpx 12rpx rgba(56, 189, 248, 0.06),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.94) !important;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+}
+
+.zs-row-odd.selected,
+.zs-row-even.selected,
+.zs-row-odd.is-selected,
+.zs-row-even.is-selected,
+.checkitem.is-selected,
+.checkitem.selected,
+.checkitem:active,
+.radio-item.radio-checked,
+.option-item.selected,
+.option-item.active,
+.option.user-selected,
+.topic-item.selected,
+.exam-bank-item.selected,
+.member-card.selected,
+.member-card.active,
+.course-card.selected,
+.course-card.enrolled,
+.course-item.selected,
+.paper-card.selected,
+.paper-card:active,
+.record-card.selected,
+.record-card:active,
+.task-card.selected,
+.project-card.selected,
+.talk-card.selected,
+.favor-item.selected,
+.chapter-item.active,
+.chapter-row.active,
+.method-option.selected,
+.menu-cell:active,
+.ark-item:active {
+  background: var(--row-selected-gradient) !important;
+  border: 3rpx solid #fb923c !important;
+  border-radius: 32rpx !important;
+  box-shadow:
+    0 14rpx 34rpx -6rpx rgba(251, 146, 60, 0.25),
+    0 0 0 4rpx rgba(251, 146, 60, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
+}
+
+.zs-form-label,
+.form-label,
+.input-label,
+.edit-field__label,
+.editor-label,
+.event-form-label,
+.exam-form-label,
+.inno-field-label,
+.gt-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 25rpx !important;
+  font-weight: 800 !important;
+  color: #581c87 !important;
+  margin-bottom: 12rpx;
+}
+
+.zs-form-input,
+.form-input,
+.input-field,
+.edit-field__input,
+.editor-input,
+.event-form-input,
+.event-form-picker,
+.exam-form-input,
+.exam-option-input,
+.inno-input,
+.gt-input,
+.fb-input,
+.custom-topic-input,
+.chapter-edit-input,
+.chapter-edit-subinput,
+.jianda-score-input,
+.jianda-comment-input,
+.login-sheet-input,
+.homework-input,
+.slotinput {
+  width: 100%;
+  min-height: 82rpx;
+  padding: 0 26rpx !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 2rpx solid rgba(192, 132, 252, 0.30) !important;
+  border-radius: 24rpx !important;
+  font-size: 27rpx !important;
+  color: #1e1b4b !important;
+  box-sizing: border-box;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.zs-form-textarea,
+.form-textarea,
+.edit-field__textarea,
+.editor-textarea,
+.event-form-textarea,
+.exam-form-textarea,
+.inno-textarea,
+.gt-textarea,
+.fb-textarea,
+.homework-input {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 20rpx 26rpx !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 2rpx solid rgba(192, 132, 252, 0.30) !important;
+  border-radius: 26rpx !important;
+  font-size: 27rpx !important;
+  color: #1e1b4b !important;
+  box-sizing: border-box;
+  line-height: 1.55;
+  box-shadow: inset 0 2rpx 6rpx rgba(147, 51, 234, 0.04), 0 2rpx 8rpx rgba(255, 255, 255, 0.9) !important;
+}
+
+.zs-modal-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 32rpx;
+}
+
+/* ── 全局“完成”按钮：薄荷青提 3D 糖果果冻胶囊 ── */
+.micro-btn.finish,
+.btn-finish,
+.zs-btn-finish,
+.talk-action-btn.finish {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 52%, #059669 100%) !important;
+  color: #ffffff !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.65) !important;
+  border-radius: 999rpx !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 10rpx 22rpx -4rpx rgba(16, 185, 129, 0.42),
+    0 3rpx 8rpx rgba(5, 150, 105, 0.22),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.55) !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+}
+
+.micro-btn.finish:active,
+.btn-finish:active,
+.zs-btn-finish:active,
+.talk-action-btn.finish:active {
+  transform: scale(0.92) translateY(2rpx) !important;
+}
+
+/* ── 全局“跳过 / 取消”按钮：蜜桃樱花苏打 3D 马卡龙果冻胶囊 ── */
+.micro-btn.skip,
+.btn-skip,
+.btn-abandon,
+.zs-btn-skip,
+.zs-btn-cancel,
+.modal-btn.cancel,
+.gt-modal-btn.cancel,
+.inno-modal-btn.cancel,
+.event-modal-btn.cancel,
+.fb-btn.cancel,
+.greet-btn.cancel,
+.talk-action-btn.ghost {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 48%, #f3e8ff 100%) !important;
+  color: #be185d !important;
+  border: 2rpx solid rgba(244, 114, 182, 0.52) !important;
+  border-radius: 999rpx !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 10rpx 22rpx -4rpx rgba(236, 72, 153, 0.24),
+    0 3rpx 8rpx rgba(192, 132, 252, 0.14),
+    inset 0 3rpx 0 #ffffff !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+}
+
+.micro-btn.skip:active,
+.btn-skip:active,
+.btn-abandon:active,
+.zs-btn-skip:active,
+.zs-btn-cancel:active,
+.modal-btn.cancel:active,
+.gt-modal-btn.cancel:active,
+.inno-modal-btn.cancel:active,
+.event-modal-btn.cancel:active,
+.fb-btn.cancel:active,
+.greet-btn.cancel:active,
+.talk-action-btn.ghost:active {
+  transform: scale(0.92) translateY(2rpx) !important;
+}
+
+.zs-btn-submit {
+  flex: 1.3;
+  height: 84rpx;
+  line-height: 84rpx;
+  text-align: center;
+  background: linear-gradient(135deg, #f472b6 0%, #a855f7 52%, #7c3aed 100%);
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  border: 2rpx solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 12rpx 28rpx -4rpx rgba(168, 85, 247, 0.38),
+    inset 0 3rpx 0 rgba(255, 255, 255, 0.48);
+  margin: 0;
+  padding: 0;
+}
+
+.zs-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
-  box-sizing: border-box;
+  justify-content: center;
+  padding: 96rpx 40rpx;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.zs-empty__icon {
+  font-size: 72rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.85;
+}
+
+.zs-empty__title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-sec);
+  margin-bottom: 10rpx;
+}
+
+.zs-empty__desc {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.zs-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 32rpx;
+  color: var(--text-sec);
+  font-size: 26rpx;
 }

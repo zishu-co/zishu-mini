@@ -1,10 +1,14 @@
 // @ts-nocheck
-import { fetchFolder, fetchFavor, deleteFavor } from '../../services/user/user'
+import { fetchFolder, fetchFavor, deleteFavor, newFolder } from '../../services/user/user'
 
 Page({
   data: {
     folders: [] as any[],
     items: [] as any[],
+    filteredItems: [] as any[],
+    searchKeyword: '',
+    typeFilter: 'all', // 'all' | '课程' | '文章' | '试卷'
+    totalItemsCount: 0,
     activeIndex: 0,
     loading: true,
   },
@@ -13,14 +17,101 @@ Page({
     this.fetchFolders()
   },
 
+  onPullDownRefresh() {
+    this.fetchFolders().finally(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '自塾精选知识库 · 我的收藏夹',
+      path: '/pages/learn/index',
+    }
+  },
+
+  computeTotalItems(folders: any[]) {
+    return (folders || []).reduce((acc: number, f: any) => acc + (Number(f.item_num) || 0), 0)
+  },
+
+  applySearchFilter(items: any[], keyword: string, typeFilter = this.data.typeFilter) {
+    let baseList = items || []
+    if (typeFilter && typeFilter !== 'all') {
+      baseList = baseList.filter((item: any) => String(item.target_type || '').indexOf(typeFilter) !== -1)
+    }
+    const kw = (keyword || '').trim().toLowerCase()
+    if (!kw) return baseList
+    return baseList.filter((item: any) => {
+      const title = String(item.target_title || '').toLowerCase()
+      const type = String(item.target_type || '').toLowerCase()
+      return title.indexOf(kw) !== -1 || type.indexOf(kw) !== -1
+    })
+  },
+
+  onTypeFilterChange(e: any) {
+    const typeFilter = e.currentTarget.dataset.type || 'all'
+    const filteredItems = this.applySearchFilter(this.data.items, this.data.searchKeyword, typeFilter)
+    this.setData({ typeFilter, filteredItems })
+  },
+
+  onSearchInput(e: any) {
+    const searchKeyword = e.detail.value || ''
+    const filteredItems = this.applySearchFilter(this.data.items, searchKeyword, this.data.typeFilter)
+    this.setData({ searchKeyword, filteredItems })
+  },
+
+  clearSearch() {
+    const filteredItems = this.applySearchFilter(this.data.items, '', this.data.typeFilter)
+    this.setData({
+      searchKeyword: '',
+      filteredItems,
+    })
+  },
+
+  goToArticles() {
+    wx.navigateTo({ url: '/pages/article/index' })
+  },
+
+  goToLearnCenter() {
+    wx.switchTab({ url: '/pages/learn/index' })
+  },
+
+  onCreateFolder() {
+    wx.showModal({
+      title: '新建收藏夹',
+      editable: true,
+      placeholderText: '请输入收藏夹名称（如：AI好课、精选文章）',
+      confirmText: '创建',
+      success: async (res) => {
+        if (!res.confirm) return
+        const name = String(res.content || '').trim()
+        if (!name) {
+          wx.showToast({ title: '请输入收藏夹名称', icon: 'none' })
+          return
+        }
+        try {
+          wx.showLoading({ title: '创建中...', mask: true })
+          await newFolder(name)
+          wx.hideLoading()
+          wx.showToast({ title: '已新建收藏夹', icon: 'success' })
+          this.fetchFolders()
+        } catch (err) {
+          wx.hideLoading()
+          wx.showToast({ title: '创建失败，请重试', icon: 'none' })
+        }
+      },
+    })
+  },
+
   fetchFolders() {
     wx.showLoading({ title: '加载中...', mask: true })
 
-    fetchFolder()
+    return fetchFolder()
       .then((res: any) => {
         wx.hideLoading()
         const folders = Array.isArray(res) ? res : []
-        this.setData({ folders })
+        const totalItemsCount = this.computeTotalItems(folders)
+        this.setData({ folders, totalItemsCount })
         if (folders.length > 0) {
           this.fetchItems(folders[0].folderid)
         } else {
@@ -29,13 +120,14 @@ Page({
       })
       .catch(() => {
         wx.hideLoading()
-        this.setData({ folders: [], loading: false })
+        this.setData({ folders: [], totalItemsCount: 0, loading: false })
       })
   },
 
   switchFolder(e: any) {
-    const index = e.currentTarget.dataset.index
+    const index = Number(e.currentTarget.dataset.index)
     const folder = this.data.folders[index]
+    if (!folder) return
     this.setData({ activeIndex: index, loading: true })
     this.fetchItems(folder.folderid)
   },
@@ -43,22 +135,44 @@ Page({
   fetchItems(folderId: string) {
     fetchFavor(folderId)
       .then((res: any) => {
-        let items = []
+        let rawItems: any[] = []
         if (typeof res === 'string') {
-          try { items = JSON.parse(res) } catch { items = res }
+          try {
+            const parsed = JSON.parse(res)
+            rawItems = Array.isArray(parsed) ? parsed : []
+          } catch {
+            rawItems = []
+          }
         } else if (Array.isArray(res)) {
-          items = res
+          rawItems = res
         }
-        this.setData({ items, loading: false })
+        const items = rawItems.map((item: any, idx: number) => ({
+          ...item,
+          _origIndex: idx,
+          _typeIcon: this.typeIcon(item.target_type),
+        }))
+        const filteredItems = this.applySearchFilter(items, this.data.searchKeyword)
+        this.setData({ items, filteredItems, loading: false })
       })
       .catch(() => {
-        this.setData({ items: [], loading: false })
+        this.setData({ items: [], filteredItems: [], loading: false })
       })
   },
 
+  onItemTap(e: any) {
+    const { type, targetid } = e.currentTarget.dataset
+    if (!targetid) return
+    if (type === '课程' || type === '合集' || type === '视频') {
+      wx.navigateTo({ url: `/pages/course-detail/index?id=${targetid}` })
+    } else if (type === '文章') {
+      wx.navigateTo({ url: `/pages/article/index?id=${targetid}` })
+    } else if (type === '试卷') {
+      wx.navigateTo({ url: `/pages/test/test?testid=${targetid}` })
+    }
+  },
+
   deleteItem(e: any) {
-    const { favorid, index } = e.currentTarget.dataset
-    const items = [...this.data.items]
+    const { favorid } = e.currentTarget.dataset
 
     wx.showModal({
       title: '确认删除',
@@ -68,17 +182,20 @@ Page({
 
         deleteFavor(favorid)
           .then(() => {
-            items.splice(index, 1)
-            this.setData({ items })
+            const items = this.data.items.filter(
+              (it: any) => Number(it.favorid) !== Number(favorid)
+            )
+            const filteredItems = this.applySearchFilter(items, this.data.searchKeyword)
 
             // 更新文件夹计数
             const folders = [...this.data.folders]
             const activeIndex = this.data.activeIndex
             if (folders[activeIndex]) {
               folders[activeIndex].item_num = Math.max(0, (folders[activeIndex].item_num || 1) - 1)
-              this.setData({ folders })
             }
+            const totalItemsCount = this.computeTotalItems(folders)
 
+            this.setData({ items, filteredItems, folders, totalItemsCount })
             wx.showToast({ title: '删除成功', icon: 'success' })
           })
           .catch(() => {
@@ -90,6 +207,7 @@ Page({
 
   typeIcon(type: string): string {
     const map: Record<string, string> = {
+      '课程': '📚',
       '试卷': '📝',
       '合集': '🎬',
       '视频': '🎥',

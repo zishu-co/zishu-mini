@@ -6,21 +6,50 @@
 
   <!-- 顶部区域：搜索 + 轮播图 -->
   <view class="home-page-header" wx:if="{{!pageLoading}}">
-    <!-- 搜索栏（保留占位） -->
+    <!-- 顶部品牌标题栏 -->
+    <view class="inno-hero-bar">
+      <view class="inno-hero-top">
+        <view class="inno-hero-left">
+          <text class="inno-hero-title">创新工坊</text>
+          <text class="inno-hero-sub">真实场景项目共创 · 赢取塾值赏金</text>
+        </view>
+        <view class="mode-switch">
+          <view
+            class="mode-pill {{viewMode === 'projects' ? 'active' : ''}}"
+            data-mode="projects"
+            bindtap="onSwitchMode"
+          >🚀 项目 ({{filteredProjects.length}})</view>
+          <view
+            class="mode-pill {{viewMode === 'groups' ? 'active' : ''}}"
+            data-mode="groups"
+            bindtap="onSwitchMode"
+          >🤝 小组 ({{filteredGroups.length}})</view>
+        </view>
+      </view>
+      <view class="inno-hero-right">
+        <view class="publish-btn publish-btn-time" bindtap="onOpenTimeModal">⏱️ 工时清单</view>
+        <view class="publish-btn" wx:if="{{viewMode === 'groups'}}" bindtap="onOpenCreateGroupModal">＋ 创建小组</view>
+        <view class="publish-btn" wx:else bindtap="onOpenPublishModal">＋ 发布课题</view>
+      </view>
+    </view>
+
+    <!-- 搜索栏 -->
     <view class="search-wrap">
       <t-search
         t-class-input="t-search__input"
         t-class-input-container="t-search__input-container"
-        placeholder="AI Agent真实场景落地"
-        leftIcon=""
-        disabled
+        placeholder="{{viewMode === 'projects' ? '搜索项目名称、编号或执行人' : '搜索共创小组、方向或导师'}}"
+        value="{{searchKeyword}}"
+        bind:change="onSearchChange"
+        bind:submit="onSearchSubmit"
+        bind:clear="onSearchClear"
       >
-        <t-icon slot="left-icon" prefix="wr" name="search" size="40rpx" color="#bbb" />
+        <t-icon slot="left-icon" name="search" size="40rpx" color="#bbb" />
       </t-search>
     </view>
 
-    <!-- 轮播图（保留） -->
-    <view class="swiper-wrap">
+    <!-- 轮播图 -->
+    <view class="swiper-wrap" wx:if="{{viewMode === 'projects'}}">
       <t-swiper
         wx:if="{{imgSrcs.length > 0}}"
         current="{{current}}"
@@ -35,92 +64,494 @@
     </view>
   </view>
 
-  <!-- 标签栏（保留改造） -->
-  <view class="tab-bar" wx:if="{{!pageLoading}}">
-    <t-tabs
-      t-class="t-tabs"
-      t-class-active="tabs-external__active"
-      t-class-item="tabs-external__item"
-      defaultValue="{{0}}"
-      space-evenly="{{false}}"
-      bind:change="tabChangeHandle"
-    >
-      <t-tab-panel
-        wx:for="{{tabList}}"
-        wx:for-index="index"
-        wx:key="index"
-        label="{{item.text}}"
-        value="{{index}}"
+  <!-- 项目视图 -->
+  <block wx:if="{{!pageLoading && viewMode === 'projects'}}">
+    <view class="inno-filter-section">
+      <!-- 领域标签栏（商业级胶囊分段栏） -->
+      <view class="inno-domain-tabs-box">
+        <scroll-view class="inno-domain-tabs" scroll-x enable-flex show-scrollbar="{{false}}">
+          <view class="inno-domain-tabs__inner">
+            <view
+              wx:for="{{tabList}}"
+              wx:for-index="index"
+              wx:key="index"
+              class="inno-domain-tab {{activeTab === (item.key || '') ? 'active' : ''}}"
+              data-index="{{index}}"
+              data-key="{{item.key || ''}}"
+              bindtap="tabChangeHandle"
+            >
+              <text class="inno-domain-tab__text">{{item.key === 'F' ? '💻 ' : (item.key === 'B' ? '⚙️ ' : (item.key === 'D' ? '📄 ' : (item.key === 'T' ? '🎬 ' : (item.key === 'C' ? '🎓 ' : '🌟 '))))}}{{item.text}}</text>
+              <view class="inno-domain-tab__line" wx:if="{{activeTab === (item.key || '')}}"></view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 状态筛选胶囊 -->
+      <view class="status-filter-bar">
+        <view
+          class="status-pill {{statusFilter === 'all' ? 'active' : ''}}"
+          data-status="all"
+          bindtap="onStatusFilterTap"
+        >📋 全部</view>
+        <view
+          class="status-pill {{statusFilter === 'pending' ? 'active' : ''}}"
+          data-status="pending"
+          bindtap="onStatusFilterTap"
+        >🔥 招募中</view>
+        <view
+          class="status-pill {{statusFilter === 'in-progress' ? 'active' : ''}}"
+          data-status="in-progress"
+          bindtap="onStatusFilterTap"
+        >⚡ 进行中</view>
+        <view
+          class="status-pill {{statusFilter === 'completed' ? 'active' : ''}}"
+          data-status="completed"
+          bindtap="onStatusFilterTap"
+        >✅ 已结项</view>
+      </view>
+    </view>
+
+    <!-- 项目列表 -->
+    <view class="project-list">
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{filteredProjects.length === 0 && !listLoading}}">
+        <text class="empty-icon">📭</text>
+        <text class="empty-text">暂无符合筛选条件的项目</text>
+        <view class="reset-filter-btn" bindtap="onResetFilters">🔄 重置筛选条件</view>
+      </view>
+
+      <!-- 项目卡片 -->
+      <view
+        class="project-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+        wx:for="{{filteredProjects}}"
+        wx:key="id"
+        bindtap="goToProjectDetail"
+        data-id="{{item.id}}"
+      >
+        <!-- 卡片头部 -->
+        <view class="card-header">
+          <view class="card-header-left">
+            <view class="card-serial">{{item.task_serial || '—'}}</view>
+            <view class="bounty-pill" wx:if="{{item.bonus > 0}}">💰 {{item.bonus}} 塾值</view>
+          </view>
+          <view class="card-status status-{{item.statusClass}}">
+            {{item.statusText}}
+          </view>
+        </view>
+
+        <!-- 项目名称 -->
+        <view class="card-title">{{item.title || '无标题'}}</view>
+
+        <!-- 描述 -->
+        <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+
+        <!-- 底部信息行 + 认领按钮 -->
+        <view class="card-footer">
+          <view class="card-footer-meta">
+            <!-- 执行人 -->
+            <view class="footer-item">
+              <text class="footer-icon">👤</text>
+              <text class="footer-text">{{item.taker || '待认领'}}</text>
+            </view>
+            <!-- 塾师 -->
+            <view class="footer-item" wx:if="{{item.shushi}}">
+              <text class="footer-icon">🎓</text>
+              <text class="footer-text">{{item.shushi}}</text>
+            </view>
+            <!-- 截止日期 -->
+            <view class="footer-item" wx:if="{{item.deadlineText}}">
+              <text class="footer-icon">📅</text>
+              <text class="footer-text deadline-{{item.deadlineColor}}">
+                {{item.deadlineText}}
+              </text>
+            </view>
+          </view>
+
+          <!-- 认领按钮（未认领时显示） -->
+          <view
+            class="claim-btn"
+            wx:if="{{item.statusClass === 'pending'}}"
+            catchtap="claimProject"
+            data-id="{{item.id}}"
+            data-index="{{index}}"
+          >
+            {{claimingId === item.id ? '⏳ 认领中' : '⚡ 立即认领'}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="list-loading" wx:if="{{listLoading}}">
+        <t-loading theme="circular" size="32rpx" text="加载中..." />
+      </view>
+    </view>
+  </block>
+
+  <!-- 共创小组视图 -->
+  <block wx:if="{{!pageLoading && viewMode === 'groups'}}">
+    <view class="project-list">
+      <view class="empty-state" wx:if="{{filteredGroups.length === 0}}">
+        <text class="empty-icon">🤝</text>
+        <text class="empty-text">未找到匹配的共创小组</text>
+        <view class="reset-filter-btn" bindtap="onResetFilters">🧹 清空搜索词</view>
+      </view>
+
+      <view
+        class="group-card {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+        wx:for="{{filteredGroups}}"
+        wx:key="key"
+        bindtap="onGroupCardTap"
+        data-key="{{item.key}}"
+      >
+        <view class="group-card-top">
+          <view class="group-badge">{{item.badge}}</view>
+          <view class="group-bounty">累计赏金 💰 {{item.totalBonus}} 塾值</view>
+        </view>
+        <view class="group-name">{{item.name}}</view>
+        <view class="group-desc">{{item.desc}}</view>
+        <view class="group-footer">
+          <view class="group-stats">
+            <text class="group-stat-item">📋 {{item.projectCount}} 个课题</text>
+            <text class="group-stat-item">🔥 {{item.openCount}} 个招募中</text>
+            <text class="group-stat-item">🎓 领航：{{item.mentor}}</text>
+          </view>
+          <view class="group-action-btns">
+            <view
+              class="group-join-btn"
+              catchtap="onOpenGroupDetailModal"
+              data-group="{{item}}"
+            >🏛️ 详情</view>
+            <view
+              class="group-join-btn"
+              catchtap="onOpenAttendModal"
+              data-group="{{item}}"
+            >📅 周报</view>
+            <view
+              class="group-join-btn"
+              catchtap="onOpenJoinGroupModal"
+              data-group="{{item}}"
+            >🤝 入组</view>
+            <view class="group-enter-btn">🚀 课题 ›</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 发布新课题弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showPublishModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-title">🚀 发布创新共创课题</view>
+      <view class="inno-modal-sub">自动编号：{{publishForm.task_serial}}</view>
+
+      <view class="inno-field-label">课题领域</view>
+      <view class="inno-type-chips">
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'F' ? 'active' : ''}}"
+          data-type="F"
+          bindtap="onSelectPublishType"
+        >💻 F 前端</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'B' ? 'active' : ''}}"
+          data-type="B"
+          bindtap="onSelectPublishType"
+        >⚙️ B 后端</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'D' ? 'active' : ''}}"
+          data-type="D"
+          bindtap="onSelectPublishType"
+        >📄 D 文档</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'T' ? 'active' : ''}}"
+          data-type="T"
+          bindtap="onSelectPublishType"
+        >🎬 T 教程</view>
+        <view
+          class="inno-type-chip {{publishForm.task_type === 'C' ? 'active' : ''}}"
+          data-type="C"
+          bindtap="onSelectPublishType"
+        >🎓 C 课程</view>
+      </view>
+
+      <view class="inno-field-label">课题名称</view>
+      <input
+        class="inno-input"
+        value="{{publishForm.title}}"
+        placeholder="输入清晰可交付的课题标题..."
+        data-field="title"
+        bindinput="onPublishFormInput"
       />
-    </t-tabs>
+
+      <view class="inno-row-2">
+        <view class="inno-col">
+          <view class="inno-field-label">悬赏塾值</view>
+          <input
+            class="inno-input"
+            type="digit"
+            value="{{publishForm.bonus}}"
+            data-field="bonus"
+            bindinput="onPublishFormInput"
+          />
+        </view>
+        <view class="inno-col">
+          <view class="inno-field-label">计划工时(h)</view>
+          <input
+            class="inno-input"
+            type="digit"
+            value="{{publishForm.planed_hour}}"
+            data-field="planed_hour"
+            bindinput="onPublishFormInput"
+          />
+        </view>
+      </view>
+
+      <view class="inno-field-label">截止日期（YYYY-MM-DD）</view>
+      <input
+        class="inno-input"
+        value="{{publishForm.deadline}}"
+        placeholder="2026-11-15"
+        data-field="deadline"
+        bindinput="onPublishFormInput"
+      />
+
+      <view class="inno-field-label">课题描述与验收标准</view>
+      <textarea
+        class="inno-textarea"
+        value="{{publishForm.desc}}"
+        placeholder="描述课题背景、交付物要求与参考资料..."
+        maxlength="1000"
+        data-field="desc"
+        bindinput="onPublishFormInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitPublishProject">
+          {{submittingPublish ? '⏳ 发布中...' : '🚀 确认发布'}}
+        </view>
+      </view>
+    </view>
   </view>
 
-  <!-- 项目列表 -->
-  <view class="project-list" wx:if="{{!pageLoading}}">
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{filteredList.length === 0 && !listLoading}}">
-      <text class="empty-icon">📭</text>
-      <text class="empty-text">暂无项目</text>
+  <!-- 申请加入创新小组弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showJoinGroupModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-title">🤝 申请加入共创小组</view>
+      <view class="inno-modal-sub">{{joinGroupForm.groupname}}</view>
+
+      <view class="inno-field-label">申请理由与擅长方向</view>
+      <textarea
+        class="inno-textarea"
+        value="{{joinGroupForm.reason}}"
+        placeholder="简单介绍你的已修课程、技术特长与希望参与的课题方向..."
+        maxlength="500"
+        bindinput="onJoinReasonInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitJoinGroup">
+          {{submittingJoinGroup ? '⏳ 提交中...' : '✅ 提交入组申请'}}
+        </view>
+      </view>
     </view>
+  </view>
 
-    <!-- 项目卡片 -->
-    <view
-      class="project-card"
-      wx:for="{{filteredList}}"
-      wx:key="id"
-      bindtap="goToProjectDetail"
-      data-id="{{item.id}}"
-    >
-      <!-- 卡片头部 -->
-      <view class="card-header">
-        <view class="card-serial">{{item.task_serial || '—'}}</view>
-        <view class="card-status status-{{getStatusTag(item.half_progress, item.taker)}}">
-          {{item.finish_date ? '已完成' : (item.taker ? '进行中' : '待认领')}}
+  <!-- 102-attend.md: 小组周报考勤汇报弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showAttendModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-title">📅 小组周报考勤汇报</view>
+      <view class="inno-modal-sub">{{attendForm.groupname}}</view>
+
+      <view class="inno-field-label">本周目标 (Objective) *</view>
+      <input
+        class="inno-input"
+        value="{{attendForm.object}}"
+        placeholder="本周计划推进的核心目标..."
+        data-field="object"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-field-label">本周贡献与产出 (Contribution) *</view>
+      <textarea
+        class="inno-textarea"
+        value="{{attendForm.contrib}}"
+        placeholder="本周完成的课题进展、代码提交或文档产出..."
+        maxlength="500"
+        data-field="contrib"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-field-label">协作需求与求助 (Demand)</view>
+      <input
+        class="inno-input"
+        value="{{attendForm.demand}}"
+        placeholder="需要塾师或小组成员协助的事项（选填）"
+        data-field="demand"
+        bindinput="onAttendFormInput"
+      />
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitAttendReport">
+          {{submittingAttend ? '⏳ 提交中...' : '💾 保存周报考勤'}}
         </view>
       </view>
 
-      <!-- 项目名称 -->
-      <view class="card-title">{{item.title || '无标题'}}</view>
-
-      <!-- 描述 -->
-      <view class="card-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
-
-      <!-- 底部信息行 -->
-      <view class="card-footer">
-        <!-- 执行人 -->
-        <view class="footer-item">
-          <text class="footer-icon">👤</text>
-          <text class="footer-text">{{item.taker || '待认领'}}</text>
+      <!-- 107-attend-review.md: 同行互评建议 (Start/Stop/Continue) 与塾主评议 -->
+      <view class="inno-review-divider">
+        <view class="inno-field-label">💬 同行互评建议 (Start / Stop / Continue)</view>
+        <view class="inno-row-2">
+          <view class="inno-col">
+            <input
+              class="inno-input"
+              value="{{adviceForm.begin}}"
+              placeholder="建议开始做 (Start)..."
+              data-field="begin"
+              bindinput="onAdviceFormInput"
+            />
+          </view>
+          <view class="inno-col">
+            <input
+              class="inno-input"
+              value="{{adviceForm.keepon}}"
+              placeholder="继续保持 (Keep)..."
+              data-field="keepon"
+              bindinput="onAdviceFormInput"
+            />
+          </view>
         </view>
-        <!-- 赏金 -->
-        <view class="footer-item" wx:if="{{item.bonus > 0}}">
-          <text class="footer-icon">💰</text>
-          <text class="footer-text bonus">{{item.bonus}}</text>
-        </view>
-        <!-- 截止日期 -->
-        <view class="footer-item" wx:if="{{item.deadline}}">
-          <text class="footer-icon">📅</text>
-          <text class="footer-text deadline-{{getDeadlineColor(item.deadline)}}">
-            {{item.deadline}}
-          </text>
+        <view class="inno-feedback-row">
+          <input
+            class="inno-input inno-feedback-input"
+            value="{{adviceForm.feedback}}"
+            placeholder="塾主周报总评（选填）"
+            data-field="feedback"
+            bindinput="onAdviceFormInput"
+          />
+          <view class="group-join-btn" bindtap="onSubmitAttendAdvice">💬 送出互评</view>
+          <view class="group-join-btn" bindtap="onSubmitAttendFeedback">🏅 塾主评议</view>
         </view>
       </view>
+    </view>
+  </view>
 
-      <!-- 认领按钮（未认领时显示） -->
+  <!-- 101-group.md: 小组详情与成员看板弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showGroupDetailModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-top-row">
+        <view class="inno-modal-title">🏛️ {{activeGroupDetail.groupname || '共创小组详情'}}</view>
+        <view class="group-join-btn" bindtap="onOpenEditGroupModal">✏️ 编辑小组</view>
+      </view>
+      <view class="inno-modal-sub">{{activeGroupDetail.type}} · 先修要求：{{activeGroupDetail.must_course || '无'}}</view>
+
+      <view class="inno-field-label">小组使命与研究方向</view>
+      <view class="inno-mission-box">
+        {{activeGroupDetail.desc || '围绕真实场景课题展开协作共创与同行评议。'}}
+      </view>
+
+      <view class="inno-field-label inno-field-label-spaced">小组成员 ({{groupDetailMembers.length}})</view>
+      <view wx:if="{{groupDetailMembers.length === 0}}" class="inno-empty-inline">
+        欢迎第一位正式入组伙伴！
+      </view>
       <view
-        class="claim-btn"
-        wx:if="{{!item.taker && !item.finish_date}}"
-        catchtap="claimProject"
-        data-id="{{item.id}}"
-        data-index="{{index}}"
+        wx:for="{{groupDetailMembers}}"
+        wx:key="id"
+        class="inno-list-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
       >
-        认领
+        <text class="inno-list-row-main">👤 {{item.username}} ({{item.role || '成员'}})</text>
+        <text class="inno-list-row-sub">入组：{{item.join_time || '近期'}}</text>
+      </view>
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 关闭</view>
       </view>
     </view>
+  </view>
 
-    <!-- 加载更多 -->
-    <view class="list-loading" wx:if="{{listLoading}}">
-      <t-loading theme="circular" size="32rpx" text="加载中..." />
+  <!-- 105-edit-group.md: 创建/编辑共创小组弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showCreateGroupModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-title">{{createGroupForm.isEdit ? '✏️ 编辑共创小组' : '🌱 申请创建共创小组'}}</view>
+      <view class="inno-field-label">小组名称 *</view>
+      <input
+        class="inno-input"
+        value="{{createGroupForm.groupname}}"
+        placeholder="例如：AI 多模态智能体组"
+        data-field="groupname"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label">小组类别</view>
+      <input
+        class="inno-input"
+        value="{{createGroupForm.type}}"
+        placeholder="工程组 / 研究组 / 课程组"
+        data-field="type"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label" wx:if="{{createGroupForm.isEdit}}">建议先修课程</view>
+      <input
+        wx:if="{{createGroupForm.isEdit}}"
+        class="inno-input"
+        value="{{createGroupForm.must_course}}"
+        placeholder="例如：Python 基础、FastAPI 实战"
+        data-field="must_course"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-field-label">小组简介与共创目标 *</view>
+      <textarea
+        class="inno-textarea"
+        value="{{createGroupForm.desc}}"
+        placeholder="描述小组的研究课题、协作方式与产出目标..."
+        maxlength="600"
+        data-field="desc"
+        bindinput="onCreateGroupFormInput"
+      />
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 取消</view>
+        <view class="inno-modal-btn confirm" bindtap="onSubmitCreateOrSaveGroup">
+          {{submittingCreateGroup ? '⏳ 保存中...' : '✅ 确认提交'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 104-project.md: 个人工时清单与打卡明细弹窗 -->
+  <view class="inno-modal-mask" wx:if="{{showTimeModal}}" bindtap="onCloseInnoModals">
+    <view class="inno-modal-card" catchtap="noop">
+      <view class="inno-modal-title">⏱️ 我的创新工时清单</view>
+      <view class="inno-modal-sub">累计课题投入与工时结算记录</view>
+
+      <view class="inno-field-label">📋 课题工时汇总 ({{docketsList.length}})</view>
+      <view wx:if="{{docketsList.length === 0}}" class="inno-empty-inline">
+        暂无已登记的课题工时汇总
+      </view>
+      <view
+        wx:for="{{docketsList}}"
+        wx:key="id"
+        class="inno-list-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+      >
+        <text class="inno-list-row-main">{{item.task_serial}} · {{item.title}}</text>
+        <text class="inno-list-row-teal">{{item.total_hour || 0}}h ({{item.status}})</text>
+      </view>
+
+      <view class="inno-field-label inno-field-label-spaced">🕒 最近工时打卡明细 ({{timeRecordsList.length}})</view>
+      <view wx:if="{{timeRecordsList.length === 0}}" class="inno-empty-inline">
+        暂无打卡明细记录
+      </view>
+      <view
+        wx:for="{{timeRecordsList}}"
+        wx:key="id"
+        class="inno-record-row {{index % 2 === 0 ? 'zs-row-odd' : 'zs-row-even'}}"
+      >
+        <text>{{item.task_serial}} {{item.project}}</text>
+        <text>{{item.duration || 0}} 分钟 · {{item.status}}</text>
+      </view>
+
+      <view class="inno-modal-actions">
+        <view class="inno-modal-btn cancel" bindtap="onCloseInnoModals">✕ 关闭</view>
+      </view>
     </view>
   </view>
 

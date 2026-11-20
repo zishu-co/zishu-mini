@@ -1,22 +1,30 @@
-/* pages/finish-course/index.wxss */
-/* spec: specs/miniprogram/active/001-port-finish-course.md */
+/* pages/finish-course/index.wxss — 荣誉结课与证书生成旗舰视觉 */
 
 .finish-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40rpx 20rpx;
+  background: linear-gradient(135deg, #2e1065 0%, #5b21b6 48%, #7c3aed 100%);
+  padding: 28rpx 0 calc(env(safe-area-inset-bottom) + 60rpx);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
 }
 
 .finish-card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  max-width: 560rpx;
-  width: 100%;
-  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(251, 207, 232, 0.5) 0%, transparent 52%),
+    radial-gradient(circle at 0% 100%, rgba(196, 181, 253, 0.44) 0%, transparent 52%),
+    linear-gradient(180deg, #fffbfe 0%, #f8f4ff 100%);
+  border-radius: 44rpx;
+  padding: 44rpx 36rpx;
+  margin: 12rpx 28rpx 24rpx;
+  width: calc(100% - 56rpx);
+  box-sizing: border-box;
+  box-shadow:
+    0 28rpx 68rpx rgba(15, 23, 42, 0.28),
+    inset 0 3rpx 0 #ffffff;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
 }
 
 .finish-header {
@@ -25,13 +33,13 @@
 }
 
 .congrats-icon {
-  font-size: 144rpx;
+  font-size: 96rpx;
   margin-bottom: 10rpx;
   line-height: 1;
 }
 
 .finish-title {
-  font-size: 60rpx;
+  font-size: 40rpx;
   color: #333;
   font-weight: bold;
   margin-bottom: 8rpx;
@@ -39,25 +47,89 @@
 
 .subtitle {
   color: #666;
-  font-size: 45rpx;
+  font-size: 30rpx;
 }
 
 .blessing-section {
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  background: linear-gradient(145deg, #ffffff 0%, #fff5fa 48%, #f8f0ff 100%);
+  border: 2rpx solid rgba(236, 72, 153, 0.22);
+  border-radius: 28rpx;
+  padding: 26rpx;
   margin-bottom: 24rpx;
+  box-shadow:
+    0 10rpx 24rpx rgba(168, 85, 247, 0.08),
+    inset 0 3rpx 0 #ffffff;
 }
 
 .blessing-text {
-  color: #444;
-  font-size: 42rpx;
-  line-height: 1.8;
+  color: #4c1d95;
+  font-size: 26rpx;
+  line-height: 1.75;
   text-align: center;
+  display: block;
+}
+
+/* 结课通关 Step 清单 */
+.checklist-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(145deg, #f3f0ff 0%, #e8efff 50%, #e6f9ff 100%);
+  border-radius: 28rpx;
+  padding: 22rpx 28rpx;
+  margin-bottom: 28rpx;
+  border: 2rpx solid rgba(96, 165, 250, 0.26);
+  box-shadow:
+    0 10rpx 24rpx rgba(96, 165, 250, 0.08),
+    inset 0 3rpx 0 #ffffff;
+}
+
+.checklist-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.checklist-dot {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #7c3aed;
+  font-size: 22rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checklist-step.done .checklist-dot {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  color: #ffffff;
+}
+
+.checklist-label {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #6b6380;
+  white-space: nowrap;
+}
+
+.checklist-step.done .checklist-label {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.checklist-line {
+  flex: 1;
+  height: 3rpx;
+  background: #ddd6fe;
+  margin: 0 16rpx 24rpx;
 }
 
 .section-title {
-  font-size: 48rpx;
+  font-size: 32rpx;
   color: #333;
   font-weight: bold;
   margin-bottom: 16rpx;
@@ -90,25 +162,27 @@
 
 .quiz-label {
   color: #666;
-  font-size: 42rpx;
+  font-size: 28rpx;
   margin-right: 8rpx;
 }
 
 .quiz-score {
-  font-size: 60rpx;
+  font-size: 40rpx;
   font-weight: bold;
 }
 
 .quiz-score.no-attempt {
   color: #999;
-  font-size: 45rpx;
+  font-size: 30rpx;
 }
 
 .quiz-status-tag {
-  font-size: 36rpx;
+  font-size: 23rpx;
   padding: 4rpx 20rpx;
   border-radius: 20rpx;
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* 三色样式 */
@@ -139,45 +213,71 @@
   color: #389e0d;
 }
 
+button.quiz-btn,
 .quiz-btn {
   width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
   margin-top: 16rpx;
-  background: #fff;
-  color: #667eea;
-  border: 1rpx solid #667eea;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  color: #6d28d9;
+  border: 2rpx solid rgba(124, 58, 237, 0.28);
+  border-radius: 999rpx;
+  font-size: 27rpx;
+  font-weight: 800;
+  box-shadow: 0 6rpx 16rpx rgba(124, 58, 237, 0.1), inset 0 2rpx 0 #ffffff;
+}
+
+.quiz-btn::after {
+  border: none;
 }
 
 /* 作业输入 */
 .homework-tip {
-  color: #666;
-  font-size: 39rpx;
+  color: #475569;
+  font-size: 26rpx;
   margin-bottom: 12rpx;
 }
 
 .homework-input-row {
   display: flex;
-  gap: 12rpx;
+  gap: 14rpx;
   align-items: center;
 }
 
 .homework-input {
   flex: 1;
-  border: 1rpx solid #dcdfe6;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  height: 72rpx;
-  font-size: 42rpx;
-  background: #fff;
+  border: 2rpx solid rgba(192, 132, 252, 0.32);
+  border-radius: 999rpx;
+  padding: 0 28rpx;
+  height: 78rpx;
+  font-size: 27rpx;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    inset 0 2rpx 6rpx rgba(124, 58, 237, 0.05),
+    0 4rpx 14rpx rgba(168, 85, 247, 0.06);
 }
 
+button.submit-btn,
 .submit-btn {
-  background: #667eea;
+  width: auto !important;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%);
   color: #fff;
-  border-radius: 8rpx;
-  font-size: 42rpx;
-  min-width: 120rpx;
-  height: 72rpx;
-  line-height: 72rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+  padding: 0 36rpx;
+  min-width: 140rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  box-shadow:
+    0 8rpx 20rpx rgba(124, 58, 237, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+}
+
+.submit-btn::after {
+  border: none;
 }
 
 .homework-submitted {
@@ -185,19 +285,19 @@
   align-items: center;
   gap: 8rpx;
   margin-top: 8rpx;
-  font-size: 39rpx;
+  font-size: 26rpx;
   color: #666;
   flex-wrap: wrap;
 }
 
 .check-icon {
-  color: #67c23a;
+  color: #7c3aed;
   font-weight: bold;
-  font-size: 48rpx;
+  font-size: 32rpx;
 }
 
 .homework-link {
-  color: #667eea;
+  color: #7c3aed;
   word-break: break-all;
   flex: 1;
   min-width: 0;
@@ -215,7 +315,7 @@
 
 .ark-tip text {
   color: #8a6608;
-  font-size: 39rpx;
+  font-size: 26rpx;
 }
 
 /* 结课证书 */
@@ -236,38 +336,49 @@
 }
 
 .cert-title {
-  font-size: 57rpx;
+  font-size: 38rpx;
   color: #8a6608;
   font-weight: bold;
+  margin-bottom: 6rpx;
+}
+
+.cert-serial {
+  font-size: 20rpx;
+  color: #a1802b;
+  letter-spacing: 2rpx;
   margin-bottom: 12rpx;
 }
 
 .cert-name {
-  font-size: 54rpx;
+  font-size: 36rpx;
   color: #333;
   margin-bottom: 8rpx;
   font-weight: bold;
 }
 
 .cert-course {
-  font-size: 42rpx;
+  font-size: 28rpx;
   color: #666;
   margin-bottom: 12rpx;
 }
 
 .cert-date {
-  font-size: 36rpx;
+  font-size: 24rpx;
   color: #999;
 }
 
 .download-btn {
   width: 100%;
-  background: #fff;
-  color: #d4af37;
-  border: 1rpx solid #d4af37;
-  margin-bottom: 24rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  color: #b45309;
+  border: 2rpx solid #f59e0b;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  margin: 0 0 24rpx;
+  height: 84rpx;
+  line-height: 84rpx;
+  box-shadow: 0 6rpx 18rpx rgba(245, 158, 11, 0.16);
 }
 
 /* 确认结课 */
@@ -278,85 +389,24 @@
 .confirm-btn {
   width: 100%;
   height: 88rpx;
-  font-size: 48rpx;
-  background: #67c23a;
+  font-size: 32rpx;
+  font-weight: 600;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
   color: #fff;
   border: none;
-  border-radius: 8rpx;
+  border-radius: 44rpx;
   margin-bottom: 16rpx;
   line-height: 88rpx;
+  box-shadow: 0 8rpx 24rpx rgba(124, 58, 237, 0.3);
+}
+
+.confirm-btn::after {
+  border: none;
 }
 
 .confirm-tip {
   color: #999;
-  font-size: 33rpx;
-}
-
-/* 已结课艺术化 label */
-.finished-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: 16rpx;
-}
-
-.finished-ribbon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-  width: 100%;
-  padding: 20rpx 0;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ffecd2 100%);
-  border: 3rpx solid #e8a87c;
-  border-radius: 16rpx;
-  box-shadow: 0 4rpx 20rpx rgba(232, 168, 124, 0.35);
-  position: relative;
-  overflow: hidden;
-}
-
-.finished-ribbon::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 25%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 50%,
-    transparent 100%
-  );
-  animation: ribbon-shine 2.5s ease-in-out infinite;
-}
-
-@keyframes ribbon-shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.finished-star {
-  font-size: 48rpx;
-  line-height: 1;
-}
-
-.finished-text {
-  font-size: 52rpx;
-  font-weight: bold;
-  color: #5a3e2b;
-  letter-spacing: 12rpx;
-  text-shadow: 2rpx 2rpx 0 rgba(255, 255, 255, 0.6);
-}
-
-.finished-badge {
-  display: block;
-  font-size: 36rpx;
-  color: #e8a87c;
-  font-weight: bold;
+  font-size: 22rpx;
 }
 
 /* 加载中 */
@@ -364,5 +414,175 @@
   padding: 100rpx 0;
   text-align: center;
   color: #fff;
+  font-size: 28rpx;
+}
+
+/* 荣誉证书弹窗与离屏 Canvas */
+.cert-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 18, 56, 0.56);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100;
+}
+
+.cert-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 640rpx;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cert-modal-card {
+  width: 100%;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(253, 230, 138, 0.45) 0%, transparent 52%),
+    linear-gradient(160deg, #fffdf7 0%, #fef7e6 55%, #fff5fa 100%);
+  border: 6rpx solid #d4af37;
+  border-radius: 44rpx;
+  padding: 46rpx 36rpx;
+  text-align: center;
+  box-shadow:
+    0 28rpx 72rpx rgba(212, 175, 55, 0.32),
+    inset 0 3rpx 0 #ffffff;
+}
+
+.cert-modal-badge {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #b48a1e;
+  letter-spacing: 3rpx;
+  margin-bottom: 8rpx;
+}
+
+.cert-modal-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #785604;
+  margin-bottom: 8rpx;
+}
+
+.cert-modal-serial {
+  font-size: 22rpx;
+  color: #9a7b2c;
+  margin-bottom: 20rpx;
+}
+
+.cert-modal-divider {
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  margin-bottom: 28rpx;
+}
+
+.cert-modal-recipient {
   font-size: 42rpx;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 20rpx;
+}
+
+.cert-modal-body {
+  font-size: 26rpx;
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 36rpx;
+}
+
+.cert-modal-course {
+  color: #6d28d9;
+  font-weight: 700;
+}
+
+.cert-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16rpx;
+}
+
+.cert-modal-date {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.cert-modal-seal {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  border: 4rpx solid #dc2626;
+  color: #dc2626;
+  font-size: 22rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.25;
+  transform: rotate(-12deg);
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.cert-modal-actions {
+  display: flex;
+  gap: 20rpx;
+  width: 100%;
+  margin-top: 28rpx;
+}
+
+.cert-action-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  border: none;
+}
+
+.cert-action-btn::after {
+  border: none;
+}
+
+.cert-action-btn.copy {
+  background: linear-gradient(145deg, #ffffff 0%, #f5f0ff 100%);
+  color: #7c3aed;
+  border: 2rpx solid rgba(167, 139, 250, 0.36);
+  box-shadow: inset 0 2rpx 0 #ffffff;
+}
+
+.cert-action-btn.save {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  box-shadow:
+    0 12rpx 28rpx rgba(217, 119, 6, 0.28),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+}
+
+.cert-modal-close {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2rpx solid rgba(255, 255, 255, 0.36);
+  border-radius: 999rpx;
+  padding: 12rpx 36rpx;
+}
+
+.offscreen-canvas {
+  position: fixed;
+  left: -9999rpx;
+  top: -9999rpx;
+  width: 600px;
+  height: 800px;
 }
