@@ -105,7 +105,7 @@
   >
     <view
       class="exam-sheet-card"
-      catchtap=""
+      catchtap="noop"
     >
       <view class="exam-sheet-header">
         <text class="exam-sheet-title">✨ 共创出题 · 贡献题库题目</text>
@@ -200,15 +200,15 @@
   <view
     wx:if="{{showAssemblePaperModal}}"
     class="exam-sheet-mask"
-    bindtap="onCloseAddQuesModal"
+    bindtap="onCloseAssemblePaperModal"
   >
     <view
       class="exam-sheet-card"
-      catchtap=""
+      catchtap="noop"
     >
       <view class="exam-sheet-header">
         <text class="exam-sheet-title">📑 题库组卷 · 发布闯关试卷</text>
-        <text class="exam-sheet-close" bindtap="onCloseAddQuesModal">✕</text>
+        <text class="exam-sheet-close" bindtap="onCloseAssemblePaperModal">✕</text>
       </view>
 
       <view class="exam-form-group">

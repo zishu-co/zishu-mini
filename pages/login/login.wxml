@@ -7,13 +7,13 @@
 
   <view class="header">
     <view class="welcome-text">
-      <view class="welcome-title">{{isDev ? '开发者登录' : '欢迎登录'}}</view>
-      <view class="welcome-subtitle">{{isDev ? 'Dev 模式 · 选择登录方式' : '授权登录后体验更多精彩功能'}}</view>
+      <view class="welcome-title">{{mode === 'register' ? '完善注册信息' : (isDev ? '开发者登录' : '欢迎登录')}}</view>
+      <view class="welcome-subtitle">{{mode === 'register' ? '首次登录 · 补充性别、邮箱与密码即可直接进入' : (isDev ? 'Dev 模式 · 选择登录方式' : '授权头像昵称与手机号，即刻开启共学之旅')}}</view>
     </view>
   </view>
 
-  <!-- ====== 登录方式 radio 选择（支持微信授权与手机号密码双通道） ====== -->
-  <view class="login-method-selector">
+  <!-- ====== 登录方式切换（支持微信授权与手机号密码双通道） ====== -->
+  <view class="login-method-selector" wx:if="{{mode === 'login'}}">
     <radio-group bindchange="onLoginMethodChange">
       <view class="method-option {{loginMethod === 'wechat' ? 'selected' : ''}}" bindtap="selectWechat">
         <radio value="wechat" checked="{{loginMethod === 'wechat'}}" color="#7c3aed" />
@@ -26,60 +26,144 @@
     </radio-group>
   </view>
 
-  <!-- ====== 微信授权登录 ====== -->
-  <block wx:if="{{loginMethod === 'wechat'}}">
+  <!-- ====== 微信授权登录 & 新用户原地注册流程 ====== -->
+  <block wx:if="{{loginMethod === 'wechat' || mode === 'register'}}">
     <view class="auth-section">
-      <!-- 头像授权 -->
+      <!-- 1. 头像授权 -->
       <view class="auth-item">
-        <view class="auth-title">头像授权</view>
+        <view class="auth-title-row">
+          <view class="auth-title">头像授权</view>
+          <view class="auth-status success" wx:if="{{avatarUrl}}">已完成</view>
+          <view class="auth-status" wx:else>待授权</view>
+        </view>
         <view class="auth-content" wx:if="{{avatarUrl}}">
           <view class="user-info">
             <image class="avatar" src="{{avatarUrl}}"></image>
-            <view class="nickname">已获取头像</view>
+            <view class="nickname">已获取微信头像</view>
           </view>
-          <view class="auth-status success">已完成</view>
+          <button class="auth-btn auth-btn-sm" open-type="chooseAvatar" bindchooseavatar="getAvatar">更换头像</button>
         </view>
         <view class="auth-content" wx:else>
           <view class="auth-desc">用于展示您的个人形象</view>
-          <button class="pop_avatar" wx:if="{{!avatarUrl}}" open-type="chooseAvatar" bindchooseavatar="getAvatar">📸 获取头像</button>
-          <view class="auth-status">待授权</view>
+          <button class="pop_avatar" open-type="chooseAvatar" bindchooseavatar="getAvatar">📸 获取头像</button>
         </view>
       </view>
 
-      <!-- 昵称授权 -->
+      <!-- 1. 昵称授权 -->
       <view class="auth-item">
-        <view class="auth-title">昵称授权</view>
-        <view class="auth-content">
+        <view class="auth-title-row">
+          <view class="auth-title">昵称授权</view>
+          <view class="auth-status success" wx:if="{{hasNickName && !regNameError}}">已完成</view>
+          <view class="auth-status" wx:else>{{mode === 'register' ? '必填' : '待授权'}}</view>
+        </view>
+        <view class="auth-content auth-content-col">
           <input
             type="nickname"
-            class="ipu"
-            placeholder="点击获取或输入昵称"
+            maxlength="20"
+            class="ipu {{mode === 'register' && regNameError ? 'has-error' : ''}}"
+            placeholder="点击获取微信昵称或输入昵称"
             value="{{nickName || ''}}"
             bindinput="getName"
             bindchange="getName"
-            bindblur="getName"
+            bindblur="onNickNameBlur"
           />
-          <view class="auth-status success" wx:if="{{hasUserInfo && nickName}}">已完成</view>
-          <view class="auth-status" wx:else>待授权</view>
+          <view class="form-error" wx:if="{{mode === 'register' && regNameError}}">{{regNameError}}</view>
         </view>
       </view>
 
-      <!-- 手机号授权 -->
+      <!-- 2. 手机号授权 -->
       <view class="auth-item">
-        <view class="auth-title">手机号授权</view>
+        <view class="auth-title-row">
+          <view class="auth-title">手机号授权</view>
+          <view class="auth-status success" wx:if="{{hasPhoneNumber}}">已完成</view>
+          <view class="auth-status" wx:else>待授权</view>
+        </view>
         <view class="auth-content" wx:if="{{hasPhoneNumber}}">
           <view class="user-info">
-            <view class="phone-info">{{phoneNumber}}</view>
+            <view class="phone-info">{{phoneNumber || '已授权手机号'}}</view>
           </view>
           <button class="auth-btn auth-btn-sm" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">🔄 重新授权</button>
-          <view class="auth-status success">已完成</view>
         </view>
         <view class="auth-content" wx:else>
-          <view class="auth-desc">{{phoneNumber ? ('当前号码 ' + phoneNumber + '，请点击授权刷新凭证') : '用于接收订单通知'}}</view>
+          <view class="auth-desc">{{phoneNumber ? ('当前号码 ' + phoneNumber + '，点击授权登录') : '老用户直接进入，新用户原地注册'}}</view>
           <button class="auth-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">📱 一键授权</button>
-          <view class="auth-status">待授权</view>
         </view>
       </view>
+
+      <!-- 4. 用户不存在时：原地展开性别、邮箱、密码（不提示用户不存在，不弹入塾申请半弹窗） -->
+      <block wx:if="{{mode === 'register'}}">
+        <!-- 性别 -->
+        <view class="auth-item">
+          <view class="auth-title-row">
+            <view class="auth-title">性别</view>
+            <view class="auth-status success" wx:if="{{regGender}}">已完成</view>
+            <view class="auth-status" wx:else>必选</view>
+          </view>
+          <view class="auth-content auth-content-col">
+            <view class="gender-options">
+              <view
+                class="gender-option {{regGender === '男' ? 'selected' : ''}}"
+                data-gender="男"
+                bindtap="onSelectRegGender"
+              >
+                <text class="gender-label">🚹 男</text>
+              </view>
+              <view
+                class="gender-option {{regGender === '女' ? 'selected' : ''}}"
+                data-gender="女"
+                bindtap="onSelectRegGender"
+              >
+                <text class="gender-label">🚺 女</text>
+              </view>
+            </view>
+            <view class="form-error" wx:if="{{regGenderError}}">{{regGenderError}}</view>
+          </view>
+        </view>
+
+        <!-- 邮箱 -->
+        <view class="auth-item">
+          <view class="auth-title-row">
+            <view class="auth-title">邮箱</view>
+            <view class="auth-status success" wx:if="{{emailValid}}">已完成</view>
+            <view class="auth-status" wx:else>必填</view>
+          </view>
+          <view class="auth-content auth-content-col">
+            <input
+              class="ipu reg-ipu {{regEmailError ? 'has-error' : ''}}"
+              type="text"
+              placeholder="请输入常用邮箱（如 name@example.com）"
+              value="{{regEmail}}"
+              bindinput="onRegEmailInput"
+              bindblur="onEmailBlur"
+            />
+            <view class="form-error" wx:if="{{regEmailError}}">{{regEmailError}}</view>
+          </view>
+        </view>
+
+        <!-- 密码 -->
+        <view class="auth-item">
+          <view class="auth-title-row">
+            <view class="auth-title">密码</view>
+            <view class="auth-status success" wx:if="{{pwdValid}}">已完成</view>
+            <view class="auth-status" wx:else>必填</view>
+          </view>
+          <view class="auth-content auth-content-col">
+            <view class="pwd-input-wrap">
+              <input
+                class="ipu reg-ipu pwd-ipu {{regPasswordError ? 'has-error' : ''}}"
+                type="text"
+                password="{{!showRegPwd}}"
+                placeholder="请设置登录密码（至少6位）"
+                value="{{regPassword}}"
+                bindinput="onRegPasswordInput"
+                bindblur="onPasswordBlur"
+              />
+              <view class="pwd-toggle" catchtap="toggleShowRegPwd">{{showRegPwd ? '🙈' : '👁️'}}</view>
+            </view>
+            <view class="form-error" wx:if="{{regPasswordError}}">{{regPasswordError}}</view>
+          </view>
+        </view>
+      </block>
     </view>
 
     <view class="footer">
@@ -95,17 +179,34 @@
           <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
         </view>
       </view>
-      
-      <button class="complete-btn {{privacyAgreed ? 'active' : ''}}" bindtap="completeLogin" disabled="{{!privacyAgreed}}">🚀 完成授权并进入</button>
-      <view class="login-sub-links">
-        <text class="login-sub-link" bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
-        <text class="login-sub-link" bindtap="onOpenResetModal">🔑 忘记密码重置</text>
-      </view>
+
+      <!-- 登录模式主按钮 -->
+      <block wx:if="{{mode === 'login'}}">
+        <button
+          class="complete-btn {{privacyAgreed && hasPhoneNumber ? 'active' : ''}}"
+          bindtap="completeLogin"
+        >🚀 完成授权并进入</button>
+      </block>
+
+      <!-- 注册模式主按钮：直接注册并登录 -->
+      <block wx:if="{{mode === 'register'}}">
+        <view class="reg-error-msg" wx:if="{{regErrorMsg}}">{{regErrorMsg}}</view>
+        <button
+          class="complete-btn {{canRegister ? 'active' : ''}}"
+          loading="{{regSubmitting}}"
+          disabled="{{regSubmitting}}"
+          bindtap="submitRegister"
+        >{{regSubmitting ? '⏳ 注册登录中...' : '🚀 注册并登录'}}</button>
+        <view class="reg-hint">
+          <text>已有其他手机号账号？</text>
+          <text class="link" bindtap="onBackToLogin">返回重新登录</text>
+        </view>
+      </block>
     </view>
   </block>
 
   <!-- ====== 手机号+密码登录 ====== -->
-  <block wx:if="{{loginMethod === 'password'}}">
+  <block wx:if="{{mode === 'login' && loginMethod === 'password'}}">
     <view class="dev-login-form">
       <view class="form-item">
         <input
@@ -150,7 +251,6 @@
 
       <view class="dev-hint">
         <view class="login-sub-links login-sub-links-dev">
-          <text class="login-sub-link" bindtap="onOpenRegiModal">🌱 新塾员注册申请</text>
           <text class="login-sub-link" bindtap="onOpenResetModal">🔑 忘记密码重置</text>
         </view>
         <block wx:if="{{isDev}}">
@@ -161,85 +261,7 @@
     </view>
   </block>
 
-  <!-- 101-regi.md: 新塾员注册申请弹窗 -->
-  <view
-    wx:if="{{showRegiModal}}"
-    class="login-sheet-mask"
-    bindtap="onCloseRegiModal"
-  >
-    <view
-      class="login-sheet-card"
-      catchtap=""
-    >
-      <view class="login-sheet-header">
-        <text class="login-sheet-title">🌱 新塾员入塾注册申请</text>
-        <text class="login-sheet-close" bindtap="onCloseRegiModal">✕</text>
-      </view>
-      <view class="login-sheet-field">
-        <input
-          class="login-sheet-input"
-          placeholder="姓名 / 昵称 *"
-          value="{{regiForm.name}}"
-          data-field="name"
-          bindinput="onRegiFieldInput"
-        />
-      </view>
-      <view class="login-gender-row">
-        <view
-          wx:for="{{['男','女']}}"
-          wx:key="*this"
-          data-gender="{{item}}"
-          bindtap="onSelectRegiGender"
-          class="login-gender-pill {{regiForm.gender === item ? 'active' : ''}}"
-        >{{item === '男' ? '🚹 男生' : '🚺 女生'}}</view>
-      </view>
-      <view class="login-sheet-field">
-        <input
-          class="login-sheet-input"
-          type="number"
-          maxlength="11"
-          placeholder="11位手机号码 *"
-          value="{{regiForm.phone}}"
-          data-field="phone"
-          bindinput="onRegiFieldInput"
-        />
-      </view>
-      <view class="login-sheet-field">
-        <input
-          class="login-sheet-input"
-          placeholder="常用邮箱（选填）"
-          value="{{regiForm.email}}"
-          data-field="email"
-          bindinput="onRegiFieldInput"
-        />
-      </view>
-      <view class="login-sheet-field">
-        <input
-          class="login-sheet-input"
-          password="{{true}}"
-          placeholder="设置登录密码（至少4位）*"
-          value="{{regiForm.password}}"
-          data-field="password"
-          bindinput="onRegiFieldInput"
-        />
-      </view>
-      <view class="login-sheet-field login-sheet-field-last">
-        <input
-          class="login-sheet-input"
-          placeholder="入塾初心或共学期待（选填）"
-          value="{{regiForm.notes}}"
-          data-field="notes"
-          bindinput="onRegiFieldInput"
-        />
-      </view>
-      <button
-        class="login-sheet-submit"
-        bindtap="onSubmitRegister"
-      >{{submittingRegi ? '⏳ 提交中...' : '🚀 提交入塾申请'}}</button>
-    </view>
-  </view>
-
-  <!-- 111-reset-pass.md: 忘记密码重置弹窗 -->
+  <!-- 111-reset-pass.md: 忘记密码重置弹窗（catchtap="noop" 阻止点击穿透关闭） -->
   <view
     wx:if="{{showResetModal}}"
     class="login-sheet-mask"
@@ -247,7 +269,7 @@
   >
     <view
       class="login-sheet-card"
-      catchtap=""
+      catchtap="noop"
     >
       <view class="login-sheet-header">
         <text class="login-sheet-title">🔑 申请重置密码</text>

@@ -144,6 +144,8 @@ Page<IReportDetailPageData, any>({
     });
   },
 
+  noop() {},
+
   onOpenJiandaModal() {
     this.setData({ showJiandaModal: true });
   },

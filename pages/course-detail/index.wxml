@@ -241,11 +241,11 @@
   </view>
 
   <!-- 同塾操作面板：自定义样式替代微信原生 action sheet -->
-  <view class="classmate-overlay" wx:if="{{showClassmateMenu}}" catchtouchmove="onClassmateTouchMove">
-    <view class="classmate-mask" bindtap="onCloseClassmateMenu" aria-label="关闭同塾操作菜单"></view>
-    <view class="classmate-sheet" aria-role="dialog" aria-label="同塾共学操作">
-      <view class="classmate-sheet__handle"></view>
-      <view class="classmate-sheet__header">
+  <view class="classmate-overlay" wx:if="{{showClassmateMenu}}">
+    <view class="classmate-mask" bindtap="onCloseClassmateMenu" catchtouchmove="onClassmateTouchMove" aria-label="关闭同塾操作菜单"></view>
+    <view class="classmate-sheet" catchtap="noop" aria-role="dialog" aria-label="同塾共学操作">
+      <view class="classmate-sheet__handle" catchtouchmove="onClassmateTouchMove"></view>
+      <view class="classmate-sheet__header" catchtouchmove="onClassmateTouchMove">
         <view class="classmate-sheet__heading">
           <view class="classmate-sheet__title">和 {{classmateUserName}} 一起共学</view>
           <view class="classmate-sheet__subtitle">从一次交流，开启同塾同行</view>
@@ -284,7 +284,7 @@
 
   <!-- ========== 选择塾师弹窗 Modal ========== -->
   <view class="mentor-modal-mask" wx:if="{{showMentorModal}}" bindtap="onCloseMentorModal"></view>
-  <view class="mentor-modal" wx:if="{{showMentorModal}}">
+  <view class="mentor-modal" wx:if="{{showMentorModal}}" catchtap="noop">
     <view class="mentor-modal__header">
       <view>
         <view class="mentor-modal__title">选择领航塾师</view>
@@ -331,7 +331,7 @@
 
   <!-- ========== 塾主编辑课程弹窗 Modal ========== -->
   <view class="mentor-modal-mask" wx:if="{{showEditModal}}" bindtap="onCloseEditModal"></view>
-  <view class="mentor-modal" wx:if="{{showEditModal}}">
+  <view class="mentor-modal" wx:if="{{showEditModal}}" catchtap="noop">
     <view class="mentor-modal__header">
       <view>
         <view class="mentor-modal__title">编辑课程信息</view>

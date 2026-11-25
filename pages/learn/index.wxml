@@ -175,7 +175,7 @@
     <view class="learn-modal-backdrop" bindtap="onCloseLearningModal" catchtouchmove="onModalTouchMove"></view>
 
   <!-- 选塾师弹窗 -->
-  <view class="learn-dialog" wx:if="{{showMentorModal}}" aria-role="dialog" aria-label="选择塾师">
+  <view class="learn-dialog" wx:if="{{showMentorModal}}" catchtap="noop" aria-role="dialog" aria-label="选择塾师">
     <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">选择塾师</text>
       <button class="modal-close" bindtap="onCloseMentorModal" aria-label="关闭选择塾师">✕</button>
@@ -199,7 +199,7 @@
   </view>
 
   <!-- 申报学时弹窗 -->
-  <view class="learn-dialog learn-dialog--report" wx:elif="{{showReportModal}}" aria-role="dialog" aria-label="申报学时">
+  <view class="learn-dialog learn-dialog--report" wx:elif="{{showReportModal}}" catchtap="noop" aria-role="dialog" aria-label="申报学时">
     <view class="modal-header" catchtouchmove="onModalTouchMove">
       <text class="modal-title">申报学时</text>
       <button class="modal-close" bindtap="onCloseReportModal" aria-label="关闭申报学时">✕</button>
@@ -230,7 +230,7 @@
   </view>
 
   <!-- 102-camp.md: 进阶预备营弹窗（塾员预备营 / 塾师预备营 / 塾主预备营） -->
-  <view class="learn-dialog learn-dialog--camp" wx:elif="{{showCampModal}}" aria-role="dialog" aria-label="进阶预备营">
+  <view class="learn-dialog learn-dialog--camp" wx:elif="{{showCampModal}}" catchtap="noop" aria-role="dialog" aria-label="进阶预备营">
     <view class="modal-header" catchtouchmove="onModalTouchMove">
       <view class="learn-dialog__heading">
         <view class="modal-title">🏕️ 进阶预备营</view>
@@ -299,7 +299,7 @@
   </view>
 
   <!-- 103-edit-course.md: 塾主/塾师共创课程弹窗 -->
-    <view class="learn-dialog" wx:elif="{{showEditCourseModal}}" aria-role="dialog" aria-label="共创课程">
+    <view class="learn-dialog" wx:elif="{{showEditCourseModal}}" catchtap="noop" aria-role="dialog" aria-label="共创课程">
       <view class="modal-header" catchtouchmove="onModalTouchMove">
         <text class="modal-title">🛠️ 共创与发布自塾课程</text>
         <button class="modal-close" bindtap="onCloseEditCourseModal" aria-label="关闭共创课程">✕</button>

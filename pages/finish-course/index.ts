@@ -311,4 +311,6 @@ Page<IPageData, IPageData>({
       });
     }
   },
+
+  noop() {},
 });

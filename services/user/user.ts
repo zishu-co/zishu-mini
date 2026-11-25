@@ -448,6 +448,22 @@ export const deleteProfilePhoto = (filename: string) => {
 }
 
 /**
+ * v2.1: 小程序微信授权原地直接注册并登录
+ * POST /api/users/regi_miniprogram
+ */
+export const regiMiniProgram = (data: {
+  sessionkey: string
+  encryptedData: string
+  iv: string
+  name: string
+  email: string
+  gender: '男' | '女'
+  password?: string
+}) => {
+  return post('/api/users/regi_miniprogram', data)
+}
+
+/**
  * 101-regi.md: 新塾员注册申请
  * POST /api/users/register
  */

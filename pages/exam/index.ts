@@ -112,9 +112,17 @@ Page({
     });
   },
 
+  noop() {},
+
   onCloseAddQuesModal() {
     this.setData({
       showAddQuesModal: false,
+      showAssemblePaperModal: false,
+    });
+  },
+
+  onCloseAssemblePaperModal() {
+    this.setData({
       showAssemblePaperModal: false,
     });
   },

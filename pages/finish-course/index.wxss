@@ -427,7 +427,7 @@ button.submit-btn,
   background: rgba(30, 18, 56, 0.56);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 100;
+  z-index: 10000;
 }
 
 .cert-modal {
@@ -436,7 +436,7 @@ button.submit-btn,
   top: 50%;
   transform: translate(-50%, -50%);
   width: 640rpx;
-  z-index: 101;
+  z-index: 10001;
   display: flex;
   flex-direction: column;
   align-items: center;

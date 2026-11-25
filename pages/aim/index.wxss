@@ -288,7 +288,7 @@
   background: rgba(36, 16, 68, 0.42);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 200;
+  z-index: 10000;
 }
 
 .goal-modal {
@@ -305,7 +305,7 @@
   border-radius: 44rpx;
   padding: 28rpx 34rpx 36rpx;
   box-sizing: border-box;
-  z-index: 201;
+  z-index: 10001;
   overflow-y: auto;
   box-shadow:
     0 28rpx 72rpx -12rpx rgba(109, 40, 217, 0.26),

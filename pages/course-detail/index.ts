@@ -582,4 +582,6 @@ Page<IPageData, IPageData>({
       this.onGoArkGroup();
     }
   },
+
+  noop() {},
 });

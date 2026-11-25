@@ -55,8 +55,10 @@ App<IAppOption>({
     this.checkLoginStatus();
   },
 
-  // 检查登录状态
+  // 检查登录状态（带请求序号防并发竞态覆盖最新 sessionkey）
   checkLoginStatus(callback?: (uuid: string | null) => void) {
+    const reqSeq = ((this as any)._loginReqSeq || 0) + 1;
+    (this as any)._loginReqSeq = reqSeq;
     // 登录
     wx.login({
       success: res => {
@@ -76,12 +78,16 @@ App<IAppOption>({
             },
             timeout: 60000,
             success: (openidRes: any) => {
+              if ((that as any)._loginReqSeq !== reqSeq) {
+                return;
+              }
               console.log('调用openid的返回结果为：', openidRes);
               // 后端直接返回 UUID 字符串，不是 JSON 对象，所以 res.data 就是 UUID 本身
               const uuid = openidRes.data;
               console.log('session_uuid为：', uuid);
               if (uuid && typeof uuid === 'string') {
                 that.globalData.sessionkey = uuid;
+                (that.globalData as any).sessionkeyUpdatedAt = Date.now();
                 if (typeof callback === 'function') callback(uuid);
               } else {
                 if (typeof callback === 'function') callback(null);

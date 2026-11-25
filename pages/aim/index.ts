@@ -720,6 +720,8 @@ Page<IAimPageData, IAimData>({
       duration: 1800,
     });
   },
+
+  noop() {},
 });
 
 interface IAimPageData extends IAimData {}

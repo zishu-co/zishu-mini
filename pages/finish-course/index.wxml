@@ -119,7 +119,7 @@
 
   <!-- 荣誉证书预览与生成弹窗 -->
   <view class="cert-modal-mask" wx:if="{{showCertModal}}" bindtap="onCloseCertModal"></view>
-  <view class="cert-modal" wx:if="{{showCertModal}}">
+  <view class="cert-modal" wx:if="{{showCertModal}}" catchtap="noop">
     <view class="cert-modal-card">
       <view class="cert-modal-badge">🏅 ZISHU ACADEMY CERTIFICATE</view>
       <view class="cert-modal-title">自塾荣誉结课证书</view>

@@ -96,7 +96,7 @@
 
   <!-- 目标创建 / 编辑弹窗 -->
   <view class="goal-modal-mask" wx:if="{{showGoalModal}}" bindtap="onCloseGoalModal"></view>
-  <view class="goal-modal" wx:if="{{showGoalModal}}">
+  <view class="goal-modal" wx:if="{{showGoalModal}}" catchtap="noop">
     <view class="goal-modal-header">
       <text class="goal-modal-title">{{isEditingGoal ? '编辑目标' : '创建新目标'}}</text>
       <text class="goal-modal-close" bindtap="onCloseGoalModal">✕</text>

@@ -1,82 +1,71 @@
-# 登录页规格文档
+# 登录页规格文档（v2.1）
 
-## 1. 概述
+## 1. 目标
 
-- **功能描述**: 处理用户微信登录和手机号授权
-- **业务背景**: 需要获取用户信息和手机号才能使用完整功能
-- **优先级**: P0
+处理微信小程序用户的**微信授权登录**与**新用户原地自助注册直登**：
+1. 用户授权头像和昵称；
+2. 用户授权手机号；
+3. **老用户（手机号已存在）**：直接保存双 Token 与用户信息并进入首页（`/pages/aim/index`），无需二次点击停留；
+4. **新用户（手机号不存在）**：**不弹出“用户不存在”提示**，**不出现“提交入塾申请”半弹窗表单**，原地平滑展开**性别（男/女）、邮箱、密码（≥6位）**填写项，点击「注册并登录」后直接创建正式账号并登录进入首页。
 
-## 2. 页面结构
+---
 
-| 页面 | 路由 | 说明 |
-|-----|------|-----|
-| 登录页 | `/pages/login/login` | 非 TabBar 页面 |
+## 2. 验收标准
 
-## 3. 功能需求
+- [x] **第 1 步（头像与昵称授权）**：提供 `open-type="chooseAvatar"` 获取头像与 `type="nickname"` 获取/填写昵称
+- [x] **第 2 步（手机号授权）**：点击「一键授权」调用 `POST /api/users/token_miniprogram` 解密并校验手机号
+- [x] **第 3 步（已存在用户直登）**：当 `token_miniprogram` 返回 `200 OK` + `atoken` 时，持久化 `accessToken`/`refreshToken`/`userId`/`userInfo` 并**直接跳转进入首页**
+- [x] **第 4 步（未注册用户原地注册直登）**：
+  - 当 `token_miniprogram` 返回 `404` 或 `用户不存在` 时，**不弹任何“用户不存在” Toast**，且保留当前 `sessionkey`（不触发 `wx.login` 重置）
+  - 在手机号卡片下方**原地出现**填写 **性别（男/女）**、**邮箱**、**密码（≥6位）**，**不出现“提交入塾申请”的半弹窗表单**
+  - 点击「注册并登录」调用 `POST /api/users/regi_miniprogram`（并兼容同步密码与完整昵称），返回双 Token 后**直接登录跳转进入首页**
+- [x] **全站半弹窗防冒泡铁律**：凡遮罩层（`bindtap="onClose..."`）内嵌的半弹窗卡片，必须绑定有效的空方法 `catchtap="noop"`（严禁写空字符串 `catchtap=""`，因为微信小程序 WXML 对空字符串不绑定事件处理器，会导致点击文本框或卡片任意处冒泡触发遮罩关闭）
 
-### 3.1 核心功能
+---
 
-| 功能点 | 描述 | 验收标准 |
-|-------|------|---------|
-| 微信登录 | 获取用户微信信息 | 获取头像和昵称 |
-| 手机号授权 | 绑定用户手机号 | 获取加密手机号 |
-| 登录状态检查 | 检查是否已登录 | 已登录跳转首页 |
-| 自动登录 | 启动时自动检查登录态 | 自动跳转到对应页面 |
+## 3. 关键路径与接口契约
 
-### 3.2 用户交互流程
+### 3.1 用户交互状态流
 
 ```
-进入登录页 → 检查登录状态
-                  ↓
-        已登录 → 跳转到首页
-                  ↓ 未登录
-         显示登录按钮
-                  ↓
-         用户点击登录
-                  ↓
-         微信授权获取用户信息
-                  ↓
-         显示手机号绑定按钮
-                  ↓
-         用户点击绑定手机号
-                  ↓
-         保存用户信息 → 跳转首页
+进入 /pages/login/login
+  ↓
+1. 授权头像 (chooseAvatar) + 授权/输入昵称 (type="nickname")
+  ↓
+2. 一键授权手机号 (getPhoneNumber) → POST /api/users/token_miniprogram
+  ├─ 200 OK（用户已存在）
+  │    └─ 保存双 Token & 用户信息 → 直接进入首页 /pages/aim/index
+  └─ 404 / detail="用户不存在"（新用户）
+       └─ 不弹错误提示 → mode 切为 'register'，原地展开：
+            • 性别（男 / 女）
+            • 邮箱（标准 Email 格式校验）
+            • 密码（≥ 6 位）
+          ↓
+       点击「注册并登录」→ POST /api/users/regi_miniprogram
+          ↓
+       200 OK → 保存双 Token & 用户信息 → 直接进入首页 /pages/aim/index
 ```
 
-## 4. 数据模型
+### 3.2 关联文件与 API
 
-### 4.1 全局状态
+- **小程序端文件**：
+  - `pages/login/login.wxml`
+  - `pages/login/login.ts`
+  - `pages/login/login.wxss`
+  - `app.ts`（`checkLoginStatus` 请求序号防竞态覆盖 `sessionkey`）
+  - `services/user/user.ts`（`regiMiniProgram`）
+- **后端路由（`zishu/backend/app/routers/users.py`）**：
+  - `GET /api/users/openid` — `wx.login` code 换取 `session_uuid`
+  - `POST /api/users/token_miniprogram` — 手机号解密登录（存在返回 `200 + TokenModel`，不存在返回 `404 + {"message": "用户不存在", "phone": phone}`）
+  - `POST /api/users/regi_miniprogram` — 新用户原地注册并直接签发 `atoken` + `rtoken`（支持 `{sessionkey, encryptedData, iv, name, email, gender, password}`）
+  - `POST /api/users/token` — 手机号 + 密码登录通道
 
-```typescript
-// app.ts globalData
-interface GlobalData {
-  userInfo: any;              // 用户信息
-  hasUserInfo: boolean;       // 是否已获取用户信息
-  phoneNumber: string;        // 手机号
-  hasPhoneNumber: boolean;    // 是否已绑定手机号
-  accessToken: string | null;
-  refreshToken: string | null;
-  openid: string | null;
-  sessionkey: string | null;
-  code: string | null;
-}
-```
+---
 
-### 4.2 API 接口
+## 4. 状态
 
-| 接口 | 方法 | 描述 |
-|-----|------|-----|
-| `/api/users/openid` | POST | 通过 code 获取 openid |
+- [x] **drafting** / [x] **in_progress** / [x] **done** / [ ] **shipped**
 
-## 5. 验收标准
-
-- [ ] 页面正常显示登录按钮
-- [ ] 微信授权成功获取用户信息
-- [ ] 手机号授权成功获取手机号
-- [ ] 登录信息正确保存到全局状态
-- [ ] 登录完成后正确跳转
-
-## 6. 状态
-
-- **开发状态**: ✅ 已完成
-- **最后更新**: 初始版本
+**变更历史**：
+- 2026-07-15：v2 初版合并登录与原地注册模式
+- 2026-11-25：v2.1 修复 `momo` 分支合并回退问题；恢复无提示原地注册直登流程并补齐性别/邮箱/密码三项与老用户授权直登；彻底移除入塾申请半弹窗；根治全站半弹窗 `catchtap=""` 点击文本框即消失 Bug

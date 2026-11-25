@@ -499,4 +499,6 @@ Page<IPageData, IPageData>({
   genderClass(g?: string): string {
     return g === '男' ? 'gender-male' : g === '女' ? 'gender-female' : '';
   },
+
+  noop() {},
 });

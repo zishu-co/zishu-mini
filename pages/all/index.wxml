@@ -129,7 +129,7 @@
 
   <!-- 共学交流弹窗 -->
   <view class="greet-mask" wx:if="{{showGreetModal}}" bindtap="onCloseGreetModal"></view>
-  <view class="greet-modal" wx:if="{{showGreetModal && greetTarget}}">
+  <view class="greet-modal" wx:if="{{showGreetModal && greetTarget}}" catchtap="noop">
     <view class="greet-header">
       <view>
         <text class="greet-title">👋 向 {{greetTarget.username}} 发起共学交流</text>
@@ -166,7 +166,7 @@
 
   <!-- 101-profile.md: 同路人学习名片弹窗 -->
   <view class="greet-mask" wx:if="{{showProfileModal}}" bindtap="onClosePeerProfile"></view>
-  <view class="greet-modal profile-modal" wx:if="{{showProfileModal && profilePeer}}">
+  <view class="greet-modal profile-modal" wx:if="{{showProfileModal && profilePeer}}" catchtap="noop">
     <view class="profile-head">
       <view class="member-avatar {{profilePeer._genderClass}}">
         <text class="avatar-text">{{profilePeer._avatarChar}}</text>

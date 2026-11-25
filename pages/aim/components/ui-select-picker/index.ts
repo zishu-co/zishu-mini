@@ -52,6 +52,12 @@ Component({
       this.triggerEvent('onClose');
     },
 
+    onVisibleChange(e: any) {
+      if (e?.detail?.visible === false) {
+        this.onClose();
+      }
+    },
+
     open() {
       this.setData({ show: true });
     },

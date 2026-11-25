@@ -601,12 +601,14 @@ page {
 .learn-modal-backdrop {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background: rgba(36, 16, 68, 0.44);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 .learn-dialog {
   position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 560px;
   max-height: 100%;

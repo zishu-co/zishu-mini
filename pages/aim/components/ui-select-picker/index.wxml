@@ -1,4 +1,4 @@
-<t-popup visible="{{show}}" placement="bottom">
+<t-popup visible="{{show}}" placement="bottom" z-index="{{10000}}" bind:visible-change="onVisibleChange">
   <view class="city-picker-box" slot="content">
     <view wx:if="{{headerVisible}}" class="city-picker-header city-picker-more">
       <view class="btn" hover-class="btn__active" catch:tap="onClose">取消</view>

@@ -140,7 +140,7 @@
   >
     <view
       class="jianda-sheet-card"
-      catchtap=""
+      catchtap="noop"
     >
       <view class="jianda-sheet-header">
         <text class="jianda-sheet-title">✍️ 简答题批阅与复盘 ({{jiandaList.length}}题)</text>

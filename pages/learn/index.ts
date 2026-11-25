@@ -742,4 +742,6 @@ Page<ILearnPageData, any>({
       this.setData({ savingCourse: false });
     }
   },
+
+  noop() {},
 });

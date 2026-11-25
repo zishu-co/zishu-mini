@@ -436,7 +436,7 @@
   background: rgba(36, 16, 68, 0.42);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 200;
+  z-index: 10000;
 }
 
 .greet-modal {
@@ -452,7 +452,7 @@
     linear-gradient(180deg, #fffafe 0%, #ffffff 42%, #faf7ff 100%);
   border-radius: 44rpx;
   padding: 28rpx 34rpx 36rpx;
-  z-index: 201;
+  z-index: 10001;
   box-sizing: border-box;
   overflow-y: auto;
   box-shadow:
