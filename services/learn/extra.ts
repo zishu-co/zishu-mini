@@ -28,10 +28,10 @@ export const listAllMentors = (data?: any): Promise<any> => get('/api/learn/list
 export const fetchLearnSheet = (id: number): Promise<any> => get(`/api/learn/learn_sheet/${id}`);
 
 /** finishCourse —— 后端路由 /api/learn/learn/finish/{course_id} */
-export const finishCourse = (courseId: number): Promise<any> => post(`/api/learn/learn/finish/${courseId}`, data);
+export const finishCourse = (courseId: number, data?: any): Promise<any> => post(`/api/learn/learn/finish/${courseId}`, data);
 
 /** submitHomework —— 后端路由 /api/learn/learn/finish/{course_id}/homework */
-export const submitHomework = (courseId: number): Promise<any> => post(`/api/learn/learn/finish/${courseId}/homework`, data);
+export const submitHomework = (courseId: number, data?: any): Promise<any> => post(`/api/learn/learn/finish/${courseId}/homework`, data);
 
 /** fetchSelections —— 后端路由 /api/learn/fetch_selections */
 export const fetchSelections = (data?: any): Promise<any> => get('/api/learn/fetch_selections');

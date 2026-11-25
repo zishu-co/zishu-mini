@@ -28,7 +28,7 @@ export const saveAlbum = (data?: any): Promise<any> => post('/api/video/save_alb
 export const saveVideo = (data?: any): Promise<any> => post('/api/video/savevideo', data);
 
 /** editAlbum —— 后端路由 /api/video/edit_album/{albumid} */
-export const editAlbum = (albumId: number): Promise<any> => put(`/api/video/edit_album/${albumId}`, data);
+export const editAlbum = (albumId: number, data?: any): Promise<any> => put(`/api/video/edit_album/${albumId}`, data);
 
 /** deleteAlbum —— 后端路由 /api/video/delete_album/{albumid} */
 export const deleteAlbum = (albumId: number): Promise<any> => del(`/api/video/delete_album/${albumId}`);

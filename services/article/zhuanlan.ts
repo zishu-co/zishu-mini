@@ -25,7 +25,7 @@ export const deleteArticle = (data?: any): Promise<any> => del('/api/article/del
 export const saveZhuanlan = (data?: any): Promise<any> => post('/api/article/savezhuanlan', data);
 
 /** editZhuanlan —— 后端路由 /api/article/editzhuanlan/{zhuanlanid} */
-export const editZhuanlan = (zhuanlanId: number): Promise<any> => put(`/api/article/editzhuanlan/${zhuanlanId}`, data);
+export const editZhuanlan = (zhuanlanId: number, data?: any): Promise<any> => put(`/api/article/editzhuanlan/${zhuanlanId}`, data);
 
 /** deleteZhuanlan —— 后端路由 /api/article/deletezhuanlan/{zhuanlanid} */
 export const deleteZhuanlan = (zhuanlanId: number): Promise<any> => del(`/api/article/deletezhuanlan/${zhuanlanId}`);

@@ -16,7 +16,7 @@ export const saveGoal = (data?: any): Promise<any> => post('/api/users/save_goal
 export const updateGoalProgress = (data?: any): Promise<any> => post('/api/goals/update_progress', data);
 
 /** abandonGoal —— 后端路由 /api/goals/{goal_id}/abandon */
-export const abandonGoal = (goalId: number): Promise<any> => post(`/api/goals/${goalId}/abandon`, data);
+export const abandonGoal = (goalId: number, data?: any): Promise<any> => post(`/api/goals/${goalId}/abandon`, data);
 
 /** saveGoalV2 —— 后端路由 /api/goals/save_goal */
 export const saveGoalV2 = (data?: any): Promise<any> => post('/api/goals/save_goal', data);
